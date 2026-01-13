@@ -1,0 +1,48 @@
+name: sanad_app
+description: "Sanad App"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Style And Widgets
+  cupertino_icons: ^1.0.8
+
+  # App Controller And Helpers
+  flutter_bloc: ^9.1.1
+  easy_localization: ^3.0.8
+  permission_handler: ^12.0.1
+  flutter_intl_phone_field: ^0.0.7
+  open_file: ^3.5.11
+  url_launcher: ^6.3.2
+
+  # Network
+  dio: ^5.9.0
+  dartz: ^0.10.1
+  pretty_dio_logger: ^1.4.0
+  connectivity_plus: ^7.0.0
+
+  # Utilities
+  share_plus: ^12.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/svgs/
+    - assets/icons/
+    - assets/images/
+    - assets/translations/
+
