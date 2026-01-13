@@ -1,0 +1,1040 @@
+{
+  "core": {
+    "no_content": "No content",
+    "error_title": "Something Went Wrong",
+    "error_desc": "An unexpected error occurred. Please try again or contact support if the issue persists.",
+    "reload": "Reload",
+    "yes": "Yes",
+    "no": "No",
+    "time_ago": {
+      "seconds": "{value} seconds ago",
+      "minutes": "{value} minutes ago",
+      "hours": "{value} hours ago",
+      "days": "{value} days ago",
+      "weeks": "{value} weeks ago",
+      "months": "{value} months ago",
+      "years": "{value} years ago"
+    }
+  },
+  "failure": {
+    "code": {
+      "400": "Bad Request: Invalid syntax.",
+      "401": "Unauthorized: Authentication required.",
+      "403": "Forbidden: Access denied.",
+      "404": "Not Found: Resource not found.",
+      "500": "Internal Server Error: Server error.",
+      "default": "Unexpected Error: Try again later."
+    },
+    "dio": {
+      "connection_timeout": "Connection timeout with ApiServer",
+      "send_timeout": "Send timeout with ApiServer",
+      "connection_error": "No Internet Connection",
+      "receive_timeout": "Receive timeout with ApiServer",
+      "request_canceled": "Request to ApiServer was canceled",
+      "unexpected_error": "Unexpected Error, Please try again!",
+      "ops_error": "Ops There was an Error, Please try again"
+    },
+    "unexpected_error": "Unexpected Error, Please try again!",
+    "refresh": "Refresh",
+    "no_internet": "No Internet Connection"
+  },
+  "validators": {
+    "required": "*required",
+    "email": {
+      "required": "*required",
+      "pattern": "Please enter a valid email address."
+    },
+    "password": {
+      "required": "*required",
+      "identical": "Passwords do not match",
+      "min_length": "Password must be at least 8 characters long",
+      "contain_number": "Password must contain at least one number",
+      "contain_upper_case": "Password must contain at least one uppercase letter",
+      "contain_lower_case": "Password must contain at least one lowercase letter",
+      "contain_special_char": "Password must contain at least one special character",
+      "old_new_same": "Your new password cannot be the same as the old one",
+      "must_include": "Password must include",
+      "contain_special_char_summary": "a special character",
+      "contain_upper_case_summary": "an uppercase letter",
+      "contain_lower_case_summary": "a lowercase letter",
+      "contain_letter_summary": "a letter",
+      "contain_number_summary": "a number",
+      "min_length_summary": "at least 8 characters long",
+      "no_spaces": "Password must not contain spaces",
+      "no_name": "Password must not contain your name",
+      "no_email": "Password must not contain your email address"
+    },
+    "numbers": {
+      "only": "This field must contain only numbers.",
+      "range": "The number must be between {min} and {max}.",
+      "exact_length": "This field must be exactly {length} number long.",
+      "greater_than": "The number must be greater than {min}.",
+      "less_than": "The number must be less than {max}."
+    },
+    "phone": {
+      "required": "*required",
+      "invalid": "Invalid phone number"
+    },
+    "OTP": {
+      "required": "*required",
+      "length": "OTP must be exactly 6 digits long."
+    },
+    "length": {
+      "min": "This field must be at least {length} characters long.",
+      "max": "This field must not exceed {length} characters.",
+      "exact": "This field must be exactly {length} characters long."
+    }
+  },
+  "intro": {
+    "sign_up": "Sign Up",
+    "have_account": "I have an account"
+  },
+  "onboarding": {
+    "item1": {
+      "title": "Sign Up",
+      "desc": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor."
+    },
+    "item2": {
+      "title": "Look for something that interest you",
+      "desc": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor."
+    },
+    "item3": {
+      "title": "Select your luxury products",
+      "desc": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor."
+    },
+    "item4": {
+      "title": "Rent them out",
+      "desc": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor."
+    },
+    "sign_up": "Sign Up",
+    "have_account": "I have an account"
+  },
+  "auth": {
+    "uae_pass": {
+      "title": "Verify your identity",
+      "desc": "Government regulations require us to verify your ID. This helps prevent someone else from creating a Chiaka account in your name.\n\nAfter this step, you’ll be ready to start \nrenting products.",
+      "continue": "Continue",
+      "verify_later": "Verify later"
+    },
+    "survey": {
+      "title": "Create Account",
+      "platforms": {
+        "title": "How did you hear about us?",
+        "desc": "This will help us personalize your experience."
+      },
+      "gender": {
+        "title": "What is your gender?",
+        "desc": "This will help us personalize your experience.",
+        "types": {
+          "male": "Male",
+          "female": "Female",
+          "other": "Other",
+          "non_binary": "Non-Binary"
+        }
+      },
+      "categories": {
+        "title": "What are your interests?",
+        "desc": "Choose 5 categories that best describe you."
+      },
+      "countries": {
+        "title": "Select your country",
+        "desc": "This will help us find more relevant products and experiences in your area."
+      },
+      "continue": "Continue",
+      "skip": "Skip"
+    },
+    "sign_in": {
+      "title": "Sign In",
+      "email": "Email",
+      "password": "Password",
+      "forgot_password": "Forget password?",
+      "phone": "Phone Number",
+      "or": "Or",
+      "continue_with_email": "Continue with Email",
+      "continue_with_apple": "Continue with Apple",
+      "continue_with_google": "Continue with Google"
+    },
+    "sign_up": {
+      "title": "Sign Up",
+      "first_name": "First Name",
+      "last_name": "Last Name",
+      "make_sure": "Make sure it matches the name on your government ID.",
+      "birthday": "Birthday (dd/mm/yyyy)",
+      "birthday_desc": "To sign up, you need to be at least 18. Your Birthday won’t be shared with other people who use Chiaka",
+      "phone": "Phone Number",
+      "phone_desc": "Enter your phone number so we can text you an authentication code",
+      "select_date": "Select Your Date Of Birth",
+      "email": "Email",
+      "select": "Select",
+      "email_desc": "We will email you confirmations and receipts.",
+      "password": "Password",
+      "password_desc": "The password must be at least 8 characters long, contain at least one number, one uppercase letter, and one special character.",
+      "by_selecting": "By selecting Agree and continue, I certifiy that I am 18 years of age and I agree to the Dynamic Layers Terms of Service, Payments Terms of Service and Notification Policy and acknowledge the Privacy Policy.",
+      "continue": "Agree and continue"
+    },
+    "verification": {
+      "title": "Verification",
+      "resend_success": "Resend code success",
+      "message": "Enter the 6-digit code we sent you via your email",
+      "phone_message": "Enter the 6-digit code we sent you via your phone",
+      "continue": "Continue",
+      "send_again": "Send again"
+    },
+    "reset": {
+      "forgot_password": "Forget password",
+      "email": "Email",
+      "forgot_desc": "Enter your email to receive a verification code to reset your password.",
+      "continue": "Continue",
+      "enter_code": "Enter the 6-digit code we sent you via email",
+      "verification": "Verification",
+      "reset_password": "Reset password",
+      "enter_password": "Enter Password",
+      "password_desc": "The password must be at least 8 characters long, contain at least one number, one uppercase letter, and one special character.",
+      "re_enter_password": "Re Enter Password"
+    }
+  },
+  "home": {
+    "navbar": {
+      "home": "Home",
+      "browse": "Browse",
+      "bag": "Cart",
+      "profile": "Profile",
+      "favorites": "Favorites"
+    },
+    "home_body": {
+      "search": "Search",
+      "verify": "Verify email.",
+      "the_love_of_summer": "For The Love of Summer",
+      "what_are_you_renting": "What are you renting for ?",
+      "weddings": "Weddings",
+      "new_arrivals": "New Arrivals",
+      "product": "Product 01",
+      "desc": "Description",
+      "verified": "Verified ",
+      "size_your_moments": "Seize Your Moments",
+      "top_rentals": "Top Rentals",
+      "for_outs": "For Outs and Abouts",
+      "rent_by_price": "Rent by Price",
+      "under_500_aed": "UNDER\nAED 500 ",
+      "all_categories": "All Categories",
+      "browse_all": "Browse All ",
+      "watches": "Watches",
+      "bags": "Cart",
+      "accessories": "Accessories"
+    }
+  },
+  "browse": {
+    "sort": {
+      "top_rated": "Top Rated",
+      "new_arrival": "New Arrival",
+      "trending": "Trending",
+      "recommend": "Recommended",
+      "price_low": "Price: Low to High",
+      "price_high": "Price: High to Low"
+    }
+  },
+  "notifications": {
+    "notifications_settings": {
+      "title": "Notifications",
+      "discount": "Discount and sales",
+      "discount_desc": "Be first in line to nab the stuff you love for less",
+      "arrivals": "New arrvials",
+      "arrivals_desc": "Be first in line to nab the stuff you love for less",
+      "promotions": "Exclusive offers & promotions",
+      "promotions_desc": "Enjoy a birthday treat, as well as tailored rewards and account updates",
+      "order_return": "Order & Return updates",
+      "order_return_desc": "Be first in line to nab the stuff you love for less"
+    },
+    "title": "Notification Center",
+    "turn_on": "Turn on notifications?",
+    "turn_on_desc": "Don’t miss important messages like upcoming & return rental returns and activity.",
+    "get_deals": "Get product deals, personalized recommendations, and more",
+    "yes": "Yes, notify me",
+    "skip": "Skip",
+    "headline": "Headline",
+    "new": "New",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "description": "Description",
+    "no_notification": "No Notifications",
+    "no_notification_desc": "Here you will be informed about new developments within our app and stay up to date."
+  },
+  "search": {
+    "title": "Search",
+    "recent": "Recent",
+    "clear_all": "Clear All",
+    "blue_shirt": "Blue Shirt"
+  },
+  "favorites": {
+    "brand": "Brand",
+    "color": "Colour",
+    "size": "Size",
+    "reset": "Reset"
+  },
+  "filters": {
+    "title": "Filter",
+    "close": "Close",
+    "new_arrivals": "New Arrivals",
+    "sort": "Sort",
+    "brand": "Brands",
+    "all": "All",
+    "price": "Price",
+    "sale": "Sale",
+    "color": "Color",
+    "apply": "Apply filters",
+    "sorting": "Sorting",
+    "top_rated": "Top Rated",
+    "trending": "Trending",
+    "recommend": "Recommend ",
+    "price_high_low": "Price (High to Low)",
+    "price_low_high": "Price (Low to High)",
+    "rental_period": "Rental Period",
+    "days": "Days",
+    "delivery_date": "Delivery date",
+    "return_date": "Return date",
+    "apply_changes": "Apply changes",
+    "clear_dates": "Clear dates"
+  },
+  "cart": {
+    "title": "Shopping cart",
+    "empty_bag": "Your cart is empty",
+    "delete_item": "Do you want to delete the item?",
+    "item_title": "Item A Title",
+    "item_desc": "Product description",
+    "rental_period": "Rental Period",
+    "discount_promo": "Discount promo",
+    "added_successfully": "Item added to cart successfully",
+    "promo_code": "Spend 100 AED and get 10% off everything with the code: get10",
+    "empty_bag_desc": "Items remain in your cart for 60 minutes, and then they are moved to your saves Items.",
+    "checkout": "Checkout"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "thankYou": "Thank you for your order",
+    "confirmationMessage": "Please check your email inbox for your order confirmation.",
+    "orderTotal": "Order Total",
+    "orderReference": "Order Reference",
+    "orderStatus": "Order Status",
+    "myOrders": "My Orders",
+    "homeScreen": "Home Screen"
+  },
+  "AED": "AED",
+  "menu": {
+    "title": "Profile",
+    "become_lender_title": "Become a Lender",
+    "become_lender_subtitle": "It’s simple to get set up and start earning.",
+    "name": "Omar Elkateb",
+    "view_profile": "View profile",
+    "become_lender": "Become a Lender",
+    "become_lender_desc": "It's simple to get set up and start earning.",
+    "settings": "Settings",
+    "account_info": "Account information",
+    "my_orders": "My orders",
+    "my_addresses": "My addresses",
+    "payments_and_payouts": "Payments and payouts",
+    "login_and_security": "Login & Security",
+    "notifications": "Notifications",
+    "privacy_and_sharing": "Privacy and sharing",
+    "tools": "Help & Support",
+    "report_a_concern": "Report a concern",
+    "give_feedback": "Give us Feedback",
+    "legal": "Legal",
+    "terms_of_service": "Terms of Service",
+    "privacy_policy": "Privacy Policy",
+    "open_source_licenses": "Open source licenses",
+    "refund": "Refund policy",
+    "logout": "Logout",
+    "version": "VERSION 23.21 (202312)",
+    "switch_to_lender": "Switch to Lender"
+  },
+  "edit_profile": {
+    "name": "Name",
+    "edit_info": "Edit account info",
+    "first_name": "First name",
+    "last_name": "Last name",
+    "email": "Email",
+    "email_helper": "Enter your email so we can send you an authentication code",
+    "phone": "Phone",
+    "phone_helper": "Enter your phone number so we can send you an authentication code",
+    "phone_number": "Phone number",
+    "passport_id": "Passport ID",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "submit_changes": "Save changes",
+    "provider_verified": "Provider & verified"
+  },
+  "security": {
+    "settings": "Security Settings",
+    "title": "Security",
+    "login": "Login & Security",
+    "password": "Password",
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "update": "Update",
+    "cancel": "Cancel",
+    "delete_account": "Delete Account",
+    "submit_changes": "Save changes",
+    "password_updated_successfully": "Password updated successfully"
+  },
+  "delete_account": {
+    "settings": "Settings",
+    "title": "Delete your account",
+    "desc": "Before we delete your data, we’ll just need you to answer a few questions. to confirm you’re the true owner of this account, we may also contact you at.",
+    "delete_warning": "Deleting your renter profile will also delete your lender profile and listed products.",
+    "comment_optional": "Comment (optional)",
+    "confirm": "Confirm Deletion",
+    "select_reason": "Select reason",
+    "success": {
+      "title": "Account Deleted Successfully",
+      "desc": "Your account has been permanently deleted. We’re sorry to see you go!",
+      "done": "Done"
+    },
+    "reasons": {
+      "not_satisfied": "I’m not satisfied with my experience on Chiaka",
+      "privacy_concern": "I’m not confident about how Chiaka treats my private data",
+      "duplicate_account": "I want to delete a duplicate account",
+      "not_using": "I don’t use Chiaka enough"
+    }
+  },
+  "addresses": {
+    "my_addresses": "My addresses",
+    "create_address": "Create Address",
+    "shipping_address": "Shipping Address",
+    "add_new_address": "Add new address",
+    "name": "Address Name",
+    "number": "Building Number",
+    "street": "Street",
+    "city": "City",
+    "postal_code": "Postal Code",
+    "country": "Country",
+    "submit": "Submit",
+    "delete_item": "Do you want to delete the address?",
+    "no_addresses": "No Addresses Yet",
+    "add_address_to_continue": "Add your first address to get started. Keep all your important locations in one place.",
+    "address_type": {
+      "title": "Address Type",
+      "apartment": "Apartment",
+      "house": "House",
+      "office": "Office"
+    }
+  },
+  "contact_us": {
+    "title": "Report a concern",
+    "user_id": "User ID: {id}",
+    "full_name": "Full name",
+    "email": "Email",
+    "topic_title": "Topic title",
+    "comments": "Comments",
+    "submit": "Submit",
+    "success": {
+      "title": "Sent successfully",
+      "desc": "Thank you for reaching out! We've received your message and our team will be in touch with you shortly. We appreciate your patience and look forward to assisting you.",
+      "done": "Done"
+    }
+  },
+  "legal": {
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "refund": "Refund Policy"
+  },
+  "products": {
+    "all": "All",
+    "title": "Products",
+    "unavailable_range": "The selected period includes unavailable dates. Please choose another date.",
+    "rental_period": {
+      "4_days": "4 Days",
+      "8_days": "8 Days",
+      "16_days": "16 Days"
+    },
+    "product_details": {
+      "condition": {
+        "title": "Condition",
+        "no_signs_of_wear": "Like new (no signs of wear)",
+        "signs_of_wear": "Signs of wear"
+      },
+      "verified": "Verified",
+      "pending_verification": "Pending Verification",
+      "title": "Product details",
+      "product": "Product",
+      "product_code": "Model number",
+      "specifications": "Specifications",
+      "model": "Model",
+      "color": "Color",
+      "size": "Size",
+      "weight": "Weight",
+      "about": "About the product",
+      "about_desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+      "reviews": "Reviews",
+      "overall_rating": "Overall rating",
+      "stars": "stars",
+      "all_reviews": "All Reviews",
+      "days_ago": "days ago",
+      "good_product": "Good product but expensive",
+      "post_review": "Post review",
+      "write_review": "Write a review",
+      "thoughts": "Thoughts on this product?",
+      "your_overall_rating": "Your overall rating",
+      "write_your_review": "Write your review here..",
+      "review_title": "Review title",
+      "model_name": "Model name",
+      "brand_name": "Brand name",
+      "product_details": "Product Details",
+      "product_specs": "Read more about the product specs",
+      "available_options": "Available options ",
+      "available_options_desc": "2 items of this product",
+      "rental_period": "Rental Period",
+      "rental_period_desc": "Select duration and date.",
+      "some_reviews": "Some of the reviews",
+      "view_all": "View all reviews",
+      "you_might_also_like": "You might also like",
+      "starting": "Starting",
+      "add_to_bag": "Add to cart"
+    }
+  },
+  "orders": {
+    "appbar": "Orders",
+    "details": "Order details",
+    "reschedule_item": "Reschedule Item",
+    "cancel_item": "Cancel Item",
+    "status": {
+      "all": "All",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "in_progress": "In Progress",
+      "shipped": "Shipped",
+      "declined": "Declined",
+      "delivered": "Delivered",
+      "completed": "Completed",
+      "cancelled": "Canceled",
+      "returned": "Returned"
+    },
+    "date_range": {
+      "1_month": "Last 30 Days",
+      "3_months": "Last 3 Months"
+    },
+    "write_review": "Write a Review"
+  },
+  "cancel_order": {
+    "appbar": "Cancel Order",
+    "title": "Heads Up!",
+    "refund_policy": "If you cancel your order, your refund amount may vary depending on when you cancel:\n • Full refund for early cancellations\n • Partial refund if it's closer to the delivery date\n • No refund for last-minute cancellations\nAn invoice will be sent to the following email",
+    "select_reason": "Select a reason",
+    "comment_optional": "Comment (optional)",
+    "confirm": "Confirm",
+    "reasons": {
+      "reason1": "Product is unavailable",
+      "reason2": "Unexpected circumstances"
+    },
+    "success": {
+      "title": "Order Cancelled",
+      "desc": "Your order item has been successfully cancelled.",
+      "done": "Done"
+    }
+  },
+  "reschedule_order": {
+    "appbar": "Reschedule Order",
+    "success": {
+      "title": "Order Rescheduled",
+      "desc": "Your order has been successfully rescheduled.",
+      "done": "Done"
+    }
+  },
+  "create_review": {
+    "write_review": "Write a Review",
+    "thoughts": "What are your thoughts?",
+    "your_overall_rating": "Your Overall Rating",
+    "comment_optional": "Comment (optional)",
+    "post_review": "Post Review",
+    "submit": "Submit",
+    "success": {
+      "title": "Thank You for Your Review!",
+      "desc": "Your feedback helps us improve our services. We appreciate your time!",
+      "done": "Done"
+    }
+  },
+  "lender_intro": {
+    "app_bar_title": "Create account",
+    "main_title": "It's simple to get started on Chiaka",
+    "lets_get_started": "Let's get started",
+    "items": {
+      "find_fast": {
+        "title": "Find it fast, every time.",
+        "desc": "Use a preferred method to recognize your item."
+      },
+      "tell_about_listing": {
+        "title": "Tell us about your listing",
+        "desc": "Share some basic info, like where will it be and the rental requirements"
+      },
+      "make_stand_out": {
+        "title": "Make it stand out",
+        "desc": "Add 4 or more photos plus a title and description."
+      },
+      "verify_publish": {
+        "title": "Verify and publish",
+        "desc": "Choose your preferred pricing and receive a listing authentication badge."
+      }
+    }
+  },
+  "lender_home": {
+    "navbar": {
+      "home": "Home",
+      "listing": "Listing",
+      "alerts": "Alerts",
+      "menu": "Menu"
+    },
+    "views": {
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing",
+      "completed": "Completed",
+      "empty_upcoming_orders": "You don't have any upcoming orders",
+      "empty_ongoing_orders": "You don't have any ongoing rentals at the moment",
+      "empty_completed_orders": "You don't have any completed orders",
+      "empty_upcoming_orders_text": "Looks like a free day. We'll keep you posted on any updates.",
+      "empty_ongoing_orders_text": "Orders being prepared, delivered, or awaiting return will appear here.",
+      "empty_completed_orders_text": "No bookings on the horizon just yet. Stay tuned."
+    }
+  },
+  "lander_orders": {
+    "filters": {
+      "all": "All",
+      "title": "Filters",
+      "apply": "Apply filters",
+      "reset": "Reset",
+      "done": "Done",
+      "search": "Search",
+      "sort_by": {
+        "title": "Sort by",
+        "all": "All",
+        "start_date_latest": "Start date (Latest First)",
+        "start_date_earliest": "Start date (Earliest First)",
+        "end_date_latest": "End date (Latest First)",
+        "end_date_oldest": "End date (Oldest First)",
+        "item_name_ascending": "Item name (A-Z)",
+        "item_name_descending": "Item name (Z-A)"
+      },
+      "statuses": {
+        "title": "Order Status",
+        "subtitle": "Select one or more",
+        "all": "All",
+        "pending_approval": "Pending approval",
+        "confirmed": "Approved",
+        "in_progress": "In progress",
+        "delayed_return": "Delayed return",
+        "returned": "Returned",
+        "refunded": "Refunded",
+        "cancelled": "Cancelled",
+        "declined": "Declined"
+      },
+      "group_by": {
+        "title": "Group by",
+        "all": "All",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "yesterday": "Yesterday",
+        "this_week": "This week",
+        "last_week": "Last week",
+        "next_week": "Next week",
+        "this_month": "This month",
+        "last_month": "Last month",
+        "next_month": "Next month",
+        "this_year": "This year"
+      }
+    },
+    "details": {
+      "app_bar": "Order Details",
+      "order_number": "Order Number: {number}",
+      "details_listing": "View listing details",
+      "model": "Model",
+      "color": "Color",
+      "size": "Size",
+      "rental_duration": "Rental Duration",
+      "next_rental": "Next Rental",
+      "rental_earnings": "Rental Earnings",
+      "need_help": "Need Help?",
+      "need_help_description": "Contact our support team"
+    },
+    "actions": {
+      "approve": {
+        "title": "Approve",
+        "description": "Are you sure you want to approve this order?",
+        "success": "Order approved successfully"
+      },
+      "decline": {
+        "title": "Decline",
+        "description": "Are you sure you want to decline this order?",
+        "success": "Order declined successfully"
+      },
+      "cancel": {
+        "title": "Cancel rental",
+        "description": "Are you sure you want to cancel this order?",
+        "success": "Order cancelled successfully"
+      }
+    },
+    "cancel": {
+      "app_bar": "Cancel Order",
+      "title": "Cancel Order: {number}",
+      "warning_message": "Frequent cancellations of rental orders may impact your rating and reduce the visibility of your products in the application.",
+      "cancel_order_button": "Cancel rental",
+      "keep_order_button": "Keep Order",
+      "reasons": {
+        "select_reason": "Select a reason",
+        "reason1": "Product is unavailable",
+        "reason2": "Unexpected circumstances"
+      },
+      "comment_optional": "Comment (optional)"
+    },
+    "help": {
+      "app_bar": "Help Center",
+      "title": "Need Help?",
+      "order_number": "Order Number: {number}",
+      "reasons": {
+        "title": "Select reason",
+        "select_reason": "Select reason",
+        "reason1": "The product is not as described",
+        "reason2": "The product is not available"
+      },
+      "urgency_level": {
+        "title": "Select urgency level",
+        "select_urgency_level": "Select urgency level",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "urgent": "Urgent"
+      },
+      "comment_optional": "Comment (optional)",
+      "submit": "Submit",
+      "success": "Help request sent successfully"
+    },
+    "periods": {
+      "4_days": "4 Days",
+      "8_days": "8 Days",
+      "16_days": "16 Days"
+    }
+  },
+  "lender_menu": {
+    "title": "Menu",
+    "account": "Account",
+    "settings": "Settings",
+    "lending": "Lending",
+    "new_listing": "Create a new listing",
+    "earnings": "Earnings",
+    "payments": "Payments",
+    "logout": "Logout",
+    "version": "VERSION 23.21 (202312)",
+    "switch_to_renter": "Switch to renter"
+  },
+  "lander_profile_settings": {
+    "title": "Profile",
+    "edit_personal_information": "Edit personal information",
+    "my_addresses": "My Address",
+    "payments": "Payments",
+    "payouts": "Payouts",
+    "notifications_settings": "Notification settings",
+    "privacy_and_sharing": "Privacy and sharing"
+  },
+  "ai": {
+    "brands": {
+      "select_title": "Select a brand",
+      "select_description": "Brand selection helps improve scan accuracy.",
+      "select_hint": "Select a brand",
+      "continue": "Continue"
+    },
+    "search_manual": {
+      "app_bar_title": "Search manually",
+      "search_hint": "Search for a product",
+      "empty_title": "No products found",
+      "empty_description": "Try searching for a different product.",
+      "create_manually": "Create manually"
+    },
+    "product": {
+      "model": "Model",
+      "color": "Color",
+      "size": "Size",
+      "create_listing": "Create listing"
+    },
+    "scan_image_results": {
+      "app_bar_title": "Scan image results",
+      "empty_title": "No products found",
+      "empty_description": "Try scanning a different image.",
+      "create_manually": "Create manually"
+    }
+  },
+  "listing": {
+    "address": {
+      "title": "Address required to continue",
+      "description": "Please add your full address to proceed. This helps us verify your location and improves the visibility of your listing.",
+      "button": "Add address"
+    },
+    "create": {
+      "form_error": "Please fill in all the required fields.",
+      "app_bar_title": "Create Listing",
+      "select_color": "Select color",
+      "select_size": "Select size",
+      "manufacturer_details": {
+        "title": "Manufacture details",
+        "brand_name_hint": "Brand name*",
+        "brand_name_label": "Brand name*",
+        "model_name_hint": "Model name*",
+        "model_name_label": "Model name*",
+        "model_year_hint": "Model year*",
+        "model_year_label": "Model year*",
+        "serial_number_hint": "Serial number*",
+        "serial_number_label": "Serial number*",
+        "serial_number_helper": "This information will only be disclosed for verification purposes and will not be shown on the product details for the renter.",
+        "color_hint": "Color*",
+        "color_label": "Color*",
+        "size_hint": "Size*",
+        "size_label": "Size*"
+      },
+      "condition": {
+        "title": "Condition",
+        "no_signs_of_wear": "Like new (no signs of wear)",
+        "signs_of_wear": "Signs of wear",
+        "error": "Please select the product condition."
+      },
+      "description": {
+        "title": "Description",
+        "hint": "Please type in your details*",
+        "label": "Description*",
+        "helper": "Tell us a bit more about your product. When did you buy it? what is unique about it. This will be shown on the product details for renter."
+      },
+      "price": {
+        "title": "Pricing",
+        "subtitle": "Set Your Preferred Rental Period",
+        "description": "Pick one or more rental durations: 4, 8, or 16 days. The more options you offer, the more visibility your listing receives"
+      },
+      "period": {
+        "title": "Rental period",
+        "4_days": "4 days",
+        "8_days": "8 days",
+        "16_days": "16 days",
+        "error": "Select at least one rental period."
+      },
+      "period_rates": {
+        "error": "Please add rates for the selected periods."
+      },
+      "continue": "Continue",
+      "options": {
+        "app_bar_title": "Product Listing",
+        "headline": "Easily locate what's yours.",
+        "scan_title": "Scan your product",
+        "scan_desc": "Identify the model from a photo and fill in the product details automatically",
+        "search_title": "Search for your product",
+        "search_desc": "Enter your product's brand, model, or reference number",
+        "create_manual_listing": "Create manual listing"
+      },
+      "success": "Listing created successfully."
+    },
+    "complete_create": {
+      "app_bar_title": "Listing information",
+      "upload_images": {
+        "title": "Upload images",
+        "subtitle": "Authentically and impressively presented",
+        "description": "1. Take sharp and well-lit pictures\n2. Make sure that any dents, scratches and other signs of wear are clearly visible\n3. Try to photograph your product from all angles."
+      },
+      "product_images": {
+        "title": "Product images",
+        "error": "You must upload product images.",
+        "min_error": "Please upload at least {min} product images."
+      },
+      "ownership_images": {
+        "title": "Ownership & Authentication",
+        "error": "Please upload ownership and authentication images."
+      },
+      "add_photos": "Add photos",
+      "photos_uploaded": "{uploaded} of {count} Photos uploaded",
+      "max_images_error": "You can upload up to {count} images only.",
+      "pick_images_error": "Couldn't pick images. Please try again.",
+      "duplicate_images_error": "These images are already added. Please select different images.",
+      "select_image_source": "Select Image Source",
+      "camera": "Camera",
+      "gallery": "Gallery",
+      "camera_permission_denied": "Camera permission is required to take photos.",
+      "camera_permission_permanently_denied": "Camera permission is permanently denied. Please enable it from settings.",
+      "gallery_permission_denied": "Photo library permission is required to select photos.",
+      "gallery_permission_permanently_denied": "Photo library permission is permanently denied. Please enable it from settings."
+    },
+    "update": {
+      "app_bar_title": "Edit listing",
+      "continue": "Continue",
+      "save": "Save changes",
+      "success": "Listing updated successfully.",
+      "missing_id": "Unable to update listing. Missing identifier."
+    },
+    "complete_update": {
+      "app_bar_title": "Listing information"
+    },
+    "filters": {
+      "all": "All",
+      "search": "Search",
+      "title": "Filters",
+      "apply": "Apply filters",
+      "sort_by": {
+        "title": "Sort by",
+        "newest_first": "Newest first",
+        "oldest_first": "Oldest first",
+        "price_low_to_high": "Price: Low to High",
+        "price_high_to_low": "Price: High to Low",
+        "highest_rated": "Highest rated",
+        "shortest_duration_first": "Shortest duration first",
+        "longest_duration_first": "Longest duration first"
+      },
+      "brand": {
+        "title": "Brand"
+      },
+      "rental_status": {
+        "title": "Rental status",
+        "all": "All",
+        "upcoming": "Upcoming",
+        "ongoing": "Ongoing",
+        "completed": "Completed"
+      },
+      "rating": {
+        "title": "Rating",
+        "all": "All",
+        "five_stars": "5 stars",
+        "four_stars": "4 stars",
+        "three_stars": "3 stars",
+        "two_stars": "2 stars",
+        "one_star": "1 star",
+        "unrated": "Unrated"
+      },
+      "rental_duration": {
+        "title": "Rental duration",
+        "all": "All",
+        "four_days": "4 days",
+        "eight_days": "8 days",
+        "sixteen_days": "16 days"
+      },
+      "added_date": {
+        "title": "Added date",
+        "all": "All",
+        "last_24_hours": "Last 24 hours",
+        "last_7_days": "Last 7 days",
+        "last_30_days": "Last 30 days",
+        "older": "Older"
+      },
+      "colors": {
+        "title": "Color",
+        "all": "All",
+        "red": "Red",
+        "blue": "Blue",
+        "green": "Green",
+        "yellow": "Yellow",
+        "purple": "Purple",
+        "orange": "Orange",
+        "pink": "Pink",
+        "brown": "Brown",
+        "gray": "Gray",
+        "black": "Black",
+        "white": "White"
+      },
+      "sizes": {
+        "title": "Size",
+        "all": "All",
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large"
+      },
+      "rental_rate": {
+        "title": "Rental Rate",
+        "apply": "Apply"
+      }
+    },
+    "help": {
+      "help_center": "Help Center",
+      "reasons": {
+        "title": "Select reason",
+        "select_reason": "Select reason",
+        "reason1": "The product is not as described",
+        "reason2": "The product is not available"
+      },
+      "comment_optional": "Comment (optional)",
+      "submit": "Submit",
+      "success": "Help request sent successfully"
+    },
+    "details": {
+      "app_bar": "Listing Details",
+      "rental_rate": "Rental Rate",
+      "availability": "Availability",
+      "availability_description": "Modify rental periods",
+      "rental_status": "Rental Status",
+      "next_rental": "Next Rental",
+      "last_rental": "Last Rental",
+      "no_of_rentals": "Number of Rentals",
+      "total_earnings": "Total Earnings",
+      "rating_&_reviews": "Rating & Reviews",
+      "need_help": "Need Help?",
+      "need_help_description": "Contact our support team",
+      "model": "Model",
+      "color": "Color",
+      "size": "Size",
+      "authentication_message": "Authentication Message",
+      "delete": "Delete Listing",
+      "edit": "Edit"
+    },
+    "delete": {
+      "title": "Delete Listing",
+      "description": "Are you sure you want to delete this listing?",
+      "button": "Delete Listing",
+      "success": "Listing deleted successfully"
+    },
+    "reviews": {
+      "app_bar": "Ratings & reviews",
+      "dispute_rating": "Dispute rating",
+      "view": {
+        "all": "All",
+        "five_stars": "5 Stars",
+        "four_stars": "4 Stars",
+        "three_to_one_stars": "3 to 1"
+      }
+    },
+    "overview": {
+      "create_new_listing": "Add new listing",
+      "empty_title": "No listings yet",
+      "empty_description": "List your first product to get started. You'll need at least one listing to track and manage your orders."
+    }
+  },
+  "map": {
+    "appbar": "Select Location",
+    "location_title": "Location",
+    "take_current_location": "Use Current Location",
+    "location_required": "Location is required",
+    "current_location_set": "Location set: {lat}, {lng}",
+    "current_location_not_set": "Location not set",
+    "location_service_disabled": "Location services are disabled. Please enable them in settings.",
+    "location_permission_denied": "Location permission denied",
+    "location_permission_permanently_denied": "Location permission permanently denied. Please enable it in app settings.",
+    "location_timeout": "Location request timed out. Please try again.",
+    "location_error": "An error occurred while getting location. Please try again.",
+    "continue": "Continue",
+    "search_place": "Search for a place",
+    "search_error_title": "Search error"
+  },
+  "lander_create_address": {
+    "app_bar": "Create Address",
+    "selected_place": "Selected Place",
+    "change_place": "Change",
+    "shipping_address": "Shipping Address",
+    "address_name": "Address Name",
+    "apartment_or_villa_number": "Apartment or Villa Number",
+    "street": "Street",
+    "postal_code": "Postal Code",
+    "country": "Country",
+    "continue": "Continue"
+  },
+  "earnings": {
+    "title": "Earnings",
+    "net_earnings": "Net earnings",
+    "from_last_month": "from last month",
+    "paid": "Paid",
+    "order": "Order #",
+    "periods": {
+      "title": "Select period",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year"
+    }
+  }
+}
