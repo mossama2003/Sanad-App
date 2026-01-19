@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shuaa_alamal/core/style/app_text_style.dart';
 
 import '../../constant/app_size.dart';
 import '../../style/app_colors.dart';
+import '../../style/app_text_style.dart';
 import 'custom_icon.dart';
 
 class CustomFieldText extends StatelessWidget {
@@ -67,10 +67,7 @@ class CustomFieldText extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (title != null) ...[
-          Text(
-            title!,
-            style: TextStyle(color: AppColors.grey700).sm,
-          ),
+          Text(title!, style: TextStyle(color: AppColors.grey700).xs),
           SizedBox(height: AppSize.getHeight(6)),
         ],
         TextFormField(
@@ -93,6 +90,12 @@ class CustomFieldText extends StatelessWidget {
           validator: validator,
           inputFormatters: inputFormatters,
           decoration: InputDecoration(
+            hintStyle: TextStyle(color: AppColors.grey).xs,
+
+            contentPadding: padding,
+            hintText: hintText ?? labelText ?? '',
+            errorStyle: TextStyle(fontSize: AppSize.font(14)),
+
             suffixIconConstraints: BoxConstraints(
               minHeight: AppSize.getHeight(40),
               maxHeight: AppSize.getHeight(40),
@@ -101,14 +104,35 @@ class CustomFieldText extends StatelessWidget {
               minHeight: AppSize.getHeight(40),
               maxHeight: AppSize.getHeight(40),
             ),
-            contentPadding: padding,
-            hintText: hintText ?? labelText ?? '',
-            errorStyle: TextStyle(fontSize: AppSize.font(14)),
+
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppColors.grey300),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+
+              borderSide: BorderSide(color: AppColors.grey300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+
+              borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+
+              borderSide: BorderSide(color: Colors.red),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+
+              borderSide: BorderSide(color: Colors.red, width: 1.5),
+            ),
+
             prefixIcon: iconStart != null
                 ? Row(
                     mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       CustomIcon(
                         icon: iconStart!,
@@ -119,11 +143,10 @@ class CustomFieldText extends StatelessWidget {
                     ],
                   )
                 : null,
+
             suffixIcon: iconEnd != null
                 ? Row(
                     mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       CustomIcon(
                         icon: iconEnd!,

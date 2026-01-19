@@ -1,10 +1,10 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:shuaa_alamal/core/style/app_text_style.dart';
 
 import '../../constant/app_assets.dart';
 import '../../constant/app_size.dart';
 import '../../style/app_colors.dart';
+import '../../style/app_text_style.dart';
 import 'custom_icon.dart';
 
 class CustomFieldDropdown<T> extends StatelessWidget {
@@ -33,14 +33,7 @@ class CustomFieldDropdown<T> extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (title != null) ...[
-          Text(
-            title!,
-            style: TextStyle(
-              fontSize: AppSize.font(16),
-              fontWeight: FontWeight.w500,
-              color: AppColors.textBlack,
-            ),
-          ),
+          Text(title!, style: TextStyle(color: AppColors.grey700).xs),
           SizedBox(height: AppSize.getHeight(6)),
         ],
         DropdownButtonFormField2<T>(
@@ -61,17 +54,17 @@ class CustomFieldDropdown<T> extends StatelessWidget {
             padding: AppSize.padding(horizontal: 14),
           ),
           alignment: Alignment.center,
-          style: TextStyle(color: AppColors.grey900).sm.copyWith(
-                height: AppSize.fontHeight(16, 20),
-              ),
+          style: TextStyle(
+            color: AppColors.grey900,
+          ).sm.copyWith(height: AppSize.fontHeight(16, 20)),
           onChanged: enabled ? onChanged : null,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           hint: hintText != null && selected == null
               ? Text(
                   '$hintText',
-                  style: TextStyle(color: AppColors.grey900).sm.copyWith(
-                        height: AppSize.fontHeight(16, 20),
-                      ),
+                  style: TextStyle(
+                    color: AppColors.grey900,
+                  ).sm.copyWith(height: AppSize.fontHeight(16, 20)),
                 )
               : null,
           decoration: InputDecoration(

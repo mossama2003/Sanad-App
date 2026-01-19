@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 
-import '../../../helper/app_locals.dart';
 import '../../local/cache/cache_helper.dart';
 
 /// An interceptor that handles the error responses from a [DIO] request.
@@ -12,13 +11,13 @@ class AppInterceptors extends Interceptor {
   /// On [REQUEST] API
   @override
   Future<void> onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    final String? token = await CacheHelper.get(CacheKeys.token);
+      RequestOptions options,
+      RequestInterceptorHandler handler,
+      ) async {
+    final String? lang = CacheHelper.get('lang');
+    final String? token = CacheHelper.get('token');
     options.headers.addAll({
-      'Accept': 'application/json',
-      'Accept-Language': AppLocales.currentLocaleCode,
+      if (lang != null) 'lang': lang,
       if (token != null) 'Authorization': 'Bearer $token',
     });
     return handler.next(options);
@@ -30,3 +29,4 @@ class AppInterceptors extends Interceptor {
     return handler.next(response);
   }
 }
+

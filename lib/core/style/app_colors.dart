@@ -7,7 +7,10 @@ class AppColors {
 
   static bool get isDark => CacheHelper.get(CacheKeys.theme) == CacheKeys.dark;
 
-  static const Color primary = Color(0xffD81F5F);
+  static const Color primary = Color(0xff00b281);
+  static const Color secondary = Color(0xffedfdf5);
+  static const Color green = Color(0xff008000);
+  static const Color laserBlue = Color(0xff416efd);
 
   static const Color brand50 = Color(0xffFFF5F9);
   static const Color brand200 = Color(0xffFFB6CF);
@@ -39,7 +42,7 @@ class AppColors {
   static const Color border = Color(0xffEAECF0);
 
   static const Color buttonGhost = Color(0xff7E49FF);
-  static const Color buttonPrimary = Color(0xffD81F5F);
+  static const Color buttonPrimary = Color(0xff00b281);
   static const Color buttonPrimaryDisabled = Color(0xffF2F4F7);
   static const Color buttonDisabledText = Color(0xff98A2B3);
   static const Color buttonPrimaryText = Color(0xffE8E7E6);

@@ -1,0 +1,24 @@
+{
+  "name": "open_file_ios",
+  "version": "1.0.3",
+  "summary": "The iOS implementation of open_file.",
+  "description": "A new Flutter project.",
+  "homepage": "https://github.com/crazecoder/open_file/tree/master/open_file_ios",
+  "license": {
+    "file": "../LICENSE"
+  },
+  "authors": {
+    "crazecoder": "21527312@qq.com"
+  },
+  "source": {
+    "path": "."
+  },
+  "source_files": "open_file_ios/Sources/open_file_ios/**/*.{h,m}",
+  "public_header_files": "open_file_ios/Sources/open_file_ios/**/*.h",
+  "dependencies": {
+    "Flutter": []
+  },
+  "platforms": {
+    "ios": "12.0"
+  }
+}

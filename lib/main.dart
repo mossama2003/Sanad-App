@@ -1,80 +1,76 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'core/helper/app_helper.dart';
+import 'core/helper/app_locals.dart';
+import 'core/helper/app_navigator.dart';
+import 'core/network/local/cache/cache_helper.dart';
+import 'core/network/remote/api/dio_helper.dart';
+import 'core/style/app_theme.dart';
+import 'features/onboarding/presentation/screens/onboarding_screen.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  /// SHARED PREFERENCE INITIALIZATION
+  await CacheHelper.init();
+
+  /// LANGUAGE INIT
+  await EasyLocalization.ensureInitialized();
+  await AppLocales.init();
+
+  /// DIO INITIALIZATION
+  DioHelper.init();
+
+  /// DISABLE AUTO ROTATE
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  runApp(
+    EasyLocalization(
+      path: 'assets/translations',
+      startLocale: AppLocales.currentLocale,
+      fallbackLocale: AppLanguage.english.locale,
+      supportedLocales: AppLocales.supportedLocales,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+    return GestureDetector(
+      onTap: AppHelper.closeKeyboard,
+      child: MaterialApp(
+        title: 'CHIAKA',
+        home: OnboardingScreen(),
+        navigatorKey: AppNavigator.key,
+        debugShowCheckedModeBanner: false,
+        themeMode: ThemeMode.light,
+        theme: AppTheme.appLightTheme,
+        locale: context.locale,
+        supportedLocales: context.supportedLocales,
+        localizationsDelegates: context.localizationDelegates,
+        builder: (context, child) =>
+            ScrollConfiguration(behavior: AppBehavior(), child: child!),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
+class AppBehavior extends ScrollBehavior {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
   }
 }

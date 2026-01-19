@@ -20,51 +20,25 @@ class AppSvg {
 
   static String sarSymbol = '$icons/sar-symbol.svg';
   static String successBooking = '$svg/success-booking.svg';
+  static String google = '$svg/google.svg';
+  static String apple = '$svg/apple.svg';
 }
 
 class AppImages {
-  static final String slider = '$images/slider.png';
-  static final String logo = "$images/logo.png";
-  static final String logoMark = "$images/logo_mark.png";
+  static String onboardingImage1 = '$images/onboarding1.png';
+  static String onboardingImage2 = '$images/onboarding2.png';
+  static String onboardingImage3 = '$images/onboarding3.png';
 }
 
 class AppIcons {
-  static String lang = '$icons/lang.svg';
-  static String home = '$icons/home.svg';
-  static String calendar = '$icons/calendar.svg';
-  static String doctors = '$icons/doctors.svg';
-  static String docProfile = '$icons/doc_profile.svg';
-  static String menu = '$icons/menu.svg';
-  static String dotsVertical = '$icons/dots-vertical.svg';
-  static String medication = '$icons/medication.svg';
-  static String therapySession = '$icons/therapy_session.svg';
-  static String clock = '$icons/clock.svg';
-  static String download = '$icons/download.svg';
+  static String email = '$icons/email.svg';
+  static String lock = '$icons/lock.svg';
+  static String eyeShow = '$icons/eye-show.svg';
+  static String eyeOff = '$icons/eye-off.svg';
   static String delete = '$icons/delete.svg';
   static String file = '$icons/file.svg';
-  static String uploadFile = '$icons/upload_file.svg';
-  static String checkCheck = '$icons/check-check.svg';
-  static String add = '$icons/add.svg';
-  static String apple = '$icons/apple.svg';
-  static String bell = '$icons/bell.svg';
-  static String catAdd = '$icons/cat_add.svg';
-  static String copy = '$icons/copy.svg';
-  static String google = '$icons/google.svg';
-  static String location = '$icons/location.svg';
-  static String mail = '$icons/mail.svg';
-  static String phone = '$icons/phone.svg';
-  static String search = '$icons/search.svg';
-  static String star = '$icons/star.svg';
-  static String user = '$icons/user.svg';
-  static String education = '$icons/education.svg';
-  static String experience = '$icons/experience.svg';
-  static String share = '$icons/share.svg';
-  static String favOff = '$icons/fav_off.svg';
-  static String favOn = '$icons/fav_on.svg';
+  static String uploadFile = '$icons/upload-file.svg';
   static String chevronDown = '$icons/chevron-down.svg';
-  static String checkIcon = '$icons/check-icon.svg';
-  static String infoCircle = '$icons/info-circle.svg';
-  static String notificationBox = '$icons/notification-box.svg';
-  static String logout = '$icons/log-out.svg';
-  static String bankNote = '$icons/bank-note.svg';
+  static String close = '$icons/close.svg';
+  static String add = '$icons/add.svg';
 }

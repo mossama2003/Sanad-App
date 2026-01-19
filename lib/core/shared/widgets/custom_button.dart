@@ -40,21 +40,21 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: loading || !enable ? null : onTap,
-      borderRadius: BorderRadius.circular(AppSize.getHeight(8)),
+      borderRadius: BorderRadius.circular(AppSize.getHeight(12)),
       child: Container(
         width: width ?? double.infinity,
         height: height ?? AppSize.getHeight(42),
         padding: AppSize.padding(horizontal: 12),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppSize.getSize(8)),
+          borderRadius: BorderRadius.circular(AppSize.getSize(12)),
           color: loading || !enable
               ? AppColors.buttonPrimaryDisabled
               : bgColor ?? AppColors.buttonPrimary,
           border: !enable
               ? Border.all(color: AppColors.grey200)
               : borderColor != null && !loading
-                  ? Border.all(color: borderColor!)
-                  : null,
+              ? Border.all(color: borderColor!)
+              : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -1,0 +1,145 @@
+{
+  "core": {
+    "no_content": "No content",
+    "error_title": "Something Went Wrong",
+    "error_desc": "An unexpected error occurred. Please try again or contact support if the issue persists.",
+    "reload": "Reload",
+    "yes": "Yes",
+    "no": "No",
+    "time_ago": {
+      "seconds": "{value} seconds ago",
+      "minutes": "{value} minutes ago",
+      "hours": "{value} hours ago",
+      "days": "{value} days ago",
+      "weeks": "{value} weeks ago",
+      "months": "{value} months ago",
+      "years": "{value} years ago"
+    }
+  },
+  "failure": {
+    "code": {
+      "400": "Bad Request: Invalid syntax.",
+      "401": "Unauthorized: Authentication required.",
+      "403": "Forbidden: Access denied.",
+      "404": "Not Found: Resource not found.",
+      "500": "Internal Server Error: Server error.",
+      "default": "Unexpected Error: Try again later."
+    },
+    "dio": {
+      "connection_timeout": "Connection timeout with ApiServer",
+      "send_timeout": "Send timeout with ApiServer",
+      "connection_error": "No Internet Connection",
+      "receive_timeout": "Receive timeout with ApiServer",
+      "request_canceled": "Request to ApiServer was canceled",
+      "unexpected_error": "Unexpected Error, Please try again!",
+      "ops_error": "Ops There was an Error, Please try again"
+    },
+    "unexpected_error": "Unexpected Error, Please try again!",
+    "refresh": "Refresh",
+    "no_internet": "No Internet Connection"
+  },
+  "validators": {
+    "required": "*required",
+    "email": {
+      "required": "*required",
+      "pattern": "Please enter a valid email address."
+    },
+    "password": {
+      "required": "*required",
+      "identical": "Passwords do not match",
+      "min_length": "Password must be at least 8 characters long",
+      "contain_number": "Password must contain at least one number",
+      "contain_upper_case": "Password must contain at least one uppercase letter",
+      "contain_lower_case": "Password must contain at least one lowercase letter",
+      "contain_special_char": "Password must contain at least one special character",
+      "old_new_same": "Your new password cannot be the same as the old one",
+      "must_include": "Password must include",
+      "contain_special_char_summary": "a special character",
+      "contain_upper_case_summary": "an uppercase letter",
+      "contain_lower_case_summary": "a lowercase letter",
+      "contain_letter_summary": "a letter",
+      "contain_number_summary": "a number",
+      "min_length_summary": "at least 8 characters long",
+      "no_spaces": "Password must not contain spaces",
+      "no_name": "Password must not contain your name",
+      "no_email": "Password must not contain your email address"
+    },
+    "numbers": {
+      "only": "This field must contain only numbers.",
+      "range": "The number must be between {min} and {max}.",
+      "exact_length": "This field must be exactly {length} number long.",
+      "greater_than": "The number must be greater than {min}.",
+      "less_than": "The number must be less than {max}."
+    },
+    "phone": {
+      "required": "*required",
+      "invalid": "Invalid phone number"
+    },
+    "OTP": {
+      "required": "*required",
+      "length": "OTP must be exactly 6 digits long."
+    },
+    "length": {
+      "min": "This field must be at least {length} characters long.",
+      "max": "This field must not exceed {length} characters.",
+      "exact": "This field must be exactly {length} characters long."
+    }
+  },
+  "onboarding": {
+    "make_a_difference": "Make a Difference",
+    "join_thousands_of_volunteers": "Join thousands of volunteers making an impact in communities across the country.",
+    "give_receive": "Give & Receive",
+    "support_causes": "Support causes you care about through donations and connect with those who need help.",
+    "earn_achieve": "Earn & Achieve",
+    "track_your_impact": "Track your impact with XP points, badges, and streaks. Every action counts!",
+    "skip": "Skip",
+    "next": "Next",
+    "get_started": "Get Started"
+  },
+  "sign_in": {
+    "title": "Welcome to Sanad",
+    "desc": "Sign in to continue",
+    "i_am": "I am a",
+    "volunteer": "Volunteer",
+    "organization": "Organization",
+    "email_or_phone": "Email or Phone",
+    "enter_email_or_phone": "Enter Your Email or Phone",
+    "password": "Password",
+    "enter_password": "Enter Your Password",
+    "forget_password": "Forget Password?",
+    "sign_with_google": "Continue with Google",
+    "sign_with_apple": "Continue with Apple",
+    "sign_in_button": "Sign In",
+    "dont_have_account": "Don't have an account? ",
+    "sign_up_as_volunteer": "Sign up as Volunteer",
+    "or": " or ",
+    "sign_up_as_organization": "Organization"
+  },
+  "sign_up_volunteer": {
+    "title": "Join as a Volunteer",
+    "desc": "Start making a difference today",
+    "full_name": "Full Name",
+    "enter_full_name": "Enter Your Full Name",
+    "email": "Email",
+    "enter_email": "Enter Your Email",
+    "phone_number": "Phone Number",
+    "location": "Location",
+    "select_your_city": "Select your city",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "birthday": "Birthday",
+    "blood_type": "Blood Type",
+    "skills_interests": "Skills & Interests",
+    "national_id": "National ID (Front & Back)",
+    "upload_national_id": "Upload National ID",
+    "password": "Password",
+    "create_strong_password": "Create a Strong Password",
+    "confirm_password": "Confirm Password",
+    "confirm_your_password": "Confirm Your Password",
+    "accept_terms": "I accept the Terms of Service and Privacy Policy",
+    "sign_up_button": "Create Account",
+    "already_have_account": "Already have an account? ",
+    "sign_in": "Sign In"
+  }
+}

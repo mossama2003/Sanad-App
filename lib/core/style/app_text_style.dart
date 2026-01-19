@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shuaa_alamal/core/constant/app_constants.dart';
+import '../constant/app_constants.dart';
 import '../constant/app_size.dart';
 
 extension AppTextStyle on TextStyle {
@@ -41,8 +41,8 @@ extension AppTextStyle on TextStyle {
 
   TextStyle get xs {
     return copyWith(
-      fontSize: AppSize.font(12),
-      fontWeight: FontWeight.w500,
+      fontSize: AppSize.font(14),
+      fontWeight: FontWeight.w400,
       height: AppSize.fontHeight(12, 20),
       fontFamily: AppConstants.fontIBMPlexSansArabic,
     );

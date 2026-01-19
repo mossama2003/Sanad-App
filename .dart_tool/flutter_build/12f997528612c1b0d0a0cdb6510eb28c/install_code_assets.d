@@ -1,0 +1,1 @@
+ /Users/mohamed/Desktop/Projects/Sanad-App/.dart_tool/flutter_build/12f997528612c1b0d0a0cdb6510eb28c/native_assets.json: 

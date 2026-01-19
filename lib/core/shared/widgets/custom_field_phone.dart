@@ -4,10 +4,10 @@ import 'package:flutter_intl_phone_field/country_picker_dialog.dart';
 import 'package:flutter_intl_phone_field/phone_number.dart';
 import 'package:flutter_intl_phone_field/countries.dart';
 import 'package:flutter/material.dart';
-import 'package:shuaa_alamal/core/style/app_text_style.dart';
 
 import '../../constant/app_size.dart';
 import '../../network/local/cache/cache_helper.dart';
+import '../../style/app_text_style.dart';
 import '../../validator/app_validators.dart';
 import '../../style/app_colors.dart';
 

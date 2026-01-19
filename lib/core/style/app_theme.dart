@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shuaa_alamal/core/style/app_text_style.dart';
 
 import '../constant/app_constants.dart';
 import '../constant/app_size.dart';
 import 'app_colors.dart';
+import 'app_text_style.dart';
 
 class AppTheme {
   static ThemeData appLightTheme = ThemeData(
@@ -26,9 +26,7 @@ class AppTheme {
     progressIndicatorTheme: const ProgressIndicatorThemeData(
       color: AppColors.primary,
     ),
-    colorScheme: ColorScheme.fromSwatch().copyWith(
-      primary: AppColors.primary,
-    ),
+    colorScheme: ColorScheme.fromSwatch().copyWith(primary: AppColors.primary),
     appBarTheme: AppBarTheme(
       elevation: 0.0,
       titleSpacing: AppSize.getWidth(16),
@@ -40,14 +38,17 @@ class AppTheme {
       backgroundColor: AppColors.appbarBgLight,
       surfaceTintColor: AppColors.appbarBgLight,
       systemOverlayStyle: SystemUiOverlayStyle(
-        statusBarBrightness:
-            Platform.isIOS ? Brightness.light : Brightness.dark,
+        statusBarBrightness: Platform.isIOS
+            ? Brightness.light
+            : Brightness.dark,
         statusBarColor: AppColors.appbarBgLight,
-        statusBarIconBrightness:
-            Platform.isIOS ? Brightness.light : Brightness.dark,
+        statusBarIconBrightness: Platform.isIOS
+            ? Brightness.light
+            : Brightness.dark,
         systemNavigationBarColor: AppColors.appbarBgLight,
-        systemNavigationBarIconBrightness:
-            Platform.isIOS ? Brightness.light : Brightness.dark,
+        systemNavigationBarIconBrightness: Platform.isIOS
+            ? Brightness.light
+            : Brightness.dark,
       ),
       iconTheme: IconThemeData(color: AppColors.grey600),
     ),

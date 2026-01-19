@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../constant/app_size.dart';
 import '../../helper/app_locals.dart';
-import 'package:shuaa_alamal/core/style/app_colors.dart';
-import 'package:shuaa_alamal/core/style/app_text_style.dart';
+import '../../style/app_colors.dart';
+import '../../style/app_text_style.dart';
 
 class CustomDatePicker extends StatefulWidget {
   const CustomDatePicker({
