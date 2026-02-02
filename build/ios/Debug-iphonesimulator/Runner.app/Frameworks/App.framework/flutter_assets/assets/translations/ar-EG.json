@@ -114,5 +114,97 @@
     "sign_up_as_volunteer": "إنشاء حساب كمتطوع",
     "or": " أو ",
     "sign_up_as_organization": "كمؤسسة"
+  },
+  "sign_up_volunteer": {
+    "title": "انضم كمتطوع",
+    "desc": "ابدأ في إحداث فرق اليوم",
+    "full_name": "الاسم بالكامل",
+    "enter_full_name": "أدخل اسمك بالكامل",
+    "email": "البريد الإلكتروني",
+    "enter_email": "أدخل بريدك الإلكتروني",
+    "phone_number": "رقم الهاتف",
+    "location": "الموقع",
+    "select_your_city": "اختر مدينتك",
+    "gender": "النوع",
+    "male": "ذكر",
+    "female": "أنثى",
+    "birthday": "تاريخ الميلاد",
+    "blood_type": "فصيلة الدم",
+    "select_blood_type": "اختر فصيلة الدم",
+    "skills_interests": "المهارات والاهتمامات",
+    "national_id": "الرقم القومي (الوجه الأمامي والخلفي)",
+    "upload_national_id": "رفع صورة البطاقة الشخصية",
+    "password": "كلمة المرور",
+    "create_strong_password": "أنشئ كلمة مرور قوية",
+    "confirm_password": "تأكيد كلمة المرور",
+    "confirm_your_password": "أكد كلمة المرور",
+    "accept_terms": "أوافق على شروط الخدمة وسياسة الخصوصية",
+    "sign_up_button": "إنشاء حساب",
+    "already_have_account": "لديك حساب بالفعل؟ ",
+    "sign_in": "تسجيل الدخول"
+  },
+  "sign_up_organization": {
+    "title": "تسجيل المؤسسة",
+    "desc": "أنشئ فعاليات واستقطب متطوعين",
+    "organization_name": "اسم المؤسسة",
+    "hint_organization_name": "مثال: الهلال الأحمر المصري",
+    "website_link": "الموقع الإلكتروني / الرابط",
+    "hint_website_link": "https://yourorganization.org",
+    "official_email": "البريد الإلكتروني الرسمي",
+    "hint_official_email": "contact@organization.org",
+    "phone_number": "رقم الهاتف",
+    "headquarters_location": "موقع المقر الرئيسي",
+    "hint_headquarters_location": "اختر مدينة المقر الرئيسي",
+    "branch_locations": "مواقع الفروع (اختياري)",
+    "hint_branch_locations": "إضافة فرع",
+    "verification_documents": "مستندات التحقق",
+    "hint_verification_documents": "رفع مستندات التسجيل",
+    "desc_verification_documents": "ملفات PDF أو صور للمستندات الرسمية مثل شهادة التسجيل أو المستندات الضريبية أو اعتماد الجمعيات الأهلية",
+    "password": "كلمة المرور",
+    "create_strong_password": "أنشئ كلمة مرور قوية",
+    "confirm_password": "تأكيد كلمة المرور",
+    "confirm_your_password": "أكد كلمة المرور",
+    "accept_terms": "أوافق على شروط الخدمة وسياسة الخصوصية",
+    "sign_up_button": "إرسال للمراجعة",
+    "already_have_account": "لديك حساب بالفعل؟ ",
+    "sign_in": "تسجيل الدخول"
+  },
+  "home": {
+    "navbar": {
+      "home": "الرئيسية",
+      "events": "الفعاليات",
+      "community": "المجتمع",
+      "donations": "التبرعات",
+      "cases": "الحالات"
+    },
+    "dashboard": {
+      "title": "مرحبًا بعودتك، ",
+      "desc": "هل أنت مستعد لإحداث فرق اليوم؟",
+      "xp_points": "نقاط الخبرة",
+      "day_streak": "سلسلة الأيام",
+      "badges": "الشارات"
+    },
+    "options": {
+      "emergency": "طوارئ",
+      "report_urgent": "بلاغ عاجل",
+      "qr_check_in": "تسجيل الحضور عبر QR",
+      "scan_to_earn": "امسح لتحصل على نقاط"
+    },
+    "upcoming_events": {
+      "title": "الفعاليات القادمة",
+      "view_all": "عرض الكل"
+    },
+    "recently_completed": {
+      "title": "تم إنجازه مؤخرًا"
+    }
+  },
+  "home_removed": {
+    "blood_donation_drive": "حملة التبرع بالدم",
+    "egyptian_red_crescent": "الهلال الأحمر المصري",
+    "date": "15 ديسمبر 2025 • 10:00 صباحًا",
+    "cairo_medical_center": "المركز الطبي بالقاهرة",
+    "food_distribution": "توزيع المواد الغذائية",
+    "resala_charity": "جمعية رسالة",
+    "dec_8_2025": "8 ديسمبر 2025"
   }
 }

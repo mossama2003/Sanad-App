@@ -130,6 +130,7 @@
     "female": "Female",
     "birthday": "Birthday",
     "blood_type": "Blood Type",
+    "select_blood_type": "Select blood Type",
     "skills_interests": "Skills & Interests",
     "national_id": "National ID (Front & Back)",
     "upload_national_id": "Upload National ID",
@@ -141,5 +142,69 @@
     "sign_up_button": "Create Account",
     "already_have_account": "Already have an account? ",
     "sign_in": "Sign In"
+  },
+  "sign_up_organization": {
+    "title": "Register Your Organization",
+    "desc": "Create events and recruit volunteers",
+    "organization_name": "Organization Name",
+    "hint_organization_name": "e.g., Egyptian Red Crescent",
+    "website_link": "Website / Link",
+    "hint_website_link": "https://yourorganization.org",
+    "official_email": "Official Email",
+    "hint_official_email": "contact@organization.org",
+    "phone_number": "Phone Number",
+    "headquarters_location": "Headquarters Location",
+    "hint_headquarters_location": "Select headquarters city",
+    "branch_locations": "Branch Locations (Optional)",
+    "hint_branch_locations": "Add Branch",
+    "verification_documents": "Verification Documents",
+    "hint_verification_documents": "Upload Registration Documents",
+    "desc_verification_documents": "PDF or images of official registration, tax documents, or NGO certification",
+    "password": "Password",
+    "create_strong_password": "Create a Strong Password",
+    "confirm_password": "Confirm Password",
+    "confirm_your_password": "Confirm Your Password",
+    "accept_terms": "I accept the Terms of Service and Privacy Policy",
+    "sign_up_button": "Submit for Verification",
+    "already_have_account": "Already have an account? ",
+    "sign_in": "Sign In"
+  },
+  "home": {
+    "navbar": {
+      "home": "Home",
+      "events": "Events",
+      "community": "Community",
+      "donations": "Donations",
+      "cases": "Cases"
+    },
+    "dashboard": {
+      "title": "Welcome back, ",
+      "desc": "Ready to make a difference today?",
+      "xp_points": "XP Points",
+      "day_streak": "Day Streak",
+      "badges": "Badges"
+    },
+    "options": {
+      "emergency": "Emergency",
+      "report_urgent": "Report Urgent",
+      "qr_check_in": "QR Check-in",
+      "scan_to_earn": "Scan to earn XP"
+    },
+    "upcoming_events": {
+      "title": "Upcoming Events",
+      "view_all": "View All"
+    },
+    "recently_completed": {
+      "title": "Recently Completed"
+    }
+  },
+  "home_removed": {
+    "blood_donation_drive": "Blood Donation Drive",
+    "egyptian_red_crescent": "Egyptian Red Crescent",
+    "date": "Dec 15, 2025 • 10:00 AM",
+    "cairo_medical_center": "Cairo Medical Center",
+    "food_distribution": "Food Distribution",
+    "resala_charity": "Resala Charity",
+    "dec_8_2025": "Dec 8, 2025"
   }
 }

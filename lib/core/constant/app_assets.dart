@@ -28,6 +28,7 @@ class AppImages {
   static String onboardingImage1 = '$images/onboarding1.png';
   static String onboardingImage2 = '$images/onboarding2.png';
   static String onboardingImage3 = '$images/onboarding3.png';
+  static String donationImage = '$images/donation.jpg';
 }
 
 class AppIcons {
@@ -41,4 +42,20 @@ class AppIcons {
   static String chevronDown = '$icons/chevron-down.svg';
   static String close = '$icons/close.svg';
   static String add = '$icons/add.svg';
+  static String home = '$icons/home.svg';
+  static String events = '$icons/events.svg';
+  static String community = '$icons/community.svg';
+  static String donations = '$icons/donations.svg';
+  static String cases = '$icons/cases.svg';
+  static String notification = '$icons/notification.svg';
+  static String achievement = '$icons/achievement.svg';
+  static String fire = '$icons/fire.svg';
+  static String badge = '$icons/badge.svg';
+  static String warning = '$icons/warning.svg';
+  static String qr = '$icons/qr.svg';
+  static String search = '$icons/search.svg';
+  static String filter = '$icons/filter.svg';
+  static String location = '$icons/location.svg';
+  static String duration = '$icons/duration.svg';
+  static String chat = '$icons/chat.svg';
 }

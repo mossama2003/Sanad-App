@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
+import 'package:sanad_app/features/home/presentation/screens/home_body.dart';
 
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
@@ -194,7 +195,10 @@ class _SignInFormState extends State<SignInForm> {
                   onTap: () {},
                 ),
                 SizedBox(height: AppSize.getHeight(25)),
-                CustomButton(title: 'sign_in.sign_in_button'.tr()),
+                CustomButton(
+                  onTap: () => AppNavigator.push(HomeBody()),
+                  title: 'sign_in.sign_in_button'.tr(),
+                ),
                 SizedBox(height: AppSize.getHeight(8)),
                 RichText(
                   textAlign: TextAlign.center,

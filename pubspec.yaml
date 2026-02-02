@@ -45,6 +45,7 @@ dependencies:
   smooth_page_indicator: ^2.0.1
   image_picker: ^1.2.1
   dotted_decoration: ^2.0.0
+  lottie: ^3.3.2
 
 dev_dependencies:
   flutter_test:
@@ -61,4 +62,5 @@ flutter:
     - assets/icons/
     - assets/images/
     - assets/translations/
+    - assets/lottie/coming_soon.json
 

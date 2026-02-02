@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/helper/app_helper.dart';
 import 'core/helper/app_locals.dart';
@@ -8,6 +9,8 @@ import 'core/helper/app_navigator.dart';
 import 'core/network/local/cache/cache_helper.dart';
 import 'core/network/remote/api/dio_helper.dart';
 import 'core/style/app_theme.dart';
+import 'features/home/data/repos/home_repo.dart';
+import 'features/home/presentation/controllers/home_cubit.dart';
 import 'features/onboarding/presentation/screens/onboarding_screen.dart';
 
 void main() async {
@@ -45,20 +48,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: AppHelper.closeKeyboard,
-      child: MaterialApp(
-        title: 'CHIAKA',
-        home: OnboardingScreen(),
-        navigatorKey: AppNavigator.key,
-        debugShowCheckedModeBanner: false,
-        themeMode: ThemeMode.light,
-        theme: AppTheme.appLightTheme,
-        locale: context.locale,
-        supportedLocales: context.supportedLocales,
-        localizationsDelegates: context.localizationDelegates,
-        builder: (context, child) =>
-            ScrollConfiguration(behavior: AppBehavior(), child: child!),
+    return MultiBlocProvider(
+      providers: [BlocProvider(create: (_) => HomeCubit(HomeRepoImpel()))],
+      child: GestureDetector(
+        onTap: AppHelper.closeKeyboard,
+        child: MaterialApp(
+          title: 'Sanad',
+          home: OnboardingScreen(),
+          navigatorKey: AppNavigator.key,
+          debugShowCheckedModeBanner: false,
+          themeMode: ThemeMode.light,
+          theme: AppTheme.appLightTheme,
+          locale: context.locale,
+          supportedLocales: context.supportedLocales,
+          localizationsDelegates: context.localizationDelegates,
+          builder: (context, child) =>
+              ScrollConfiguration(behavior: AppBehavior(), child: child!),
+        ),
       ),
     );
   }

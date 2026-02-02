@@ -76,7 +76,15 @@ class _SignInScreenState extends State<SignInScreen> {
                               height: AppSize.getSize(50),
                               decoration: BoxDecoration(
                                 color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.grey.withValues(
+                                      alpha: 0.35,
+                                    ),
+                                    blurRadius: 3,
+                                  ),
+                                ],
                               ),
                               child: Center(
                                 child: Text(

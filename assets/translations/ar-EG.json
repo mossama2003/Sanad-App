@@ -168,5 +168,53 @@
     "sign_up_button": "إرسال للمراجعة",
     "already_have_account": "لديك حساب بالفعل؟ ",
     "sign_in": "تسجيل الدخول"
+  },
+  "home": {
+    "navbar": {
+      "home": "الرئيسية",
+      "events": "الفعاليات",
+      "community": "المجتمع",
+      "donations": "التبرعات",
+      "cases": "الحالات"
+    },
+    "dashboard": {
+      "title": "مرحبًا بعودتك، ",
+      "desc": "هل أنت مستعد لإحداث فرق اليوم؟",
+      "xp_points": "نقاط الخبرة",
+      "day_streak": "سلسلة الأيام",
+      "badges": "الشارات"
+    },
+    "options": {
+      "emergency": "طوارئ",
+      "report_urgent": "بلاغ عاجل",
+      "qr_check_in": "تسجيل الحضور عبر QR",
+      "scan_to_earn": "امسح لتحصل على نقاط"
+    },
+    "upcoming_events": {
+      "title": "الفعاليات القادمة",
+      "view_all": "عرض الكل"
+    },
+    "recently_completed": {
+      "title": "تم إنجازه مؤخرًا"
+    }
+  },
+  "home_removed": {
+    "blood_donation_drive": "حملة التبرع بالدم",
+    "blood_donation": "التبرع بالدم",
+    "egyptian_red_crescent": "الهلال الأحمر المصري",
+    "date": "15 ديسمبر 2025 • 10:00 ص",
+    "cairo_medical_center": "مركز القاهرة الطبي",
+    "food_distribution": "توزيع الطعام",
+    "resala_charity": "جمعية رسالة",
+    "dec_8_2025": "8 ديسمبر 2025",
+    "duration": "المدة: 4 ساعات",
+    "members": "45 متطوع • 15 مكان متبقي"
+  },
+  "events": {
+    "title": "الفعاليات المتاحة",
+    "desc": "ابحث عن فرص لصنع فرق",
+    "search": "ابحث في الفعاليات...",
+    "filters": "الفلاتر",
+    "event_button": "عرض التفاصيل"
   }
 }
