@@ -200,11 +200,34 @@
   },
   "home_removed": {
     "blood_donation_drive": "Blood Donation Drive",
+    "blood_donation_drive_date": "Blood Donation Drive - Dec 15",
+    "dont_forget_to_bring_your_id": "Don't forget to bring your ID! • 2h ago",
+    "blood_donation": "Blood Donation",
     "egyptian_red_crescent": "Egyptian Red Crescent",
     "date": "Dec 15, 2025 • 10:00 AM",
     "cairo_medical_center": "Cairo Medical Center",
     "food_distribution": "Food Distribution",
     "resala_charity": "Resala Charity",
-    "dec_8_2025": "Dec 8, 2025"
+    "dec_8_2025": "Dec 8, 2025",
+    "duration": "Duration: 4 hours",
+    "members": "45 volunteers • 15 spots left"
+  },
+  "events": {
+    "title": "Available Events",
+    "desc": "Find opportunities to make a difference",
+    "search": "Search events...",
+    "filters": "Filers",
+    "button": "View Details"
+  },
+  "community": {
+    "title": "Communities",
+    "desc": "Connect with other volunteers",
+    "search": "Search communities",
+    "expired": "Expired: Chat ends 3 days after event"
+  },
+  "donations": {
+    "title": "Donation Campaigns",
+    "desc": "Support causes that matter",
+    "button": "Donate Now"
   }
 }

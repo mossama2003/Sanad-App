@@ -28,7 +28,8 @@ class AppImages {
   static String onboardingImage1 = '$images/onboarding1.png';
   static String onboardingImage2 = '$images/onboarding2.png';
   static String onboardingImage3 = '$images/onboarding3.png';
-  static String donationImage = '$images/donation.jpg';
+  static String eventsImage = '$images/events.jpg';
+  static String donationsImage = '$images/donations.png';
 }
 
 class AppIcons {

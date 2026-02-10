@@ -200,21 +200,67 @@
   },
   "home_removed": {
     "blood_donation_drive": "حملة التبرع بالدم",
+    "blood_donation_drive_date": "حملة التبرع بالدم - 15 ديسمبر",
+    "dont_forget_to_bring_your_id": "لا تنسَ إحضار بطاقة الهوية! • منذ ساعتين",
     "blood_donation": "التبرع بالدم",
     "egyptian_red_crescent": "الهلال الأحمر المصري",
-    "date": "15 ديسمبر 2025 • 10:00 ص",
-    "cairo_medical_center": "مركز القاهرة الطبي",
+    "date": "15 ديسمبر 2025 • 10:00 صباحًا",
+    "cairo_medical_center": "المركز الطبي بالقاهرة",
     "food_distribution": "توزيع الطعام",
     "resala_charity": "جمعية رسالة",
     "dec_8_2025": "8 ديسمبر 2025",
     "duration": "المدة: 4 ساعات",
-    "members": "45 متطوع • 15 مكان متبقي"
+    "4_hours": "المدة: 4 ساعات",
+    "members": "45 متطوعًا • متبقي 15 مكانًا",
+    "help_save": "ساعد في إنقاذ الأرواح من خلال التبرع بالدم. جميع فصائل الدم مطلوبة."
+  },
+  "donations_removed": {
+    "winter_clothing_drive": "حملة التبرع بالملابس الشتوية",
+    "help_provide_warm": "ساعد في توفير ملابس دافئة للأسر المحتاجة خلال فصل الشتاء.",
+    "resala_charity": "جمعية رسالة",
+    "raised": "تم جمع 32,500 جنيه",
+    "goal": "الهدف 50,000 جنيه",
+    "funded": "تم تمويل 65.0%",
+    "days_left": "متبقي 15 يومًا"
   },
   "events": {
     "title": "الفعاليات المتاحة",
-    "desc": "ابحث عن فرص لصنع فرق",
-    "search": "ابحث في الفعاليات...",
+    "desc": "اكتشف فرصًا لإحداث فرق",
+    "search": "ابحث عن الفعاليات...",
     "filters": "الفلاتر",
-    "event_button": "عرض التفاصيل"
+    "button": "عرض التفاصيل",
+    "bottom_sheet": {
+      "date_time": "التاريخ والوقت",
+      "duration": "المدة",
+      "location": "الموقع",
+      "volunteers": "عدد المتطوعين",
+      "button": "الانضمام إلى الفعالية"
+    },
+    "filter": {
+      "title": "نوع الفعالية",
+      "all": "الكل",
+      "blood_donation": "التبرع بالدم",
+      "orphanage": "دار الأيتام",
+      "environment": "البيئة",
+      "food_distribution": "توزيع الطعام",
+      "healthcare": "الرعاية الصحية"
+    }
+  },
+  "community": {
+    "title": "المجتمعات",
+    "desc": "تواصل مع متطوعين آخرين",
+    "search": "ابحث عن المجتمعات",
+    "expired": "منتهي: تنتهي الدردشة بعد 3 أيام من الفعالية"
+  },
+  "donations": {
+    "title": "حملات التبرع",
+    "desc": "ادعم القضايا التي تهمك",
+    "button": "تبرع الآن",
+    "pop_up": {
+      "donation_Amount": "مبلغ التبرع (جنيه)",
+      "enter_amount": "أدخل المبلغ",
+      "cancel": "إلغاء",
+      "confirm": "تأكيد"
+    }
   }
 }

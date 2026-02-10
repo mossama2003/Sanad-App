@@ -12,6 +12,7 @@ class AppColors {
   static const Color green = Color(0xff008000);
   static const Color laserBlue = Color(0xff416efd);
   static const Color red = Color(0xfff72c3d);
+  static const Color magenta = Color(0xffED1B72);
 
   static const Color brand50 = Color(0xffFFF5F9);
   static const Color brand200 = Color(0xffFFB6CF);

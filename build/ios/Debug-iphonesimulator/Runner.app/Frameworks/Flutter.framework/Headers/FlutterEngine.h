@@ -340,7 +340,7 @@ FLUTTER_DARWIN_EXPORT
  *
  * @see [Navigation
  * Channel](https://api.flutter.dev/flutter/services/SystemChannels/navigation-constant.html)
- * @see [Navigator Widget](https://api.flutter.dev/flutter/widgets/Navigator-class.html)
+ * @see [Navigator Widget](https://api.flutter.dev/flutter/cards/Navigator-class.html)
  */
 @property(nonatomic, readonly) FlutterMethodChannel* navigationChannel;
 

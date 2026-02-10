@@ -31,11 +31,13 @@ class CustomFieldText extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.inputFormatters,
+    this.bgColor,
   });
 
   final TextEditingController controller;
 
   final bool iconColor;
+  final Color? bgColor;
   final String? iconStart;
   final String? iconEnd;
   final Function()? iconEndTap;
@@ -90,6 +92,8 @@ class CustomFieldText extends StatelessWidget {
           validator: validator,
           inputFormatters: inputFormatters,
           decoration: InputDecoration(
+            filled: bgColor != null,
+            fillColor: bgColor,
             hintStyle: TextStyle(color: AppColors.grey).xs,
 
             contentPadding: padding,

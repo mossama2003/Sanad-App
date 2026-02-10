@@ -1,19 +1,19 @@
+import 'package:sanad_app/features/auth/presentation/sign_in/screens/sign_in_screen.dart';
+import 'package:sanad_app/core/shared/widgets/custom_field_dropdown.dart';
+import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
-import 'package:sanad_app/core/shared/widgets/custom_button.dart';
-import 'package:sanad_app/core/shared/widgets/custom_field_dropdown.dart';
-import 'package:sanad_app/features/auth/presentation/sign_in/screens/sign_in_screen.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 
-import '../../../../../core/constant/app_size.dart';
-import '../../../../../core/shared/widgets/custom_field_text.dart';
-import '../../../../../core/style/app_text_style.dart';
-import '../../../../../core/validator/app_validators.dart';
-import '../../../../../core/style/app_colors.dart';
+import '../../../../../core/shared/widgets/custom_selectable_chips.dart';
 import '../../../../../core/shared/widgets/custom_upload_file.dart';
-import '../widget/selectable_skills_widget.dart';
+import '../../../../../core/shared/widgets/custom_field_text.dart';
+import '../../../../../core/validator/app_validators.dart';
+import '../../../../../core/style/app_text_style.dart';
+import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/style/app_colors.dart';
 
 class VolunteerSignUpForm extends StatefulWidget {
   const VolunteerSignUpForm({super.key});
@@ -143,8 +143,8 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
             ),
             SizedBox(height: AppSize.getHeight(15)),
             // Skills
-            SelectableSkillsWidget(
-              skills: [
+            CustomSelectableChips(
+              items: [
                 'Teaching',
                 'Healthcare',
                 'Technology',
@@ -158,9 +158,7 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                 'Social Media',
                 'Photography',
               ],
-              onSelectionChanged: (selectedSkills) {
-                print('Selected Skills: $selectedSkills');
-              },
+              multiSelect: true,
             ),
             SizedBox(height: AppSize.getHeight(15)),
             // National ID

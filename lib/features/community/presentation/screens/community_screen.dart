@@ -46,6 +46,7 @@ class CommunityScreen extends StatelessWidget {
                     SizedBox(height: AppSize.getHeight(20)),
                     CustomFieldText(
                       controller: TextEditingController(),
+                      bgColor: AppColors.white,
                       iconStart: AppIcons.search,
                       hintText: 'community.search'.tr(),
                     ),

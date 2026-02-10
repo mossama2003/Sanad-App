@@ -4,6 +4,7 @@ import 'package:sanad_app/features/events/presentation/screens/events_screen.dar
 
 import '../../../coming_soon_screen.dart';
 import '../../../community/presentation/screens/community_screen.dart';
+import '../../../donations/presentation/screens/donations_screen.dart';
 import '../../data/enums/home_navbar_enum.dart';
 import '../../data/repos/home_repo.dart';
 import '../screens/home_screen.dart';
@@ -28,7 +29,7 @@ class HomeCubit extends Cubit<HomeState> {
     HomeNavbarItem.home: const HomeScreen(),
     HomeNavbarItem.events: const EventsScreen(),
     HomeNavbarItem.community: const CommunityScreen(),
-    HomeNavbarItem.donations: const ComingSoonScreen(),
+    HomeNavbarItem.donations: const DonationsScreen(),
     HomeNavbarItem.cases: const ComingSoonScreen(),
   };
 

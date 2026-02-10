@@ -210,19 +210,57 @@
     "resala_charity": "Resala Charity",
     "dec_8_2025": "Dec 8, 2025",
     "duration": "Duration: 4 hours",
-    "members": "45 volunteers • 15 spots left"
+    "4_hours": "Duration: 4 hours",
+    "members": "45 volunteers • 15 spots left",
+    "help_save": "Help save lives by donating blood. All blood types needed."
+  },
+  "donations_removed": {
+    "winter_clothing_drive": "Winter Clothing Drive",
+    "help_provide_warm": "Help provide warm clothing for families in need this winter season.",
+    "resala_charity": "Resala Charity",
+    "raised": "32,500 EGP raised",
+    "goal": "50,000 EGP goal",
+    "funded": "65.0% funded",
+    "days_left": "15 days left"
   },
   "events": {
     "title": "Available Events",
     "desc": "Find opportunities to make a difference",
     "search": "Search events...",
     "filters": "Filers",
-    "event_button": "View Details"
+    "button": "View Details",
+    "bottom_sheet": {
+      "date_time": "Date & Time",
+      "duration": "Duration",
+      "location": "Location",
+      "volunteers": "Volunteers",
+      "button": "Join Event"
+    },
+    "filter": {
+      "title": "Event Type",
+      "all": "All",
+      "blood_donation": "Blood Donations",
+      "orphanage": "Orphanage",
+      "environment": "Environment",
+      "food_distribution": "Food Distribution",
+      "healthcare": "HealthCare"
+    }
   },
   "community": {
     "title": "Communities",
     "desc": "Connect with other volunteers",
     "search": "Search communities",
     "expired": "Expired: Chat ends 3 days after event"
+  },
+  "donations": {
+    "title": "Donation Campaigns",
+    "desc": "Support causes that matter",
+    "button": "Donate Now",
+    "pop_up": {
+      "donation_Amount": "Donation Amount (EGP)",
+      "enter_amount": "Enter amount",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    }
   }
 }

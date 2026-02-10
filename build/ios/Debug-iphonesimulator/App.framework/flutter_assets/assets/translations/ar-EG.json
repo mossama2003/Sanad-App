@@ -200,11 +200,27 @@
   },
   "home_removed": {
     "blood_donation_drive": "حملة التبرع بالدم",
+    "blood_donation": "التبرع بالدم",
     "egyptian_red_crescent": "الهلال الأحمر المصري",
-    "date": "15 ديسمبر 2025 • 10:00 صباحًا",
-    "cairo_medical_center": "المركز الطبي بالقاهرة",
-    "food_distribution": "توزيع المواد الغذائية",
+    "date": "15 ديسمبر 2025 • 10:00 ص",
+    "cairo_medical_center": "مركز القاهرة الطبي",
+    "food_distribution": "توزيع الطعام",
     "resala_charity": "جمعية رسالة",
-    "dec_8_2025": "8 ديسمبر 2025"
+    "dec_8_2025": "8 ديسمبر 2025",
+    "duration": "المدة: 4 ساعات",
+    "members": "45 متطوع • 15 مكان متبقي"
+  },
+  "events": {
+    "title": "الفعاليات المتاحة",
+    "desc": "ابحث عن فرص لصنع فرق",
+    "search": "ابحث في الفعاليات...",
+    "filters": "الفلاتر",
+    "event_button": "عرض التفاصيل"
+  },
+  "donations": {
+    "title": "حملات التبرع",
+    "desc": "ادعم القضايا التي تهمك",
+    "button": "تبرع الآن"
   }
+
 }
