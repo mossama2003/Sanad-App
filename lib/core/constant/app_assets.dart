@@ -30,6 +30,7 @@ class AppImages {
   static String onboardingImage3 = '$images/onboarding3.png';
   static String eventsImage = '$images/events.jpg';
   static String donationsImage = '$images/donations.png';
+  static String casesImage = '$images/cases.png';
 }
 
 class AppIcons {
@@ -59,4 +60,11 @@ class AppIcons {
   static String location = '$icons/location.svg';
   static String duration = '$icons/duration.svg';
   static String chat = '$icons/chat.svg';
+  static String check = '$icons/check.svg';
+  static String phone = '$icons/phone.svg';
+  static String creditCard = '$icons/credit-card.svg';
+  static String share = '$icons/share.svg';
+  static String emergency = '$icons/emergency.svg';
+  static String completed = '$icons/completed.svg';
+  static String star = '$icons/star.svg';
 }

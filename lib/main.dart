@@ -1,17 +1,19 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_app/features/organization/home/data/repos/organization_home_repo.dart';
+import 'package:sanad_app/features/organization/home/presentation/controllers/organization_home_cubit.dart';
 
-import 'core/helper/app_helper.dart';
-import 'core/helper/app_locals.dart';
-import 'core/helper/app_navigator.dart';
+import 'features/organization/home/presentation/screens/organization_home_body.dart';
+import 'features/volunteer/home/presentation/controllers/volunteer_home_cubit.dart';
+import 'features/volunteer/home/data/repos/volunteer_home_repo.dart';
 import 'core/network/local/cache/cache_helper.dart';
 import 'core/network/remote/api/dio_helper.dart';
+import 'core/helper/app_navigator.dart';
+import 'core/helper/app_helper.dart';
+import 'core/helper/app_locals.dart';
 import 'core/style/app_theme.dart';
-import 'features/home/data/repos/home_repo.dart';
-import 'features/home/presentation/controllers/home_cubit.dart';
-import 'features/onboarding/presentation/screens/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,12 +51,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => HomeCubit(HomeRepoImpel()))],
+      providers: [
+        BlocProvider(
+          create: (_) => VolunteerHomeCubit(VolunteerHomeRepoImpel()),
+        ),
+        BlocProvider(
+          create: (_) => OrganizationHomeCubit(OrganizationHomeRepoImpel()),
+        ),
+      ],
       child: GestureDetector(
         onTap: AppHelper.closeKeyboard,
         child: MaterialApp(
           title: 'Sanad',
-          home: OnboardingScreen(),
+          home: OrganizationHomeBody(),
           navigatorKey: AppNavigator.key,
           debugShowCheckedModeBanner: false,
           themeMode: ThemeMode.light,

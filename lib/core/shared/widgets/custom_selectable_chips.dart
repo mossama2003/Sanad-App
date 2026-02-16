@@ -17,6 +17,13 @@ class CustomSelectableChips extends StatefulWidget {
   /// callback
   final ValueChanged<List<String>>? onChanged;
 
+  /// 🎨 Colors
+  final Color selectedColor;
+  final Color unSelectedColor;
+  final Color selectedTextColor;
+  final Color unSelectedTextColor;
+  final Color borderColor;
+
   const CustomSelectableChips({
     super.key,
     required this.items,
@@ -24,10 +31,16 @@ class CustomSelectableChips extends StatefulWidget {
     this.multiSelect = true,
     this.initialSelected,
     this.onChanged,
+    this.selectedColor = AppColors.primary,
+    this.unSelectedColor = AppColors.grey100,
+    this.selectedTextColor = AppColors.white,
+    this.unSelectedTextColor = AppColors.black,
+    this.borderColor = AppColors.primary,
   });
 
   @override
-  State<CustomSelectableChips> createState() => _CustomSelectableChipsState();
+  State<CustomSelectableChips> createState() =>
+      _CustomSelectableChipsState();
 }
 
 class _CustomSelectableChipsState extends State<CustomSelectableChips> {
@@ -42,14 +55,12 @@ class _CustomSelectableChipsState extends State<CustomSelectableChips> {
   void _onTap(String item) {
     setState(() {
       if (widget.multiSelect) {
-        // 🟢 Multi select
         if (selectedItems.contains(item)) {
           selectedItems.remove(item);
         } else {
           selectedItems.add(item);
         }
       } else {
-        // 🔵 Single select
         if (selectedItems.contains(item)) {
           selectedItems.clear();
         } else {
@@ -90,18 +101,24 @@ class _CustomSelectableChipsState extends State<CustomSelectableChips> {
                 duration: const Duration(milliseconds: 200),
                 padding: AppSize.padding(vertical: 6, horizontal: 14),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : AppColors.grey100,
+                  color: isSelected
+                      ? widget.selectedColor
+                      : widget.unSelectedColor,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected ? AppColors.primary : Colors.transparent,
+                    color: isSelected
+                        ? widget.borderColor
+                        : Colors.transparent,
                   ),
                 ),
                 child: Text(
                   item,
                   style: TextStyle(
-                    color: isSelected ? AppColors.white : AppColors.black,
+                    color: isSelected
+                        ? widget.selectedTextColor
+                        : widget.unSelectedTextColor,
                     fontSize: AppSize.font(13),
-                    fontWeight: FontWeight.w300,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ),

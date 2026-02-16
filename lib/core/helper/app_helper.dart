@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../features/auth/data/models/user_model.dart';
+import '../../features/shared/auth/data/models/user_model.dart';
 import '../network/local/cache/cache_helper.dart';
 import '../shared/controllers/app/app_cubit.dart';
 import 'app_navigator.dart';
@@ -27,7 +27,7 @@ class AppHelper {
   }
 
   static Future<void> getAuthUser() async {
-    await AppCubit.get(AppNavigator.context).getAuth();
+    // await AppCubit.get(AppNavigator.context).getAuth();
   }
 
   static Future<void> share(String text) async {

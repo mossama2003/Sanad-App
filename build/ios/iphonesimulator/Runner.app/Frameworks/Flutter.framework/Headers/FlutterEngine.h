@@ -45,7 +45,7 @@ extern NSString* const FlutterDefaultInitialRoute;
  *
  * A FlutterEngine can also be used to prewarm the Dart execution environment and reduce the
  * latency of showing the Flutter screen when a `FlutterViewController` is created and presented.
- * See http://flutter.dev/docs/development/add-to-app/performance for more details on loading
+ * See https://docs.flutter.dev/development/add-to-app/performance for more details on loading
  * performance.
  *
  * Alternatively, you can simply create a new `FlutterViewController` with only a
@@ -340,7 +340,7 @@ FLUTTER_DARWIN_EXPORT
  *
  * @see [Navigation
  * Channel](https://api.flutter.dev/flutter/services/SystemChannels/navigation-constant.html)
- * @see [Navigator Widget](https://api.flutter.dev/flutter/cards/Navigator-class.html)
+ * @see [Navigator Widget](https://api.flutter.dev/flutter/widgets/Navigator-class.html)
  */
 @property(nonatomic, readonly) FlutterMethodChannel* navigationChannel;
 

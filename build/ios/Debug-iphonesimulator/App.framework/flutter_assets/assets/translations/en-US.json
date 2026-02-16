@@ -210,14 +210,41 @@
     "resala_charity": "Resala Charity",
     "dec_8_2025": "Dec 8, 2025",
     "duration": "Duration: 4 hours",
-    "members": "45 volunteers • 15 spots left"
+    "4_hours": "Duration: 4 hours",
+    "members": "45 volunteers • 15 spots left",
+    "help_save": "Help save lives by donating blood. All blood types needed."
+  },
+  "donations_removed": {
+    "winter_clothing_drive": "Winter Clothing Drive",
+    "help_provide_warm": "Help provide warm clothing for families in need this winter season.",
+    "resala_charity": "Resala Charity",
+    "raised": "32,500 EGP raised",
+    "goal": "50,000 EGP goal",
+    "funded": "65.0% funded",
+    "days_left": "15 days left"
   },
   "events": {
     "title": "Available Events",
     "desc": "Find opportunities to make a difference",
     "search": "Search events...",
     "filters": "Filers",
-    "button": "View Details"
+    "button": "View Details",
+    "bottom_sheet": {
+      "date_time": "Date & Time",
+      "duration": "Duration",
+      "location": "Location",
+      "volunteers": "Volunteers",
+      "button": "Join Event"
+    },
+    "filter": {
+      "title": "Event Type",
+      "all": "All",
+      "blood_donation": "Blood Donations",
+      "orphanage": "Orphanage",
+      "environment": "Environment",
+      "food_distribution": "Food Distribution",
+      "healthcare": "HealthCare"
+    }
   },
   "community": {
     "title": "Communities",
@@ -228,6 +255,72 @@
   "donations": {
     "title": "Donation Campaigns",
     "desc": "Support causes that matter",
-    "button": "Donate Now"
+    "button": "Donate Now",
+    "pop_up": {
+      "donation_Amount": "Donation Amount (EGP)",
+      "enter_amount": "Enter amount",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    }
+  },
+  "cases": {
+    "title": "Urgent Cases",
+    "desc": "Verified cases needing immediate support",
+    "button": "Submit a Case for Review",
+    "card": {
+      "button": "Support This Case"
+    },
+    "pop_up": {
+      "contact_person": "Contact Person",
+      "phone": "Phone",
+      "bank_account": "Bank Account",
+      "you_can_support": "You can support this case by contacting directly or making a donation to the provided bank account.",
+      "close": "Close",
+      "call_now": "Call Now"
+    }
+  },
+  "cases_removed": {
+    "family_displaced_by_fire": "Family Displaced by Fire",
+    "a_family_of_6_lost": "A family of 6 lost their home in a residential fire. They urgently need shelter, clothing, and basic necessities. The fire destroyed all their belongings and they are currently staying with relatives.",
+    "contact": "Contact: Mohamed Ahmed",
+    "national_bank": "0123456789 - National Bank of Egypt",
+    "mohamed": "Mohamed Ahmed"
+  },
+  "emergency": {
+    "title": "Emergency Events",
+    "desc": "Urgent situations requiring immediate help",
+    "button": "Report Emergency Event",
+    "card": {
+      "critical": "critical",
+      "join_now": "Join Now",
+      "contact": "Contact"
+    },
+    "reports": {
+      "title": "Report Emergency Event",
+      "desc": "Provide details about the urgent situation",
+      "emergency_title": "Emergency Title",
+      "brief": "Brief title of the emergency",
+      "description": "Description",
+      "detailed": "Detailed description of the situation and what help is needed",
+      "urgency_level": "Urgency Level",
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "location": "Location",
+      "city_specific_adress": "City or specific address",
+      "volunteers_needed": "Volunteers Needed",
+      "estimated_number_needed": "Estimated number needed",
+      "contact_information": "Contact Information",
+      "phone_number_for_coordination": "Phone number for coordination",
+      "cancel": "Cancel",
+      "submit_emergency": "Submit Emergency"
+    }
+  },
+  "emergency_removed": {
+    "flood_relief": "Flood Relief - Minya",
+    "urgent_need": "Urgent need for volunteers to help with flood relief efforts. Distribute supplies and assist affected families.",
+    "minya_egypt": "Minya, Egypt",
+    "volunteers_joined": "23 / 50 volunteers joined",
+    "posted": "Posted 2h ago by Egyptian Red Crescent"
   }
 }

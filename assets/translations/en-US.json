@@ -85,182 +85,298 @@
       "exact": "This field must be exactly {length} characters long."
     }
   },
-  "onboarding": {
-    "make_a_difference": "Make a Difference",
-    "join_thousands_of_volunteers": "Join thousands of volunteers making an impact in communities across the country.",
-    "give_receive": "Give & Receive",
-    "support_causes": "Support causes you care about through donations and connect with those who need help.",
-    "earn_achieve": "Earn & Achieve",
-    "track_your_impact": "Track your impact with XP points, badges, and streaks. Every action counts!",
-    "skip": "Skip",
-    "next": "Next",
-    "get_started": "Get Started"
-  },
-  "sign_in": {
-    "title": "Welcome to Sanad",
-    "desc": "Sign in to continue",
-    "i_am": "I am a",
-    "volunteer": "Volunteer",
-    "organization": "Organization",
-    "email_or_phone": "Email or Phone",
-    "enter_email_or_phone": "Enter Your Email or Phone",
-    "password": "Password",
-    "enter_password": "Enter Your Password",
-    "forget_password": "Forget Password?",
-    "sign_with_google": "Continue with Google",
-    "sign_with_apple": "Continue with Apple",
-    "sign_in_button": "Sign In",
-    "dont_have_account": "Don't have an account? ",
-    "sign_up_as_volunteer": "Sign up as Volunteer",
-    "or": " or ",
-    "sign_up_as_organization": "Organization"
-  },
-  "sign_up_volunteer": {
-    "title": "Join as a Volunteer",
-    "desc": "Start making a difference today",
-    "full_name": "Full Name",
-    "enter_full_name": "Enter Your Full Name",
-    "email": "Email",
-    "enter_email": "Enter Your Email",
-    "phone_number": "Phone Number",
-    "location": "Location",
-    "select_your_city": "Select your city",
-    "gender": "Gender",
-    "male": "Male",
-    "female": "Female",
-    "birthday": "Birthday",
-    "blood_type": "Blood Type",
-    "select_blood_type": "Select blood Type",
-    "skills_interests": "Skills & Interests",
-    "national_id": "National ID (Front & Back)",
-    "upload_national_id": "Upload National ID",
-    "password": "Password",
-    "create_strong_password": "Create a Strong Password",
-    "confirm_password": "Confirm Password",
-    "confirm_your_password": "Confirm Your Password",
-    "accept_terms": "I accept the Terms of Service and Privacy Policy",
-    "sign_up_button": "Create Account",
-    "already_have_account": "Already have an account? ",
-    "sign_in": "Sign In"
-  },
-  "sign_up_organization": {
-    "title": "Register Your Organization",
-    "desc": "Create events and recruit volunteers",
-    "organization_name": "Organization Name",
-    "hint_organization_name": "e.g., Egyptian Red Crescent",
-    "website_link": "Website / Link",
-    "hint_website_link": "https://yourorganization.org",
-    "official_email": "Official Email",
-    "hint_official_email": "contact@organization.org",
-    "phone_number": "Phone Number",
-    "headquarters_location": "Headquarters Location",
-    "hint_headquarters_location": "Select headquarters city",
-    "branch_locations": "Branch Locations (Optional)",
-    "hint_branch_locations": "Add Branch",
-    "verification_documents": "Verification Documents",
-    "hint_verification_documents": "Upload Registration Documents",
-    "desc_verification_documents": "PDF or images of official registration, tax documents, or NGO certification",
-    "password": "Password",
-    "create_strong_password": "Create a Strong Password",
-    "confirm_password": "Confirm Password",
-    "confirm_your_password": "Confirm Your Password",
-    "accept_terms": "I accept the Terms of Service and Privacy Policy",
-    "sign_up_button": "Submit for Verification",
-    "already_have_account": "Already have an account? ",
-    "sign_in": "Sign In"
-  },
-  "home": {
-    "navbar": {
-      "home": "Home",
-      "events": "Events",
-      "community": "Community",
-      "donations": "Donations",
-      "cases": "Cases"
+  "shared": {
+    "onboarding": {
+      "make_a_difference": "Make a Difference",
+      "join_thousands_of_volunteers": "Join thousands of volunteers making an impact in communities across the country.",
+      "give_receive": "Give & Receive",
+      "support_causes": "Support causes you care about through donations and connect with those who need help.",
+      "earn_achieve": "Earn & Achieve",
+      "track_your_impact": "Track your impact with XP points, badges, and streaks. Every action counts!",
+      "skip": "Skip",
+      "next": "Next",
+      "get_started": "Get Started"
     },
-    "dashboard": {
-      "title": "Welcome back, ",
-      "desc": "Ready to make a difference today?",
-      "xp_points": "XP Points",
-      "day_streak": "Day Streak",
-      "badges": "Badges"
+    "sign_in": {
+      "title": "Welcome to Sanad",
+      "desc": "Sign in to continue",
+      "i_am": "I am a",
+      "volunteer": "Volunteer",
+      "organization": "Organization",
+      "email_or_phone": "Email or Phone",
+      "enter_email_or_phone": "Enter Your Email or Phone",
+      "password": "Password",
+      "enter_password": "Enter Your Password",
+      "forget_password": "Forget Password?",
+      "sign_with_google": "Continue with Google",
+      "sign_with_apple": "Continue with Apple",
+      "sign_in_button": "Sign In",
+      "dont_have_account": "Don't have an account? ",
+      "sign_up_as_volunteer": "Sign up as Volunteer",
+      "or": " or ",
+      "sign_up_as_organization": "Organization"
     },
-    "options": {
-      "emergency": "Emergency",
-      "report_urgent": "Report Urgent",
-      "qr_check_in": "QR Check-in",
-      "scan_to_earn": "Scan to earn XP"
+    "donations_removed": {
+      "winter_clothing_drive": "Winter Clothing Drive",
+      "help_provide_warm": "Help provide warm clothing for families in need this winter season.",
+      "resala_charity": "Resala Charity",
+      "raised": "32,500 EGP raised",
+      "goal": "50,000 EGP goal",
+      "funded": "65.0% funded",
+      "days_left": "15 days left"
     },
-    "upcoming_events": {
-      "title": "Upcoming Events",
-      "view_all": "View All"
+    "donations": {
+      "title": "Donation Campaigns",
+      "desc": "Support causes that matter",
+      "button": "Donate Now",
+      "pop_up": {
+        "donation_Amount": "Donation Amount (EGP)",
+        "enter_amount": "Enter amount",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
     },
-    "recently_completed": {
-      "title": "Recently Completed"
+    "cases": {
+      "title": "Urgent Cases",
+      "desc": "Verified cases needing immediate support",
+      "button": "Submit a Case for Review",
+      "card": {
+        "button": "Support This Case"
+      },
+      "pop_up": {
+        "contact_person": "Contact Person",
+        "phone": "Phone",
+        "bank_account": "Bank Account",
+        "you_can_support": "You can support this case by contacting directly or making a donation to the provided bank account.",
+        "close": "Close",
+        "call_now": "Call Now"
+      }
+    },
+    "cases_removed": {
+      "family_displaced_by_fire": "Family Displaced by Fire",
+      "a_family_of_6_lost": "A family of 6 lost their home in a residential fire. They urgently need shelter, clothing, and basic necessities. The fire destroyed all their belongings and they are currently staying with relatives.",
+      "contact": "Contact: Mohamed Ahmed",
+      "national_bank": "0123456789 - National Bank of Egypt",
+      "mohamed": "Mohamed Ahmed"
     }
   },
-  "home_removed": {
-    "blood_donation_drive": "Blood Donation Drive",
-    "blood_donation_drive_date": "Blood Donation Drive - Dec 15",
-    "dont_forget_to_bring_your_id": "Don't forget to bring your ID! • 2h ago",
-    "blood_donation": "Blood Donation",
-    "egyptian_red_crescent": "Egyptian Red Crescent",
-    "date": "Dec 15, 2025 • 10:00 AM",
-    "cairo_medical_center": "Cairo Medical Center",
-    "food_distribution": "Food Distribution",
-    "resala_charity": "Resala Charity",
-    "dec_8_2025": "Dec 8, 2025",
-    "duration": "Duration: 4 hours",
-    "4_hours": "Duration: 4 hours",
-    "members": "45 volunteers • 15 spots left",
-    "help_save": "Help save lives by donating blood. All blood types needed."
-  },
-  "donations_removed": {
-    "winter_clothing_drive": "Winter Clothing Drive",
-    "help_provide_warm": "Help provide warm clothing for families in need this winter season.",
-    "resala_charity": "Resala Charity",
-    "raised": "32,500 EGP raised",
-    "goal": "50,000 EGP goal",
-    "funded": "65.0% funded",
-    "days_left": "15 days left"
-  },
-  "events": {
-    "title": "Available Events",
-    "desc": "Find opportunities to make a difference",
-    "search": "Search events...",
-    "filters": "Filers",
-    "button": "View Details",
-    "bottom_sheet": {
-      "date_time": "Date & Time",
-      "duration": "Duration",
-      "location": "Location",
-      "volunteers": "Volunteers",
-      "button": "Join Event"
+  "organization": {
+    "sign_up": {
+      "title": "Register Your Organization",
+      "desc": "Create events and recruit volunteers",
+      "organization_name": "Organization Name",
+      "hint_organization_name": "e.g., Egyptian Red Crescent",
+      "website_link": "Website / Link",
+      "hint_website_link": "https://yourorganization.org",
+      "official_email": "Official Email",
+      "hint_official_email": "contact@organization.org",
+      "phone_number": "Phone Number",
+      "headquarters_location": "Headquarters Location",
+      "hint_headquarters_location": "Select headquarters city",
+      "branch_locations": "Branch Locations (Optional)",
+      "hint_branch_locations": "Add Branch",
+      "verification_documents": "Verification Documents",
+      "hint_verification_documents": "Upload Registration Documents",
+      "desc_verification_documents": "PDF or images of official registration, tax documents, or NGO certification",
+      "password": "Password",
+      "create_strong_password": "Create a Strong Password",
+      "confirm_password": "Confirm Password",
+      "confirm_your_password": "Confirm Your Password",
+      "accept_terms": "I accept the Terms of Service and Privacy Policy",
+      "sign_up_button": "Submit for Verification",
+      "already_have_account": "Already have an account? ",
+      "sign_in": "Sign In"
     },
-    "filter": {
-      "title": "Event Type",
-      "all": "All",
-      "blood_donation": "Blood Donations",
-      "orphanage": "Orphanage",
-      "environment": "Environment",
+    "home": {
+      "navbar": {
+        "home": "Home",
+        "events": "Events",
+        "donations": "Donations",
+        "cases": "Cases"
+      },
+      "dashboard": {
+        "title": "Welcome back, ",
+        "desc": "Manage your events and volunteers",
+        "active_events": "Active Events",
+        "completed": "Completed",
+        "volunteers": "Volunteers"
+      },
+      "create_event_button": "Create New Event",
+      "your_active_events": {
+        "title": "Your Active Events",
+        "volunteers": "Volunteers",
+        "view_details_button": "View Details",
+        "edit_event_button": "Edit Event"
+      },
+      "recently_completed": {
+        "title": "Recently Completed"
+      }
+    },
+    "home_removed": {
+      "blood_donation_drive": "Blood Donation Drive",
+      "blood_donation": "Blood Donation",
+      "resala_charity": "Resala Charity",
+      "dec_8_2025": "Dec 8, 2025",
+      "date": "Dec 15, 2025",
+      "45_60": "45 / 60",
       "food_distribution": "Food Distribution",
-      "healthcare": "HealthCare"
+      "members": "34 volunteers",
+      "52_volunteer": "52 volunteers",
+      "10am": "10:00 AM",
+      "cairo_medical_canter": "Cairo Medical Center"
+    },
+    "events": {
+      "title": "Your Events",
+      "desc": "Manage and track your events",
+      "create_event_button": "Create New Event",
+      "volunteers": "Volunteers",
+      "filter": {
+        "all": "All",
+        "upcoming": "Upcoming",
+        "in_progress": "In Progress",
+        "completed": "Completed"
+      }
     }
   },
-  "community": {
-    "title": "Communities",
-    "desc": "Connect with other volunteers",
-    "search": "Search communities",
-    "expired": "Expired: Chat ends 3 days after event"
-  },
-  "donations": {
-    "title": "Donation Campaigns",
-    "desc": "Support causes that matter",
-    "button": "Donate Now",
-    "pop_up": {
-      "donation_Amount": "Donation Amount (EGP)",
-      "enter_amount": "Enter amount",
-      "cancel": "Cancel",
-      "confirm": "Confirm"
+  "volunteer": {
+    "sign_up": {
+      "title": "Join as a Volunteer",
+      "desc": "Start making a difference today",
+      "full_name": "Full Name",
+      "enter_full_name": "Enter Your Full Name",
+      "email": "Email",
+      "enter_email": "Enter Your Email",
+      "phone_number": "Phone Number",
+      "location": "Location",
+      "select_your_city": "Select your city",
+      "gender": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "birthday": "Birthday",
+      "blood_type": "Blood Type",
+      "select_blood_type": "Select blood Type",
+      "skills_interests": "Skills & Interests",
+      "national_id": "National ID (Front & Back)",
+      "upload_national_id": "Upload National ID",
+      "password": "Password",
+      "create_strong_password": "Create a Strong Password",
+      "confirm_password": "Confirm Password",
+      "confirm_your_password": "Confirm Your Password",
+      "accept_terms": "I accept the Terms of Service and Privacy Policy",
+      "sign_up_button": "Create Account",
+      "already_have_account": "Already have an account? ",
+      "sign_in": "Sign In"
+    },
+    "home": {
+      "navbar": {
+        "home": "Home",
+        "events": "Events",
+        "community": "Community",
+        "donations": "Donations",
+        "cases": "Cases"
+      },
+      "dashboard": {
+        "title": "Welcome back, ",
+        "desc": "Ready to make a difference today?",
+        "xp_points": "XP Points",
+        "day_streak": "Day Streak",
+        "badges": "Badges"
+      },
+      "options": {
+        "emergency": "Emergency",
+        "report_urgent": "Report Urgent",
+        "qr_check_in": "QR Check-in",
+        "scan_to_earn": "Scan to earn XP"
+      },
+      "upcoming_events": {
+        "title": "Upcoming Events",
+        "view_all": "View All"
+      },
+      "recently_completed": {
+        "title": "Recently Completed"
+      }
+    },
+    "home_removed": {
+      "blood_donation_drive": "Blood Donation Drive",
+      "blood_donation_drive_date": "Blood Donation Drive - Dec 15",
+      "dont_forget_to_bring_your_id": "Don't forget to bring your ID! • 2h ago",
+      "blood_donation": "Blood Donation",
+      "egyptian_red_crescent": "Egyptian Red Crescent",
+      "date": "Dec 15, 2025 • 10:00 AM",
+      "cairo_medical_center": "Cairo Medical Center",
+      "food_distribution": "Food Distribution",
+      "resala_charity": "Resala Charity",
+      "dec_8_2025": "Dec 8, 2025",
+      "duration": "Duration: 4 hours",
+      "4_hours": "Duration: 4 hours",
+      "members": "45 volunteers • 15 spots left",
+      "help_save": "Help save lives by donating blood. All blood types needed."
+    },
+    "events": {
+      "title": "Available Events",
+      "desc": "Find opportunities to make a difference",
+      "search": "Search events...",
+      "filters": "Filers",
+      "button": "View Details",
+      "bottom_sheet": {
+        "date_time": "Date & Time",
+        "duration": "Duration",
+        "location": "Location",
+        "volunteers": "Volunteers",
+        "button": "Join Event"
+      },
+      "filter": {
+        "title": "Event Type",
+        "all": "All",
+        "blood_donation": "Blood Donations",
+        "orphanage": "Orphanage",
+        "environment": "Environment",
+        "food_distribution": "Food Distribution",
+        "healthcare": "HealthCare"
+      }
+    },
+    "community": {
+      "title": "Communities",
+      "desc": "Connect with other volunteers",
+      "search": "Search communities",
+      "expired": "Expired: Chat ends 3 days after event"
+    },
+    "emergency": {
+      "title": "Emergency Events",
+      "desc": "Urgent situations requiring immediate help",
+      "button": "Report Emergency Event",
+      "card": {
+        "critical": "critical",
+        "join_now": "Join Now",
+        "contact": "Contact"
+      },
+      "reports": {
+        "title": "Report Emergency Event",
+        "desc": "Provide details about the urgent situation",
+        "emergency_title": "Emergency Title",
+        "brief": "Brief title of the emergency",
+        "description": "Description",
+        "detailed": "Detailed description of the situation and what help is needed",
+        "urgency_level": "Urgency Level",
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "location": "Location",
+        "city_specific_adress": "City or specific address",
+        "volunteers_needed": "Volunteers Needed",
+        "estimated_number_needed": "Estimated number needed",
+        "contact_information": "Contact Information",
+        "phone_number_for_coordination": "Phone number for coordination",
+        "cancel": "Cancel",
+        "submit_emergency": "Submit Emergency"
+      }
+    },
+    "emergency_removed": {
+      "flood_relief": "Flood Relief - Minya",
+      "urgent_need": "Urgent need for volunteers to help with flood relief efforts. Distribute supplies and assist affected families.",
+      "minya_egypt": "Minya, Egypt",
+      "volunteers_joined": "23 / 50 volunteers joined",
+      "posted": "Posted 2h ago by Egyptian Red Crescent"
     }
   }
 }

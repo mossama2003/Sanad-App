@@ -5,7 +5,7 @@
         <entry key="_flutterfire_internals">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/_flutterfire_internals-1.3.65/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/_flutterfire_internals-1.3.66/lib" />
             </list>
           </value>
         </entry>
@@ -75,14 +75,14 @@
         <entry key="carousel_slider">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/carousel_slider-5.1.1/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/carousel_slider-5.1.2/lib" />
             </list>
           </value>
         </entry>
         <entry key="characters">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/characters-1.4.0/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/characters-1.4.1/lib" />
             </list>
           </value>
         </entry>
@@ -166,7 +166,7 @@
         <entry key="dio">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/dio-5.9.0/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/dio-5.9.1/lib" />
             </list>
           </value>
         </entry>
@@ -271,7 +271,7 @@
         <entry key="firebase_core">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_core-4.3.0/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_core-4.4.0/lib" />
             </list>
           </value>
         </entry>
@@ -285,28 +285,28 @@
         <entry key="firebase_core_web">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_core_web-3.3.1/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_core_web-3.4.0/lib" />
             </list>
           </value>
         </entry>
         <entry key="firebase_messaging">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging-16.1.0/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging-16.1.1/lib" />
             </list>
           </value>
         </entry>
         <entry key="firebase_messaging_platform_interface">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging_platform_interface-4.7.5/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging_platform_interface-4.7.6/lib" />
             </list>
           </value>
         </entry>
         <entry key="firebase_messaging_web">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging_web-4.1.1/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging_web-4.1.2/lib" />
             </list>
           </value>
         </entry>
@@ -593,14 +593,14 @@
         <entry key="matcher">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/matcher-0.12.17/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/matcher-0.12.18/lib" />
             </list>
           </value>
         </entry>
         <entry key="material_color_utilities">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/material_color_utilities-0.11.1/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/material_color_utilities-0.13.0/lib" />
             </list>
           </value>
         </entry>
@@ -1020,7 +1020,7 @@
         <entry key="test_api">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/test_api-0.7.7/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/test_api-0.7.9/lib" />
             </list>
           </value>
         </entry>
@@ -1237,7 +1237,7 @@
       </option>
     </properties>
     <CLASSES>
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/_flutterfire_internals-1.3.65/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/_flutterfire_internals-1.3.66/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/archive-4.0.7/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/args-2.7.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/async-2.13.0/lib" />
@@ -1247,8 +1247,8 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/cached_network_image-3.4.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/cached_network_image_platform_interface-4.1.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/cached_network_image_web-1.3.1/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/carousel_slider-5.1.1/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/characters-1.4.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/carousel_slider-5.1.2/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/characters-1.4.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/chewie-1.13.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/clock-1.1.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/collection-1.19.1/lib" />
@@ -1260,7 +1260,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.8/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dartz-0.10.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dbus-0.7.11/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dio-5.9.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dio-5.9.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dio_web_adapter-2.1.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dots_indicator-4.0.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dotted_decoration-2.0.0/lib" />
@@ -1275,12 +1275,12 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/file_selector_macos-0.9.5/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/file_selector_platform_interface-2.7.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/file_selector_windows-0.9.3+5/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_core-4.3.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_core-4.4.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_core_platform_interface-6.0.2/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_core_web-3.3.1/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging-16.1.0/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging_platform_interface-4.7.5/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging_web-4.1.1/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_core_web-3.4.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging-16.1.1/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging_platform_interface-4.7.6/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging_web-4.1.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/fixnum-1.1.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_bloc-9.1.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_cache_manager-3.4.1/lib" />
@@ -1317,8 +1317,8 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/lints-6.0.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/logging-1.3.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/lottie-3.3.2/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/matcher-0.12.17/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/material_color_utilities-0.11.1/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/matcher-0.12.18/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/material_color_utilities-0.13.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/meta-1.17.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/mime-2.0.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/nested-1.0.0/lib" />
@@ -1377,7 +1377,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/string_scanner-1.4.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/synchronized-3.4.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/term_glyph-1.2.2/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/test_api-0.7.7/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/test_api-0.7.9/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/typed_data-1.4.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/url_launcher-6.3.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.28/lib" />

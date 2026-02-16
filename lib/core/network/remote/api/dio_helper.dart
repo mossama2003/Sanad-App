@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
-import '../../end_points.dart';
 import 'dio_interceptors.dart';
 
 class DioHelper {
@@ -12,7 +11,7 @@ class DioHelper {
   static void init() async {
     dio = Dio(
       BaseOptions(
-        baseUrl: BASE_URL,
+        // baseUrl: BASE_URL,
         followRedirects: false,
         receiveDataWhenStatusError: true,
         validateStatus: (status) => status! < 500,

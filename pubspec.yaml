@@ -22,23 +22,23 @@ dependencies:
   url_launcher: ^6.3.2
 
   # Network
-  dio: ^5.9.0
+  dio: ^5.9.1
   dartz: ^0.10.1
   pretty_dio_logger: ^1.4.0
   connectivity_plus: ^7.0.0
 
   # Firebase
-  firebase_messaging: ^16.1.0
-  firebase_core: ^4.3.0
+  firebase_messaging: ^16.1.1
+  firebase_core: ^4.4.0
 
 
   # Utilities
-  share_plus: ^12.0.0
+  share_plus: ^12.0.1
   easy_date_timeline: ^2.0.9
   dropdown_button2: ^2.3.9
   pin_code_fields: ^8.0.1
   flutter_widget_from_html: ^0.17.1
-  carousel_slider: ^5.1.1
+  carousel_slider: ^5.1.2
   dots_indicator: ^4.0.1
   flutter_svg: ^2.2.3
   shared_preferences: ^2.5.4
