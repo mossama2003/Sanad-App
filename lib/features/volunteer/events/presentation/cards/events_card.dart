@@ -58,7 +58,7 @@ class EventsCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
-                      'home_removed.blood_donation'.tr(),
+                      'volunteer.home_removed.blood_donation'.tr(),
                       style: TextStyle(
                         color: AppColors.red,
                         fontSize: AppSize.font(12),
@@ -76,7 +76,7 @@ class EventsCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'home_removed.blood_donation_drive'.tr(),
+                  'volunteer.home_removed.blood_donation_drive'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(15),
                     fontWeight: FontWeight.w400,
@@ -84,7 +84,7 @@ class EventsCard extends StatelessWidget {
                 ),
                 SizedBox(height: AppSize.getHeight(3)),
                 Text(
-                  'home_removed.egyptian_red_crescent'.tr(),
+                  'volunteer.home_removed.egyptian_red_crescent'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(13),
                     fontWeight: FontWeight.w400,
@@ -102,7 +102,7 @@ class EventsCard extends StatelessWidget {
                     ),
                     SizedBox(width: AppSize.getWidth(5)),
                     Text(
-                      'home_removed.date'.tr(),
+                      'volunteer.home_removed.date'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
                         fontWeight: FontWeight.w300,
@@ -121,7 +121,7 @@ class EventsCard extends StatelessWidget {
                     ),
                     SizedBox(width: AppSize.getWidth(5)),
                     Text(
-                      'home_removed.duration'.tr(),
+                      'volunteer.home_removed.duration'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
                         fontWeight: FontWeight.w300,
@@ -140,7 +140,7 @@ class EventsCard extends StatelessWidget {
                     ),
                     SizedBox(width: AppSize.getWidth(5)),
                     Text(
-                      'home_removed.cairo_medical_center'.tr(),
+                      'volunteer.home_removed.cairo_medical_center'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
                         fontWeight: FontWeight.w300,
@@ -159,7 +159,7 @@ class EventsCard extends StatelessWidget {
                     ),
                     SizedBox(width: AppSize.getWidth(5)),
                     Text(
-                      'home_removed.members'.tr(),
+                      'volunteer.home_removed.members'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
                         fontWeight: FontWeight.w300,
@@ -169,7 +169,7 @@ class EventsCard extends StatelessWidget {
                 ),
                 SizedBox(height: AppSize.getHeight(15)),
                 CustomButton(
-                  title: 'events.button'.tr(),
+                  title: 'volunteer.events.button'.tr(),
                   onTap: () => AppNavigator.sheet(const EventsBottomSheet()),
                 ),
               ],

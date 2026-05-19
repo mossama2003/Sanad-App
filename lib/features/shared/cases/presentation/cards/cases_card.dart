@@ -95,7 +95,7 @@ class CasesCard extends StatelessWidget {
                 ),
                 SizedBox(height: AppSize.getHeight(8)),
                 Text(
-                  'cases_removed.family_displaced_by_fire'.tr(),
+                  'shared.cases_removed.family_displaced_by_fire'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(15),
                     fontWeight: FontWeight.w400,
@@ -103,7 +103,7 @@ class CasesCard extends StatelessWidget {
                 ),
                 SizedBox(height: AppSize.getHeight(12)),
                 Text(
-                  'cases_removed.a_family_of_6_lost'.tr(),
+                  'shared.cases_removed.a_family_of_6_lost'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(15),
                     fontWeight: FontWeight.w300,
@@ -129,7 +129,7 @@ class CasesCard extends StatelessWidget {
                           ),
                           SizedBox(width: AppSize.getWidth(10)),
                           Text(
-                            'cases_removed.contact'.tr(),
+                            'shared.cases_removed.contact'.tr(),
                             style: TextStyle(
                               fontSize: AppSize.font(13),
                               color: AppColors.grey700,
@@ -171,7 +171,7 @@ class CasesCard extends StatelessWidget {
                           ),
                           SizedBox(width: AppSize.getWidth(10)),
                           Text(
-                            'cases_removed.national_bank'.tr(),
+                            'shared.cases_removed.national_bank'.tr(),
                             style: TextStyle(
                               fontSize: AppSize.font(13),
                               color: AppColors.grey700,
@@ -221,7 +221,7 @@ class CasesCard extends StatelessWidget {
                 ),
                 SizedBox(height: AppSize.getHeight(15)),
                 CustomButton(
-                  title: 'cases.card.button'.tr(),
+                  title: 'shared.cases.card.button'.tr(),
                   height: AppSize.getHeight(50),
                   onTap: () => AppNavigator.dialog(CasesPopUp()),
                   bgColor: AppColors.laserBlue,

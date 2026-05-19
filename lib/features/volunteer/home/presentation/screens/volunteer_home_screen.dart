@@ -73,7 +73,7 @@ class VolunteerHomeScreen extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'home.options.emergency'.tr(),
+                                        'volunteer.home.options.emergency'.tr(),
                                         style: TextStyle(
                                           fontSize: AppSize.font(12),
                                           color: AppColors.black,
@@ -81,7 +81,7 @@ class VolunteerHomeScreen extends StatelessWidget {
                                         ),
                                       ),
                                       Text(
-                                        'home.options.report_urgent'.tr(),
+                                        'volunteer.home.options.report_urgent'.tr(),
                                         style: TextStyle(
                                           fontSize: AppSize.font(10),
                                           color: AppColors.red,
@@ -131,7 +131,7 @@ class VolunteerHomeScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'home.options.qr_check_in'.tr(),
+                                      'volunteer.home.options.qr_check_in'.tr(),
                                       style: TextStyle(
                                         fontSize: AppSize.font(12),
                                         color: AppColors.black,
@@ -139,7 +139,7 @@ class VolunteerHomeScreen extends StatelessWidget {
                                       ),
                                     ),
                                     Text(
-                                      'home.options.scan_to_earn'.tr(),
+                                      'volunteer.home.options.scan_to_earn'.tr(),
                                       style: TextStyle(
                                         fontSize: AppSize.font(10),
                                         color: AppColors.primary,

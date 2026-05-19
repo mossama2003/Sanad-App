@@ -24,7 +24,7 @@ class ReportEmergencyScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'emergency.reports.title'.tr(),
+                  'volunteer.emergency.reports.title'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(22),
                     fontWeight: FontWeight.w500,
@@ -33,7 +33,7 @@ class ReportEmergencyScreen extends StatelessWidget {
                 ),
                 SizedBox(height: AppSize.getHeight(8)),
                 Text(
-                  'emergency.reports.desc'.tr(),
+                  'volunteer.emergency.reports.desc'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(15),
                     fontWeight: FontWeight.w400,
@@ -44,8 +44,8 @@ class ReportEmergencyScreen extends StatelessWidget {
                 CustomFieldText(
                   controller: TextEditingController(),
                   validator: AppValidators.required,
-                  title: 'emergency.reports.emergency_title'.tr(),
-                  hintText: 'emergency.reports.brief'.tr(),
+                  title: 'volunteer.emergency.reports.emergency_title'.tr(),
+                  hintText: 'volunteer.emergency.reports.brief'.tr(),
                 ),
                 SizedBox(height: AppSize.getHeight(12)),
                 CustomFieldText(
@@ -53,12 +53,12 @@ class ReportEmergencyScreen extends StatelessWidget {
                   validator: AppValidators.required,
                   maxLines: 5,
                   minLines: 5,
-                  title: 'emergency.reports.description'.tr(),
-                  hintText: 'emergency.reports.detailed'.tr(),
+                  title: 'volunteer.emergency.reports.description'.tr(),
+                  hintText: 'volunteer.emergency.reports.detailed'.tr(),
                 ),
                 SizedBox(height: AppSize.getHeight(12)),
                 Text(
-                  'emergency.reports.urgency_level'.tr(),
+                  'volunteer.emergency.reports.urgency_level'.tr(),
                   style: TextStyle(color: AppColors.grey700).xs,
                 ),
                 SizedBox(height: AppSize.getHeight(6)),
@@ -75,7 +75,7 @@ class ReportEmergencyScreen extends StatelessWidget {
                         ),
                         child: Center(
                           child: Text(
-                            'emergency.reports.critical'.tr(),
+                            'volunteer.emergency.reports.critical'.tr(),
                             style: TextStyle(
                               fontSize: AppSize.font(15),
                               color: AppColors.red,
@@ -95,7 +95,7 @@ class ReportEmergencyScreen extends StatelessWidget {
                         ),
                         child: Center(
                           child: Text(
-                            'emergency.reports.high'.tr(),
+                            'volunteer.emergency.reports.high'.tr(),
                             style: TextStyle(
                               fontSize: AppSize.font(15),
                               color: AppColors.brand600,
@@ -115,7 +115,7 @@ class ReportEmergencyScreen extends StatelessWidget {
                         ),
                         child: Center(
                           child: Text(
-                            'emergency.reports.medium'.tr(),
+                            'volunteer.emergency.reports.medium'.tr(),
                             style: TextStyle(
                               fontSize: AppSize.font(15),
                               color: AppColors.secondary400,
@@ -130,22 +130,22 @@ class ReportEmergencyScreen extends StatelessWidget {
                 CustomFieldText(
                   controller: TextEditingController(),
                   validator: AppValidators.required,
-                  title: 'emergency.reports.location'.tr(),
-                  hintText: 'emergency.reports.city_specific_adress'.tr(),
+                  title: 'volunteer.emergency.reports.location'.tr(),
+                  hintText: 'volunteer.emergency.reports.city_specific_adress'.tr(),
                 ),
                 SizedBox(height: AppSize.getHeight(12)),
                 CustomFieldText(
                   controller: TextEditingController(),
                   validator: AppValidators.required,
-                  title: 'emergency.reports.volunteers_needed'.tr(),
-                  hintText: 'emergency.reports.estimated_number_needed'.tr(),
+                  title: 'volunteer.emergency.reports.volunteers_needed'.tr(),
+                  hintText: 'volunteer.emergency.reports.estimated_number_needed'.tr(),
                 ),
                 SizedBox(height: AppSize.getHeight(12)),
                 CustomFieldText(
                   controller: TextEditingController(),
                   validator: AppValidators.required,
-                  title: 'emergency.reports.contact_information'.tr(),
-                  hintText: 'emergency.reports.phone_number_for_coordination'
+                  title: 'volunteer.emergency.reports.contact_information'.tr(),
+                  hintText: 'volunteer.emergency.reports.phone_number_for_coordination'
                       .tr(),
                 ),
                 SizedBox(height: AppSize.getHeight(20)),
@@ -155,7 +155,7 @@ class ReportEmergencyScreen extends StatelessWidget {
                     Expanded(
                       child: CustomButton(
                         onTap: () => AppNavigator.pop(),
-                        title: 'emergency.reports.cancel'.tr(),
+                        title: 'volunteer.emergency.reports.cancel'.tr(),
                         textColor: AppColors.black,
                         textSize: AppSize.font(15),
                         height: AppSize.getHeight(45),
@@ -165,7 +165,7 @@ class ReportEmergencyScreen extends StatelessWidget {
                     SizedBox(width: AppSize.getWidth(10)),
                     Expanded(
                       child: CustomButton(
-                        title: 'emergency.reports.submit_emergency'.tr(),
+                        title: 'volunteer.emergency.reports.submit_emergency'.tr(),
                         textColor: AppColors.white,
                         textSize: AppSize.font(15),
                         height: AppSize.getHeight(45),

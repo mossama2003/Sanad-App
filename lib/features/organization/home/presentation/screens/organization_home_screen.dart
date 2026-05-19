@@ -1,9 +1,4 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sanad_app/core/constant/app_assets.dart';
-import 'package:sanad_app/core/shared/widgets/custom_button.dart';
-import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
-import 'package:sanad_app/core/style/app_colors.dart';
 import 'package:sanad_app/core/constant/app_size.dart';
 
 import '../sections/organization_recently_completed_section.dart';

@@ -1,10 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
-import '../../../../../core/shared/widgets/custom_button.dart';
-import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/shared/widgets/custom_progress_bar.dart';
 import '../../../../../core/style/app_colors.dart';
 

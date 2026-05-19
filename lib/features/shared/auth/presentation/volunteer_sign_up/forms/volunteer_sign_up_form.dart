@@ -76,50 +76,50 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
           children: [
             CustomFieldText(
               controller: nameController,
-              title: 'sign_up_volunteer.full_name'.tr(),
-              hintText: 'sign_up_volunteer.enter_full_name'.tr(),
+              title: 'volunteer.sign_up.full_name'.tr(),
+              hintText: 'volunteer.sign_up.enter_full_name'.tr(),
               validator: AppValidators.required,
             ),
             SizedBox(height: AppSize.getHeight(15)),
             CustomFieldText(
               controller: emailController,
-              title: 'sign_up_volunteer.email'.tr(),
-              hintText: 'sign_up_volunteer.enter_email'.tr(),
+              title: 'volunteer.sign_up.email'.tr(),
+              hintText: 'volunteer.sign_up.enter_email'.tr(),
               validator: AppValidators.email,
             ),
             SizedBox(height: AppSize.getHeight(15)),
             CustomFieldText(
               controller: phoneController,
-              title: 'sign_up_volunteer.phone_number'.tr(),
-              hintText: 'sign_up_volunteer.phone_number'.tr(),
+              title: 'volunteer.sign_up.phone_number'.tr(),
+              hintText: 'volunteer.sign_up.phone_number'.tr(),
               validator: AppValidators.required,
             ),
             SizedBox(height: AppSize.getHeight(15)),
             CustomFieldText(
               controller: locationController,
-              title: 'sign_up_volunteer.location'.tr(),
-              hintText: 'sign_up_volunteer.select_your_city'.tr(),
+              title: 'volunteer.sign_up.location'.tr(),
+              hintText: 'volunteer.sign_up.select_your_city'.tr(),
               validator: AppValidators.required,
             ),
             SizedBox(height: AppSize.getHeight(15)),
             // Gender selection
             Text(
-              'sign_up_volunteer.gender'.tr(),
+              'volunteer.sign_up.gender'.tr(),
               style: TextStyle(color: AppColors.grey700).xs,
             ),
             SizedBox(height: AppSize.getHeight(6)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _genderOption('sign_up_volunteer.male'.tr(), 0),
-                _genderOption('sign_up_volunteer.female'.tr(), 1),
+                _genderOption('volunteer.sign_up.male'.tr(), 0),
+                _genderOption('volunteer.sign_up.female'.tr(), 1),
               ],
             ),
             SizedBox(height: AppSize.getHeight(15)),
             // Birthday
             CustomFieldText(
               controller: locationController,
-              title: 'sign_up_volunteer.birthday'.tr(),
+              title: 'volunteer.sign_up.birthday'.tr(),
               hintText: 'dd/mm/yyyy',
               validator: AppValidators.required,
             ),
@@ -132,8 +132,8 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                   )
                   .toList(),
               selected: selectedBloodType,
-              title: 'sign_up_volunteer.blood_type'.tr(),
-              hintText: 'sign_up_volunteer.select_blood_type'.tr(),
+              title: 'volunteer.sign_up.blood_type'.tr(),
+              hintText: 'volunteer.sign_up.select_blood_type'.tr(),
               validator: AppValidators.required,
               onChanged: (value) {
                 setState(() {
@@ -163,8 +163,8 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
             SizedBox(height: AppSize.getHeight(15)),
             // National ID
             CustomUploadFile(
-              title: 'sign_up_volunteer.national_id'.tr(),
-              hint: 'sign_up_volunteer.upload_national_id'.tr(),
+              title: 'volunteer.sign_up.national_id'.tr(),
+              hint: 'volunteer.sign_up.upload_national_id'.tr(),
               icon: AppIcons.uploadFile,
               onTap: () {},
               onRemove: () {},
@@ -173,8 +173,8 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
             // Password
             CustomFieldText(
               controller: TextEditingController(),
-              title: 'sign_up_volunteer.password'.tr(),
-              hintText: 'sign_up_volunteer.create_strong_password'.tr(),
+              title: 'volunteer.sign_up.password'.tr(),
+              hintText: 'volunteer.sign_up.create_strong_password'.tr(),
               validator: AppValidators.password,
               iconEnd: AppIcons.eyeShow,
             ),
@@ -182,8 +182,8 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
             // Password Confirm
             CustomFieldText(
               controller: TextEditingController(),
-              title: 'sign_up_volunteer.confirm_password'.tr(),
-              hintText: 'sign_up_volunteer.confirm_your_password'.tr(),
+              title: 'volunteer.sign_up.confirm_password'.tr(),
+              hintText: 'volunteer.sign_up.confirm_your_password'.tr(),
               validator: AppValidators.password,
               iconEnd: AppIcons.eyeShow,
             ),
@@ -208,7 +208,7 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                 SizedBox(width: AppSize.getWidth(8)),
                 Expanded(
                   child: Text(
-                    'sign_up_volunteer.accept_terms'.tr(),
+                    'volunteer.sign_up.accept_terms'.tr(),
                     style: TextStyle(color: AppColors.black).xs,
                   ),
                 ),
@@ -216,7 +216,7 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
             ),
             SizedBox(height: AppSize.getHeight(10)),
             CustomButton(
-              title: 'sign_up_volunteer.sign_up_button'.tr(),
+              title: 'volunteer.sign_up.sign_up_button'.tr(),
               onTap: () {},
             ),
             SizedBox(height: AppSize.getHeight(8)),
@@ -225,11 +225,11 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
               child: RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  text: "sign_up_volunteer.already_have_account".tr(),
+                  text: "volunteer.sign_up.already_have_account".tr(),
                   style: TextStyle(color: AppColors.black).xs,
                   children: [
                     TextSpan(
-                      text: "sign_up_volunteer.sign_in".tr(),
+                      text: "volunteer.sign_up.sign_in".tr(),
                       style: TextStyle(color: AppColors.green).xs,
                       recognizer: TapGestureRecognizer()
                         ..onTap = () => AppNavigator.remove(SignInScreen()),

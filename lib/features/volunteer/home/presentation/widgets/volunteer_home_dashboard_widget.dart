@@ -31,7 +31,7 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${'home.dashboard.title'.tr()}Ahmed Hassan!',
+              '${'volunteer.home.dashboard.title'.tr()}Ahmed Hassan!',
               style: TextStyle(
                 color: AppColors.white,
                 fontSize: AppSize.font(20),
@@ -40,7 +40,7 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
             ),
             SizedBox(height: AppSize.getHeight(10)),
             Text(
-              'home.dashboard.desc'.tr(),
+              'volunteer.home.dashboard.desc'.tr(),
               style: TextStyle(
                 color: AppColors.white,
                 fontSize: AppSize.font(15),
@@ -78,7 +78,7 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'home.dashboard.xp_points'.tr(),
+                        'volunteer.home.dashboard.xp_points'.tr(),
                         style: TextStyle(
                           fontSize: AppSize.font(10),
                           fontWeight: FontWeight.w300,
@@ -115,7 +115,7 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'home.dashboard.day_streak'.tr(),
+                        'volunteer.home.dashboard.day_streak'.tr(),
                         style: TextStyle(
                           fontSize: AppSize.font(10),
                           fontWeight: FontWeight.w300,
@@ -152,7 +152,7 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'home.dashboard.badges'.tr(),
+                        'volunteer.home.dashboard.badges'.tr(),
                         style: TextStyle(
                           fontSize: AppSize.font(10),
                           fontWeight: FontWeight.w300,

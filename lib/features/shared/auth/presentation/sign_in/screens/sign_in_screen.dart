@@ -124,7 +124,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            'sign_in.title'.tr(),
+                                            'shared.sign_in.title'.tr(),
                                             style: TextStyle(
                                               color: AppColors.green,
                                               fontSize: AppSize.font(20),
@@ -135,7 +135,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                             height: AppSize.getHeight(5),
                                           ),
                                           Text(
-                                            'sign_in.desc'.tr(),
+                                            'shared.sign_in.desc'.tr(),
                                             style: TextStyle(
                                               color: AppColors.black.withValues(
                                                 alpha: 0.5,

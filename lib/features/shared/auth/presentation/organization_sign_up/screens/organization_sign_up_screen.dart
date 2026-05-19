@@ -85,7 +85,7 @@ class _OrganizationSignUpScreenState extends State<OrganizationSignUpScreen> {
                           child: Column(
                             children: [
                               Text(
-                                'sign_up_organization.title'.tr(),
+                                'organization.sign_up.title'.tr(),
                                 style: TextStyle(
                                   color: AppColors.laserBlue,
                                   fontSize: AppSize.font(20),
@@ -94,7 +94,7 @@ class _OrganizationSignUpScreenState extends State<OrganizationSignUpScreen> {
                               ),
                               SizedBox(height: AppSize.getHeight(5)),
                               Text(
-                                'sign_up_organization.desc'.tr(),
+                                'organization.sign_up.desc'.tr(),
                                 style: TextStyle(
                                   color: AppColors.black.withValues(alpha: 0.5),
                                   fontSize: AppSize.font(15),

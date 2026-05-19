@@ -21,7 +21,7 @@ class DonationsPopUp extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'donations_removed.winter_clothing_drive'.tr(),
+              'shared.donations_removed.winter_clothing_drive'.tr(),
               style: TextStyle(
                 fontSize: AppSize.font(20),
                 fontWeight: FontWeight.w400,
@@ -29,7 +29,7 @@ class DonationsPopUp extends StatelessWidget {
             ),
             SizedBox(height: AppSize.getHeight(10)),
             Text(
-              'donations_removed.resala_charity'.tr(),
+              'shared.donations_removed.resala_charity'.tr(),
               style: TextStyle(
                 fontSize: AppSize.font(15),
                 fontWeight: FontWeight.w400,
@@ -39,8 +39,8 @@ class DonationsPopUp extends StatelessWidget {
             SizedBox(height: AppSize.getHeight(10)),
             CustomFieldText(
               controller: TextEditingController(),
-              title: 'donations.pop_up.donation_Amount'.tr(),
-              hintText: 'donations.pop_up.enter_amount'.tr(),
+              title: 'shared.donations.pop_up.donation_Amount'.tr(),
+              hintText: 'shared.donations.pop_up.enter_amount'.tr(),
             ),
             SizedBox(height: AppSize.getHeight(13)),
             Row(
@@ -79,7 +79,7 @@ class DonationsPopUp extends StatelessWidget {
                 Expanded(
                   child: CustomButton(
                     onTap: () => AppNavigator.pop(),
-                    title: 'donations.pop_up.cancel'.tr(),
+                    title: 'shared.donations.pop_up.cancel'.tr(),
                     textColor: AppColors.black,
                     textSize: AppSize.font(15),
                     height: AppSize.getHeight(45),
@@ -89,7 +89,7 @@ class DonationsPopUp extends StatelessWidget {
                 SizedBox(width: AppSize.getWidth(10)),
                 Expanded(
                   child: CustomButton(
-                    title: 'donations.pop_up.confirm'.tr(),
+                    title: 'shared.donations.pop_up.confirm'.tr(),
                     textColor: AppColors.white,
                     textSize: AppSize.font(15),
                     height: AppSize.getHeight(45),

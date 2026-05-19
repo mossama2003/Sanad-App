@@ -20,7 +20,7 @@ class CasesPopUp extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'cases_removed.family_displaced_by_fire'.tr(),
+              'shared.cases_removed.family_displaced_by_fire'.tr(),
               style: TextStyle(
                 fontSize: AppSize.font(20),
                 fontWeight: FontWeight.w400,
@@ -38,7 +38,7 @@ class CasesPopUp extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'cases.pop_up.contact_person'.tr(),
+                    'shared.cases.pop_up.contact_person'.tr(),
                     style: TextStyle(
                       fontSize: AppSize.font(12),
                       color: AppColors.grey700,
@@ -46,7 +46,7 @@ class CasesPopUp extends StatelessWidget {
                   ),
                   SizedBox(height: AppSize.getHeight(5)),
                   Text(
-                    'cases_removed.mohamed'.tr(),
+                    'shared.cases_removed.mohamed'.tr(),
                     style: TextStyle(
                       fontSize: AppSize.font(14),
                       color: AppColors.black,
@@ -55,7 +55,7 @@ class CasesPopUp extends StatelessWidget {
                   ),
                   SizedBox(height: AppSize.getHeight(10)),
                   Text(
-                    'cases.pop_up.phone'.tr(),
+                    'shared.cases.pop_up.phone'.tr(),
                     style: TextStyle(
                       fontSize: AppSize.font(12),
                       color: AppColors.grey700,
@@ -72,7 +72,7 @@ class CasesPopUp extends StatelessWidget {
                   ),
                   SizedBox(height: AppSize.getHeight(10)),
                   Text(
-                    'cases.pop_up.bank_account'.tr(),
+                    'shared.cases.pop_up.bank_account'.tr(),
                     style: TextStyle(
                       fontSize: AppSize.font(12),
                       color: AppColors.grey700,
@@ -80,7 +80,7 @@ class CasesPopUp extends StatelessWidget {
                   ),
                   SizedBox(height: AppSize.getHeight(5)),
                   Text(
-                    'cases_removed.national_bank'.tr(),
+                    'shared.cases_removed.national_bank'.tr(),
                     style: TextStyle(
                       fontSize: AppSize.font(14),
                       color: AppColors.black,
@@ -103,7 +103,7 @@ class CasesPopUp extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  'cases.pop_up.you_can_support'.tr(),
+                  'shared.cases.pop_up.you_can_support'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(13),
                     color: AppColors.laserBlue,
@@ -118,7 +118,7 @@ class CasesPopUp extends StatelessWidget {
                 Expanded(
                   child: CustomButton(
                     onTap: () => AppNavigator.pop(),
-                    title: 'cases.pop_up.close'.tr(),
+                    title: 'shared.cases.pop_up.close'.tr(),
                     textColor: AppColors.black,
                     textSize: AppSize.font(15),
                     height: AppSize.getHeight(45),
@@ -128,7 +128,7 @@ class CasesPopUp extends StatelessWidget {
                 SizedBox(width: AppSize.getWidth(10)),
                 Expanded(
                   child: CustomButton(
-                    title: 'cases.pop_up.call_now'.tr(),
+                    title: 'shared.cases.pop_up.call_now'.tr(),
                     textColor: AppColors.white,
                     textSize: AppSize.font(15),
                     height: AppSize.getHeight(45),

@@ -84,7 +84,7 @@ class _VolunteerSignUpScreenState extends State<VolunteerSignUpScreen> {
                           child: Column(
                             children: [
                               Text(
-                                'sign_up_volunteer.title'.tr(),
+                                'volunteer.sign_up.title'.tr(),
                                 style: TextStyle(
                                   color: AppColors.green,
                                   fontSize: AppSize.font(20),
@@ -93,7 +93,7 @@ class _VolunteerSignUpScreenState extends State<VolunteerSignUpScreen> {
                               ),
                               SizedBox(height: AppSize.getHeight(5)),
                               Text(
-                                'sign_up_volunteer.desc'.tr(),
+                                'volunteer.sign_up.desc'.tr(),
                                 style: TextStyle(
                                   color: AppColors.black.withValues(alpha: 0.5),
                                   fontSize: AppSize.font(15),

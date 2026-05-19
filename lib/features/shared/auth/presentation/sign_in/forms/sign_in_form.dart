@@ -68,7 +68,7 @@ class _SignInFormState extends State<SignInForm> {
         //       crossAxisAlignment: CrossAxisAlignment.start,
         //       children: [
         //         Text(
-        //           'sign_in.i_am'.tr(),
+        //           'shared.sign_in.i_am'.tr(),
         //           style: TextStyle(color: AppColors.grey700).xs,
         //         ),
         //         SizedBox(height: AppSize.getHeight(8)),
@@ -98,7 +98,7 @@ class _SignInFormState extends State<SignInForm> {
         //                 ),
         //                 child: Center(
         //                   child: Text(
-        //                     'sign_in.volunteer'.tr(),
+        //                     'shared.sign_in.volunteer'.tr(),
         //                     style: TextStyle(
         //                       color: selectedIndex == 0
         //                           ? AppColors.green
@@ -133,7 +133,7 @@ class _SignInFormState extends State<SignInForm> {
         //                 ),
         //                 child: Center(
         //                   child: Text(
-        //                     'sign_in.organization'.tr(),
+        //                     'shared.sign_in.organization'.tr(),
         //                     style: TextStyle(
         //                       color: selectedIndex == 1
         //                           ? AppColors.green
@@ -164,61 +164,61 @@ class _SignInFormState extends State<SignInForm> {
                 CustomFieldText(
                   controller: TextEditingController(),
                   validator: AppValidators.email,
-                  hintText: 'sign_in.enter_email_or_phone'.tr(),
-                  title: 'sign_in.email_or_phone'.tr(),
+                  hintText: 'shared.sign_in.enter_email_or_phone'.tr(),
+                  title: 'shared.sign_in.email_or_phone'.tr(),
                   iconStart: AppIcons.email,
                 ),
                 SizedBox(height: AppSize.getHeight(15)),
                 CustomFieldText(
                   controller: TextEditingController(),
                   validator: AppValidators.password,
-                  hintText: 'sign_in.enter_password'.tr(),
-                  title: 'sign_in.password'.tr(),
+                  hintText: 'shared.sign_in.enter_password'.tr(),
+                  title: 'shared.sign_in.password'.tr(),
                   iconStart: AppIcons.lock,
                   iconEnd: AppIcons.eyeShow,
                 ),
                 SizedBox(height: AppSize.getHeight(15)),
                 Text(
-                  'sign_in.forget_password'.tr(),
+                  'shared.sign_in.forget_password'.tr(),
                   style: TextStyle(color: AppColors.green).xs,
                 ),
                 SizedBox(height: AppSize.getHeight(25)),
                 _socialIcon(
                   svg: AppSvg.google,
                   onTap: () {},
-                  text: 'sign_in.sign_with_google',
+                  text: 'shared.sign_in.sign_with_google',
                 ),
                 SizedBox(height: AppSize.getHeight(10)),
                 _socialIcon(
                   svg: AppSvg.apple,
-                  text: 'sign_in.sign_with_apple',
+                  text: 'shared.sign_in.sign_with_apple',
                   onTap: () {},
                 ),
                 SizedBox(height: AppSize.getHeight(25)),
                 CustomButton(
                   onTap: () => AppNavigator.push(VolunteerHomeBody()),
-                  title: 'sign_in.sign_in_button'.tr(),
+                  title: 'shared.sign_in.sign_in_button'.tr(),
                 ),
                 SizedBox(height: AppSize.getHeight(8)),
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    text: "sign_in.dont_have_account".tr(),
+                    text: "shared.sign_in.dont_have_account".tr(),
                     style: TextStyle(color: AppColors.black).xs,
                     children: [
                       TextSpan(
-                        text: "sign_in.sign_up_as_volunteer".tr(),
+                        text: "shared.sign_in.sign_up_as_volunteer".tr(),
                         style: TextStyle(color: AppColors.green).xs,
                         recognizer: TapGestureRecognizer()
                           ..onTap = () =>
                               AppNavigator.push(VolunteerSignUpScreen()),
                       ),
                       TextSpan(
-                        text: "sign_in.or".tr(),
+                        text: "shared.sign_in.or".tr(),
                         style: TextStyle(color: AppColors.black).xs,
                       ),
                       TextSpan(
-                        text: "sign_in.sign_up_as_organization".tr(),
+                        text: "shared.sign_in.sign_up_as_organization".tr(),
                         style: TextStyle(color: AppColors.green).xs,
                         recognizer: TapGestureRecognizer()
                           ..onTap = () =>

@@ -63,7 +63,7 @@ class EventsBottomSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'home_removed.blood_donation_drive'.tr(),
+                    'volunteer.home_removed.blood_donation_drive'.tr(),
                     style: TextStyle(
                       fontSize: AppSize.font(20),
                       fontWeight: FontWeight.w500,
@@ -71,7 +71,7 @@ class EventsBottomSheet extends StatelessWidget {
                   ),
                   SizedBox(height: AppSize.getHeight(10)),
                   Text(
-                    'home_removed.egyptian_red_crescent'.tr(),
+                    'volunteer.home_removed.egyptian_red_crescent'.tr(),
                     style: TextStyle(
                       fontSize: AppSize.font(15),
                       fontWeight: FontWeight.w400,
@@ -80,7 +80,7 @@ class EventsBottomSheet extends StatelessWidget {
                   ),
                   SizedBox(height: AppSize.getHeight(12)),
                   Text(
-                    'home_removed.help_save'.tr(),
+                    'volunteer.home_removed.help_save'.tr(),
                     style: TextStyle(
                       fontSize: AppSize.font(15),
                       fontWeight: FontWeight.w300,
@@ -110,7 +110,7 @@ class EventsBottomSheet extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'events.bottom_sheet.date_time'.tr(),
+                                  'volunteer.events.bottom_sheet.date_time'.tr(),
                                   style: TextStyle(
                                     fontSize: AppSize.font(13),
                                     color: AppColors.grey700,
@@ -118,7 +118,7 @@ class EventsBottomSheet extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  'home_removed.date'.tr(),
+                                  'volunteer.home_removed.date'.tr(),
                                   style: TextStyle(
                                     fontSize: AppSize.font(14),
                                     color: AppColors.black,
@@ -144,7 +144,7 @@ class EventsBottomSheet extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'events.bottom_sheet.duration'.tr(),
+                                  'volunteer.events.bottom_sheet.duration'.tr(),
                                   style: TextStyle(
                                     fontSize: AppSize.font(13),
                                     color: AppColors.grey700,
@@ -152,7 +152,7 @@ class EventsBottomSheet extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  'home_removed.4_hours'.tr(),
+                                  'volunteer.home_removed.4_hours'.tr(),
                                   style: TextStyle(
                                     fontSize: AppSize.font(14),
                                     color: AppColors.black,
@@ -178,7 +178,7 @@ class EventsBottomSheet extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'events.bottom_sheet.location'.tr(),
+                                  'volunteer.events.bottom_sheet.location'.tr(),
                                   style: TextStyle(
                                     fontSize: AppSize.font(13),
                                     color: AppColors.grey700,
@@ -186,7 +186,7 @@ class EventsBottomSheet extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  'home_removed.cairo_medical_center'.tr(),
+                                  'volunteer.home_removed.cairo_medical_center'.tr(),
                                   style: TextStyle(
                                     fontSize: AppSize.font(14),
                                     color: AppColors.black,
@@ -212,7 +212,7 @@ class EventsBottomSheet extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'events.bottom_sheet.volunteers'.tr(),
+                                  'volunteer.events.bottom_sheet.volunteers'.tr(),
                                   style: TextStyle(
                                     fontSize: AppSize.font(13),
                                     color: AppColors.grey700,
@@ -220,7 +220,7 @@ class EventsBottomSheet extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  'home_removed.members'.tr(),
+                                  'volunteer.home_removed.members'.tr(),
                                   style: TextStyle(
                                     fontSize: AppSize.font(14),
                                     color: AppColors.black,
@@ -236,7 +236,7 @@ class EventsBottomSheet extends StatelessWidget {
                   ),
                   SizedBox(height: AppSize.getHeight(20)),
                   CustomButton(
-                    title: 'events.bottom_sheet.button'.tr(),
+                    title: 'volunteer.events.bottom_sheet.button'.tr(),
                     height: AppSize.getHeight(50),
                     bgColor: AppColors.primary,
                   ),

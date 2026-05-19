@@ -25,7 +25,7 @@ class DonationsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'donations.title'.tr(),
+                      'shared.donations.title'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(22),
                         fontWeight: FontWeight.w500,
@@ -34,7 +34,7 @@ class DonationsScreen extends StatelessWidget {
                     ),
                     SizedBox(height: AppSize.getHeight(8)),
                     Text(
-                      'donations.desc'.tr(),
+                      'shared.donations.desc'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(15),
                         fontWeight: FontWeight.w400,

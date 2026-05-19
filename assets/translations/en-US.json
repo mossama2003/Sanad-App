@@ -141,6 +141,7 @@
       "desc": "Verified cases needing immediate support",
       "button": "Submit a Case for Review",
       "card": {
+        "verified": "Verified",
         "button": "Support This Case"
       },
       "pop_up": {
@@ -153,11 +154,49 @@
       }
     },
     "cases_removed": {
+      "days_Ago": "2 days ago",
       "family_displaced_by_fire": "Family Displaced by Fire",
       "a_family_of_6_lost": "A family of 6 lost their home in a residential fire. They urgently need shelter, clothing, and basic necessities. The fire destroyed all their belongings and they are currently staying with relatives.",
       "contact": "Contact: Mohamed Ahmed",
       "national_bank": "0123456789 - National Bank of Egypt",
       "mohamed": "Mohamed Ahmed"
+    },
+    "notifications": {
+      "appbar": "Notifications",
+      "unread": "unread"
+    },
+    "notifications_removed": {
+      "new_badge_earned": "New Badge Earned!",
+      "you_earned_the_social_butterfly_badge": "You earned the Social Butterfly badge",
+      "1h_ago": "1h ago"
+    },
+    "profile": {
+      "appbar": "Profile",
+      "profile_information": "Profile Information",
+      "appearance": "Appearance",
+      "light_mood": "Light Mood",
+      "dark_mood": "Dark Mood",
+      "support": "Support",
+      "help_support":"Help & Support",
+      "privacy_policy": "Privacy Policy",
+      "terms_service": "Terms of Service",
+      "FAQs": "FAQs",
+      "logout": "Logout"
+    },
+    "edit_profile": {
+      "appbar": "Edit Profile",
+      "full_name": "Full Name",
+      "email": "Email",
+      "button": "Save Changes"
+    },
+    "profile_removed": {
+      "red_crescent": "Red Crescent",
+      "email": "mossama370@gmail.com",
+      "phone": "+20 123 456 7890",
+      "location": "Cairo, Egypt",
+      "events": "Joined Dec 2024",
+      "xp": "1,250 XP Points",
+      "button": "Edit Profile"
     }
   },
   "organization": {

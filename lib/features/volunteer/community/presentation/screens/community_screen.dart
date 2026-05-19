@@ -27,7 +27,7 @@ class CommunityScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'community.title'.tr(),
+                      'volunteer.community.title'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(22),
                         fontWeight: FontWeight.w500,
@@ -36,7 +36,7 @@ class CommunityScreen extends StatelessWidget {
                     ),
                     SizedBox(height: AppSize.getHeight(8)),
                     Text(
-                      'community.desc'.tr(),
+                      'volunteer.community.desc'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(15),
                         fontWeight: FontWeight.w400,
@@ -48,7 +48,7 @@ class CommunityScreen extends StatelessWidget {
                       controller: TextEditingController(),
                       bgColor: AppColors.white,
                       iconStart: AppIcons.search,
-                      hintText: 'community.search'.tr(),
+                      hintText: 'volunteer.community.search'.tr(),
                     ),
                     SizedBox(height: AppSize.getHeight(20)),
                     Container(
@@ -93,7 +93,7 @@ class CommunityScreen extends StatelessWidget {
                                     Row(
                                       children: [
                                         Text(
-                                          'home_removed.blood_donation_drive_date'
+                                          'volunteer.home_removed.blood_donation_drive_date'
                                               .tr(),
                                           style: TextStyle(
                                             fontSize: AppSize.font(15),
@@ -125,7 +125,7 @@ class CommunityScreen extends StatelessWidget {
                                     ),
                                     SizedBox(height: AppSize.getHeight(5)),
                                     Text(
-                                      'home_removed.egyptian_red_crescent'.tr(),
+                                      'volunteer.home_removed.egyptian_red_crescent'.tr(),
                                       style: TextStyle(
                                         fontSize: AppSize.font(13),
                                         fontWeight: FontWeight.w400,
@@ -167,7 +167,7 @@ class CommunityScreen extends StatelessWidget {
                                         ),
                                         SizedBox(width: AppSize.getWidth(2)),
                                         Text(
-                                          'home_removed.dec_8_2025'.tr(),
+                                          'volunteer.home_removed.dec_8_2025'.tr(),
                                           style: TextStyle(
                                             fontSize: AppSize.font(13),
                                             color: AppColors.black.withValues(
@@ -180,7 +180,7 @@ class CommunityScreen extends StatelessWidget {
                                     ),
                                     SizedBox(height: AppSize.getHeight(5)),
                                     Text(
-                                      'home_removed.dont_forget_to_bring_your_id'
+                                      'volunteer.home_removed.dont_forget_to_bring_your_id'
                                           .tr(),
                                       style: TextStyle(
                                         fontSize: AppSize.font(13),
@@ -204,7 +204,7 @@ class CommunityScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
-                              'community.expired'.tr(),
+                              'volunteer.community.expired'.tr(),
                               style: TextStyle(
                                 fontSize: AppSize.font(12),
                                 color: AppColors.black,

@@ -27,7 +27,7 @@ class CasesScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'cases.title'.tr(),
+                      'shared.cases.title'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(22),
                         fontWeight: FontWeight.w500,
@@ -36,7 +36,7 @@ class CasesScreen extends StatelessWidget {
                     ),
                     SizedBox(height: AppSize.getHeight(8)),
                     Text(
-                      'cases.desc'.tr(),
+                      'shared.cases.desc'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(15),
                         fontWeight: FontWeight.w400,
@@ -45,7 +45,7 @@ class CasesScreen extends StatelessWidget {
                     ),
                     SizedBox(height: AppSize.getHeight(20)),
                     CustomButton(
-                      title: 'cases.button'.tr(),
+                      title: 'shared.cases.button'.tr(),
                       bgColor: AppColors.laserBlue,
                       icon: AppIcons.add,
                       height: AppSize.getHeight(50),

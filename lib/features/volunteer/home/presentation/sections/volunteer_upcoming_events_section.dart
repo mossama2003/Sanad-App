@@ -17,7 +17,7 @@ class VolunteerUpcomingEventsSection extends StatelessWidget {
         Row(
           children: [
             Text(
-              'home.upcoming_events.title'.tr(),
+              'volunteer.home.upcoming_events.title'.tr(),
               style: TextStyle(
                 fontSize: AppSize.font(18),
                 fontWeight: FontWeight.w400,
@@ -28,7 +28,7 @@ class VolunteerUpcomingEventsSection extends StatelessWidget {
             TextButton(
               onPressed: () => AppNavigator.push(EventsScreen()),
               child: Text(
-                'home.upcoming_events.view_all'.tr(),
+                'volunteer.home.upcoming_events.view_all'.tr(),
                 style: TextStyle(
                   fontSize: AppSize.font(12),
                   fontWeight: FontWeight.w400,
@@ -63,7 +63,7 @@ class VolunteerUpcomingEventsSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'home_removed.blood_donation_drive'.tr(),
+                      'volunteer.home_removed.blood_donation_drive'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(15),
                         fontWeight: FontWeight.w400,
@@ -71,7 +71,7 @@ class VolunteerUpcomingEventsSection extends StatelessWidget {
                     ),
                     SizedBox(height: AppSize.getHeight(5)),
                     Text(
-                      'home_removed.egyptian_red_crescent'.tr(),
+                      'volunteer.home_removed.egyptian_red_crescent'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
                         fontWeight: FontWeight.w400,
@@ -82,7 +82,7 @@ class VolunteerUpcomingEventsSection extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          'home_removed.date'.tr(),
+                          'volunteer.home_removed.date'.tr(),
                           style: TextStyle(
                             fontSize: AppSize.font(13),
                             fontWeight: FontWeight.w300,
@@ -90,7 +90,7 @@ class VolunteerUpcomingEventsSection extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          'home_removed.cairo_medical_center'.tr(),
+                          'volunteer.home_removed.cairo_medical_center'.tr(),
                           style: TextStyle(
                             fontSize: AppSize.font(13),
                             fontWeight: FontWeight.w400,

@@ -39,7 +39,7 @@ class EmergencyCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    'emergency.card.critical'.tr().toUpperCase(),
+                    'volunteer.emergency.card.critical'.tr().toUpperCase(),
                     style: TextStyle(
                       fontSize: AppSize.font(11),
                       fontWeight: FontWeight.w500,
@@ -52,7 +52,7 @@ class EmergencyCard extends StatelessWidget {
           ),
           SizedBox(height: AppSize.getHeight(8)),
           Text(
-            'emergency_removed.flood_relief'.tr(),
+            'volunteer.emergency_removed.flood_relief'.tr(),
             style: TextStyle(
               fontSize: AppSize.font(20),
               color: AppColors.red,
@@ -61,7 +61,7 @@ class EmergencyCard extends StatelessWidget {
           ),
           SizedBox(height: AppSize.getHeight(8)),
           Text(
-            'emergency_removed.urgent_need'.tr(),
+            'volunteer.emergency_removed.urgent_need'.tr(),
             style: TextStyle(
               fontSize: AppSize.font(15),
               color: AppColors.grey700,
@@ -78,7 +78,7 @@ class EmergencyCard extends StatelessWidget {
               ),
               SizedBox(width: AppSize.getWidth(5)),
               Text(
-                'emergency_removed.minya_egypt'.tr(),
+                'volunteer.emergency_removed.minya_egypt'.tr(),
                 style: TextStyle(
                   fontSize: AppSize.font(13),
                   color: AppColors.grey800,
@@ -98,7 +98,7 @@ class EmergencyCard extends StatelessWidget {
               ),
               SizedBox(width: AppSize.getWidth(5)),
               Text(
-                'emergency_removed.volunteers_joined'.tr(),
+                'volunteer.emergency_removed.volunteers_joined'.tr(),
                 style: TextStyle(
                   fontSize: AppSize.font(13),
                   color: AppColors.grey800,
@@ -118,7 +118,7 @@ class EmergencyCard extends StatelessWidget {
               ),
               SizedBox(width: AppSize.getWidth(5)),
               Text(
-                'emergency_removed.posted'.tr(),
+                'volunteer.emergency_removed.posted'.tr(),
                 style: TextStyle(
                   fontSize: AppSize.font(13),
                   color: AppColors.grey800,
@@ -140,7 +140,7 @@ class EmergencyCard extends StatelessWidget {
                 flex: 2,
                 child: CustomButton(
                   onTap: () {},
-                  title: 'emergency.card.join_now'.tr(),
+                  title: 'volunteer.emergency.card.join_now'.tr(),
                   height: AppSize.getHeight(45),
                   bgColor: AppColors.red,
                 ),
@@ -149,7 +149,7 @@ class EmergencyCard extends StatelessWidget {
               Expanded(
                 child: CustomButton(
                   onTap: () {},
-                  title: 'emergency.card.contact'.tr(),
+                  title: 'volunteer.emergency.card.contact'.tr(),
                   height: AppSize.getHeight(45),
                   bgColor: AppColors.white,
                   borderColor: AppColors.grey300,

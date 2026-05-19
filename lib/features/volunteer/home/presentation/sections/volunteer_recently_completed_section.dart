@@ -13,7 +13,7 @@ class VolunteerRecentlyCompletedSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'home.recently_completed.title'.tr(),
+          'volunteer.home.recently_completed.title'.tr(),
           style: TextStyle(
             fontSize: AppSize.font(18),
             fontWeight: FontWeight.w400,
@@ -47,7 +47,7 @@ class VolunteerRecentlyCompletedSection extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          'home_removed.food_distribution'.tr(),
+                          'volunteer.home_removed.food_distribution'.tr(),
                           style: TextStyle(
                             fontSize: AppSize.font(15),
                             fontWeight: FontWeight.w400,
@@ -75,7 +75,7 @@ class VolunteerRecentlyCompletedSection extends StatelessWidget {
                     ),
                     SizedBox(height: AppSize.getHeight(5)),
                     Text(
-                      'home_removed.resala_charity'.tr(),
+                      'volunteer.home_removed.resala_charity'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
                         fontWeight: FontWeight.w400,
@@ -84,7 +84,7 @@ class VolunteerRecentlyCompletedSection extends StatelessWidget {
                     ),
                     SizedBox(height: AppSize.getHeight(5)),
                     Text(
-                      'home_removed.dec_8_2025'.tr(),
+                      'volunteer.home_removed.dec_8_2025'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
                         fontWeight: FontWeight.w300,

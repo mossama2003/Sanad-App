@@ -34,7 +34,7 @@ class EmergencyScreen extends StatelessWidget {
                     ),
                     SizedBox(width: AppSize.getWidth(8)),
                     Text(
-                      'emergency.title'.tr(),
+                      'volunteer.emergency.title'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(22),
                         fontWeight: FontWeight.w500,
@@ -45,7 +45,7 @@ class EmergencyScreen extends StatelessWidget {
                 ),
                 SizedBox(height: AppSize.getHeight(8)),
                 Text(
-                  'emergency.desc'.tr(),
+                  'volunteer.emergency.desc'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(15),
                     fontWeight: FontWeight.w400,
@@ -55,7 +55,7 @@ class EmergencyScreen extends StatelessWidget {
                 SizedBox(height: AppSize.getHeight(20)),
                 CustomButton(
                   onTap: () => AppNavigator.push(ReportEmergencyScreen()),
-                  title: 'emergency.button'.tr(),
+                  title: 'volunteer.emergency.button'.tr(),
                   bgColor: AppColors.red,
                   icon: AppIcons.add,
                   height: AppSize.getHeight(50),

@@ -57,7 +57,7 @@ class DonationsCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'donations_removed.winter_clothing_drive'.tr(),
+                  'shared.donations_removed.winter_clothing_drive'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(20),
                     fontWeight: FontWeight.w400,
@@ -65,7 +65,7 @@ class DonationsCard extends StatelessWidget {
                 ),
                 SizedBox(height: AppSize.getHeight(8)),
                 Text(
-                  'donations_removed.help_provide_warm'.tr(),
+                  'shared.donations_removed.help_provide_warm'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(15),
                     fontWeight: FontWeight.w400,
@@ -74,7 +74,7 @@ class DonationsCard extends StatelessWidget {
                 ),
                 SizedBox(height: AppSize.getHeight(8)),
                 Text(
-                  'donations_removed.resala_charity'.tr(),
+                  'shared.donations_removed.resala_charity'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(12),
                     fontWeight: FontWeight.w400,
@@ -85,7 +85,7 @@ class DonationsCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'donations_removed.raised'.tr(),
+                      'shared.donations_removed.raised'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
                         fontWeight: FontWeight.w400,
@@ -94,7 +94,7 @@ class DonationsCard extends StatelessWidget {
                     ),
                     Spacer(),
                     Text(
-                      'donations_removed.goal'.tr(),
+                      'shared.donations_removed.goal'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
                         fontWeight: FontWeight.w400,
@@ -109,7 +109,7 @@ class DonationsCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'donations_removed.funded'.tr(),
+                      'shared.donations_removed.funded'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
                         fontWeight: FontWeight.w400,
@@ -118,7 +118,7 @@ class DonationsCard extends StatelessWidget {
                     ),
                     Spacer(),
                     Text(
-                      'donations_removed.days_left'.tr(),
+                      'shared.donations_removed.days_left'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
                         fontWeight: FontWeight.w400,
@@ -129,7 +129,7 @@ class DonationsCard extends StatelessWidget {
                 ),
                 SizedBox(height: AppSize.getHeight(15)),
                 CustomButton(
-                  title: 'donations.button'.tr(),
+                  title: 'shared.donations.button'.tr(),
                   icon: AppIcons.donations,
                   bgColor: AppColors.magenta,
                   height: AppSize.getHeight(50),

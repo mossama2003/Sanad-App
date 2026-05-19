@@ -36,7 +36,7 @@ class _EventsScreenState extends State<EventsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'events.title'.tr(),
+                      'volunteer.events.title'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(22),
                         fontWeight: FontWeight.w500,
@@ -45,7 +45,7 @@ class _EventsScreenState extends State<EventsScreen> {
                     ),
                     SizedBox(height: AppSize.getHeight(8)),
                     Text(
-                      'events.desc'.tr(),
+                      'volunteer.events.desc'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(15),
                         fontWeight: FontWeight.w400,
@@ -58,14 +58,14 @@ class _EventsScreenState extends State<EventsScreen> {
                       controller: TextEditingController(),
                       bgColor: AppColors.white,
                       iconStart: AppIcons.search,
-                      hintText: 'events.search'.tr(),
+                      hintText: 'volunteer.events.search'.tr(),
                     ),
 
                     SizedBox(height: AppSize.getHeight(10)),
 
                     /// زرار الفلتر
                     CustomButton(
-                      title: 'events.filters'.tr(),
+                      title: 'volunteer.events.filters'.tr(),
                       onTap: () {
                         setState(() {
                           showFilters = !showFilters;
@@ -97,14 +97,14 @@ class _EventsScreenState extends State<EventsScreen> {
                                   color: AppColors.white,
                                 ),
                                 child: CustomSelectableChips(
-                                  title: 'events.filter.title'.tr(),
+                                  title: 'volunteer.events.filter.title'.tr(),
                                   items: [
-                                    'events.filter.all'.tr(),
-                                    'events.filter.blood_donation'.tr(),
-                                    'events.filter.orphanage'.tr(),
-                                    'events.filter.environment'.tr(),
-                                    'events.filter.food_distribution'.tr(),
-                                    'events.filter.healthcare'.tr(),
+                                    'volunteer.events.filter.all'.tr(),
+                                    'volunteer.events.filter.blood_donation'.tr(),
+                                    'volunteer.events.filter.orphanage'.tr(),
+                                    'volunteer.events.filter.environment'.tr(),
+                                    'volunteer.events.filter.food_distribution'.tr(),
+                                    'volunteer.events.filter.healthcare'.tr(),
                                   ],
                                   multiSelect: false,
                                 ),

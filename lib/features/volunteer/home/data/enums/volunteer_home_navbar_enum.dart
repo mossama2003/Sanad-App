@@ -27,15 +27,15 @@ extension VolunteerHomeNavbarItemExt on VolunteerHomeNavbarItem {
   String get label {
     switch (this) {
       case VolunteerHomeNavbarItem.home:
-        return 'home.navbar.home'.tr();
+        return 'volunteer.home.navbar.home'.tr();
       case VolunteerHomeNavbarItem.events:
-        return 'home.navbar.events'.tr();
+        return 'volunteer.home.navbar.events'.tr();
       case VolunteerHomeNavbarItem.community:
-        return 'home.navbar.community'.tr();
+        return 'volunteer.home.navbar.community'.tr();
       case VolunteerHomeNavbarItem.donations:
-        return 'home.navbar.donations'.tr();
+        return 'volunteer.home.navbar.donations'.tr();
       case VolunteerHomeNavbarItem.cases:
-        return 'home.navbar.cases'.tr();
+        return 'volunteer.home.navbar.cases'.tr();
     }
   }
 
