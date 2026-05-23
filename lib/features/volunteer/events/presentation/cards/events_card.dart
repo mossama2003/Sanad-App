@@ -17,7 +17,7 @@ class EventsCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
             color: AppColors.black.withValues(alpha: 0.2),
@@ -30,8 +30,8 @@ class EventsCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
             ),
             child: Stack(
               children: [
@@ -49,8 +49,8 @@ class EventsCard extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  top: 8,
-                  left: 8,
+                  top: AppSize.getHeight(10),
+                  left: AppSize.getWidth(10),
                   child: Container(
                     padding: AppSize.padding(horizontal: 12, vertical: 2),
                     decoration: BoxDecoration(

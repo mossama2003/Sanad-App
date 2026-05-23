@@ -14,7 +14,7 @@ class SignInPhoneParam {
     return {
       "phone_country_code": phoneCode,
       'phone': phoneNumber,
-      if (fcmToken != null) "fcmToken": fcmToken,
+      "fcmToken": ?fcmToken,
     };
   }
 }

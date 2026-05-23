@@ -40,18 +40,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Map<String, String>> pages = [
     {
       'image': AppImages.onboardingImage1,
-      'titleKey': 'onboarding.make_a_difference',
-      'descKey': 'onboarding.join_thousands_of_volunteers',
+      'titleKey': 'shared.onboarding.make_a_difference',
+      'descKey': 'shared.onboarding.join_thousands_of_volunteers',
     },
     {
       'image': AppImages.onboardingImage2,
-      'titleKey': 'onboarding.give_receive',
-      'descKey': 'onboarding.support_causes',
+      'titleKey': 'shared.onboarding.give_receive',
+      'descKey': 'shared.onboarding.support_causes',
     },
     {
       'image': AppImages.onboardingImage3,
-      'titleKey': 'onboarding.earn_achieve',
-      'descKey': 'onboarding.track_your_impact',
+      'titleKey': 'shared.onboarding.earn_achieve',
+      'descKey': 'shared.onboarding.track_your_impact',
     },
   ];
 
@@ -99,7 +99,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       AppNavigator.remove(SignInScreen());
                     },
                     child: Text(
-                      'onboarding.skip'.tr(),
+                      'shared.onboarding.skip'.tr(),
                       style: TextStyle(color: AppColors.grey).sm,
                     ),
                   ),
@@ -189,8 +189,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               SizedBox(height: AppSize.getHeight(25)),
               CustomButton(
                 title: currentIndex == pages.length - 1
-                    ? 'onboarding.get_started'.tr()
-                    : 'onboarding.next'.tr(),
+                    ? 'shared.onboarding.get_started'.tr()
+                    : 'shared.onboarding.next'.tr(),
                 onTap: isAnimating
                     ? null
                     : () async {

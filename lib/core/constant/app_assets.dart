@@ -31,6 +31,8 @@ class AppImages {
   static String eventsImage = '$images/events.jpg';
   static String donationsImage = '$images/donations.png';
   static String casesImage = '$images/cases.png';
+  static String dashboardBackground = '$images/dashboard_background.png';
+  static String organizationBackground = '$images/organization_background.jpg';
 }
 
 class AppIcons {
@@ -67,4 +69,7 @@ class AppIcons {
   static String emergency = '$icons/emergency.svg';
   static String completed = '$icons/completed.svg';
   static String star = '$icons/star.svg';
+  static String growthArrow = '$icons/growth-arrow.svg';
+  static String comment = '$icons/comment.svg';
+  static String person = '$icons/person.svg';
 }

@@ -123,11 +123,16 @@
       "raised": "32,500 EGP raised",
       "goal": "50,000 EGP goal",
       "funded": "65.0% funded",
-      "days_left": "15 days left"
+      "days_left": "15 days left",
+      "EGP_12500": "EGP 12,500",
+      "8": "8"
     },
     "donations": {
       "title": "Donation Campaigns",
       "desc": "Support causes that matter",
+      "your_total_donations": "Your total donations",
+      "active_campaigns": "Active Campaigns",
+      "campaigns_supported": "Campaigns supported",
       "button": "Donate Now",
       "pop_up": {
         "donation_Amount": "Donation Amount (EGP)",
@@ -142,6 +147,9 @@
       "button": "Submit a Case for Review",
       "card": {
         "verified": "Verified",
+        "urgent": "Urgent",
+        "required": "Required",
+        "raised": "Raised",
         "button": "Support This Case"
       },
       "pop_up": {
@@ -159,7 +167,9 @@
       "a_family_of_6_lost": "A family of 6 lost their home in a residential fire. They urgently need shelter, clothing, and basic necessities. The fire destroyed all their belongings and they are currently staying with relatives.",
       "contact": "Contact: Mohamed Ahmed",
       "national_bank": "0123456789 - National Bank of Egypt",
-      "mohamed": "Mohamed Ahmed"
+      "mohamed": "Mohamed Ahmed",
+      "EGP_75000": "EGP 75,000",
+      "EGP_45000": "EGP 45,000"
     },
     "notifications": {
       "appbar": "Notifications",
@@ -177,7 +187,7 @@
       "light_mood": "Light Mood",
       "dark_mood": "Dark Mood",
       "support": "Support",
-      "help_support":"Help & Support",
+      "help_support": "Help & Support",
       "privacy_policy": "Privacy Policy",
       "terms_service": "Terms of Service",
       "FAQs": "FAQs",
@@ -365,20 +375,38 @@
         "button": "Join Event"
       },
       "filter": {
-        "title": "Event Type",
+        "type_title": "Event Type",
         "all": "All",
         "blood_donation": "Blood Donations",
         "orphanage": "Orphanage",
         "environment": "Environment",
         "food_distribution": "Food Distribution",
-        "healthcare": "HealthCare"
+        "healthcare": "HealthCare",
+        "location_title": "Event Location",
+        "cairo": "Cairo",
+        "giza": "Giza",
+        "alexandria": "Alexandria",
+        "mansoura": "Mansoura",
+        "aswan": "Aswan",
+        "luxor": "Luxor",
+        "date_title": "Event Date",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "this_week": "This Week",
+        "this_month": "This Month",
+        "upcoming": "Upcoming"
       }
     },
     "community": {
       "title": "Communities",
       "desc": "Connect with other volunteers",
       "search": "Search communities",
-      "expired": "Expired: Chat ends 3 days after event"
+      "expired": "Expired: Chat ends 3 days after event",
+      "ended": "Ended",
+      "2_min_ago": "2 min ago",
+      "2_days_ago": "2 days ago",
+      "communities_are_automatically_created": "Communities are automatically created when you join an event.",
+      "chat_access_remains": "Chat access remains for 3 days after the event ends."
     },
     "emergency": {
       "title": "Emergency Events",

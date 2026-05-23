@@ -39,20 +39,20 @@ class _EventsScreenState extends State<EventsScreen> {
                       'volunteer.events.title'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(22),
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.black,
                       ),
                     ),
-                    SizedBox(height: AppSize.getHeight(8)),
+                    SizedBox(height: AppSize.getHeight(3)),
                     Text(
                       'volunteer.events.desc'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(15),
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w300,
                         color: AppColors.black.withValues(alpha: 0.7),
                       ),
                     ),
-                    SizedBox(height: AppSize.getHeight(20)),
+                    SizedBox(height: AppSize.getHeight(15)),
 
                     CustomFieldText(
                       controller: TextEditingController(),
@@ -63,7 +63,6 @@ class _EventsScreenState extends State<EventsScreen> {
 
                     SizedBox(height: AppSize.getHeight(10)),
 
-                    /// زرار الفلتر
                     CustomButton(
                       title: 'volunteer.events.filters'.tr(),
                       onTap: () {
@@ -86,7 +85,7 @@ class _EventsScreenState extends State<EventsScreen> {
                               ),
                               child: Container(
                                 width: double.infinity,
-                                padding: AppSize.padding(all: 10),
+                                padding: AppSize.padding(all: 14),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
@@ -96,17 +95,68 @@ class _EventsScreenState extends State<EventsScreen> {
                                   ),
                                   color: AppColors.white,
                                 ),
-                                child: CustomSelectableChips(
-                                  title: 'volunteer.events.filter.title'.tr(),
-                                  items: [
-                                    'volunteer.events.filter.all'.tr(),
-                                    'volunteer.events.filter.blood_donation'.tr(),
-                                    'volunteer.events.filter.orphanage'.tr(),
-                                    'volunteer.events.filter.environment'.tr(),
-                                    'volunteer.events.filter.food_distribution'.tr(),
-                                    'volunteer.events.filter.healthcare'.tr(),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    /// Events Type
+                                    CustomSelectableChips(
+                                      title:
+                                          'volunteer.events.filter.type_title'
+                                              .tr(),
+                                      items: [
+                                        'volunteer.events.filter.all'.tr(),
+                                        'volunteer.events.filter.blood_donation'
+                                            .tr(),
+                                        'volunteer.events.filter.orphanage'
+                                            .tr(),
+                                        'volunteer.events.filter.environment'
+                                            .tr(),
+                                        'volunteer.events.filter.food_distribution'
+                                            .tr(),
+                                        'volunteer.events.filter.healthcare'
+                                            .tr(),
+                                      ],
+                                      multiSelect: false,
+                                    ),
+
+                                    SizedBox(height: AppSize.getHeight(20)),
+
+                                    /// Events Location
+                                    CustomSelectableChips(
+                                      title:
+                                          'volunteer.events.filter.location_title'
+                                              .tr(),
+                                      items: [
+                                        'volunteer.events.filter.cairo'.tr(),
+                                        'volunteer.events.filter.alexandria'
+                                            .tr(),
+                                        'volunteer.events.filter.giza'.tr(),
+                                        'volunteer.events.filter.mansoura'.tr(),
+                                        'volunteer.events.filter.aswan'.tr(),
+                                        'volunteer.events.filter.luxor'.tr(),
+                                      ],
+                                      multiSelect: false,
+                                    ),
+
+                                    SizedBox(height: AppSize.getHeight(20)),
+
+                                    /// Events Date
+                                    CustomSelectableChips(
+                                      title:
+                                          'volunteer.events.filter.date_title'
+                                              .tr(),
+                                      items: [
+                                        'volunteer.events.filter.today'.tr(),
+                                        'volunteer.events.filter.tomorrow'.tr(),
+                                        'volunteer.events.filter.this_week'
+                                            .tr(),
+                                        'volunteer.events.filter.this_month'
+                                            .tr(),
+                                        'volunteer.events.filter.upcoming'.tr(),
+                                      ],
+                                      multiSelect: false,
+                                    ),
                                   ],
-                                  multiSelect: false,
                                 ),
                               ),
                             )

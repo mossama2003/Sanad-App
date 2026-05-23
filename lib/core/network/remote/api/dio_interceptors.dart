@@ -17,7 +17,7 @@ class AppInterceptors extends Interceptor {
     final String? lang = CacheHelper.get('lang');
     final String? token = CacheHelper.get('token');
     options.headers.addAll({
-      if (lang != null) 'lang': lang,
+      'lang': ?lang,
       if (token != null) 'Authorization': 'Bearer $token',
     });
     return handler.next(options);

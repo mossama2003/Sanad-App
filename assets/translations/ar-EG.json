@@ -88,11 +88,11 @@
   "shared": {
     "onboarding": {
       "make_a_difference": "اصنع فرقًا",
-      "join_thousands_of_volunteers": "انضم إلى آلاف المتطوعين الذين يُحدثون أثرًا في المجتمعات في جميع أنحاء البلاد.",
-      "give_receive": "اعطِ واستقبل",
+      "join_thousands_of_volunteers": "انضم إلى آلاف المتطوعين الذين يحدثون تأثيرًا في المجتمعات في جميع أنحاء البلاد.",
+      "give_receive": "أعطِ وتلقَّ",
       "support_causes": "ادعم القضايا التي تهتم بها من خلال التبرعات وتواصل مع من يحتاجون إلى المساعدة.",
       "earn_achieve": "اكسب وحقق",
-      "track_your_impact": "تتبّع أثرك من خلال نقاط الخبرة (XP) والشارات وسلاسل الإنجاز. كل مساهمة تُحدث فرقًا!",
+      "track_your_impact": "تابع تأثيرك عبر نقاط XP والشارات وسلاسل الإنجاز. كل خطوة لها قيمة!",
       "skip": "تخطي",
       "next": "التالي",
       "get_started": "ابدأ الآن"
@@ -102,32 +102,37 @@
       "desc": "سجّل الدخول للمتابعة",
       "i_am": "أنا",
       "volunteer": "متطوع",
-      "organization": "مؤسسة",
+      "organization": "منظمة",
       "email_or_phone": "البريد الإلكتروني أو رقم الهاتف",
       "enter_email_or_phone": "أدخل بريدك الإلكتروني أو رقم هاتفك",
       "password": "كلمة المرور",
       "enter_password": "أدخل كلمة المرور",
-      "forget_password": "هل نسيت كلمة المرور؟",
-      "sign_with_google": "المتابعة باستخدام جوجل",
-      "sign_with_apple": "المتابعة باستخدام أبل",
+      "forget_password": "نسيت كلمة المرور؟",
+      "sign_with_google": "المتابعة باستخدام Google",
+      "sign_with_apple": "المتابعة باستخدام Apple",
       "sign_in_button": "تسجيل الدخول",
       "dont_have_account": "ليس لديك حساب؟ ",
-      "sign_up_as_volunteer": "أنشئ حسابًا كمتطوع",
+      "sign_up_as_volunteer": "إنشاء حساب كمتطوع",
       "or": " أو ",
-      "sign_up_as_organization": "كمؤسسة"
+      "sign_up_as_organization": "منظمة"
     },
     "donations_removed": {
-      "winter_clothing_drive": "حملة ملابس الشتاء",
-      "help_provide_warm": "ساعد في توفير ملابس دافئة للأسر المحتاجة خلال فصل الشتاء.",
-      "resala_charity": "جمعية رسالة الخيرية",
+      "winter_clothing_drive": "حملة الملابس الشتوية",
+      "help_provide_warm": "ساعد في توفير ملابس دافئة للعائلات المحتاجة هذا الشتاء.",
+      "resala_charity": "جمعية رسالة",
       "raised": "تم جمع 32,500 جنيه مصري",
       "goal": "الهدف 50,000 جنيه مصري",
-      "funded": "تم تمويل 65.0٪",
-      "days_left": "متبقي 15 يومًا"
+      "funded": "تم تمويل 65.0%",
+      "days_left": "متبقي 15 يومًا",
+      "EGP_12500": "12,500 جنيه مصري",
+      "8": "8"
     },
     "donations": {
       "title": "حملات التبرع",
       "desc": "ادعم القضايا المهمة",
+      "your_total_donations": "إجمالي تبرعاتك",
+      "active_campaigns": "الحملات النشطة",
+      "campaigns_supported": "الحملات التي تم دعمها",
       "button": "تبرع الآن",
       "pop_up": {
         "donation_Amount": "مبلغ التبرع (جنيه مصري)",
@@ -138,32 +143,37 @@
     },
     "cases": {
       "title": "حالات عاجلة",
-      "desc": "حالات موثقة تحتاج إلى دعم فوري",
+      "desc": "حالات موثوقة تحتاج إلى دعم فوري",
       "button": "إرسال حالة للمراجعة",
       "card": {
         "verified": "موثّق",
+        "urgent": "عاجل",
+        "required": "مطلوب",
+        "raised": "تم جمعه",
         "button": "ادعم هذه الحالة"
       },
       "pop_up": {
         "contact_person": "الشخص المسؤول",
-        "phone": "رقم الهاتف",
+        "phone": "الهاتف",
         "bank_account": "الحساب البنكي",
-        "you_can_support": "يمكنك دعم هذه الحالة من خلال التواصل المباشر أو التبرع إلى الحساب البنكي المذكور.",
+        "you_can_support": "يمكنك دعم هذه الحالة عبر التواصل المباشر أو التبرع إلى الحساب البنكي المرفق.",
         "close": "إغلاق",
         "call_now": "اتصل الآن"
       }
     },
     "cases_removed": {
       "days_Ago": "منذ يومين",
-      "family_displaced_by_fire": "أسرة متضررة من حريق",
-      "a_family_of_6_lost": "فقدت أسرة مكونة من 6 أفراد منزلها في حريق سكني. هم بحاجة ماسة إلى مأوى وملابس واحتياجات أساسية. دمر الحريق جميع ممتلكاتهم وهم يقيمون حاليًا لدى أقاربهم.",
-      "contact": "جهة الاتصال: محمد أحمد",
+      "family_displaced_by_fire": "عائلة نازحة بسبب حريق",
+      "a_family_of_6_lost": "فقدت عائلة مكونة من 6 أفراد منزلها في حريق سكني. هم بحاجة عاجلة إلى مأوى وملابس واحتياجات أساسية. دمر الحريق جميع ممتلكاتهم وهم حاليًا يقيمون لدى أقاربهم.",
+      "contact": "التواصل: محمد أحمد",
       "national_bank": "0123456789 - البنك الأهلي المصري",
-      "mohamed": "محمد أحمد"
+      "mohamed": "محمد أحمد",
+      "EGP_75000": "75,000 جنيه مصري",
+      "EGP_45000": "45,000 جنيه مصري"
     },
     "notifications": {
       "appbar": "الإشعارات",
-      "unread": "غير مقروءة"
+      "unread": "غير مقروء"
     },
     "notifications_removed": {
       "new_badge_earned": "تم الحصول على شارة جديدة!",
@@ -179,7 +189,7 @@
       "support": "الدعم",
       "help_support": "المساعدة والدعم",
       "privacy_policy": "سياسة الخصوصية",
-      "terms_service": "شروط الخدمة",
+      "terms_service": "شروط الاستخدام",
       "FAQs": "الأسئلة الشائعة",
       "logout": "تسجيل الخروج"
     },
@@ -195,33 +205,33 @@
       "phone": "+20 123 456 7890",
       "location": "القاهرة، مصر",
       "events": "انضم في ديسمبر 2024",
-      "xp": "1,250 نقطة خبرة",
+      "xp": "1,250 نقطة XP",
       "button": "تعديل الملف الشخصي"
     }
   },
   "organization": {
     "sign_up": {
-      "title": "سجّل مؤسستك",
+      "title": "تسجيل منظمتك",
       "desc": "أنشئ فعاليات واستقطب متطوعين",
-      "organization_name": "اسم المؤسسة",
+      "organization_name": "اسم المنظمة",
       "hint_organization_name": "مثال: الهلال الأحمر المصري",
       "website_link": "الموقع الإلكتروني / الرابط",
       "hint_website_link": "https://yourorganization.org",
       "official_email": "البريد الإلكتروني الرسمي",
       "hint_official_email": "contact@organization.org",
       "phone_number": "رقم الهاتف",
-      "headquarters_location": "مقر المؤسسة الرئيسي",
+      "headquarters_location": "مقر المنظمة الرئيسي",
       "hint_headquarters_location": "اختر مدينة المقر الرئيسي",
-      "branch_locations": "مواقع الفروع (اختياري)",
+      "branch_locations": "الفروع (اختياري)",
       "hint_branch_locations": "إضافة فرع",
       "verification_documents": "مستندات التحقق",
       "hint_verification_documents": "رفع مستندات التسجيل",
-      "desc_verification_documents": "ملفات PDF أو صور من مستندات التسجيل الرسمية أو المستندات الضريبية أو شهادة تسجيل الجمعية",
+      "desc_verification_documents": "ملفات PDF أو صور لتسجيل رسمي، مستندات ضريبية، أو شهادة NGO",
       "password": "كلمة المرور",
-      "create_strong_password": "أنشئ كلمة مرور قوية",
+      "create_strong_password": "إنشاء كلمة مرور قوية",
       "confirm_password": "تأكيد كلمة المرور",
       "confirm_your_password": "أكد كلمة المرور",
-      "accept_terms": "أوافق على شروط الاستخدام وسياسة الخصوصية",
+      "accept_terms": "أوافق على شروط الخدمة وسياسة الخصوصية",
       "sign_up_button": "إرسال للمراجعة",
       "already_have_account": "لديك حساب بالفعل؟ ",
       "sign_in": "تسجيل الدخول"
@@ -235,9 +245,9 @@
       },
       "dashboard": {
         "title": "مرحبًا بعودتك، ",
-        "desc": "قم بإدارة فعالياتك والمتطوعين",
+        "desc": "إدارة فعالياتك والمتطوعين",
         "active_events": "الفعاليات النشطة",
-        "completed": "المكتملة",
+        "completed": "مكتملة",
         "volunteers": "المتطوعون"
       },
       "create_event_button": "إنشاء فعالية جديدة",
@@ -253,12 +263,12 @@
     },
     "home_removed": {
       "blood_donation_drive": "حملة التبرع بالدم",
-      "blood_donation": "تبرع بالدم",
-      "resala_charity": "جمعية رسالة الخيرية",
+      "blood_donation": "التبرع بالدم",
+      "resala_charity": "جمعية رسالة",
       "dec_8_2025": "8 ديسمبر 2025",
       "date": "15 ديسمبر 2025",
       "45_60": "45 / 60",
-      "food_distribution": "توزيع مواد غذائية",
+      "food_distribution": "توزيع الطعام",
       "members": "34 متطوعًا",
       "52_volunteer": "52 متطوعًا",
       "10am": "10:00 صباحًا",
@@ -288,20 +298,20 @@
       "phone_number": "رقم الهاتف",
       "location": "الموقع",
       "select_your_city": "اختر مدينتك",
-      "gender": "الجنس",
+      "gender": "النوع",
       "male": "ذكر",
       "female": "أنثى",
       "birthday": "تاريخ الميلاد",
       "blood_type": "فصيلة الدم",
       "select_blood_type": "اختر فصيلة الدم",
       "skills_interests": "المهارات والاهتمامات",
-      "national_id": "الرقم القومي (الوجه الأمامي والخلفي)",
-      "upload_national_id": "رفع صورة الرقم القومي",
+      "national_id": "الرقم القومي (أمام وخلف)",
+      "upload_national_id": "رفع البطاقة الشخصية",
       "password": "كلمة المرور",
-      "create_strong_password": "أنشئ كلمة مرور قوية",
+      "create_strong_password": "إنشاء كلمة مرور قوية",
       "confirm_password": "تأكيد كلمة المرور",
       "confirm_your_password": "أكد كلمة المرور",
-      "accept_terms": "أوافق على شروط الاستخدام وسياسة الخصوصية",
+      "accept_terms": "أوافق على شروط الخدمة وسياسة الخصوصية",
       "sign_up_button": "إنشاء حساب",
       "already_have_account": "لديك حساب بالفعل؟ ",
       "sign_in": "تسجيل الدخول"
@@ -317,15 +327,15 @@
       "dashboard": {
         "title": "مرحبًا بعودتك، ",
         "desc": "هل أنت مستعد لإحداث فرق اليوم؟",
-        "xp_points": "نقاط الخبرة",
+        "xp_points": "نقاط XP",
         "day_streak": "سلسلة الأيام",
         "badges": "الشارات"
       },
       "options": {
-        "emergency": "حالات طارئة",
+        "emergency": "حالة طارئة",
         "report_urgent": "الإبلاغ عن حالة عاجلة",
-        "qr_check_in": "تسجيل الحضور عبر QR",
-        "scan_to_earn": "امسح لتحصل على نقاط XP"
+        "qr_check_in": "تسجيل دخول QR",
+        "scan_to_earn": "امسح لكسب XP"
       },
       "upcoming_events": {
         "title": "الفعاليات القادمة",
@@ -338,23 +348,23 @@
     "home_removed": {
       "blood_donation_drive": "حملة التبرع بالدم",
       "blood_donation_drive_date": "حملة التبرع بالدم - 15 ديسمبر",
-      "dont_forget_to_bring_your_id": "لا تنسَ إحضار بطاقتك الشخصية! • منذ ساعتين",
-      "blood_donation": "تبرع بالدم",
+      "dont_forget_to_bring_your_id": "لا تنسَ إحضار البطاقة الشخصية! • منذ ساعتين",
+      "blood_donation": "التبرع بالدم",
       "egyptian_red_crescent": "الهلال الأحمر المصري",
       "date": "15 ديسمبر 2025 • 10:00 صباحًا",
       "cairo_medical_center": "مركز القاهرة الطبي",
-      "food_distribution": "توزيع مواد غذائية",
-      "resala_charity": "جمعية رسالة الخيرية",
+      "food_distribution": "توزيع الطعام",
+      "resala_charity": "جمعية رسالة",
       "dec_8_2025": "8 ديسمبر 2025",
       "duration": "المدة: 4 ساعات",
       "4_hours": "المدة: 4 ساعات",
-      "members": "45 متطوعًا • متبقي 15 مكانًا",
+      "members": "45 متطوعًا • 15 مكان متبقي",
       "help_save": "ساعد في إنقاذ الأرواح من خلال التبرع بالدم. جميع فصائل الدم مطلوبة."
     },
     "events": {
       "title": "الفعاليات المتاحة",
-      "desc": "اعثر على فرص لإحداث فرق",
-      "search": "ابحث عن فعاليات...",
+      "desc": "ابحث عن فرص لإحداث فرق",
+      "search": "ابحث عن الفعاليات...",
       "filters": "الفلاتر",
       "button": "عرض التفاصيل",
       "bottom_sheet": {
@@ -362,48 +372,66 @@
         "duration": "المدة",
         "location": "الموقع",
         "volunteers": "المتطوعون",
-        "button": "انضم إلى الفعالية"
+        "button": "الانضمام للفعالية"
       },
       "filter": {
-        "title": "نوع الفعالية",
+        "type_title": "نوع الفعالية",
         "all": "الكل",
         "blood_donation": "التبرع بالدم",
-        "orphanage": "دار أيتام",
+        "orphanage": "دور الأيتام",
         "environment": "البيئة",
-        "food_distribution": "توزيع مواد غذائية",
-        "healthcare": "الرعاية الصحية"
+        "food_distribution": "توزيع الطعام",
+        "healthcare": "الرعاية الصحية",
+        "location_title": "موقع الفعالية",
+        "cairo": "القاهرة",
+        "giza": "الجيزة",
+        "alexandria": "الإسكندرية",
+        "mansoura": "المنصورة",
+        "aswan": "أسوان",
+        "luxor": "الأقصر",
+        "date_title": "تاريخ الفعالية",
+        "today": "اليوم",
+        "tomorrow": "غدًا",
+        "this_week": "هذا الأسبوع",
+        "this_month": "هذا الشهر",
+        "upcoming": "القادمة"
       }
     },
     "community": {
       "title": "المجتمعات",
       "desc": "تواصل مع متطوعين آخرين",
-      "search": "ابحث في المجتمعات",
-      "expired": "منتهي: ينتهي الدردشة بعد 3 أيام من الفعالية"
+      "search": "ابحث عن مجتمعات",
+      "expired": "منتهي: تنتهي المحادثة بعد 3 أيام من انتهاء الفعالية",
+      "ended": "انتهى",
+      "2_min_ago": "منذ دقيقتين",
+      "2_days_ago": "منذ يومين",
+      "communities_are_automatically_created": "يتم إنشاء المجتمعات تلقائيًا عند الانضمام إلى فعالية.",
+      "chat_access_remains": "يبقى الوصول للدردشة لمدة 3 أيام بعد انتهاء الفعالية."
     },
     "emergency": {
-      "title": "فعاليات طارئة",
-      "desc": "حالات عاجلة تتطلب مساعدة فورية",
-      "button": "الإبلاغ عن فعالية طارئة",
+      "title": "الفعاليات الطارئة",
+      "desc": "حالات عاجلة تحتاج إلى مساعدة فورية",
+      "button": "الإبلاغ عن حالة طارئة",
       "card": {
         "critical": "حرج",
         "join_now": "انضم الآن",
         "contact": "تواصل"
       },
       "reports": {
-        "title": "الإبلاغ عن فعالية طارئة",
-        "desc": "قدّم تفاصيل حول الحالة العاجلة",
-        "emergency_title": "عنوان الحالة الطارئة",
+        "title": "الإبلاغ عن حالة طارئة",
+        "desc": "أدخل تفاصيل الحالة العاجلة",
+        "emergency_title": "عنوان الحالة",
         "brief": "عنوان مختصر للحالة",
         "description": "الوصف",
-        "detailed": "وصف تفصيلي للحالة والمساعدة المطلوبة",
+        "detailed": "وصف تفصيلي للحالة وما المطلوب من مساعدة",
         "urgency_level": "مستوى الخطورة",
         "critical": "حرج",
-        "high": "عالٍ",
+        "high": "عالي",
         "medium": "متوسط",
         "location": "الموقع",
         "city_specific_adress": "المدينة أو العنوان التفصيلي",
         "volunteers_needed": "عدد المتطوعين المطلوب",
-        "estimated_number_needed": "العدد المتوقع المطلوب",
+        "estimated_number_needed": "العدد المتوقع",
         "contact_information": "معلومات التواصل",
         "phone_number_for_coordination": "رقم الهاتف للتنسيق",
         "cancel": "إلغاء",
@@ -411,11 +439,11 @@
       }
     },
     "emergency_removed": {
-      "flood_relief": "إغاثة سيول - المنيا",
-      "urgent_need": "حاجة عاجلة لمتطوعين للمساعدة في جهود الإغاثة من السيول. توزيع الإمدادات ومساعدة الأسر المتضررة.",
+      "flood_relief": "إغاثة السيول - المنيا",
+      "urgent_need": "حاجة عاجلة لمتطوعين للمساعدة في جهود الإغاثة من السيول. توزيع الإمدادات ومساعدة العائلات المتضررة.",
       "minya_egypt": "المنيا، مصر",
       "volunteers_joined": "23 / 50 متطوعًا انضموا",
-      "posted": "تم النشر منذ ساعتين بواسطة الهلال الأحمر المصري"
+      "posted": "نُشر منذ ساعتين بواسطة الهلال الأحمر المصري"
     }
   }
 }

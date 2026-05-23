@@ -17,7 +17,7 @@ class CasesCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
             color: AppColors.black.withValues(alpha: 0.2),
@@ -29,22 +29,107 @@ class CasesCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
+            clipBehavior: Clip.hardEdge,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
             ),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: AppColors.grey.withValues(alpha: 0.3),
-                  width: 1,
+            child: Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: AppColors.grey.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Image.asset(
+                    AppImages.casesImage,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              child: Image.asset(
-                AppImages.casesImage,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+                Positioned(
+                  bottom: AppSize.getHeight(10),
+                  right: AppSize.getWidth(10),
+                  child: Container(
+                    padding: AppSize.padding(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: AppColors.divider,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Text(
+                      'shared.cases_removed.days_Ago'.tr(),
+                      style: TextStyle(
+                        color: AppColors.black,
+                        fontSize: AppSize.font(11),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+
+                Positioned(
+                  top: AppSize.getHeight(10),
+                  left: AppSize.getWidth(10),
+                  child: Container(
+                    padding: AppSize.padding(horizontal: 15, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: AppColors.brand200.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      children: [
+                        CustomIcon(
+                          icon: AppIcons.cases,
+                          color: AppColors.red,
+                          width: AppSize.getSize(17),
+                          height: AppSize.getSize(17),
+                        ),
+                        SizedBox(width: AppSize.getWidth(5)),
+                        Text(
+                          'shared.cases.card.urgent'.tr(),
+                          style: TextStyle(
+                            color: AppColors.red,
+                            fontSize: AppSize.font(11),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                Positioned(
+                  top: AppSize.getHeight(10),
+                  left: AppSize.getWidth(101),
+                  child: Container(
+                    padding: AppSize.padding(horizontal: 15, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: AppColors.white.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      children: [
+                        CustomIcon(
+                          icon: AppIcons.check,
+                          color: AppColors.green,
+                          width: AppSize.getSize(17),
+                          height: AppSize.getSize(17),
+                        ),
+                        SizedBox(width: AppSize.getWidth(5)),
+                        Text(
+                          'shared.cases.card.verified'.tr(),
+                          style: TextStyle(
+                            color: AppColors.green,
+                            fontSize: AppSize.font(11),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Padding(
@@ -52,131 +137,78 @@ class CasesCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: AppSize.padding(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        color: AppColors.primary.withValues(alpha: 0.2),
-                      ),
-                      child: Center(
-                        child: Row(
-                          children: [
-                            CustomIcon(
-                              icon: AppIcons.check,
-                              color: AppColors.primary,
-                              width: AppSize.getSize(13),
-                              height: AppSize.getSize(13),
-                            ),
-                            SizedBox(width: AppSize.getWidth(3)),
-                            Text(
-                              'Verified',
-                              style: TextStyle(
-                                fontSize: AppSize.font(10),
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: AppSize.getWidth(8)),
-                    Text(
-                      '2 days ago',
-                      style: TextStyle(
-                        fontSize: AppSize.font(13),
-                        fontWeight: FontWeight.w300,
-                        color: AppColors.grey700,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: AppSize.getHeight(8)),
                 Text(
                   'shared.cases_removed.family_displaced_by_fire'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(15),
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: AppSize.getHeight(12)),
+                SizedBox(height: AppSize.getHeight(8)),
                 Text(
                   'shared.cases_removed.a_family_of_6_lost'.tr(),
                   style: TextStyle(
-                    fontSize: AppSize.font(15),
-                    fontWeight: FontWeight.w300,
+                    fontSize: AppSize.font(13),
+                    color: AppColors.grey,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
                 SizedBox(height: AppSize.getHeight(15)),
                 Container(
                   padding: AppSize.padding(all: 12),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: AppColors.grey50,
+                    borderRadius: BorderRadius.circular(25),
+                    color: AppColors.grey300.withValues(alpha: 0.3),
                   ),
                   child: Column(
                     children: [
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CustomIcon(
-                            icon: AppIcons.phone,
-                            color: AppColors.laserBlue,
-                            width: AppSize.getSize(20),
-                            height: AppSize.getSize(20),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'shared.cases.card.required'.tr(),
+                                style: TextStyle(
+                                  fontSize: AppSize.font(13),
+                                  color: AppColors.grey600,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              SizedBox(height: AppSize.getHeight(5)),
+                              Text(
+                                'shared.cases_removed.EGP_75000'.tr(),
+                                style: TextStyle(
+                                  fontSize: AppSize.font(20),
+                                  color: AppColors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(width: AppSize.getWidth(10)),
-                          Text(
-                            'shared.cases_removed.contact'.tr(),
-                            style: TextStyle(
-                              fontSize: AppSize.font(13),
-                              color: AppColors.grey700,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: AppSize.getHeight(10)),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CustomIcon(
-                            icon: AppIcons.phone,
-                            color: AppColors.laserBlue,
-                            width: AppSize.getSize(20),
-                            height: AppSize.getSize(20),
-                          ),
-                          SizedBox(width: AppSize.getWidth(10)),
-                          Text(
-                            '+20 123 456 7890',
-                            style: TextStyle(
-                              fontSize: AppSize.font(13),
-                              color: AppColors.laserBlue,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: AppSize.getHeight(10)),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CustomIcon(
-                            icon: AppIcons.creditCard,
-                            color: AppColors.laserBlue,
-                            width: AppSize.getSize(20),
-                            height: AppSize.getSize(20),
-                          ),
-                          SizedBox(width: AppSize.getWidth(10)),
-                          Text(
-                            'shared.cases_removed.national_bank'.tr(),
-                            style: TextStyle(
-                              fontSize: AppSize.font(13),
-                              color: AppColors.grey700,
-                              fontWeight: FontWeight.w400,
-                            ),
+                          Spacer(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                'shared.cases.card.raised'.tr(),
+                                style: TextStyle(
+                                  fontSize: AppSize.font(13),
+                                  color: AppColors.grey600,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              SizedBox(height: AppSize.getHeight(5)),
+                              Text(
+                                'shared.cases_removed.EGP_45000'.tr(),
+                                style: TextStyle(
+                                  fontSize: AppSize.font(20),
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -184,10 +216,74 @@ class CasesCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: AppSize.getHeight(10)),
-                Divider(thickness: 0.3, height: 1, color: AppColors.grey300),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomIcon(
+                      icon: AppIcons.person,
+                      color: AppColors.grey700,
+                      width: AppSize.getSize(20),
+                      height: AppSize.getSize(20),
+                    ),
+                    SizedBox(width: AppSize.getWidth(10)),
+                    Text(
+                      'shared.cases_removed.contact'.tr(),
+                      style: TextStyle(
+                        fontSize: AppSize.font(13),
+                        color: AppColors.grey700,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
                 SizedBox(height: AppSize.getHeight(10)),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    CustomIcon(
+                      icon: AppIcons.phone,
+                      color: AppColors.grey700,
+                      width: AppSize.getSize(20),
+                      height: AppSize.getSize(20),
+                    ),
+                    SizedBox(width: AppSize.getWidth(10)),
+                    Text(
+                      '+20 123 456 7890',
+                      style: TextStyle(
+                        fontSize: AppSize.font(13),
+                        color: AppColors.grey700,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: AppSize.getHeight(10)),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomIcon(
+                      icon: AppIcons.creditCard,
+                      color: AppColors.grey700,
+                      width: AppSize.getSize(20),
+                      height: AppSize.getSize(20),
+                    ),
+                    SizedBox(width: AppSize.getWidth(10)),
+                    Text(
+                      'shared.cases_removed.national_bank'.tr(),
+                      style: TextStyle(
+                        fontSize: AppSize.font(13),
+                        color: AppColors.grey700,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: AppSize.getHeight(10)),
+                Divider(thickness: 0.3, height: 1, color: AppColors.grey300),
+                SizedBox(height: AppSize.getHeight(15)),
+                Row(
+                  children: [
+                    SizedBox(width: AppSize.getWidth(25)),
                     CustomIcon(
                       icon: AppIcons.donations,
                       color: AppColors.grey600,
@@ -202,24 +298,52 @@ class CasesCard extends StatelessWidget {
                         fontWeight: FontWeight.w300,
                       ),
                     ),
-                    SizedBox(width: AppSize.getWidth(10)),
+                    SizedBox(width: AppSize.getWidth(25)),
                     CustomIcon(
-                      icon: AppIcons.share,
+                      icon: AppIcons.comment,
                       color: AppColors.grey600,
                       width: AppSize.getWidth(18),
                       height: AppSize.getHeight(18),
                     ),
                     SizedBox(width: AppSize.getWidth(3)),
                     Text(
-                      '87',
+                      '80',
                       style: TextStyle(
                         fontSize: AppSize.font(15),
                         fontWeight: FontWeight.w300,
                       ),
                     ),
+                    Spacer(),
+                    Container(
+                      padding: AppSize.padding(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        children: [
+                          CustomIcon(
+                            icon: AppIcons.share,
+                            color: AppColors.green,
+                            width: AppSize.getWidth(18),
+                            height: AppSize.getHeight(18),
+                          ),
+                          SizedBox(width: AppSize.getWidth(3)),
+                          Text(
+                            '87',
+                            style: TextStyle(
+                              color: AppColors.green,
+                              fontSize: AppSize.font(15),
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: AppSize.getWidth(25)),
                   ],
                 ),
-                SizedBox(height: AppSize.getHeight(15)),
+                SizedBox(height: AppSize.getHeight(20)),
                 CustomButton(
                   title: 'shared.cases.card.button'.tr(),
                   height: AppSize.getHeight(50),

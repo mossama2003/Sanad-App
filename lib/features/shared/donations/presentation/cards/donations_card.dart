@@ -14,132 +14,166 @@ class DonationsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.2),
-            blurRadius: 8,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'shared.donations.active_campaigns'.tr(),
+          style: TextStyle(
+            fontSize: AppSize.font(18),
+            fontWeight: FontWeight.w500,
+            color: AppColors.black,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            ),
-            child: Stack(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: AppColors.grey.withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Image.asset(
-                    AppImages.donationsImage,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
-            ),
+        ),
+        SizedBox(height: AppSize.getHeight(10)),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withValues(alpha: 0.2),
+                blurRadius: 8,
+              ),
+            ],
           ),
-          Padding(
-            padding: AppSize.padding(all: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'shared.donations_removed.winter_clothing_drive'.tr(),
-                  style: TextStyle(
-                    fontSize: AppSize.font(20),
-                    fontWeight: FontWeight.w400,
-                  ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
                 ),
-                SizedBox(height: AppSize.getHeight(8)),
-                Text(
-                  'shared.donations_removed.help_provide_warm'.tr(),
-                  style: TextStyle(
-                    fontSize: AppSize.font(15),
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.black.withValues(alpha: 0.8),
-                  ),
-                ),
-                SizedBox(height: AppSize.getHeight(8)),
-                Text(
-                  'shared.donations_removed.resala_charity'.tr(),
-                  style: TextStyle(
-                    fontSize: AppSize.font(12),
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.black.withValues(alpha: 0.4),
-                  ),
-                ),
-                SizedBox(height: AppSize.getHeight(8)),
-                Row(
+                child: Stack(
                   children: [
-                    Text(
-                      'shared.donations_removed.raised'.tr(),
-                      style: TextStyle(
-                        fontSize: AppSize.font(13),
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.black.withValues(alpha: 0.8),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AppColors.grey.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Image.asset(
+                        AppImages.donationsImage,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    Spacer(),
-                    Text(
-                      'shared.donations_removed.goal'.tr(),
-                      style: TextStyle(
-                        fontSize: AppSize.font(13),
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.black.withValues(alpha: 0.8),
+
+                    Positioned(
+                      top: AppSize.getHeight(10),
+                      right: AppSize.getWidth(10),
+                      child: Container(
+                        padding: AppSize.padding(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: AppColors.divider,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Text(
+                          'shared.donations_removed.days_left'.tr(),
+                          style: TextStyle(
+                            color: AppColors.black,
+                            fontSize: AppSize.font(11),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: AppSize.getHeight(6)),
-                CustomProgressBar(percent: 65, color: AppColors.magenta),
-                SizedBox(height: AppSize.getHeight(6)),
-                Row(
+              ),
+              Padding(
+                padding: AppSize.padding(all: 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'shared.donations_removed.funded'.tr(),
+                      'shared.donations_removed.winter_clothing_drive'.tr(),
                       style: TextStyle(
-                        fontSize: AppSize.font(13),
+                        fontSize: AppSize.font(20),
                         fontWeight: FontWeight.w400,
-                        color: AppColors.magenta,
                       ),
                     ),
-                    Spacer(),
+                    SizedBox(height: AppSize.getHeight(8)),
                     Text(
-                      'shared.donations_removed.days_left'.tr(),
+                      'shared.donations_removed.help_provide_warm'.tr(),
                       style: TextStyle(
-                        fontSize: AppSize.font(13),
+                        fontSize: AppSize.font(15),
                         fontWeight: FontWeight.w400,
                         color: AppColors.black.withValues(alpha: 0.8),
                       ),
                     ),
+                    SizedBox(height: AppSize.getHeight(8)),
+                    Text(
+                      'shared.donations_removed.resala_charity'.tr(),
+                      style: TextStyle(
+                        fontSize: AppSize.font(12),
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.black.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    SizedBox(height: AppSize.getHeight(8)),
+                    Row(
+                      children: [
+                        Text(
+                          'shared.donations_removed.raised'.tr(),
+                          style: TextStyle(
+                            fontSize: AppSize.font(13),
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.black.withValues(alpha: 0.8),
+                          ),
+                        ),
+                        Spacer(),
+                        Text(
+                          'shared.donations_removed.goal'.tr(),
+                          style: TextStyle(
+                            fontSize: AppSize.font(13),
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.black.withValues(alpha: 0.8),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: AppSize.getHeight(6)),
+                    CustomProgressBar(percent: 65, color: AppColors.magenta),
+                    SizedBox(height: AppSize.getHeight(6)),
+                    Row(
+                      children: [
+                        Text(
+                          'shared.donations_removed.funded'.tr(),
+                          style: TextStyle(
+                            fontSize: AppSize.font(13),
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.magenta,
+                          ),
+                        ),
+                        Spacer(),
+                        Text(
+                          'shared.donations_removed.days_left'.tr(),
+                          style: TextStyle(
+                            fontSize: AppSize.font(13),
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.black.withValues(alpha: 0.8),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: AppSize.getHeight(15)),
+                    CustomButton(
+                      title: 'shared.donations.button'.tr(),
+                      icon: AppIcons.donations,
+                      bgColor: AppColors.magenta,
+                      height: AppSize.getHeight(50),
+                      onTap: () => AppNavigator.dialog(const DonationsPopUp()),
+                    ),
                   ],
                 ),
-                SizedBox(height: AppSize.getHeight(15)),
-                CustomButton(
-                  title: 'shared.donations.button'.tr(),
-                  icon: AppIcons.donations,
-                  bgColor: AppColors.magenta,
-                  height: AppSize.getHeight(50),
-                  onTap: () => AppNavigator.dialog(const DonationsPopUp()),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

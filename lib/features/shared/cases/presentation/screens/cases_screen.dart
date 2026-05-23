@@ -1,6 +1,4 @@
-import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../volunteer/home/presentation/widgets/volunteer_home_appbar_widget.dart';
@@ -14,13 +12,27 @@ class CasesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        backgroundColor: AppColors.laserBlue,
+        elevation: 6,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Icon(Icons.add, color: AppColors.white),
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               VolunteerHomeAppbarWidget(),
+
               SizedBox(height: AppSize.getHeight(15)),
+
               Padding(
                 padding: AppSize.padding(horizontal: 12),
                 child: Column(
@@ -30,27 +42,24 @@ class CasesScreen extends StatelessWidget {
                       'shared.cases.title'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(22),
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.black,
                       ),
                     ),
-                    SizedBox(height: AppSize.getHeight(8)),
+
+                    SizedBox(height: AppSize.getHeight(3)),
+
                     Text(
                       'shared.cases.desc'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(15),
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w300,
                         color: AppColors.black.withValues(alpha: 0.7),
                       ),
                     ),
-                    SizedBox(height: AppSize.getHeight(20)),
-                    CustomButton(
-                      title: 'shared.cases.button'.tr(),
-                      bgColor: AppColors.laserBlue,
-                      icon: AppIcons.add,
-                      height: AppSize.getHeight(50),
-                    ),
-                    SizedBox(height: AppSize.getHeight(20)),
+
+                    SizedBox(height: AppSize.getHeight(15)),
+
                     CasesCard(),
                   ],
                 ),
