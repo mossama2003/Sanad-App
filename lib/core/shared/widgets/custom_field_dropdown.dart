@@ -19,12 +19,12 @@ class CustomFieldDropdown<T> extends StatelessWidget {
     required this.onChanged,
   });
 
-  final T? selected;
+  final ValueNotifier<T?> selected;
   final bool enabled;
   final String? title;
   final String? hintText;
   final ValueChanged<T?> onChanged;
-  final List<DropdownMenuItem<T>>? items;
+  final List<DropdownItem<T>>? items;
   final FormFieldValidator<T>? validator;
 
   @override
@@ -38,7 +38,7 @@ class CustomFieldDropdown<T> extends StatelessWidget {
         ],
         DropdownButtonFormField2<T>(
           items: items,
-          value: selected,
+          valueListenable: selected,
           validator: validator,
           iconStyleData: IconStyleData(
             icon: Center(
@@ -57,11 +57,16 @@ class CustomFieldDropdown<T> extends StatelessWidget {
           style: TextStyle(
             color: AppColors.grey900,
           ).sm.copyWith(height: AppSize.fontHeight(16, 20)),
-          onChanged: enabled ? onChanged : null,
+          onChanged: enabled
+              ? (value) {
+                  selected.value = value;
+                  onChanged(value);
+                }
+              : null,
           autovalidateMode: AutovalidateMode.onUserInteraction,
-          hint: hintText != null && selected == null
+          hint: hintText != null && selected.value == null
               ? Text(
-                  '$hintText',
+                  hintText!,
                   style: TextStyle(
                     color: AppColors.grey900,
                   ).sm.copyWith(height: AppSize.fontHeight(16, 20)),

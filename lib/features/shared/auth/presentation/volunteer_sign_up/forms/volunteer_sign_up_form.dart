@@ -1,9 +1,8 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:sanad_app/core/shared/widgets/custom_field_dropdown.dart';
 import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
-import 'package:sanad_app/core/helper/app_navigator.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../core/shared/widgets/custom_selectable_chips.dart';
@@ -13,7 +12,6 @@ import '../../../../../../core/validator/app_validators.dart';
 import '../../../../../../core/style/app_text_style.dart';
 import '../../../../../../core/constant/app_size.dart';
 import '../../../../../../core/style/app_colors.dart';
-import '../../sign_in/screens/sign_in_screen.dart';
 
 class VolunteerSignUpForm extends StatefulWidget {
   const VolunteerSignUpForm({super.key});
@@ -30,7 +28,8 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
   int selectedIndex = 0;
 
-  String selectedBloodType = 'A+';
+  final ValueNotifier<String?> selectedBloodType = ValueNotifier<String?>('A+');
+
   final bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
   final TextEditingController nameController = TextEditingController();
@@ -42,6 +41,18 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
   void initState() {
     super.initState();
     _startAnimations();
+  }
+
+  @override
+  void dispose() {
+    selectedBloodType.dispose();
+
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    locationController.dispose();
+
+    super.dispose();
   }
 
   void _startAnimations() {
@@ -81,6 +92,7 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
               validator: AppValidators.required,
             ),
             SizedBox(height: AppSize.getHeight(15)),
+
             CustomFieldText(
               controller: emailController,
               title: 'volunteer.sign_up.email'.tr(),
@@ -88,6 +100,7 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
               validator: AppValidators.email,
             ),
             SizedBox(height: AppSize.getHeight(15)),
+
             CustomFieldText(
               controller: phoneController,
               title: 'volunteer.sign_up.phone_number'.tr(),
@@ -95,6 +108,7 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
               validator: AppValidators.required,
             ),
             SizedBox(height: AppSize.getHeight(15)),
+
             CustomFieldText(
               controller: locationController,
               title: 'volunteer.sign_up.location'.tr(),
@@ -102,12 +116,14 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
               validator: AppValidators.required,
             ),
             SizedBox(height: AppSize.getHeight(15)),
-            // Gender selection
+
+            /// Gender
             Text(
               'volunteer.sign_up.gender'.tr(),
               style: TextStyle(color: AppColors.grey700).xs,
             ),
             SizedBox(height: AppSize.getHeight(6)),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -115,36 +131,38 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                 _genderOption('volunteer.sign_up.female'.tr(), 1),
               ],
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
-            // Birthday
+
+            /// Birthday
             CustomFieldText(
               controller: locationController,
               title: 'volunteer.sign_up.birthday'.tr(),
               hintText: 'dd/mm/yyyy',
               validator: AppValidators.required,
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
-            // Blood Type
+
+            /// Blood Type
             CustomFieldDropdown<String>(
-              items: bloodTypes
-                  .map(
-                    (b) => DropdownMenuItem<String>(value: b, child: Text(b)),
-                  )
-                  .toList(),
-              selected: selectedBloodType,
               title: 'volunteer.sign_up.blood_type'.tr(),
               hintText: 'volunteer.sign_up.select_blood_type'.tr(),
               validator: AppValidators.required,
+              selected: selectedBloodType,
+              items: bloodTypes.map((b) {
+                return DropdownItem<String>(value: b, child: Text(b));
+              }).toList(),
               onChanged: (value) {
-                setState(() {
-                  selectedBloodType = value!;
-                });
+                selectedBloodType.value = value;
               },
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
-            // Skills
+
+            /// Skills
             CustomSelectableChips(
-              items: [
+              items: const [
                 'Teaching',
                 'Healthcare',
                 'Technology',
@@ -160,8 +178,10 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
               ],
               multiSelect: true,
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
-            // National ID
+
+            /// National ID
             CustomUploadFile(
               title: 'volunteer.sign_up.national_id'.tr(),
               hint: 'volunteer.sign_up.upload_national_id'.tr(),
@@ -169,8 +189,10 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
               onTap: () {},
               onRemove: () {},
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
-            // Password
+
+            /// Password
             CustomFieldText(
               controller: TextEditingController(),
               title: 'volunteer.sign_up.password'.tr(),
@@ -178,8 +200,10 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
               validator: AppValidators.password,
               iconEnd: AppIcons.eyeShow,
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
-            // Password Confirm
+
+            /// Confirm Password
             CustomFieldText(
               controller: TextEditingController(),
               title: 'volunteer.sign_up.confirm_password'.tr(),
@@ -187,10 +211,11 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
               validator: AppValidators.password,
               iconEnd: AppIcons.eyeShow,
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
-            // Terms & Condition
+
+            /// Terms
             Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
                   width: AppSize.getSize(20),
@@ -214,29 +239,12 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                 ),
               ],
             ),
+
             SizedBox(height: AppSize.getHeight(10)),
+
             CustomButton(
               title: 'volunteer.sign_up.sign_up_button'.tr(),
               onTap: () {},
-            ),
-            SizedBox(height: AppSize.getHeight(8)),
-            Align(
-              alignment: Alignment.center,
-              child: RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  text: "volunteer.sign_up.already_have_account".tr(),
-                  style: TextStyle(color: AppColors.black).xs,
-                  children: [
-                    TextSpan(
-                      text: "volunteer.sign_up.sign_in".tr(),
-                      style: TextStyle(color: AppColors.green).xs,
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () => AppNavigator.remove(SignInScreen()),
-                    ),
-                  ],
-                ),
-              ),
             ),
           ],
         ),
@@ -246,6 +254,7 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
   Widget _genderOption(String label, int index) {
     final bool isSelected = selectedIndex == index;
+
     return GestureDetector(
       onTap: () {
         setState(() {

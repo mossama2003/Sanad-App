@@ -1,8 +1,8 @@
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:flutter/material.dart';
 
-import '../../constant/app_size.dart';
 import '../../network/local/cache/cache_helper.dart';
+import '../../constant/app_size.dart';
 import '../../style/app_colors.dart';
 
 class CustomFieldOtp extends StatelessWidget {
@@ -25,49 +25,58 @@ class CustomFieldOtp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pinController = PinInputController();
+
+    pinController.setText(controller.text);
+
     return Directionality(
       textDirection: TextDirection.ltr,
-      child: PinCodeTextField(
-        length: 6,
-        appContext: context,
-        validator: validator,
-        controller: controller,
-        enablePinAutofill: true,
-        textStyle: const TextStyle(
-          color: AppColors.primary,
-        ),
-        pinTheme: PinTheme(
-          borderWidth: 1,
-          errorBorderWidth: 1,
-          activeBorderWidth: 1,
-          inactiveBorderWidth: 1,
-          selectedBorderWidth: 1,
-          shape: PinCodeFieldShape.box,
-          fieldWidth: AppSize.getSize(48),
-          fieldHeight: AppSize.getSize(48),
-          fieldOuterPadding: EdgeInsets.zero,
-          activeColor: AppColors.primary,
-          selectedColor: AppColors.primary,
-          inactiveColor: AppColors.buttonTertiary,
-          activeFillColor: AppColors.buttonTertiary,
-          inactiveFillColor: AppColors.buttonTertiary,
-          selectedFillColor: AppColors.buttonTertiary,
-          errorBorderColor: AppColors.buttonTertiary,
-          borderRadius: BorderRadius.circular(AppSize.getSize(8)),
-        ),
-        keyboardType: keyboardType,
-        autoDisposeControllers: false,
-        cursorColor: AppColors.primary,
-        beforeTextPaste: (text) => true,
-        onChanged: onChanged,
-        onCompleted: (v) => onComplete(),
-        animationType: AnimationType.fade,
-        backgroundColor: Colors.transparent,
-        errorTextDirection: _langIsAr ? TextDirection.rtl : TextDirection.ltr,
-        errorTextSpace: AppSize.getHeight(30),
-        autovalidateMode: AutovalidateMode.disabled,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        animationDuration: const Duration(milliseconds: 300),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MaterialPinField(
+            length: 6,
+            pinController: pinController,
+            keyboardType: keyboardType,
+            enableAutofill: true,
+            autoDismissKeyboard: true,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+            theme: MaterialPinTheme(
+              cellSize: Size(AppSize.getSize(48), AppSize.getSize(48)),
+              borderRadius: BorderRadius.circular(AppSize.getSize(8)),
+              borderWidth: 1,
+              focusedBorderWidth: 1,
+              borderColor: AppColors.buttonTertiary,
+              focusedBorderColor: AppColors.primary,
+              fillColor: AppColors.buttonTertiary,
+              focusedFillColor: AppColors.buttonTertiary,
+              errorColor: AppColors.buttonTertiary,
+              shape: MaterialPinShape.outlined,
+              textStyle: const TextStyle(color: AppColors.primary),
+            ),
+
+            onChanged: (value) {
+              controller.text = value;
+              onChanged?.call(value);
+            },
+
+            onCompleted: (_) {
+              final error = validator?.call(controller.text);
+
+              if (error == null) {
+                onComplete();
+              }
+            },
+
+            errorText: validator?.call(controller.text),
+
+            errorTextStyle: TextStyle(
+              color: Colors.red,
+              fontSize: AppSize.font(12),
+            ),
+          ),
+        ],
       ),
     );
   }
