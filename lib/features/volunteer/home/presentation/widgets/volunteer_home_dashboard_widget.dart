@@ -3,10 +3,12 @@ import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../../shared/rewards/presentation/screens/rewards_screen.dart';
 
 class VolunteerHomeDashboardWidget extends StatelessWidget {
   const VolunteerHomeDashboardWidget({super.key});
@@ -76,34 +78,37 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
 
                   SizedBox(height: AppSize.getHeight(20)),
 
-                  Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildStatCard(
-                        icon: AppIcons.achievement,
-                        value: '1,250',
-                        title:
-                        'volunteer.home.dashboard.xp_points'
-                            .tr(),
-                      ),
+                  GestureDetector(
+                    onTap: () => AppNavigator.push(RewardsScreen()),
+                    child: Row(
+                      mainAxisAlignment:
+                      MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildStatCard(
+                          icon: AppIcons.achievement,
+                          value: '1,250',
+                          title:
+                          'volunteer.home.dashboard.xp_points'
+                              .tr(),
+                        ),
 
-                      _buildStatCard(
-                        icon: AppIcons.fire,
-                        value: '7',
-                        title:
-                        'volunteer.home.dashboard.day_streak'
-                            .tr(),
-                      ),
+                        _buildStatCard(
+                          icon: AppIcons.fire,
+                          value: '7',
+                          title:
+                          'volunteer.home.dashboard.day_streak'
+                              .tr(),
+                        ),
 
-                      _buildStatCard(
-                        icon: AppIcons.badge,
-                        value: '12',
-                        title:
-                        'volunteer.home.dashboard.badges'
-                            .tr(),
-                      ),
-                    ],
+                        _buildStatCard(
+                          icon: AppIcons.badge,
+                          value: '12',
+                          title:
+                          'volunteer.home.dashboard.badges'
+                              .tr(),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

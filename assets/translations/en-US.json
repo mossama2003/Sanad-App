@@ -144,6 +144,8 @@
     "cases": {
       "title": "Urgent Cases",
       "desc": "Verified cases needing immediate support",
+      "all_cases_are_verified": "All cases are verified",
+      "our_team_verifies_every_case": "Our team verifies every case before publishing to ensure authenticity.",
       "button": "Submit a Case for Review",
       "card": {
         "verified": "Verified",
@@ -181,32 +183,52 @@
       "1h_ago": "1h ago"
     },
     "profile": {
-      "appbar": "Profile",
-      "profile_information": "Profile Information",
-      "appearance": "Appearance",
-      "light_mood": "Light Mood",
-      "dark_mood": "Dark Mood",
-      "support": "Support",
-      "help_support": "Help & Support",
-      "privacy_policy": "Privacy Policy",
-      "terms_service": "Terms of Service",
-      "FAQs": "FAQs",
-      "logout": "Logout"
-    },
-    "edit_profile": {
-      "appbar": "Edit Profile",
-      "full_name": "Full Name",
-      "email": "Email",
-      "button": "Save Changes"
+      "level": "Level 12",
+      "xp": "XP Points",
+      "streak": "Day Streak",
+      "attended": "Events Attended",
+      "donations": "Total Donations",
+      "badges": "Badges",
+      "view_all": "View All",
+      "contact_information": "Contact Information",
+      "settings": {
+        "edit_profile": "Edit Profile",
+        "help_support": "Help & Support",
+        "privacy_policy": "Privacy Policy",
+        "sign_out": "Sign Out"
+      }
     },
     "profile_removed": {
-      "red_crescent": "Red Crescent",
-      "email": "mossama370@gmail.com",
-      "phone": "+20 123 456 7890",
       "location": "Cairo, Egypt",
-      "events": "Joined Dec 2024",
-      "xp": "1,250 XP Points",
-      "button": "Edit Profile"
+      "created": "Joined March 2024"
+    },
+    "badges": {
+      "badges": "Badges",
+      "earn_badges": "Earn badges by making an impact",
+      "your_collection": "Your collection",
+      "all": "All",
+      "earned": "Earned",
+      "in_progress": "In Progress",
+      "gold": "Gold",
+      "silver": "Silver",
+      "bronze": "Bronze"
+    },
+    "rewards": {
+      "rewards": "Rewards & XP",
+      "track_your_progress": "Track your progress and unlock rewards",
+      "current_level": "Current Level",
+      "level": "Level",
+      "active_hero": "Active Hero",
+      "streak_tracker": "Streak Tracker",
+      "longest": "Longest: 14 days",
+      "volunteer_today": "Volunteer today to extend your streak!",
+      "level_rewards": "Level Rewards",
+      "unlocked": "Unlocked",
+      "locked": "Locked",
+      "recent_xp_activity": "Recent XP Activity",
+      "all": "All",
+      "weekly_leaderboard": "Weekly Leaderboard",
+      "this_week": "This Week"
     }
   },
   "organization": {

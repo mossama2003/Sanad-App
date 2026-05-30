@@ -70,6 +70,17 @@ class AppIcons {
   static String completed = '$icons/completed.svg';
   static String star = '$icons/star.svg';
   static String growthArrow = '$icons/growth-arrow.svg';
+  static String rightArrow = '$icons/right_arrow.svg';
   static String comment = '$icons/comment.svg';
-  static String person = '$icons/person.svg';
+  static String contact = '$icons/contact.svg';
+  static String profile = '$icons/profile.svg';
+  static String voltage = '$icons/voltage.svg';
+  static String calendar = '$icons/calender.svg';
+  static String settings = '$icons/settings.svg';
+  static String helpSupport = '$icons/help_support.svg';
+  static String privacyPolicy = '$icons/privacy_policy.svg';
+  static String signOut = '$icons/sign_out.svg';
+  static String cup = '$icons/cup.svg';
+  static String sparkle = '$icons/sparkle.svg';
+  static String crown = '$icons/crown.svg';
 }

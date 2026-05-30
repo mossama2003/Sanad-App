@@ -220,7 +220,7 @@ class CasesCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomIcon(
-                      icon: AppIcons.person,
+                      icon: AppIcons.contact,
                       color: AppColors.grey700,
                       width: AppSize.getSize(20),
                       height: AppSize.getSize(20),

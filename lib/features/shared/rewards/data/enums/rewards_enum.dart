@@ -1,0 +1,1 @@
+enum RewardStatus { unlocked, locked }

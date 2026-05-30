@@ -1,7 +1,6 @@
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:flutter/material.dart';
 
-import '../../network/local/cache/cache_helper.dart';
 import '../../constant/app_size.dart';
 import '../../style/app_colors.dart';
 
@@ -21,7 +20,7 @@ class CustomFieldOtp extends StatelessWidget {
   final TextEditingController controller;
   final FormFieldValidator<String>? validator;
 
-  bool get _langIsAr => CacheHelper.get(CacheKeys.lang) == CacheKeys.langAr;
+  // bool get _langIsAr => CacheHelper.get(CacheKeys.lang) == CacheKeys.langAr;
 
   @override
   Widget build(BuildContext context) {

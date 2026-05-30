@@ -5,6 +5,7 @@ import '../../../../volunteer/home/presentation/widgets/volunteer_home_appbar_wi
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../cards/cases_card.dart';
+import '../cards/verified_info_card.dart';
 
 class CasesScreen extends StatelessWidget {
   const CasesScreen({super.key});
@@ -16,9 +17,7 @@ class CasesScreen extends StatelessWidget {
         onPressed: () {},
         backgroundColor: AppColors.laserBlue,
         elevation: 6,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Icon(Icons.add, color: AppColors.white),
       ),
 
@@ -58,6 +57,8 @@ class CasesScreen extends StatelessWidget {
                       ),
                     ),
 
+                    SizedBox(height: AppSize.getHeight(15)),
+                    VerifiedInfoCard(),
                     SizedBox(height: AppSize.getHeight(15)),
 
                     CasesCard(),
