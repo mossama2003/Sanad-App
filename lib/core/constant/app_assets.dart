@@ -43,6 +43,7 @@ class AppIcons {
   static String delete = '$icons/delete.svg';
   static String file = '$icons/file.svg';
   static String uploadFile = '$icons/upload-file.svg';
+  static String addPhoto = '$icons/add_photo.svg';
   static String chevronDown = '$icons/chevron-down.svg';
   static String close = '$icons/close.svg';
   static String add = '$icons/add.svg';

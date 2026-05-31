@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sanad_app/core/helper/app_navigator.dart';
+import 'package:sanad_app/features/shared/cases/presentation/screens/submit_case_screen.dart';
 
 import '../../../../volunteer/home/presentation/widgets/volunteer_home_appbar_widget.dart';
 import '../../../../../core/constant/app_size.dart';
@@ -14,7 +16,7 @@ class CasesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => AppNavigator.push(SubmitCaseScreen()),
         backgroundColor: AppColors.laserBlue,
         elevation: 6,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
