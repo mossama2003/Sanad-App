@@ -1,20 +1,10 @@
-import '../../../../../core/network/local/cache/cache_helper.dart';
+class SignInParam {
+  final String email;
+  final String password;
 
-class SignInPhoneParam {
-  final String phoneCode;
-  final String phoneNumber;
-
-  SignInPhoneParam({
-    required this.phoneCode,
-    required this.phoneNumber,
-  });
+  SignInParam({required this.email, required this.password});
 
   Map<String, dynamic> toJson() {
-    final String? fcmToken = CacheHelper.get(CacheKeys.fcmToken);
-    return {
-      "phone_country_code": phoneCode,
-      'phone': phoneNumber,
-      "fcmToken": ?fcmToken,
-    };
+    return {'username': email, 'password': password};
   }
 }

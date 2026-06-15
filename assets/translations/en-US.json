@@ -114,7 +114,8 @@
       "dont_have_account": "Don't have an account? ",
       "sign_up_as_volunteer": "Sign up as Volunteer",
       "or": " or ",
-      "sign_up_as_organization": "Organization"
+      "sign_up_as_organization": "Organization",
+      "account_signed_in": "Account Signed In"
     },
     "donations_removed": {
       "winter_clothing_drive": "Winter Clothing Drive",
@@ -210,8 +211,13 @@
       "EGP_45000": "EGP 45,000"
     },
     "notifications": {
-      "appbar": "Notifications",
-      "unread": "unread"
+      "title": "Notifications",
+      "desc": "3 new updates",
+      "mark_all_read": "Mark All Read",
+      "all": "All",
+      "unread": "Unread",
+      "rewards": "Rewards",
+      "events": "Events"
     },
     "notifications_removed": {
       "new_badge_earned": "New Badge Earned!",
@@ -292,7 +298,8 @@
       "accept_terms": "I accept the Terms of Service and Privacy Policy",
       "sign_up_button": "Submit for Verification",
       "already_have_account": "Already have an account? ",
-      "sign_in": "Sign In"
+      "sign_in": "Sign In",
+      "created_account": "Account created successfully"
     },
     "home": {
       "navbar": {
@@ -354,8 +361,12 @@
       "email": "Email",
       "enter_email": "Enter Your Email",
       "phone_number": "Phone Number",
-      "location": "Location",
+      "city": "City",
       "select_your_city": "Select your city",
+      "governorate": "Governorate",
+      "select_your_governorate": "Select your governorate",
+      "address": "Address",
+      "write_your_address": "write your address",
       "gender": "Gender",
       "male": "Male",
       "female": "Female",
@@ -363,8 +374,11 @@
       "blood_type": "Blood Type",
       "select_blood_type": "Select blood Type",
       "skills_interests": "Skills & Interests",
+      "national_id_numbers": "National ID Numbers",
+      "write_national_id_numbers": "Write National ID Numbers",
       "national_id": "National ID (Front & Back)",
-      "upload_national_id": "Upload National ID",
+      "upload_national_id_front": "Upload National ID (Front)",
+      "upload_national_id_back": "Upload National ID (Back)",
       "password": "Password",
       "create_strong_password": "Create a Strong Password",
       "confirm_password": "Confirm Password",
@@ -372,6 +386,7 @@
       "accept_terms": "I accept the Terms of Service and Privacy Policy",
       "sign_up_button": "Create Account",
       "already_have_account": "Already have an account? ",
+      "account_created": "Account created successfully!",
       "sign_in": "Sign In"
     },
     "home": {

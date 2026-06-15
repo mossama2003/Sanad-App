@@ -14,6 +14,7 @@ class CustomFieldDropdown<T> extends StatelessWidget {
     this.hintText,
     this.validator,
     this.enabled = true,
+    this.isRequired = false,
     required this.items,
     required this.selected,
     required this.onChanged,
@@ -21,6 +22,7 @@ class CustomFieldDropdown<T> extends StatelessWidget {
 
   final ValueNotifier<T?> selected;
   final bool enabled;
+  final bool isRequired;
   final String? title;
   final String? hintText;
   final ValueChanged<T?> onChanged;
@@ -33,51 +35,81 @@ class CustomFieldDropdown<T> extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (title != null) ...[
-          Text(title!, style: TextStyle(color: AppColors.grey700).xs),
+          RichText(
+            text: TextSpan(
+              text: title!,
+              style: TextStyle(color: AppColors.grey700).xs,
+              children: isRequired
+                  ? [
+                      TextSpan(
+                        text: ' *',
+                        style: TextStyle(
+                          color: AppColors.red,
+                          fontSize: AppSize.font(12),
+                        ),
+                      ),
+                    ]
+                  : [],
+            ),
+          ),
           SizedBox(height: AppSize.getHeight(6)),
         ],
         DropdownButtonFormField2<T>(
           items: items,
           valueListenable: selected,
           validator: validator,
-          iconStyleData: IconStyleData(
-            icon: Center(
-              child: CustomIcon(
-                icon: AppIcons.chevronDown,
-                width: AppSize.getSize(24),
-                height: AppSize.getSize(24),
-                color: AppColors.grey500,
-              ),
-            ),
-          ),
-          menuItemStyleData: MenuItemStyleData(
-            padding: AppSize.padding(horizontal: 14),
-          ),
-          alignment: Alignment.center,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           style: TextStyle(
-            color: AppColors.grey900,
-          ).sm.copyWith(height: AppSize.fontHeight(16, 20)),
+            color: AppColors.black,
+            fontSize: AppSize.font(14),
+            fontWeight: FontWeight.w600,
+          ),
+          hint: hintText != null && selected.value == null
+              ? Text(hintText!, style: TextStyle(color: AppColors.grey).xs)
+              : null,
           onChanged: enabled
               ? (value) {
                   selected.value = value;
                   onChanged(value);
                 }
               : null,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          hint: hintText != null && selected.value == null
-              ? Text(
-                  hintText!,
-                  style: TextStyle(
-                    color: AppColors.grey900,
-                  ).sm.copyWith(height: AppSize.fontHeight(16, 20)),
-                )
-              : null,
+          iconStyleData: IconStyleData(
+            icon: CustomIcon(
+              icon: AppIcons.downArrow,
+              width: AppSize.getSize(12),
+              height: AppSize.getSize(12),
+              color: AppColors.grey500,
+            ),
+            openMenuIcon: CustomIcon(
+              icon: AppIcons.upArrow,
+              width: AppSize.getSize(12),
+              height: AppSize.getSize(12),
+              color: AppColors.grey500,
+            ),
+          ),
           decoration: InputDecoration(
             enabled: enabled,
-            contentPadding: EdgeInsetsDirectional.only(
-              end: AppSize.getWidth(14),
-              top: AppSize.getHeight(10),
-              bottom: AppSize.getHeight(10),
+            hintStyle: TextStyle(color: AppColors.grey).xs,
+            errorStyle: TextStyle(fontSize: AppSize.font(14)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppColors.grey300),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppColors.grey300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red, width: 1.5),
             ),
           ),
         ),

@@ -27,7 +27,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    _cubit = OnboardingCubit()..updateOnboarding(_pages); // ✅
+    _cubit = OnboardingCubit()..updateOnboarding(_pages);
   }
 
   @override
@@ -133,7 +133,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             children: [
               SmoothPageIndicator(
                 controller: _cubit.controller,
-                count: _cubit.onboarding.length, // ✅
+                count: _cubit.onboarding.length,
                 effect: ExpandingDotsEffect(
                   dotHeight: 8,
                   dotWidth: 8,
@@ -158,3 +158,4 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+

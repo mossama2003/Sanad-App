@@ -6,6 +6,7 @@ import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
 import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../../shared/notification/presentation/screens/notification_screen.dart';
 import '../../../../shared/profile/presentation/screens/profile_screen.dart';
 
 class VolunteerHomeAppbarWidget extends StatelessWidget {
@@ -73,6 +74,7 @@ class VolunteerHomeAppbarWidget extends StatelessWidget {
           ),
           Spacer(),
           CustomIcon(
+            onTap: () => AppNavigator.push(NotificationsScreen()),
             icon: AppIcons.notification,
             width: AppSize.getSize(25),
             height: AppSize.getSize(25),

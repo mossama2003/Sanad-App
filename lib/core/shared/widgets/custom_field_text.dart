@@ -29,6 +29,7 @@ class CustomFieldText extends StatelessWidget {
     this.readOnly = false,
     this.autofocus = false,
     this.obscureText = false,
+    this.isRequired = false,
     this.keyboardType = TextInputType.text,
     this.inputFormatters,
     this.bgColor,
@@ -49,6 +50,7 @@ class CustomFieldText extends StatelessWidget {
   final TextInputType? keyboardType;
   final EdgeInsetsGeometry? padding;
   final bool obscureText;
+  final bool isRequired;
 
   final int? minLines;
   final int? maxLines;
@@ -69,7 +71,23 @@ class CustomFieldText extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (title != null) ...[
-          Text(title!, style: TextStyle(color: AppColors.grey700).xs),
+          RichText(
+            text: TextSpan(
+              text: title!,
+              style: TextStyle(color: AppColors.grey700).xs,
+              children: isRequired
+                  ? [
+                      TextSpan(
+                        text: ' *',
+                        style: TextStyle(
+                          color: AppColors.red,
+                          fontSize: AppSize.font(15),
+                        ),
+                      ),
+                    ]
+                  : [],
+            ),
+          ),
           SizedBox(height: AppSize.getHeight(6)),
         ],
         TextFormField(
@@ -95,11 +113,9 @@ class CustomFieldText extends StatelessWidget {
             filled: bgColor != null,
             fillColor: bgColor,
             hintStyle: TextStyle(color: AppColors.grey).xs,
-
             contentPadding: padding,
             hintText: hintText ?? labelText ?? '',
             errorStyle: TextStyle(fontSize: AppSize.font(14)),
-
             suffixIconConstraints: BoxConstraints(
               minHeight: AppSize.getHeight(40),
               maxHeight: AppSize.getHeight(40),
@@ -108,32 +124,26 @@ class CustomFieldText extends StatelessWidget {
               minHeight: AppSize.getHeight(40),
               maxHeight: AppSize.getHeight(40),
             ),
-
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: AppColors.grey300),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-
               borderSide: BorderSide(color: AppColors.grey300),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-
               borderSide: BorderSide(color: AppColors.primary, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-
               borderSide: BorderSide(color: Colors.red),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-
               borderSide: BorderSide(color: Colors.red, width: 1.5),
             ),
-
             prefixIcon: iconStart != null
                 ? Row(
                     mainAxisSize: MainAxisSize.min,
@@ -147,7 +157,6 @@ class CustomFieldText extends StatelessWidget {
                     ],
                   )
                 : null,
-
             suffixIcon: iconEnd != null
                 ? Row(
                     mainAxisSize: MainAxisSize.min,

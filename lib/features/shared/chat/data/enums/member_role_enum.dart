@@ -1,0 +1,1 @@
+enum MemberRoleEnum { admin, organizer, volunteer }

@@ -302,6 +302,42 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "flutter_image_compress",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/flutter_image_compress-2.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_image_compress_common",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/flutter_image_compress_common-1.0.6",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_image_compress_macos",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/flutter_image_compress_macos-1.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_image_compress_ohos",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/flutter_image_compress_ohos-0.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_image_compress_platform_interface",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/flutter_image_compress_platform_interface-1.0.5",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_image_compress_web",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/flutter_image_compress_web-0.1.5",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "flutter_intl_phone_field",
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/flutter_intl_phone_field-0.0.7",
       "packageUri": "lib/",
@@ -414,6 +450,24 @@
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/http_parser-4.1.2",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "image_cropper",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/image_cropper-12.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "image_cropper_for_web",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/image_cropper_for_web-7.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "image_cropper_platform_interface",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/image_cropper_platform_interface-8.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "image_picker",
@@ -930,6 +984,12 @@
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/test_api-0.7.11",
       "packageUri": "lib/",
       "languageVersion": "3.7"
+    },
+    {
+      "name": "top_snackbar_flutter",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/top_snackbar_flutter-3.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
     },
     {
       "name": "typed_data",

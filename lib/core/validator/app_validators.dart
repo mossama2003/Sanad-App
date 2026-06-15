@@ -10,6 +10,14 @@ class AppValidators {
     }
   }
 
+  /// GENERIC DROPDOWN VALIDATION (WORKS WITH ANY TYPE)
+  static String? dropdownRequired<T>(T? value) {
+    if (value == null) {
+      return 'validators.required'.tr();
+    }
+    return null;
+  }
+
   /// REQUIRED LENGTH VALIDATION
   static String? minLength(String? value, int length) {
     if (value == null || value.isEmpty) {

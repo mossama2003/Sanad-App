@@ -15,6 +15,7 @@ class ReportEmergencyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F7),
       appBar: AppBar(iconTheme: IconThemeData(color: AppColors.primary)),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -131,22 +132,26 @@ class ReportEmergencyScreen extends StatelessWidget {
                   controller: TextEditingController(),
                   validator: AppValidators.required,
                   title: 'volunteer.emergency.reports.location'.tr(),
-                  hintText: 'volunteer.emergency.reports.city_specific_adress'.tr(),
+                  hintText: 'volunteer.emergency.reports.city_specific_adress'
+                      .tr(),
                 ),
                 SizedBox(height: AppSize.getHeight(12)),
                 CustomFieldText(
                   controller: TextEditingController(),
                   validator: AppValidators.required,
                   title: 'volunteer.emergency.reports.volunteers_needed'.tr(),
-                  hintText: 'volunteer.emergency.reports.estimated_number_needed'.tr(),
+                  hintText:
+                      'volunteer.emergency.reports.estimated_number_needed'
+                          .tr(),
                 ),
                 SizedBox(height: AppSize.getHeight(12)),
                 CustomFieldText(
                   controller: TextEditingController(),
                   validator: AppValidators.required,
                   title: 'volunteer.emergency.reports.contact_information'.tr(),
-                  hintText: 'volunteer.emergency.reports.phone_number_for_coordination'
-                      .tr(),
+                  hintText:
+                      'volunteer.emergency.reports.phone_number_for_coordination'
+                          .tr(),
                 ),
                 SizedBox(height: AppSize.getHeight(20)),
                 Row(
@@ -165,7 +170,8 @@ class ReportEmergencyScreen extends StatelessWidget {
                     SizedBox(width: AppSize.getWidth(10)),
                     Expanded(
                       child: CustomButton(
-                        title: 'volunteer.emergency.reports.submit_emergency'.tr(),
+                        title: 'volunteer.emergency.reports.submit_emergency'
+                            .tr(),
                         textColor: AppColors.white,
                         textSize: AppSize.font(15),
                         height: AppSize.getHeight(45),

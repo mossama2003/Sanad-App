@@ -9,7 +9,7 @@ import PackageDescription
 let package = Package(
     name: "FlutterGeneratedPluginSwiftPackage",
     platforms: [
-        .iOS("15")
+        .iOS("13.0")
     ],
     products: [
         .library(name: "FlutterGeneratedPluginSwiftPackage", type: .static, targets: ["FlutterGeneratedPluginSwiftPackage"])
@@ -19,6 +19,7 @@ let package = Package(
         .package(name: "shared_preferences_foundation", path: "../.packages/shared_preferences_foundation-2.5.6"),
         .package(name: "share_plus", path: "../.packages/share_plus-13.1.0"),
         .package(name: "image_picker_ios", path: "../.packages/image_picker_ios-0.8.13+6"),
+        .package(name: "image_cropper", path: "../.packages/image_cropper-12.2.1"),
         .package(name: "webview_flutter_wkwebview", path: "../.packages/webview_flutter_wkwebview-3.25.1"),
         .package(name: "just_audio", path: "../.packages/just_audio-0.10.5"),
         .package(name: "audio_session", path: "../.packages/audio_session-0.2.3"),
@@ -39,6 +40,7 @@ let package = Package(
                 .product(name: "shared-preferences-foundation", package: "shared_preferences_foundation"),
                 .product(name: "share-plus", package: "share_plus"),
                 .product(name: "image-picker-ios", package: "image_picker_ios"),
+                .product(name: "image-cropper", package: "image_cropper"),
                 .product(name: "webview-flutter-wkwebview", package: "webview_flutter_wkwebview"),
                 .product(name: "just-audio", package: "just_audio"),
                 .product(name: "audio-session", package: "audio_session"),

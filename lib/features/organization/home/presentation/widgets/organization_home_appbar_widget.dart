@@ -7,6 +7,7 @@ import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 import 'package:sanad_app/features/shared/profile/presentation/screens/profile_screen.dart';
 
 import '../../../../../core/style/app_colors.dart';
+import '../../../../shared/notification/presentation/screens/notification_screen.dart';
 
 class OrganizationHomeAppbarWidget extends StatelessWidget {
   const OrganizationHomeAppbarWidget({super.key});
@@ -73,6 +74,7 @@ class OrganizationHomeAppbarWidget extends StatelessWidget {
           ),
           Spacer(),
           CustomIcon(
+            onTap: () => AppNavigator.push(NotificationsScreen()),
             icon: AppIcons.notification,
             width: AppSize.getSize(25),
             height: AppSize.getSize(25),

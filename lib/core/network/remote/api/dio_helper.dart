@@ -2,24 +2,27 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
+import '../../end_points.dart';
 import 'dio_interceptors.dart';
 
 class DioHelper {
   static Dio? dio;
 
-  /// DIO INITIALIZATION
-  static void init() async {
+  static void init() {
     dio = Dio(
       BaseOptions(
-        // baseUrl: BASE_URL,
+        baseUrl: BASE_URL,
         followRedirects: false,
         receiveDataWhenStatusError: true,
         validateStatus: (status) => status! < 500,
-        receiveTimeout: const Duration(seconds: 30),
         connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        sendTimeout: const Duration(seconds: 30),
+        maxRedirects: 5,
       ),
     );
-    dio!.interceptors.addAll([
+    dio!.options.headers = {'Content-Type': 'application/json'};
+    dio!.interceptors.addAll({
       AppInterceptors(dio!),
       if (kDebugMode)
         PrettyDioLogger(
@@ -30,68 +33,113 @@ class DioHelper {
           requestHeader: false,
           responseHeader: false,
         ),
-    ]);
+    });
   }
 
+  static String _buildUrl(String url, {bool useFullUrl = false}) {
+    if (useFullUrl) return url;
+    return '$BASE_URL$url';
+  }
+
+  /// METHOD [POST]
   static Future<Response> post({
-    Options? options,
-    FormData? formData,
-    required String endPoint,
-    Map<String, dynamic>? data,
+    required String url,
     Map<String, dynamic>? query,
+    Map<String, dynamic>? headers,
+    dynamic data,
+    Options? options,
+    bool useFullUrl = false,
   }) async {
-    return dio!.post(
-      endPoint,
-      options: options,
+    dio!.options.headers = headers ?? {'Content-Type': 'application/json'};
+    return await dio!.post(
+      _buildUrl(url, useFullUrl: useFullUrl),
+      data: data,
       queryParameters: query,
-      data: formData ?? data,
+      options: options,
     );
   }
 
+  /// METHOD [GET]
   static Future<Response> get({
-    Options? options,
-    required String endPoint,
+    required String url,
     Map<String, dynamic>? query,
+    Map<String, dynamic>? headers,
+    dynamic data,
+    bool useFullUrl = false,
   }) async {
-    return dio!.get(endPoint, queryParameters: query, options: options);
+    final isFullUrl = useFullUrl || url.startsWith('http');
+
+    return await dio!.get(
+      _buildUrl(url, useFullUrl: isFullUrl),
+      queryParameters: query,
+      data: data,
+      options: Options(headers: headers),
+    );
   }
 
-  static Future<Response> put({
-    Options? options,
-    required String endPoint,
-    FormData? formData,
-    Map<String, dynamic>? data,
+  /// METHOD [DELETE]
+  static Future<Response> delete({
+    required String url,
     Map<String, dynamic>? query,
+    Map<String, dynamic>? headers,
+    dynamic data,
+    bool useFullUrl = false,
   }) async {
-    return dio!.put(
-      endPoint,
-      data: formData ?? data,
-      options: options,
+    dio!.options.headers = headers ?? {'Content-Type': 'application/json'};
+    return await dio!.delete(
+      _buildUrl(url, useFullUrl: useFullUrl),
+      data: data,
       queryParameters: query,
     );
   }
 
-  static Future<Response> delete({
-    Options? options,
-    required String endPoint,
+  /// METHOD [PATCH]
+  static Future<Response> patch({
+    required String url,
     Map<String, dynamic>? query,
+    Map<String, dynamic>? headers,
+    dynamic data,
+    bool useFullUrl = false,
   }) async {
-    return dio!.delete(endPoint, queryParameters: query, options: options);
+    dio!.options.headers = headers ?? {'Content-Type': 'application/json'};
+    return await dio!.patch(
+      _buildUrl(url, useFullUrl: useFullUrl),
+      data: data,
+      queryParameters: query,
+    );
   }
 
-  static Future<Response> download ({
+  /// METHOD [PUT]
+  static Future<Response> put({
+    required String url,
+    Map<String, dynamic>? query,
+    dynamic data,
+    bool useFullUrl = false,
+  }) async {
+    return await dio!.put(
+      _buildUrl(url, useFullUrl: useFullUrl),
+      data: data,
+      queryParameters: query,
+    );
+  }
+
+  /// METHOD [DOWNLOAD]
+  static Future<void> download({
     required String url,
     required String savePath,
+    Map<String, dynamic>? headers,
     ProgressCallback? onReceiveProgress,
-    Map<String, dynamic>? query,
-    Options? options,
+    bool useFullUrl = false,
   }) async {
-    return dio!.download(
-      url,
-      savePath,
-      onReceiveProgress: onReceiveProgress,
-      queryParameters: query,
-      options: options,
-    );
+    try {
+      dio!.options.headers = headers ?? {'Content-Type': 'application/json'};
+      await dio!.download(
+        _buildUrl(url, useFullUrl: useFullUrl),
+        savePath,
+        onReceiveProgress: onReceiveProgress,
+      );
+    } catch (e) {
+      throw Exception('Download failed: $e');
+    }
   }
 }

@@ -17,6 +17,10 @@ class CustomUploadFile extends StatelessWidget {
     this.icon,
     this.hint,
     this.title,
+    this.minLines,
+    this.maxLines,
+    this.height,
+    this.isRequired = false,
   });
 
   final File? image;
@@ -24,17 +28,43 @@ class CustomUploadFile extends StatelessWidget {
   final VoidCallback onRemove;
   final String? icon;
   final String? hint;
+  final int? minLines;
+  final int? maxLines;
   final String? title;
+  final bool isRequired;
+  final double? height;
+
+  // Each "line" maps to a row height — same unit as CustomFieldText uses
+  double get _containerHeight =>
+      height ?? AppSize.getHeight(60 + ((maxLines ?? minLines ?? 1) - 1) * 24);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title!, style: TextStyle(color: AppColors.grey700).xs),
-        SizedBox(height: AppSize.getHeight(8)),
+        if (title != null) ...[
+          RichText(
+            text: TextSpan(
+              text: title!,
+              style: TextStyle(color: AppColors.grey700).xs,
+              children: isRequired
+                  ? [
+                      TextSpan(
+                        text: ' *',
+                        style: TextStyle(
+                          color: AppColors.red,
+                          fontSize: AppSize.font(12),
+                        ),
+                      ),
+                    ]
+                  : [],
+            ),
+          ),
+          SizedBox(height: AppSize.getHeight(8)),
+        ],
         Container(
-          height: AppSize.getHeight(60),
+          height: _containerHeight,
           width: double.infinity,
           decoration: DottedDecoration(
             shape: Shape.box,

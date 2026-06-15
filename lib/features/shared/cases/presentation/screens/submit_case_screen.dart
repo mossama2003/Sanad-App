@@ -1,8 +1,8 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:sanad_app/core/constant/app_assets.dart';
-import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
+import 'package:sanad_app/core/helper/app_navigator.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:sanad_app/core/constant/app_assets.dart';
+import 'package:flutter/material.dart';
 
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';

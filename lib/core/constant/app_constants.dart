@@ -5,13 +5,6 @@ class AppConstants {
 
   static final bool isAr = CacheHelper.get(CacheKeys.lang) == CacheKeys.langAr;
 
-  static final String addressAr =
-      '456 شارع الملك فهد، الرياض، المملكة العربية السعودية';
-  static final String addressEn = '456 King Fahd Street, Riyadh, Saudi Arabia';
-
-  static final String appAddress = isAr ? addressAr : addressEn;
-
-  static final String taxNumber = '3020142734';
-
-  static final String appUrl = 'https://shuaa-alamal.com/';
+  static const String cscApiKey =
+      "45fcbf7eec16504e3126a670eac227a6f594fd8af5133046fb7663f7004d23d7";
 }

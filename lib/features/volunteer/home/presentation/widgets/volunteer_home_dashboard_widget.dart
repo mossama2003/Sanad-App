@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sanad_app/features/shared/badges/presentation/screens/badges_screen.dart';
 
 import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
@@ -37,7 +38,6 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
             ImageFiltered(
               imageFilter: ImageFilter.blur(
                 sigmaX: 2,
-                // sigmaY: 10,
               ),
               child: Image.asset(
                 AppImages.dashboardBackground,
@@ -78,37 +78,43 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
 
                   SizedBox(height: AppSize.getHeight(20)),
 
-                  GestureDetector(
-                    onTap: () => AppNavigator.push(RewardsScreen()),
-                    child: Row(
-                      mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildStatCard(
+                  Row(
+                    mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: ()=> AppNavigator.push(RewardsScreen()),
+                        child: _buildStatCard(
                           icon: AppIcons.achievement,
                           value: '1,250',
                           title:
                           'volunteer.home.dashboard.xp_points'
                               .tr(),
                         ),
+                      ),
 
-                        _buildStatCard(
+                      GestureDetector(
+                        onTap: ()=> AppNavigator.push(RewardsScreen()),
+                        child: _buildStatCard(
                           icon: AppIcons.fire,
                           value: '7',
                           title:
                           'volunteer.home.dashboard.day_streak'
                               .tr(),
                         ),
+                      ),
 
-                        _buildStatCard(
+                      GestureDetector(
+                        onTap: ()=> AppNavigator.push(BadgesScreen()),
+                        child: _buildStatCard(
                           icon: AppIcons.badge,
                           value: '12',
                           title:
                           'volunteer.home.dashboard.badges'
                               .tr(),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),

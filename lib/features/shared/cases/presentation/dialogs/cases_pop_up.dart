@@ -12,6 +12,7 @@ class CasesPopUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: const Color(0xFFF5F5F7),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: AppSize.padding(all: 20),

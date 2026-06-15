@@ -6,6 +6,7 @@
 // @dart = 3.10
 
 import 'dart:io'; // flutter_ignore: dart_io_import.
+import 'package:flutter_image_compress_common/flutter_image_compress_common.dart' as flutter_image_compress_common;
 import 'package:image_picker_android/image_picker_android.dart' as image_picker_android;
 import 'package:open_file_android/open_file_android.dart' as open_file_android;
 import 'package:path_provider_android/path_provider_android.dart' as path_provider_android;
@@ -14,6 +15,7 @@ import 'package:sqflite_android/sqflite_android.dart' as sqflite_android;
 import 'package:url_launcher_android/url_launcher_android.dart' as url_launcher_android;
 import 'package:video_player_android/video_player_android.dart' as video_player_android;
 import 'package:webview_flutter_android/webview_flutter_android.dart' as webview_flutter_android;
+import 'package:flutter_image_compress_common/flutter_image_compress_common.dart' as flutter_image_compress_common;
 import 'package:image_picker_ios/image_picker_ios.dart' as image_picker_ios;
 import 'package:open_file_ios/open_file_ios.dart' as open_file_ios;
 import 'package:path_provider_foundation/path_provider_foundation.dart' as path_provider_foundation;
@@ -33,6 +35,7 @@ import 'package:shared_preferences_linux/shared_preferences_linux.dart' as share
 import 'package:url_launcher_linux/url_launcher_linux.dart' as url_launcher_linux;
 import 'package:wakelock_plus/wakelock_plus.dart' as wakelock_plus;
 import 'package:file_selector_macos/file_selector_macos.dart' as file_selector_macos;
+import 'package:flutter_image_compress_macos/flutter_image_compress_macos.dart' as flutter_image_compress_macos;
 import 'package:image_picker_macos/image_picker_macos.dart' as image_picker_macos;
 import 'package:open_file_mac/open_file_mac.dart' as open_file_mac;
 import 'package:path_provider_foundation/path_provider_foundation.dart' as path_provider_foundation;
@@ -58,6 +61,15 @@ class _PluginRegistrant {
   @pragma('vm:entry-point')
   static void register() {
     if (Platform.isAndroid) {
+      try {
+        flutter_image_compress_common.FlutterImageCompressCommon.registerWith();
+      } catch (err) {
+        print(
+          '`flutter_image_compress_common` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
       try {
         image_picker_android.ImagePickerAndroid.registerWith();
       } catch (err) {
@@ -131,6 +143,15 @@ class _PluginRegistrant {
       }
 
     } else if (Platform.isIOS) {
+      try {
+        flutter_image_compress_common.FlutterImageCompressCommon.registerWith();
+      } catch (err) {
+        print(
+          '`flutter_image_compress_common` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
       try {
         image_picker_ios.ImagePickerIOS.registerWith();
       } catch (err) {
@@ -300,6 +321,15 @@ class _PluginRegistrant {
       } catch (err) {
         print(
           '`file_selector_macos` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
+        flutter_image_compress_macos.FlutterImageCompressMacos.registerWith();
+      } catch (err) {
+        print(
+          '`flutter_image_compress_macos` threw an error: $err. '
           'The app may not function as expected until you remove this plugin from pubspec.yaml'
         );
       }

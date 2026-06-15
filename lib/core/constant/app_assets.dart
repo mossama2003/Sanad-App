@@ -72,6 +72,10 @@ class AppIcons {
   static String star = '$icons/star.svg';
   static String growthArrow = '$icons/growth-arrow.svg';
   static String rightArrow = '$icons/right_arrow.svg';
+  static String arrowBack = '$icons/arrow-back.svg';
+  static String arrowDown = '$icons/arrow-down.svg';
+  static String upArrow = '$icons/up-arrow.svg';
+  static String downArrow = '$icons/down-arrow.svg';
   static String comment = '$icons/comment.svg';
   static String contact = '$icons/contact.svg';
   static String profile = '$icons/profile.svg';
@@ -84,4 +88,8 @@ class AppIcons {
   static String cup = '$icons/cup.svg';
   static String sparkle = '$icons/sparkle.svg';
   static String crown = '$icons/crown.svg';
+  static String more = '$icons/more.svg';
+  static String pin = '$icons/pin.svg';
+  static String info = '$icons/info.svg';
+  static String send = '$icons/send.svg';
 }

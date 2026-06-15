@@ -15,6 +15,7 @@ class CasesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F7),
       floatingActionButton: FloatingActionButton(
         onPressed: () => AppNavigator.push(SubmitCaseScreen()),
         backgroundColor: AppColors.laserBlue,
