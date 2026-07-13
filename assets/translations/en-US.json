@@ -95,7 +95,9 @@
       "track_your_impact": "Track your impact with XP points, badges, and streaks. Every action counts!",
       "skip": "Skip",
       "next": "Next",
-      "get_started": "Get Started"
+      "get_started": "Get Started",
+      "dark": "Dark",
+      "light": "Light"
     },
     "sign_in": {
       "title": "Welcome to Sanad",
@@ -103,8 +105,8 @@
       "i_am": "I am a",
       "volunteer": "Volunteer",
       "organization": "Organization",
-      "email_or_phone": "Email or Phone",
-      "enter_email_or_phone": "Enter Your Email or Phone",
+      "email_or_username": "Email or Username",
+      "enter_email_or_username": "Enter Your Email or Username",
       "password": "Password",
       "enter_password": "Enter Your Password",
       "forget_password": "Forget Password?",

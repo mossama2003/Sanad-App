@@ -24,36 +24,53 @@ class CustomUploadFile extends StatelessWidget {
   });
 
   final File? image;
+
   final VoidCallback onTap;
   final VoidCallback onRemove;
+
   final String? icon;
   final String? hint;
+  final String? title;
+
   final int? minLines;
   final int? maxLines;
-  final String? title;
+
   final bool isRequired;
+
   final double? height;
 
-  // Each "line" maps to a row height — same unit as CustomFieldText uses
   double get _containerHeight =>
       height ?? AppSize.getHeight(60 + ((maxLines ?? minLines ?? 1) - 1) * 24);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final textColor = theme.textTheme.bodyMedium?.color ?? AppColors.inputText;
+
+    final borderColor = theme.dividerColor;
+
+    final errorColor = theme.colorScheme.error;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+
       children: [
         if (title != null) ...[
           RichText(
             text: TextSpan(
               text: title!,
-              style: TextStyle(color: AppColors.grey700).xs,
+
+              style: TextStyle(color: AppColors.textSecondary).xs,
+
               children: isRequired
                   ? [
                       TextSpan(
                         text: ' *',
+
                         style: TextStyle(
-                          color: AppColors.red,
+                          color: errorColor,
+
                           fontSize: AppSize.font(12),
                         ),
                       ),
@@ -61,33 +78,50 @@ class CustomUploadFile extends StatelessWidget {
                   : [],
             ),
           ),
+
           SizedBox(height: AppSize.getHeight(8)),
         ],
+
         Container(
           height: _containerHeight,
+
           width: double.infinity,
+
           decoration: DottedDecoration(
             shape: Shape.box,
+
             borderRadius: BorderRadius.circular(16),
-            color: AppColors.grey300,
+
+            color: borderColor,
+
             strokeWidth: 1.5,
+
             dash: const [6, 4],
           ),
+
           child: image == null
               ? InkWell(
                   onTap: onTap,
+
                   borderRadius: BorderRadius.circular(16),
+
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+
                     children: [
                       CustomIcon(
                         icon: icon!,
+
                         height: AppSize.getSize(25),
+
                         width: AppSize.getSize(25),
-                        color: AppColors.black,
+
+                        color: AppColors.iconGrey,
                       ),
+
                       SizedBox(width: AppSize.getWidth(8)),
-                      Text(hint!, style: TextStyle(color: AppColors.black)),
+
+                      Text(hint!, style: TextStyle(color: textColor)),
                     ],
                   ),
                 )
@@ -95,28 +129,44 @@ class CustomUploadFile extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),
+
                       child: Image.file(
                         image!,
+
                         width: double.infinity,
+
                         height: double.infinity,
+
                         fit: BoxFit.cover,
                       ),
                     ),
+
                     Positioned(
                       top: 8,
+
                       right: 8,
+
                       child: InkWell(
                         onTap: onRemove,
+
                         child: Container(
                           padding: AppSize.padding(all: 6),
-                          decoration: const BoxDecoration(
-                            color: Colors.black54,
+
+                          decoration: BoxDecoration(
+                            color: theme.brightness == Brightness.dark
+                                ? Colors.black87
+                                : Colors.black54,
+
                             shape: BoxShape.circle,
                           ),
+
                           child: CustomIcon(
                             icon: AppIcons.close,
+
                             color: AppColors.white,
+
                             height: AppSize.getSize(18),
+
                             width: AppSize.getSize(18),
                           ),
                         ),

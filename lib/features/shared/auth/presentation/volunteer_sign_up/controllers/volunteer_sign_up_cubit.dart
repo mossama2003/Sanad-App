@@ -1,23 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_app/features/shared/auth/data/repos/volunteer/volunteer_repo.dart';
+import 'package:sanad_app/features/shared/auth/data/params/volunteer_sign_up_param.dart';
+import 'package:sanad_app/features/shared/auth/data/models/skills_model.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sanad_app/features/shared/auth/data/models/skills_model.dart';
-import 'package:sanad_app/features/shared/auth/data/params/volunteer_sign_up_param.dart';
-import 'package:sanad_app/features/shared/auth/data/repos/volunteer/volunteer_repo.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:dio/dio.dart';
 
 import '../../../../../../core/helper/app_navigator.dart';
 import '../../../../../../core/helper/app_toast.dart';
-import '../../../data/models/city_model.dart';
 import '../../../data/models/governorate_model.dart';
 import '../../sign_in/screens/sign_in_screen.dart';
+import '../../../data/models/city_model.dart';
 
 part 'volunteer_sign_up_state.dart';
 
@@ -293,8 +293,7 @@ class VolunteerSignUpCubit extends Cubit<VolunteerSignUpState> {
         ? '$countryCode${phone.substring(1)}'
         : '$countryCode$phone';
 
-    final birthDate = DateFormat('dd/MM/yyyy')
-        .parse(birthdayController.text);
+    final birthDate = DateFormat('dd/MM/yyyy').parse(birthdayController.text);
 
     final formattedDob = DateFormat('yyyy-MM-dd').format(birthDate);
 
@@ -313,19 +312,16 @@ class VolunteerSignUpCubit extends Cubit<VolunteerSignUpState> {
         city: selectedCity.value?.nameEn ?? '',
         country: 'Egypt',
         address: locationController.text.trim(),
-        attachments: [
-          nationalIdFrontImage!,
-          nationalIdBackImage!,
-        ],
+        attachments: [nationalIdFrontImage!, nationalIdBackImage!],
       ),
     );
 
     api.fold(
-          (l) {
+      (l) {
         emit(Error());
         AppToast.error(l.errMessage);
       },
-          (r) {
+      (r) {
         emit(Success());
         AppToast.success('sign_up.account_created'.tr());
         AppNavigator.replace(SignInScreen());

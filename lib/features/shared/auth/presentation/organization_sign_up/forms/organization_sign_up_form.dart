@@ -32,8 +32,6 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
   bool showField = false;
   bool acceptTerms = false;
 
-  int selectedIndex = 0;
-
   @override
   void initState() {
     super.initState();
@@ -49,15 +47,27 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
     showField = false;
 
     Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) setState(() => showTexts = true);
+      if (mounted) {
+        setState(() {
+          showTexts = true;
+        });
+      }
     });
 
     Future.delayed(const Duration(milliseconds: 700), () {
-      if (mounted) setState(() => showButtons = true);
+      if (mounted) {
+        setState(() {
+          showButtons = true;
+        });
+      }
     });
 
     Future.delayed(const Duration(milliseconds: 1000), () {
-      if (mounted) setState(() => showField = true);
+      if (mounted) {
+        setState(() {
+          showField = true;
+        });
+      }
     });
   }
 
@@ -71,96 +81,149 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
     _cubit.addressController.dispose();
     _cubit.passwordController.dispose();
     _cubit.confirmPasswordController.dispose();
+
+    _cubit.close();
+
     super.dispose();
   }
 
   void _onSignUp() {
     if (!acceptTerms) {
       AppToast.error("You must accept terms");
+
       return;
     }
+
     _cubit.signUp();
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final textColor =
+        theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
+
+    final secondaryText =
+        theme.textTheme.bodySmall?.color ?? AppColors.textSecondary;
+
     return BlocBuilder<OrganizationSignUpCubit, OrganizationSignUpState>(
       bloc: _cubit,
+
       builder: (context, state) {
         return AnimatedSlide(
-          offset: showField ? Offset.zero : const Offset(0, 0.5),
+          offset: showField ? Offset.zero : const Offset(0, .5),
+
           duration: const Duration(milliseconds: 400),
+
           curve: Curves.easeOutCubic,
+
           child: AnimatedOpacity(
             opacity: showField ? 1 : 0,
+
             duration: const Duration(milliseconds: 400),
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+
               children: [
                 CustomFieldText(
                   controller: _cubit.nameController,
+
                   title: 'organization.sign_up.organization_name'.tr(),
+
                   hintText: 'organization.sign_up.hint_organization_name'.tr(),
+
                   validator: AppValidators.required,
                 ),
+
                 SizedBox(height: AppSize.getHeight(15)),
 
                 CustomFieldText(
                   controller: _cubit.websiteController,
+
                   title: 'organization.sign_up.website_link'.tr(),
+
                   hintText: 'organization.sign_up.hint_website_link'.tr(),
+
                   validator: AppValidators.required,
                 ),
+
                 SizedBox(height: AppSize.getHeight(15)),
 
                 CustomFieldText(
                   controller: _cubit.emailController,
+
                   title: 'organization.sign_up.official_email'.tr(),
+
                   hintText: 'organization.sign_up.hint_official_email'.tr(),
+
                   validator: AppValidators.email,
                 ),
+
                 SizedBox(height: AppSize.getHeight(15)),
 
                 CustomFieldText(
                   controller: _cubit.phoneController,
+
                   title: 'organization.sign_up.phone_number'.tr(),
+
                   hintText: '+20 123 456 7890',
+
                   validator: AppValidators.required,
                 ),
+
                 SizedBox(height: AppSize.getHeight(15)),
 
                 CustomFieldText(
                   controller: _cubit.headquartersController,
+
                   title: 'organization.sign_up.headquarters_location'.tr(),
+
                   hintText: 'organization.sign_up.hint_headquarters_location'
                       .tr(),
+
                   validator: AppValidators.required,
                 ),
+
                 SizedBox(height: AppSize.getHeight(15)),
 
                 CustomUploadFile(
                   onTap: () {},
+
                   onRemove: () {},
+
                   title: 'organization.sign_up.branch_locations'.tr(),
+
                   hint: 'organization.sign_up.hint_branch_locations'.tr(),
+
                   icon: AppIcons.add,
                 ),
+
                 SizedBox(height: AppSize.getHeight(15)),
 
                 CustomUploadFile(
                   onTap: () {},
+
                   onRemove: () {},
+
                   title: 'organization.sign_up.verification_documents'.tr(),
+
                   hint: 'organization.sign_up.hint_verification_documents'.tr(),
+
                   icon: AppIcons.uploadFile,
                 ),
 
                 SizedBox(height: AppSize.getHeight(5)),
+
                 Text(
                   'organization.sign_up.desc_verification_documents'.tr(),
+
                   style: TextStyle(
-                    color: AppColors.black,
+                    color: secondaryText,
+
                     fontSize: AppSize.font(12),
+
                     fontWeight: FontWeight.w200,
                   ),
                 ),
@@ -169,34 +232,47 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
 
                 CustomFieldText(
                   controller: _cubit.passwordController,
+
                   title: 'organization.sign_up.password'.tr(),
+
                   hintText: 'organization.sign_up.create_strong_password'.tr(),
+
                   validator: (value) => AppValidators.passwordIdentical(
                     value,
                     _cubit.passwordController.text,
                   ),
+
                   obscureText: _cubit.obscurePassword,
+
                   iconEnd: _cubit.obscurePassword
                       ? AppIcons.eyeShow
                       : AppIcons.eyeOff,
+
                   iconEndTap: () {
                     _cubit.updateObscurePassword();
                   },
                 ),
+
                 SizedBox(height: AppSize.getHeight(15)),
 
                 CustomFieldText(
                   controller: _cubit.confirmPasswordController,
+
                   title: 'organization.sign_up.confirm_password'.tr(),
+
                   hintText: 'organization.sign_up.confirm_your_password'.tr(),
+
                   validator: (value) => AppValidators.passwordIdentical(
                     value,
                     _cubit.confirmPasswordController.text,
                   ),
+
                   obscureText: _cubit.obscureConfirmedPassword,
+
                   iconEnd: _cubit.obscureConfirmedPassword
                       ? AppIcons.eyeShow
                       : AppIcons.eyeOff,
+
                   iconEndTap: () {
                     _cubit.updateObscureConfirmedPassword();
                   },
@@ -205,14 +281,17 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
                 SizedBox(height: AppSize.getHeight(15)),
 
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
                       width: AppSize.getSize(20),
+
                       height: AppSize.getSize(20),
+
                       child: Checkbox(
                         value: acceptTerms,
-                        activeColor: AppColors.green,
+
+                        activeColor: AppColors.primary,
+
                         onChanged: (value) {
                           setState(() {
                             acceptTerms = value ?? false;
@@ -220,11 +299,14 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
                         },
                       ),
                     ),
+
                     SizedBox(width: AppSize.getWidth(8)),
+
                     Expanded(
                       child: Text(
                         'organization.sign_up.accept_terms'.tr(),
-                        style: TextStyle(color: AppColors.black).xs,
+
+                        style: TextStyle(color: textColor).xs,
                       ),
                     ),
                   ],
@@ -234,8 +316,11 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
 
                 CustomButton(
                   loading: state is Loading,
+
                   onTap: _onSignUp,
+
                   title: 'organization.sign_up.sign_up_button'.tr(),
+
                   bgColor: AppColors.laserBlue,
                 ),
 
@@ -243,17 +328,25 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
 
                 Align(
                   alignment: Alignment.center,
+
                   child: RichText(
                     textAlign: TextAlign.center,
+
                     text: TextSpan(
                       text: "organization.sign_up.already_have_account".tr(),
-                      style: TextStyle(color: AppColors.black).xs,
+
+                      style: TextStyle(color: textColor).xs,
+
                       children: [
                         TextSpan(
                           text: "organization.sign_up.sign_in".tr(),
+
                           style: TextStyle(color: AppColors.laserBlue).xs,
+
                           recognizer: TapGestureRecognizer()
-                            ..onTap = () => AppNavigator.remove(SignInScreen()),
+                            ..onTap = () {
+                              AppNavigator.remove(SignInScreen());
+                            },
                         ),
                       ],
                     ),

@@ -2,7 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../core/constant/app_size.dart';
+import '../../../../../../core/network/local/cache/cache_helper.dart';
 import '../../../../../../core/style/app_colors.dart';
+import '../../../../../../core/style/app_text_style.dart';
+import '../../../../../../core/style/app_theme.dart';
 import '../forms/Volunteer_sign_up_form.dart';
 
 class VolunteerSignUpScreen extends StatefulWidget {
@@ -15,8 +18,6 @@ class VolunteerSignUpScreen extends StatefulWidget {
 class _VolunteerSignUpScreenState extends State<VolunteerSignUpScreen> {
   bool showIcon = false;
   bool showTexts = false;
-
-  int selectedIndex = 0;
 
   @override
   void initState() {
@@ -37,66 +38,167 @@ class _VolunteerSignUpScreenState extends State<VolunteerSignUpScreen> {
     });
   }
 
+  Future<void> _toggleTheme() async {
+    final currentTheme = CacheHelper.get(CacheKeys.theme) ?? CacheKeys.light;
+
+    final isDark = currentTheme == CacheKeys.dark;
+
+    final newTheme = isDark ? CacheKeys.light : CacheKeys.dark;
+
+    await CacheHelper.save(CacheKeys.theme, newTheme);
+
+    AppTheme.setTheme(
+      newTheme == CacheKeys.dark ? AppThemeEnum.dark : AppThemeEnum.light,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final textColor = Theme.of(context).textTheme.bodyMedium?.color;
+
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: AppSize.padding(all: 30),
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+
               children: [
+                Align(
+                  alignment: AlignmentDirectional.topEnd,
+
+                  child: InkWell(
+                    onTap: _toggleTheme,
+
+                    borderRadius: BorderRadius.circular(30),
+
+                    child: Container(
+                      padding: AppSize.padding(horizontal: 12, vertical: 8),
+
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+
+                        borderRadius: BorderRadius.circular(30),
+
+                        border: Border.all(
+                          color: Theme.of(context).dividerColor,
+                        ),
+                      ),
+
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+
+                        children: [
+                          Icon(
+                            isDark
+                                ? Icons.light_mode_rounded
+                                : Icons.dark_mode_rounded,
+
+                            size: 18,
+
+                            color: textColor,
+                          ),
+
+                          SizedBox(width: AppSize.getWidth(6)),
+
+                          Text(
+                            isDark ? 'Light' : 'Dark',
+
+                            style: TextStyle(color: textColor).xs,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: AppSize.getHeight(15)),
+
                 Center(
                   child: Column(
                     children: [
                       AnimatedSlide(
                         offset: showIcon ? Offset.zero : const Offset(0, 0.5),
+
                         duration: const Duration(milliseconds: 400),
+
                         curve: Curves.easeOutCubic,
+
                         child: AnimatedOpacity(
                           opacity: showIcon ? 1 : 0,
+
                           duration: const Duration(milliseconds: 400),
+
                           child: Container(
                             width: AppSize.getSize(50),
+
                             height: AppSize.getSize(50),
+
                             decoration: BoxDecoration(
                               color: AppColors.primary,
+
                               borderRadius: BorderRadius.circular(10),
                             ),
+
                             child: Center(
                               child: Text(
                                 '🤝',
+
                                 style: TextStyle(fontSize: AppSize.font(25)),
                               ),
                             ),
                           ),
                         ),
                       ),
+
                       SizedBox(height: AppSize.getHeight(15)),
+
                       AnimatedSlide(
                         offset: showTexts ? Offset.zero : const Offset(0, 0.5),
+
                         duration: const Duration(milliseconds: 400),
+
                         curve: Curves.easeOutCubic,
+
                         child: AnimatedOpacity(
                           opacity: showTexts ? 1 : 0,
+
                           duration: const Duration(milliseconds: 400),
+
                           child: Column(
                             children: [
                               Text(
                                 'volunteer.sign_up.title'.tr(),
+
                                 style: TextStyle(
-                                  color: AppColors.green,
+                                  color: AppColors.primary,
+
                                   fontSize: AppSize.font(20),
+
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+
                               SizedBox(height: AppSize.getHeight(5)),
+
                               Text(
                                 'volunteer.sign_up.desc'.tr(),
+
                                 style: TextStyle(
-                                  color: AppColors.black.withValues(alpha: 0.5),
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color
+                                      ?.withValues(alpha: .5),
+
                                   fontSize: AppSize.font(15),
+
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
@@ -107,7 +209,9 @@ class _VolunteerSignUpScreenState extends State<VolunteerSignUpScreen> {
                     ],
                   ),
                 ),
+
                 SizedBox(height: AppSize.getHeight(25)),
+
                 VolunteerSignUpForm(),
               ],
             ),

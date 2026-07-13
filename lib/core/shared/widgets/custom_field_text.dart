@@ -39,6 +39,7 @@ class CustomFieldText extends StatelessWidget {
 
   final bool iconColor;
   final Color? bgColor;
+
   final String? iconStart;
   final String? iconEnd;
   final Function()? iconEndTap;
@@ -47,13 +48,16 @@ class CustomFieldText extends StatelessWidget {
   final String? labelText;
   final String? hintText;
   final String? helperText;
+
   final TextInputType? keyboardType;
   final EdgeInsetsGeometry? padding;
+
   final bool obscureText;
   final bool isRequired;
 
   final int? minLines;
   final int? maxLines;
+
   final bool enabled;
   final bool readOnly;
   final bool autofocus;
@@ -63,24 +67,41 @@ class CustomFieldText extends StatelessWidget {
   final Function(String)? onChanged;
 
   final FormFieldValidator<String>? validator;
+
   final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final textColor = theme.textTheme.bodyMedium?.color ?? AppColors.inputText;
+
+    final hintColor = theme.brightness == Brightness.dark
+        ? AppColors.grey400
+        : AppColors.grey;
+
+    final borderColor = theme.dividerColor;
+
+    final errorColor = theme.colorScheme.error;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+
       children: [
         if (title != null) ...[
           RichText(
             text: TextSpan(
               text: title!,
-              style: TextStyle(color: AppColors.grey700).xs,
+
+              style: TextStyle(color: AppColors.textSecondary).xs,
+
               children: isRequired
                   ? [
                       TextSpan(
                         text: ' *',
+
                         style: TextStyle(
-                          color: AppColors.red,
+                          color: errorColor,
                           fontSize: AppSize.font(15),
                         ),
                       ),
@@ -88,62 +109,106 @@ class CustomFieldText extends StatelessWidget {
                   : [],
             ),
           ),
+
           SizedBox(height: AppSize.getHeight(6)),
         ],
+
         TextFormField(
           enabled: enabled,
+
           readOnly: readOnly,
+
           onTap: onTap,
+
           minLines: minLines ?? 1,
+
           maxLines: maxLines ?? minLines ?? 1,
+
           autofocus: autofocus,
+
           onChanged: onChanged,
+
           controller: controller,
+
           obscureText: obscureText,
+
           onFieldSubmitted: onSubmit,
+
           keyboardType: keyboardType,
+
           autovalidateMode: AutovalidateMode.onUserInteraction,
+
           style: TextStyle(
+            color: textColor,
+
             fontSize: AppSize.font(14),
+
             fontWeight: FontWeight.w600,
           ),
+
           validator: validator,
+
           inputFormatters: inputFormatters,
+
           decoration: InputDecoration(
-            filled: bgColor != null,
-            fillColor: bgColor,
-            hintStyle: TextStyle(color: AppColors.grey).xs,
+            filled: true,
+
+            fillColor: bgColor ?? Theme.of(context).cardColor,
+
+            hintStyle: TextStyle(color: hintColor).xs,
+
             contentPadding: padding,
+
             hintText: hintText ?? labelText ?? '',
-            errorStyle: TextStyle(fontSize: AppSize.font(14)),
+
+            errorStyle: TextStyle(
+              color: errorColor,
+
+              fontSize: AppSize.font(14),
+            ),
+
             suffixIconConstraints: BoxConstraints(
               minHeight: AppSize.getHeight(40),
+
               maxHeight: AppSize.getHeight(40),
             ),
+
             prefixIconConstraints: BoxConstraints(
               minHeight: AppSize.getHeight(40),
+
               maxHeight: AppSize.getHeight(40),
             ),
+
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.grey300),
+
+              borderSide: BorderSide(color: borderColor),
             ),
+
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.grey300),
+
+              borderSide: BorderSide(color: borderColor),
             ),
+
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
+
               borderSide: BorderSide(color: AppColors.primary, width: 1.5),
             ),
+
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.red),
+
+              borderSide: BorderSide(color: errorColor),
             ),
+
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.red, width: 1.5),
+
+              borderSide: BorderSide(color: errorColor, width: 1.5),
             ),
+
             prefixIcon: iconStart != null
                 ? Row(
                     mainAxisSize: MainAxisSize.min,

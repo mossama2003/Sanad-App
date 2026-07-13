@@ -1,13 +1,16 @@
 part of 'cache_helper.dart';
 
 class CacheKeys {
-  static final String lang = 'lang';
-  static final String langAr = 'ar';
-  static final String langEn = 'en';
-  static final String theme = 'theme';
-  static final String dark = 'dark';
-  static final String light = 'light';
-  static final String token = 'token';
-  static final String fcmToken = 'fcm_token';
-  static final String firstUse = 'firstUse';
+  static const String lang = 'lang';
+  static const String langAr = 'ar';
+  static const String langEn = 'en';
+
+  static const String theme = 'theme';
+  static const String dark = 'dark';
+  static const String light = 'light';
+
+  static const String token = 'token';
+  static const String fcmToken = 'fcm_token';
+
+  static const String firstUse = 'first_use';
 }

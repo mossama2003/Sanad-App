@@ -1,136 +1,155 @@
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../constant/app_constants.dart';
-import '../constant/app_size.dart';
+import '../network/local/cache/cache_helper.dart';
 import 'app_colors.dart';
-import 'app_text_style.dart';
 
-class AppTheme {
-  static ThemeData appLightTheme = ThemeData(
-    brightness: Brightness.light,
-    fontFamily: AppConstants.fontIBMPlexSansArabic,
-    primaryColor: AppColors.primary,
-    splashColor: Colors.transparent,
-    highlightColor: Colors.transparent,
-    scaffoldBackgroundColor: AppColors.scaffoldBgLight,
-    visualDensity: VisualDensity.adaptivePlatformDensity,
-    pageTransitionsTheme: const PageTransitionsTheme(
-      builders: <TargetPlatform, PageTransitionsBuilder>{
-        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-      },
-    ),
-    progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: AppColors.primary,
-    ),
-    colorScheme: ColorScheme.fromSwatch().copyWith(primary: AppColors.primary),
-    appBarTheme: AppBarTheme(
-      elevation: 0.0,
-      titleSpacing: AppSize.getWidth(16),
-      centerTitle: false,
-      titleTextStyle: TextStyle(
-        color: AppColors.grey700,
-        fontFamily: AppConstants.fontIBMPlexSansArabic,
-      ).md,
-      backgroundColor: AppColors.appbarBgLight,
-      surfaceTintColor: AppColors.appbarBgLight,
-      systemOverlayStyle: SystemUiOverlayStyle(
-        statusBarBrightness: Platform.isIOS
-            ? Brightness.light
-            : Brightness.dark,
-        statusBarColor: AppColors.appbarBgLight,
-        statusBarIconBrightness: Platform.isIOS
-            ? Brightness.light
-            : Brightness.dark,
-        systemNavigationBarColor: AppColors.appbarBgLight,
-        systemNavigationBarIconBrightness: Platform.isIOS
-            ? Brightness.light
-            : Brightness.dark,
-      ),
-      iconTheme: IconThemeData(color: AppColors.grey600),
-    ),
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      elevation: 2,
-      showUnselectedLabels: true,
-      selectedLabelStyle: TextStyle(
-        fontSize: AppSize.font(12),
-        fontWeight: FontWeight.w500,
-        color: AppColors.primary,
-      ),
-      type: BottomNavigationBarType.fixed,
-      unselectedLabelStyle: TextStyle(
-        fontSize: AppSize.font(12),
-        fontWeight: FontWeight.w500,
-        color: AppColors.navbarUnSelected,
-      ),
-      backgroundColor: AppColors.navbarBgLight,
-      selectedItemColor: AppColors.primary,
-      unselectedItemColor: AppColors.navbarSelectedDark,
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      isDense: true,
-      errorMaxLines: 5,
-      helperMaxLines: 3,
-      isCollapsed: true,
-      hintStyle: TextStyle(
-        fontSize: AppSize.font(16),
-        fontWeight: FontWeight.w500,
-        color: AppColors.fieldTextLight,
-        fontFamily: AppConstants.fontIBMPlexSansArabic,
-      ),
-      labelStyle: TextStyle(
-        fontSize: AppSize.font(12),
-        fontWeight: FontWeight.w400,
-        color: AppColors.platinum500,
-        fontFamily: AppConstants.fontIBMPlexSansArabic,
-      ),
-      helperStyle: TextStyle(
-        fontSize: AppSize.font(12),
-        fontWeight: FontWeight.w400,
-        color: AppColors.grey500,
-        fontFamily: AppConstants.fontIBMPlexSansArabic,
-      ),
-      errorStyle: TextStyle(
-        color: AppColors.red500,
-        fontSize: AppSize.font(12),
-        fontWeight: FontWeight.w400,
-        fontFamily: AppConstants.fontIBMPlexSansArabic,
-      ),
-      fillColor: AppColors.fieldBgLight,
-      border: _buildFieldBorder(),
-      errorBorder: _buildFieldBorder(),
-      enabledBorder: _buildFieldBorder(),
-      focusedBorder: _buildFieldBorder(),
-      focusedErrorBorder: _buildFieldBorder(),
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: AppSize.getWidth(14),
-        vertical: AppSize.getHeight(10),
-      ),
-    ),
-    bottomSheetTheme: BottomSheetThemeData(
-      backgroundColor: AppColors.scaffoldBgLight,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSize.getSize(12)),
-        ),
-      ),
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.white,
-      elevation: 0.0,
-    ),
-  );
+enum AppThemeEnum { light, dark }
+
+extension AppThemeExtension on AppThemeEnum {
+  String get key {
+    switch (this) {
+      case AppThemeEnum.light:
+        return CacheKeys.light;
+      case AppThemeEnum.dark:
+        return CacheKeys.dark;
+    }
+  }
+
+  String get name {
+    switch (this) {
+      case AppThemeEnum.light:
+        return 'settings.themes.light'.tr();
+      case AppThemeEnum.dark:
+        return 'settings.themes.dark'.tr();
+    }
+  }
+
+  ThemeMode get mode {
+    switch (this) {
+      case AppThemeEnum.light:
+        return ThemeMode.light;
+      case AppThemeEnum.dark:
+        return ThemeMode.dark;
+    }
+  }
 }
 
-InputBorder _buildFieldBorder() {
-  return OutlineInputBorder(
-    borderRadius: BorderRadius.circular(AppSize.getSize(8)),
-    borderSide: BorderSide(color: AppColors.fieldBorderLight),
+class AppTheme {
+  static final ValueNotifier<AppThemeEnum> themeNotifier = ValueNotifier(
+    AppThemeEnum.light,
   );
+
+  static Future<void> init() async {
+    final theme = CacheHelper.get(CacheKeys.theme) ?? CacheKeys.light;
+
+    themeNotifier.value = theme == CacheKeys.dark
+        ? AppThemeEnum.dark
+        : AppThemeEnum.light;
+  }
+
+  static void setTheme(AppThemeEnum theme) {
+    themeNotifier.value = theme;
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // LIGHT THEME
+  // ════════════════════════════════════════════════════════════
+
+  static ThemeData get light {
+    final base = ThemeData.light(useMaterial3: true);
+
+    return base.copyWith(
+      brightness: Brightness.light,
+
+      primaryColor: AppColors.primary,
+
+      scaffoldBackgroundColor: AppColors.scaffoldBgLight,
+
+      colorScheme: const ColorScheme.light(
+        primary: AppColors.primary,
+
+        secondary: AppColors.secondary,
+
+        surface: AppColors.white,
+
+        error: AppColors.red500,
+      ),
+
+      textTheme: base.textTheme.apply(
+        fontFamily: AppConstants.fontIBMPlexSansArabic,
+      ),
+
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.appbarBgLight,
+
+        elevation: 0,
+
+        iconTheme: IconThemeData(color: AppColors.appbarTextLight),
+      ),
+
+      dividerColor: AppColors.divider,
+
+      cardColor: AppColors.white,
+
+      inputDecorationTheme: const InputDecorationTheme(
+        filled: true,
+
+        fillColor: AppColors.fieldBgLight,
+
+        border: OutlineInputBorder(),
+      ),
+    );
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // DARK THEME
+  // ════════════════════════════════════════════════════════════
+
+  static ThemeData get dark {
+    final base = ThemeData.dark(useMaterial3: true);
+
+    return base.copyWith(
+      brightness: Brightness.dark,
+
+      primaryColor: AppColors.primary,
+
+      scaffoldBackgroundColor: AppColors.scaffoldBgDark,
+
+      colorScheme: const ColorScheme.dark(
+        primary: AppColors.primary,
+
+        secondary: AppColors.secondary,
+
+        surface: AppColors.fieldBgDark,
+
+        error: AppColors.red500,
+      ),
+
+      textTheme: base.textTheme.apply(
+        fontFamily: AppConstants.fontIBMPlexSansArabic,
+      ),
+
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.appbarBgDark,
+
+        elevation: 0,
+
+        iconTheme: IconThemeData(color: AppColors.appbarTextDark),
+      ),
+
+      dividerColor: AppColors.divider,
+
+      cardColor: AppColors.fieldBgDark,
+
+      inputDecorationTheme: const InputDecorationTheme(
+        filled: true,
+
+        fillColor: AppColors.fieldBgDark,
+
+        border: OutlineInputBorder(),
+      ),
+    );
+  }
 }

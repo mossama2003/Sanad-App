@@ -11,10 +11,17 @@ class CacheHelper {
   static Future<void> init() async {
     _sharedPreferences = await SharedPreferences.getInstance();
 
-    /// SET DEFAULT VALUES
-    if (get(CacheKeys.lang) == null) save(CacheKeys.lang, CacheKeys.langAr);
-    if (get(CacheKeys.theme) == null) save(CacheKeys.theme, 'light');
-    if (get(CacheKeys.theme) == null) save(CacheKeys.firstUse, true);
+    if (get(CacheKeys.lang) == null) {
+      save(CacheKeys.lang, CacheKeys.langAr);
+    }
+
+    if (get(CacheKeys.theme) == null) {
+      save(CacheKeys.theme, CacheKeys.light);
+    }
+
+    if (get(CacheKeys.firstUse) == null) {
+      save(CacheKeys.firstUse, true);
+    }
   }
 
   static Future<bool> save(String key, dynamic value) async {
@@ -49,23 +56,31 @@ class CacheHelper {
       await Future.wait(data.entries.map((entry) {
         final key = entry.key;
         final value = entry.value;
+
         switch (value.runtimeType) {
           case const (String):
             return _sharedPreferences.setString(key, value);
+
           case const (int):
             return _sharedPreferences.setInt(key, value);
+
           case const (bool):
             return _sharedPreferences.setBool(key, value);
+
           case const (double):
             return _sharedPreferences.setDouble(key, value);
+
           default:
             return Future.value(false);
         }
       }));
+
       return true;
     } catch (e) {
-      debugPrint('Error saving map: $e');
+      debugPrint(e.toString());
       return false;
     }
   }
 }
+
+

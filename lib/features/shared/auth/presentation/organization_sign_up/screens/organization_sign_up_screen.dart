@@ -17,11 +17,10 @@ class _OrganizationSignUpScreenState extends State<OrganizationSignUpScreen> {
   bool showIcon = false;
   bool showTexts = false;
 
-  int selectedIndex = 0;
-
   @override
   void initState() {
     super.initState();
+
     _startAnimations();
   }
 
@@ -30,41 +29,70 @@ class _OrganizationSignUpScreenState extends State<OrganizationSignUpScreen> {
     showTexts = false;
 
     Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) setState(() => showIcon = true);
+      if (mounted) {
+        setState(() {
+          showIcon = true;
+        });
+      }
     });
 
     Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) setState(() => showTexts = true);
+      if (mounted) {
+        setState(() {
+          showTexts = true;
+        });
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final textColor =
+        theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
+
+    final secondaryText =
+        theme.textTheme.bodySmall?.color ?? AppColors.textSecondary;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: AppSize.padding(all: 30),
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+
               children: [
                 Center(
                   child: Column(
                     children: [
                       AnimatedSlide(
-                        offset: showIcon ? Offset.zero : const Offset(0, 0.5),
+                        offset: showIcon ? Offset.zero : const Offset(0, .5),
+
                         duration: const Duration(milliseconds: 400),
+
                         curve: Curves.easeOutCubic,
+
                         child: AnimatedOpacity(
                           opacity: showIcon ? 1 : 0,
+
                           duration: const Duration(milliseconds: 400),
+
                           child: Container(
                             width: AppSize.getSize(50),
+
                             height: AppSize.getSize(50),
+
                             decoration: BoxDecoration(
                               color: AppColors.laserBlue,
+
                               borderRadius: BorderRadius.circular(10),
                             ),
+
                             child: Center(
                               child: Text(
                                 '🏢',
@@ -74,30 +102,47 @@ class _OrganizationSignUpScreenState extends State<OrganizationSignUpScreen> {
                           ),
                         ),
                       ),
+
                       SizedBox(height: AppSize.getHeight(15)),
+
                       AnimatedSlide(
-                        offset: showTexts ? Offset.zero : const Offset(0, 0.5),
+                        offset: showTexts ? Offset.zero : const Offset(0, .5),
+
                         duration: const Duration(milliseconds: 400),
+
                         curve: Curves.easeOutCubic,
+
                         child: AnimatedOpacity(
                           opacity: showTexts ? 1 : 0,
+
                           duration: const Duration(milliseconds: 400),
+
                           child: Column(
                             children: [
                               Text(
                                 'organization.sign_up.title'.tr(),
+
                                 style: TextStyle(
                                   color: AppColors.laserBlue,
+
                                   fontSize: AppSize.font(20),
+
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+
                               SizedBox(height: AppSize.getHeight(5)),
+
                               Text(
                                 'organization.sign_up.desc'.tr(),
+
+                                textAlign: TextAlign.center,
+
                                 style: TextStyle(
-                                  color: AppColors.black.withValues(alpha: 0.5),
+                                  color: secondaryText,
+
                                   fontSize: AppSize.font(15),
+
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
@@ -108,7 +153,9 @@ class _OrganizationSignUpScreenState extends State<OrganizationSignUpScreen> {
                     ],
                   ),
                 ),
+
                 SizedBox(height: AppSize.getHeight(25)),
+
                 OrganizationSignUpForm(),
               ],
             ),
