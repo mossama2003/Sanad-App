@@ -1,5 +1,24 @@
 class UserProfileModel {
   int? id;
+  String? type;
+  String? created;
+
+  UserProfileModel({
+    this.id,
+    this.type,
+    this.created,
+  });
+
+  factory UserProfileModel.fromJson(Map<String, dynamic> json) {
+    if (json.containsKey('nid')) {
+      return VolunteerProfileModel.fromJson(json);
+    }
+
+    return OrganizationProfileModel.fromJson(json);
+  }
+}
+
+class VolunteerProfileModel extends UserProfileModel {
   String? gender;
   String? dob;
   String? bloodGroup;
@@ -8,10 +27,8 @@ class UserProfileModel {
   String? state;
   String? city;
   String? address;
-  List<int>? interests;
 
-  UserProfileModel({
-    this.id,
+  VolunteerProfileModel({
     this.gender,
     this.dob,
     this.bloodGroup,
@@ -20,12 +37,12 @@ class UserProfileModel {
     this.state,
     this.city,
     this.address,
-    this.interests,
-  });
+    super.created,
+  }) : super(type: "volunteer");
 
-  factory UserProfileModel.fromJson(Map<String, dynamic> json) {
-    return UserProfileModel(
-      id: json['id'],
+  factory VolunteerProfileModel.fromJson(Map<String, dynamic> json) {
+    return VolunteerProfileModel(
+      created: json['created'],
       gender: json['gender'],
       dob: json['dob'],
       bloodGroup: json['blood_group'],
@@ -34,9 +51,23 @@ class UserProfileModel {
       state: json['state'],
       city: json['city'],
       address: json['address'],
-      interests: json['interests'] != null
-          ? List<int>.from(json['interests'])
-          : [],
+    );
+  }
+}
+
+class OrganizationProfileModel extends UserProfileModel {
+  String? website;
+  String? state;
+  String? headquarters;
+
+  OrganizationProfileModel({this.website, this.state, this.headquarters})
+    : super(type: "organization");
+
+  factory OrganizationProfileModel.fromJson(Map<String, dynamic> json) {
+    return OrganizationProfileModel(
+      website: json['website'],
+      state: json['state'],
+      headquarters: json['headquarters'],
     );
   }
 }

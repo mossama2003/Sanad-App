@@ -1,6 +1,7 @@
 {
   "core": {
     "no_content": "No content",
+    "search": "Search",
     "error_title": "Something Went Wrong",
     "error_desc": "An unexpected error occurred. Please try again or contact support if the issue persists.",
     "reload": "Reload",
@@ -117,7 +118,8 @@
       "sign_up_as_volunteer": "Sign up as Volunteer",
       "or": " or ",
       "sign_up_as_organization": "Organization",
-      "account_signed_in": "Account Signed In"
+      "account_signed_in": "Account Signed In",
+      "user_role_not_found": "User role not found"
     },
     "donations_removed": {
       "winter_clothing_drive": "Winter Clothing Drive",
@@ -226,26 +228,6 @@
       "you_earned_the_social_butterfly_badge": "You earned the Social Butterfly badge",
       "1h_ago": "1h ago"
     },
-    "profile": {
-      "level": "Level 12",
-      "xp": "XP Points",
-      "streak": "Day Streak",
-      "attended": "Events Attended",
-      "donations": "Total Donations",
-      "badges": "Badges",
-      "view_all": "View All",
-      "contact_information": "Contact Information",
-      "settings": {
-        "edit_profile": "Edit Profile",
-        "help_support": "Help & Support",
-        "privacy_policy": "Privacy Policy",
-        "sign_out": "Sign Out"
-      }
-    },
-    "profile_removed": {
-      "location": "Cairo, Egypt",
-      "created": "Joined March 2024"
-    },
     "badges": {
       "badges": "Badges",
       "earn_badges": "Earn badges by making an impact",
@@ -273,6 +255,22 @@
       "all": "All",
       "weekly_leaderboard": "Weekly Leaderboard",
       "this_week": "This Week"
+    },
+    "settings": {
+      "appbar": "Settings",
+      "light_mood": "Light Mood",
+      "dark_mood": "Dark Mood",
+      "account": "Account",
+      "edit_profile": "Edit Profile",
+      "change_password": "Change Password",
+      "preferences": "Preferences",
+      "privacy_settings": "Privacy Settings",
+      "security_settings": "Security Settings",
+      "language": "Language",
+      "support": "Support",
+      "help_center": "Help Center",
+      "contact_support": "Contact Support",
+      "sign_out": "Sign Out"
     }
   },
   "organization": {
@@ -293,6 +291,7 @@
       "verification_documents": "Verification Documents",
       "hint_verification_documents": "Upload Registration Documents",
       "desc_verification_documents": "PDF or images of official registration, tax documents, or NGO certification",
+      "please_upload_verification_documents": "Please upload verification documents",
       "password": "Password",
       "create_strong_password": "Create a Strong Password",
       "confirm_password": "Confirm Password",
@@ -301,7 +300,10 @@
       "sign_up_button": "Submit for Verification",
       "already_have_account": "Already have an account? ",
       "sign_in": "Sign In",
-      "created_account": "Account created successfully"
+      "created_account": "Account created successfully",
+      "you_must_accept_terms": "You Must Accept Terms and Privacy Policy",
+      "upload_logo": "Upload Logo",
+      "logo_is_required": "Logo is required"
     },
     "home": {
       "navbar": {
@@ -379,8 +381,12 @@
       "national_id_numbers": "National ID Numbers",
       "write_national_id_numbers": "Write National ID Numbers",
       "national_id": "National ID (Front & Back)",
+      "national_id_must_be_14_digits": "National ID must be 14 digits",
       "upload_national_id_front": "Upload National ID (Front)",
+      "please_upload_front_national_id": "Please upload front national ID",
       "upload_national_id_back": "Upload National ID (Back)",
+      "please_upload_back_national_id": "Please upload back national ID",
+      "please_upload_both_ids": "Please upload both front and back national ID",
       "password": "Password",
       "create_strong_password": "Create a Strong Password",
       "confirm_password": "Confirm Password",
@@ -389,7 +395,9 @@
       "sign_up_button": "Create Account",
       "already_have_account": "Already have an account? ",
       "account_created": "Account created successfully!",
-      "sign_in": "Sign In"
+      "sign_in": "Sign In",
+      "you_must_accept_terms": "You Must Accept Terms and Privacy Policy",
+      "upload_photo": "Upload Photo"
     },
     "home": {
       "navbar": {
@@ -519,6 +527,68 @@
       "minya_egypt": "Minya, Egypt",
       "volunteers_joined": "23 / 50 volunteers joined",
       "posted": "Posted 2h ago by Egyptian Red Crescent"
+    },
+    "profile": {
+      "level": "Level 12",
+      "xp": "XP Points",
+      "streak": "Day Streak",
+      "attended": "Events Attended",
+      "donations": "Total Donations",
+      "reliability_score": "Reliability Score",
+      "badges": "Badges",
+      "view_all": "View All",
+      "contact_information": "Contact Information",
+      "attendance_rate": "Attendance rate: 85%",
+      "completion_rate": "Completion rate: 90%",
+      "emergency_response": "Emergency response: 95%",
+      "org_ratings": "Org ratings: 4.5/5",
+      "priority_access": "Priority access to critical emergencies for top-rated volunteers.",
+      "volunteer_profile": "Volunteer Profile",
+      "blood_type": "Blood Type",
+      "profession": "Profession",
+      "own_vehicle": "Own Vehicle",
+      "exp": "Emergency Exp.",
+      "language": "Language",
+      "skills_certifications": "Skills & Certifications",
+      "edit_volunteer_profile": "Edit Volunteer Profile",
+      "past_roles": "Past Roles",
+      "past_roles_desc": "Roles you were assigned in event chats are saved here.",
+      "settings": "Settings"
+    },
+    "profile_removed": {
+      "nurse": "nurse",
+      "yes": "Yes",
+      "years": "3 years",
+      "team_lead": "Team Lead",
+      "beach_cleanup": "Beach Cleanup Drive",
+      "event_date1": "Nov 2025",
+      "first_aid": "First Aid",
+      "blood_donation": "Blood Donation Campaign",
+      "event_date2": "Oct 2025"
+    },
+    "edit_profile": {
+      "appbar": "Edit Profile",
+      "profile_photo": "Profile Photo",
+      "shown_across_app": "Shown across the app",
+      "change": "Change",
+      "personal_info": "Personal Information",
+      "full_name": "Full Name",
+      "email": "Email",
+      "phone": "Phone",
+      "governorate": "Governorate",
+      "city": "City",
+      "bio": "Bio",
+      "volunteer_details": "Volunteer Details",
+      "profession": "Profession",
+      "blood_type": "Blood Type",
+      "emergency_experience": "Emergency Experience",
+      "own_vehicle": "Own Vehicle",
+      "available_for_logistics": "Available for logistics tasks",
+      "languages": "Languages",
+      "skills_certifications": "Skills & Certifications",
+      "cancel": "Cancel",
+      "save_changes": "Save Changes",
+      "delete_account": "Delete Account"
     }
   }
 }

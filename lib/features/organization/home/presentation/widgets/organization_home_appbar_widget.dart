@@ -4,7 +4,6 @@ import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/constant/app_size.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
-import 'package:sanad_app/features/shared/profile/presentation/screens/profile_screen.dart';
 
 import '../../../../../core/style/app_colors.dart';
 import '../../../../shared/notification/presentation/screens/notification_screen.dart';
@@ -82,7 +81,7 @@ class OrganizationHomeAppbarWidget extends StatelessWidget {
           ),
           SizedBox(width: AppSize.getWidth(10)),
           GestureDetector(
-            onTap: () => AppNavigator.push(ProfileScreen()),
+            // onTap: () => AppNavigator.push(ProfileScreen()),
             child: Container(
               width: AppSize.getSize(35),
               height: AppSize.getSize(35),

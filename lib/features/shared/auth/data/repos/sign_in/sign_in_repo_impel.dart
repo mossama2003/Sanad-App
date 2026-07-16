@@ -6,7 +6,7 @@ class SignInRepoImpel implements SignInRepo {
     try {
       final response = await DioHelper.post(url: SIGN_IN, data: param.toJson());
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200) {
         final model = AuthResponseModel.fromJson(response.data);
 
         // 🔐 Save token (optional)

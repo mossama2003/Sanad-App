@@ -9,7 +9,7 @@ import PackageDescription
 let package = Package(
     name: "FlutterGeneratedPluginSwiftPackage",
     platforms: [
-        .iOS("13.0")
+        .iOS("15")
     ],
     products: [
         .library(name: "FlutterGeneratedPluginSwiftPackage", type: .static, targets: ["FlutterGeneratedPluginSwiftPackage"])
@@ -17,7 +17,7 @@ let package = Package(
     dependencies: [
         .package(name: "url_launcher_ios", path: "../.packages/url_launcher_ios-6.4.1"),
         .package(name: "shared_preferences_foundation", path: "../.packages/shared_preferences_foundation-2.5.6"),
-        .package(name: "share_plus", path: "../.packages/share_plus-13.1.0"),
+        .package(name: "share_plus", path: "../.packages/share_plus-13.2.0"),
         .package(name: "image_picker_ios", path: "../.packages/image_picker_ios-0.8.13+6"),
         .package(name: "image_cropper", path: "../.packages/image_cropper-12.2.1"),
         .package(name: "webview_flutter_wkwebview", path: "../.packages/webview_flutter_wkwebview-3.25.1"),
@@ -29,6 +29,7 @@ let package = Package(
         .package(name: "sqflite_darwin", path: "../.packages/sqflite_darwin-2.4.2"),
         .package(name: "firebase_messaging", path: "../.packages/firebase_messaging-16.2.2"),
         .package(name: "firebase_core", path: "../.packages/firebase_core-4.9.0"),
+        .package(name: "file_selector_ios", path: "../.packages/file_selector_ios-0.5.3+5"),
         .package(name: "connectivity_plus", path: "../.packages/connectivity_plus-7.1.1"),
         .package(name: "FlutterFramework", path: "../.packages/FlutterFramework")
     ],
@@ -50,6 +51,7 @@ let package = Package(
                 .product(name: "sqflite-darwin", package: "sqflite_darwin"),
                 .product(name: "firebase-messaging", package: "firebase_messaging"),
                 .product(name: "firebase-core", package: "firebase_core"),
+                .product(name: "file-selector-ios", package: "file_selector_ios"),
                 .product(name: "connectivity-plus", package: "connectivity_plus"),
                 .product(name: "FlutterFramework", package: "FlutterFramework")
             ]

@@ -26,6 +26,19 @@ class VolunteerRepoImpel implements VolunteerRepo {
         MapEntry('address', param.address),
       ]);
 
+      // ================= AVATAR =================
+      if (param.avatar != null) {
+        formData.files.add(
+          MapEntry(
+            'creator[avatar]',
+            await MultipartFile.fromFile(
+              param.avatar!.path,
+              filename: param.avatar!.path.split('/').last,
+            ),
+          ),
+        );
+      }
+
       // ================= INTERESTS =================
       for (int i = 0; i < param.interests.length; i++) {
         formData.fields.add(
@@ -33,24 +46,35 @@ class VolunteerRepoImpel implements VolunteerRepo {
         );
       }
 
-      // ================= ATTACHMENTS (FIX) =================
+      // ================= ATTACHMENTS =================
       for (int i = 0; i < param.attachments.length; i++) {
+        final file = param.attachments[i];
+
         formData.files.add(
           MapEntry(
             'creator[attachments][$i]',
             await MultipartFile.fromFile(
-              param.attachments[i].path,
-              filename: param.attachments[i].path.split('/').last,
+              file.path,
+              filename: file.path.split('/').last,
             ),
           ),
         );
       }
 
+      debugPrint("Attachments Count => ${param.attachments.length}");
+
+      for (var file in param.attachments) {
+        debugPrint("Attachment => ${file.path}");
+      }
+
       final response = await DioHelper.post(
         url: SIGN_UP,
+
         data: formData,
+
         options: Options(
           headers: {'Account-Type': 'volunteer'},
+
           contentType: 'multipart/form-data',
         ),
       );

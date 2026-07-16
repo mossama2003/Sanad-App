@@ -11,9 +11,7 @@ class OrganizationParam {
 
   final String website;
   final String headquarters;
-  final String address;
-
-  final List<String> branches;
+  final String state;
 
   OrganizationParam({
     required this.name,
@@ -23,9 +21,8 @@ class OrganizationParam {
     required this.avatar,
     required this.attachments,
     required this.website,
+    required this.state,
     required this.headquarters,
-    required this.address,
-    required this.branches,
   });
 
   Map<String, dynamic> toJson() {
@@ -34,14 +31,9 @@ class OrganizationParam {
       'creator[email]': email,
       'creator[password]': password,
       'creator[phone]': phone,
-
       'website': website,
+      'state': state,
       'headquarters': headquarters,
-      'address': address,
-
-      // branches list
-      for (int i = 0; i < branches.length; i++)
-        'branches[$i]': branches[i],
     };
   }
 }

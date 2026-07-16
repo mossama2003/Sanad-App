@@ -43,10 +43,7 @@ class _SignInFormState extends State<SignInForm> {
 
   @override
   void dispose() {
-    _cubit.emailController.dispose();
-    _cubit.passwordController.dispose();
     _cubit.close();
-
     super.dispose();
   }
 
@@ -78,10 +75,10 @@ class _SignInFormState extends State<SignInForm> {
     final textColor =
         theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
 
-    final secondaryText =
-        theme.textTheme.bodySmall?.color ?? AppColors.textSecondary;
-
-    final fieldColor = theme.cardColor;
+    // final secondaryText =
+    //     theme.textTheme.bodySmall?.color ?? AppColors.textSecondary;
+    //
+    // final fieldColor = theme.cardColor;
 
     return BlocBuilder<SignInCubit, SignInState>(
       bloc: _cubit,
@@ -92,52 +89,51 @@ class _SignInFormState extends State<SignInForm> {
 
           child: Column(
             children: [
-              AnimatedSlide(
-                offset: showButtons ? Offset.zero : const Offset(0, .5),
-
-                duration: const Duration(milliseconds: 400),
-
-                child: AnimatedOpacity(
-                  opacity: showButtons ? 1 : 0,
-
-                  duration: const Duration(milliseconds: 400),
-
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-
-                    children: [
-                      Text(
-                        'shared.sign_in.i_am'.tr(),
-
-                        style: TextStyle(color: secondaryText).xs,
-                      ),
-
-                      SizedBox(height: AppSize.getHeight(8)),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                        children: [
-                          _buildTypeButton(
-                            title: 'shared.sign_in.volunteer'.tr(),
-
-                            index: 0,
-                          ),
-
-                          _buildTypeButton(
-                            title: 'shared.sign_in.organization'.tr(),
-
-                            index: 1,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              SizedBox(height: AppSize.getHeight(25)),
-
+              // AnimatedSlide(
+              //   offset: showButtons ? Offset.zero : const Offset(0, .5),
+              //
+              //   duration: const Duration(milliseconds: 400),
+              //
+              //   child: AnimatedOpacity(
+              //     opacity: showButtons ? 1 : 0,
+              //
+              //     duration: const Duration(milliseconds: 400),
+              //
+              //     child: Column(
+              //       crossAxisAlignment: CrossAxisAlignment.start,
+              //
+              //       children: [
+              //         Text(
+              //           'shared.sign_in.i_am'.tr(),
+              //
+              //           style: TextStyle(color: secondaryText).xs,
+              //         ),
+              //
+              //         SizedBox(height: AppSize.getHeight(8)),
+              //
+              //         Row(
+              //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //
+              //           children: [
+              //             _buildTypeButton(
+              //               title: 'shared.sign_in.volunteer'.tr(),
+              //
+              //               index: 0,
+              //             ),
+              //
+              //             _buildTypeButton(
+              //               title: 'shared.sign_in.organization'.tr(),
+              //
+              //               index: 1,
+              //             ),
+              //           ],
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+              //
+              // SizedBox(height: AppSize.getHeight(25)),
               AnimatedSlide(
                 offset: showField ? Offset.zero : const Offset(0, .5),
 
@@ -209,16 +205,15 @@ class _SignInFormState extends State<SignInForm> {
                         onTap: () {},
                       ),
 
-                      SizedBox(height: AppSize.getHeight(10)),
-
-                      _socialIcon(
-                        svg: AppSvg.apple,
-
-                        text: 'shared.sign_in.sign_with_apple',
-
-                        onTap: () {},
-                      ),
-
+                      // SizedBox(height: AppSize.getHeight(10)),
+                      //
+                      // _socialIcon(
+                      //   svg: AppSvg.apple,
+                      //
+                      //   text: 'shared.sign_in.sign_with_apple',
+                      //
+                      //   onTap: () {},
+                      // ),
                       SizedBox(height: AppSize.getHeight(25)),
 
                       CustomButton(
@@ -282,49 +277,49 @@ class _SignInFormState extends State<SignInForm> {
     );
   }
 
-  Widget _buildTypeButton({required String title, required int index}) {
-    final selected = selectedIndex == index;
-
-    final theme = Theme.of(context);
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedIndex = index;
-        });
-      },
-
-      child: Container(
-        width: AppSize.getSize(150),
-
-        height: AppSize.getSize(50),
-
-        decoration: BoxDecoration(
-          color: selected
-              ? AppColors.primary.withValues(alpha: .12)
-              : theme.cardColor,
-
-          borderRadius: BorderRadius.circular(10),
-
-          border: Border.all(
-            color: selected ? AppColors.primary : theme.dividerColor,
-          ),
-        ),
-
-        child: Center(
-          child: Text(
-            title,
-
-            style: TextStyle(
-              color: selected
-                  ? AppColors.primary
-                  : theme.textTheme.bodyMedium?.color,
-            ).sm,
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildTypeButton({required String title, required int index}) {
+  //   final selected = selectedIndex == index;
+  //
+  //   final theme = Theme.of(context);
+  //
+  //   return GestureDetector(
+  //     onTap: () {
+  //       setState(() {
+  //         selectedIndex = index;
+  //       });
+  //     },
+  //
+  //     child: Container(
+  //       width: AppSize.getSize(150),
+  //
+  //       height: AppSize.getSize(50),
+  //
+  //       decoration: BoxDecoration(
+  //         color: selected
+  //             ? AppColors.primary.withValues(alpha: .12)
+  //             : theme.cardColor,
+  //
+  //         borderRadius: BorderRadius.circular(10),
+  //
+  //         border: Border.all(
+  //           color: selected ? AppColors.primary : theme.dividerColor,
+  //         ),
+  //       ),
+  //
+  //       child: Center(
+  //         child: Text(
+  //           title,
+  //
+  //           style: TextStyle(
+  //             color: selected
+  //                 ? AppColors.primary
+  //                 : theme.textTheme.bodyMedium?.color,
+  //           ).sm,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }
 
 Widget _socialIcon({String? svg, VoidCallback? onTap, String? text}) {

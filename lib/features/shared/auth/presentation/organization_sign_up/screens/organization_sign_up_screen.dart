@@ -1,8 +1,6 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../core/constant/app_size.dart';
-import '../../../../../../core/style/app_colors.dart';
 import '../forms/organization_sign_up_form.dart';
 
 class OrganizationSignUpScreen extends StatefulWidget {
@@ -14,46 +12,9 @@ class OrganizationSignUpScreen extends StatefulWidget {
 }
 
 class _OrganizationSignUpScreenState extends State<OrganizationSignUpScreen> {
-  bool showIcon = false;
-  bool showTexts = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _startAnimations();
-  }
-
-  void _startAnimations() {
-    showIcon = false;
-    showTexts = false;
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) {
-        setState(() {
-          showIcon = true;
-        });
-      }
-    });
-
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) {
-        setState(() {
-          showTexts = true;
-        });
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    final textColor =
-        theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
-
-    final secondaryText =
-        theme.textTheme.bodySmall?.color ?? AppColors.textSecondary;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -66,98 +27,7 @@ class _OrganizationSignUpScreenState extends State<OrganizationSignUpScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
 
-              children: [
-                Center(
-                  child: Column(
-                    children: [
-                      AnimatedSlide(
-                        offset: showIcon ? Offset.zero : const Offset(0, .5),
-
-                        duration: const Duration(milliseconds: 400),
-
-                        curve: Curves.easeOutCubic,
-
-                        child: AnimatedOpacity(
-                          opacity: showIcon ? 1 : 0,
-
-                          duration: const Duration(milliseconds: 400),
-
-                          child: Container(
-                            width: AppSize.getSize(50),
-
-                            height: AppSize.getSize(50),
-
-                            decoration: BoxDecoration(
-                              color: AppColors.laserBlue,
-
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-
-                            child: Center(
-                              child: Text(
-                                '🏢',
-                                style: TextStyle(fontSize: AppSize.font(25)),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: AppSize.getHeight(15)),
-
-                      AnimatedSlide(
-                        offset: showTexts ? Offset.zero : const Offset(0, .5),
-
-                        duration: const Duration(milliseconds: 400),
-
-                        curve: Curves.easeOutCubic,
-
-                        child: AnimatedOpacity(
-                          opacity: showTexts ? 1 : 0,
-
-                          duration: const Duration(milliseconds: 400),
-
-                          child: Column(
-                            children: [
-                              Text(
-                                'organization.sign_up.title'.tr(),
-
-                                style: TextStyle(
-                                  color: AppColors.laserBlue,
-
-                                  fontSize: AppSize.font(20),
-
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-
-                              SizedBox(height: AppSize.getHeight(5)),
-
-                              Text(
-                                'organization.sign_up.desc'.tr(),
-
-                                textAlign: TextAlign.center,
-
-                                style: TextStyle(
-                                  color: secondaryText,
-
-                                  fontSize: AppSize.font(15),
-
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: AppSize.getHeight(25)),
-
-                OrganizationSignUpForm(),
-              ],
+              children: [OrganizationSignUpForm()],
             ),
           ),
         ),

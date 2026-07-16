@@ -5,13 +5,14 @@ import 'package:sanad_app/features/shared/auth/data/repos/volunteer/volunteer_re
 import 'package:sanad_app/features/shared/auth/data/params/volunteer_sign_up_param.dart';
 import 'package:sanad_app/features/shared/auth/data/models/skills_model.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:flutter_intl_phone_field/phone_number.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_intl_phone_field/countries.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dio/dio.dart';
 
 import '../../../../../../core/helper/app_navigator.dart';
 import '../../../../../../core/helper/app_toast.dart';
@@ -28,6 +29,13 @@ class VolunteerSignUpCubit extends Cubit<VolunteerSignUpState> {
 
   static VolunteerSignUpCubit get(BuildContext context) =>
       BlocProvider.of(context);
+
+  File? avatar;
+  final ImagePicker _picker = ImagePicker();
+
+  // ===================== Phone Number =====================
+  Country? selectedCountry;
+  PhoneNumber? selectedPhone;
 
   // ===================== Skills =====================
   List<SkillsModel> interests = [];
@@ -73,11 +81,40 @@ class VolunteerSignUpCubit extends Cubit<VolunteerSignUpState> {
   final skillsController = TextEditingController();
   final nationalIdNumberController = TextEditingController();
   final passwordController = TextEditingController();
-  final confirmedPasswordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
-  final ImagePicker _picker = ImagePicker();
+  String countryDialCode = "20";
 
-  static const String countryCode = "+20";
+  void onPhoneChanged(PhoneNumber phone) {
+    selectedPhone = phone;
+    phoneController.text = phone.number;
+  }
+
+  void onCountryChanged(Country country) {
+    selectedCountry = country;
+    countryDialCode = country.dialCode;
+    phoneController.clear();
+    selectedPhone = null;
+  }
+
+  // ===================== Pick Avatar =====================
+  Future<void> pickAvatar() async {
+    final image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
+
+    if (image == null) return;
+
+    avatar = File(image.path);
+
+    emit(UpdateVolunteerImageState());
+  }
+
+  void removeAvatar() {
+    avatar = null;
+    emit(UpdateVolunteerImageState());
+  }
 
   // ===================== Skills =====================
   void updateInterests(List<int> interestsList) {
@@ -145,36 +182,50 @@ class VolunteerSignUpCubit extends Cubit<VolunteerSignUpState> {
     }
   }
 
-  // ===================== Open Camera =====================
+  // ===================== Upload National ID =====================
   Future<void> pickNationalIdImage({
     required BuildContext context,
     required bool isFront,
   }) async {
     try {
-      final source = await _showImageSourceDialog(context);
+      final source = await _showNationalIdSourceDialog(context);
+
       if (source == null) return;
 
       final XFile? file = await _picker.pickImage(source: source);
+
       if (file == null) return;
 
       File image = File(file.path);
 
-      final compressed = await _compressImage(image);
-      if (compressed != null) image = compressed;
+      // ===================== Crop =====================
+      final croppedImage = await _cropNationalIdImage(image);
 
+      if (croppedImage == null) return;
+
+      image = croppedImage;
+
+      // ===================== Compress =====================
+      final compressed = await _compressNationalIdImage(image);
+
+      if (compressed != null) {
+        image = compressed;
+      }
+
+      // ===================== Save Image =====================
       if (isFront) {
         nationalIdFrontImage = image;
       } else {
         nationalIdBackImage = image;
       }
 
-      emit(UpdateImageState());
+      emit(UpdateNationalIDState());
     } catch (e) {
-      debugPrint("Image error: $e");
+      debugPrint("Image error => $e");
     }
   }
 
-  Future<ImageSource?> _showImageSourceDialog(BuildContext context) async {
+  Future<ImageSource?> _showNationalIdSourceDialog(BuildContext context) async {
     return await showDialog<ImageSource>(
       context: context,
       builder: (context) {
@@ -195,19 +246,26 @@ class VolunteerSignUpCubit extends Cubit<VolunteerSignUpState> {
     );
   }
 
-  Future<File?> _cropImage(File file) async {
+  Future<File?> _cropNationalIdImage(File file) async {
     try {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: file.path,
+
+        aspectRatio: const CropAspectRatio(ratioX: 1.58, ratioY: 1),
+
         uiSettings: [
           AndroidUiSettings(
-            toolbarTitle: 'Crop Image',
+            toolbarTitle: 'Crop National ID',
             toolbarColor: Colors.black,
             toolbarWidgetColor: Colors.white,
-            lockAspectRatio: false,
+            lockAspectRatio: true,
             hideBottomControls: false,
           ),
-          IOSUiSettings(title: 'Crop Image'),
+
+          IOSUiSettings(
+            title: 'Crop National ID',
+            aspectRatioLockEnabled: true,
+          ),
         ],
       );
 
@@ -215,11 +273,12 @@ class VolunteerSignUpCubit extends Cubit<VolunteerSignUpState> {
 
       return File(croppedFile.path);
     } catch (e) {
+      debugPrint("Crop error => $e");
       return null;
     }
   }
 
-  Future<File?> _compressImage(File file) async {
+  Future<File?> _compressNationalIdImage(File file) async {
     final path = file.path;
 
     final result = await FlutterImageCompress.compressAndGetFile(
@@ -233,47 +292,14 @@ class VolunteerSignUpCubit extends Cubit<VolunteerSignUpState> {
     return File(result.path);
   }
 
-  Future<void> uploadNationalId() async {
-    try {
-      emit(UploadLoading(progress: 0));
-
-      final front = nationalIdFrontImage;
-      final back = nationalIdBackImage;
-
-      // 👇 هنا بالظبط
-      if (front == null || back == null) {
-        AppToast.error("Please upload both front and back ID");
-        return;
-      }
-
-      FormData formData = FormData.fromMap({
-        "national_id_front": await MultipartFile.fromFile(front.path),
-        "national_id_back": await MultipartFile.fromFile(back.path),
-      });
-
-      await Dio().post(
-        "YOUR_API_URL",
-        data: formData,
-        onSendProgress: (sent, total) {
-          final progress = sent / total;
-          emit(UploadLoading(progress: progress));
-        },
-      );
-
-      emit(UploadSuccess());
-    } catch (e) {
-      emit(UploadError());
-    }
-  }
-
   void removeNationalIdFront() {
     nationalIdFrontImage = null;
-    emit(UpdateImageState());
+    emit(UpdateNationalIDState());
   }
 
   void removeNationalIdBack() {
     nationalIdBackImage = null;
-    emit(UpdateImageState());
+    emit(UpdateNationalIDState());
   }
 
   // ===================== SIGN UP =====================
@@ -283,15 +309,11 @@ class VolunteerSignUpCubit extends Cubit<VolunteerSignUpState> {
     emit(Loading());
 
     if (nationalIdFrontImage == null || nationalIdBackImage == null) {
-      AppToast.error("Please upload both front and back ID");
+      AppToast.error('volunteer.sign_up.please_upload_both_ids'.tr());
       return;
     }
 
-    final phone = phoneController.text.trim();
-
-    final formattedPhone = phone.startsWith('0')
-        ? '$countryCode${phone.substring(1)}'
-        : '$countryCode$phone';
+    final formattedPhone = "+$countryDialCode${phoneController.text.trim()}";
 
     final birthDate = DateFormat('dd/MM/yyyy').parse(birthdayController.text);
 
@@ -313,6 +335,7 @@ class VolunteerSignUpCubit extends Cubit<VolunteerSignUpState> {
         country: 'Egypt',
         address: locationController.text.trim(),
         attachments: [nationalIdFrontImage!, nationalIdBackImage!],
+        avatar: avatar,
       ),
     );
 
@@ -323,7 +346,7 @@ class VolunteerSignUpCubit extends Cubit<VolunteerSignUpState> {
       },
       (r) {
         emit(Success());
-        AppToast.success('sign_up.account_created'.tr());
+        AppToast.success('volunteer.sign_up.account_created'.tr());
         AppNavigator.replace(SignInScreen());
       },
     );

@@ -33,6 +33,11 @@ class CustomFieldText extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.inputFormatters,
     this.bgColor,
+
+    // customization
+    this.titleColor,
+    this.titleSize,
+    this.borderRadius,
   });
 
   final TextEditingController controller;
@@ -70,6 +75,11 @@ class CustomFieldText extends StatelessWidget {
 
   final List<TextInputFormatter>? inputFormatters;
 
+  // customization
+  final Color? titleColor;
+  final double? titleSize;
+  final double? borderRadius;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -84,6 +94,8 @@ class CustomFieldText extends StatelessWidget {
 
     final errorColor = theme.colorScheme.error;
 
+    final radius = borderRadius ?? 12;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -93,13 +105,15 @@ class CustomFieldText extends StatelessWidget {
             text: TextSpan(
               text: title!,
 
-              style: TextStyle(color: AppColors.textSecondary).xs,
+              style: TextStyle(
+                color: titleColor ?? AppColors.textSecondary,
+                fontSize: titleSize ?? AppSize.font(12),
+              ),
 
               children: isRequired
                   ? [
                       TextSpan(
                         text: ' *',
-
                         style: TextStyle(
                           color: errorColor,
                           fontSize: AppSize.font(15),
@@ -114,98 +128,73 @@ class CustomFieldText extends StatelessWidget {
         ],
 
         TextFormField(
+          controller: controller,
+
           enabled: enabled,
 
           readOnly: readOnly,
 
           onTap: onTap,
 
+          onChanged: onChanged,
+
+          onFieldSubmitted: onSubmit,
+
+          autofocus: autofocus,
+
+          obscureText: obscureText,
+
+          keyboardType: keyboardType,
+
           minLines: minLines ?? 1,
 
           maxLines: maxLines ?? minLines ?? 1,
 
-          autofocus: autofocus,
+          validator: validator,
 
-          onChanged: onChanged,
-
-          controller: controller,
-
-          obscureText: obscureText,
-
-          onFieldSubmitted: onSubmit,
-
-          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
 
           autovalidateMode: AutovalidateMode.onUserInteraction,
 
           style: TextStyle(
             color: textColor,
-
             fontSize: AppSize.font(14),
-
             fontWeight: FontWeight.w600,
           ),
-
-          validator: validator,
-
-          inputFormatters: inputFormatters,
 
           decoration: InputDecoration(
             filled: true,
 
             fillColor: bgColor ?? Theme.of(context).cardColor,
 
-            hintStyle: TextStyle(color: hintColor).xs,
+            hintText: hintText ?? labelText ?? '',
+
+            hintStyle: TextStyle(color: hintColor, fontSize: AppSize.font(12)),
 
             contentPadding: padding,
 
-            hintText: hintText ?? labelText ?? '',
-
-            errorStyle: TextStyle(
-              color: errorColor,
-
-              fontSize: AppSize.font(14),
-            ),
-
-            suffixIconConstraints: BoxConstraints(
-              minHeight: AppSize.getHeight(40),
-
-              maxHeight: AppSize.getHeight(40),
-            ),
-
-            prefixIconConstraints: BoxConstraints(
-              minHeight: AppSize.getHeight(40),
-
-              maxHeight: AppSize.getHeight(40),
-            ),
-
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-
+              borderRadius: BorderRadius.circular(radius),
               borderSide: BorderSide(color: borderColor),
             ),
 
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-
+              borderRadius: BorderRadius.circular(radius),
               borderSide: BorderSide(color: borderColor),
             ),
 
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-
+              borderRadius: BorderRadius.circular(radius),
               borderSide: BorderSide(color: AppColors.primary, width: 1.5),
             ),
 
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-
+              borderRadius: BorderRadius.circular(radius),
               borderSide: BorderSide(color: errorColor),
             ),
 
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-
+              borderRadius: BorderRadius.circular(radius),
               borderSide: BorderSide(color: errorColor, width: 1.5),
             ),
 
@@ -222,6 +211,7 @@ class CustomFieldText extends StatelessWidget {
                     ],
                   )
                 : null,
+
             suffixIcon: iconEnd != null
                 ? Row(
                     mainAxisSize: MainAxisSize.min,

@@ -200,12 +200,10 @@ class _SignInScreenState extends State<SignInScreen> {
                                             ),
 
                                             child: Center(
-                                              child: Text(
-                                                '🤝',
-
-                                                style: TextStyle(
-                                                  fontSize: AppSize.font(25),
-                                                ),
+                                              child: Icon(
+                                                Icons.handshake,
+                                                color: AppColors.white,
+                                                size: 40,
                                               ),
                                             ),
                                           ),

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
+
 class VolunteerParam {
   final String name;
   final String email;
@@ -14,8 +16,8 @@ class VolunteerParam {
   final String city;
   final String address;
   final List<int> interests;
+  final File? avatar;
   final List<File> attachments;
-  final File? cover;
 
   VolunteerParam({
     required this.name,
@@ -32,10 +34,10 @@ class VolunteerParam {
     required this.address,
     required this.interests,
     required this.attachments,
-    this.cover,
+    required this.avatar,
   });
 
-  Map<String, dynamic> toJson() {
+  Future<Map<String, dynamic>> toJson() async {
     return {
       'creator[name]': name,
       'creator[email]': email,
@@ -52,10 +54,17 @@ class VolunteerParam {
 
       for (int i = 0; i < interests.length; i++) 'interests[$i]': interests[i],
 
-      if (cover != null) 'creator[avatar]': cover,
+      if (avatar != null)
+        'creator[avatar]': await MultipartFile.fromFile(
+          avatar!.path,
+          filename: avatar!.path.split('/').last,
+        ),
 
       for (int i = 0; i < attachments.length; i++)
-        'creator[attachments][$i]': attachments[i],
+        'creator[attachments][$i]': await MultipartFile.fromFile(
+          attachments[i].path,
+          filename: attachments[i].path.split('/').last,
+        ),
     };
   }
 }

@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sanad_app/core/constant/app_assets.dart';
-import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
+import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/style/app_colors.dart';
 
 class OrganizationRecentlyCompletedSection extends StatelessWidget {
@@ -124,3 +124,4 @@ class OrganizationRecentlyCompletedSection extends StatelessWidget {
     );
   }
 }
+

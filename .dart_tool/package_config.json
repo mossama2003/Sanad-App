@@ -74,10 +74,22 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "checked_yaml",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/checked_yaml-2.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
+    },
+    {
       "name": "chewie",
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/chewie-1.13.1",
       "packageUri": "lib/",
       "languageVersion": "3.8"
+    },
+    {
+      "name": "cli_util",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/cli_util-0.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "clock",
@@ -218,6 +230,24 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "file_selector",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/file_selector-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
+    },
+    {
+      "name": "file_selector_android",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/file_selector_android-0.5.2+8",
+      "packageUri": "lib/",
+      "languageVersion": "3.12"
+    },
+    {
+      "name": "file_selector_ios",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/file_selector_ios-0.5.3+5",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
       "name": "file_selector_linux",
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/file_selector_linux-0.9.4",
       "packageUri": "lib/",
@@ -234,6 +264,12 @@
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/file_selector_platform_interface-2.7.0",
       "packageUri": "lib/",
       "languageVersion": "3.7"
+    },
+    {
+      "name": "file_selector_web",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/file_selector_web-0.9.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
     },
     {
       "name": "file_selector_windows",
@@ -344,6 +380,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "flutter_launcher_icons",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/flutter_launcher_icons-0.14.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "flutter_lints",
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/flutter_lints-6.0.0",
       "packageUri": "lib/",
@@ -452,6 +494,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "image",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/image-4.8.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "image_cropper",
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/image_cropper-12.2.1",
       "packageUri": "lib/",
@@ -536,6 +584,12 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "json_annotation",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/json_annotation-4.12.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
+    },
+    {
       "name": "just_audio",
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/just_audio-0.10.5",
       "packageUri": "lib/",
@@ -585,9 +639,9 @@
     },
     {
       "name": "lottie",
-      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/lottie-3.3.3",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/lottie-3.5.1",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.12"
     },
     {
       "name": "matcher",
@@ -849,7 +903,7 @@
     },
     {
       "name": "share_plus",
-      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/share_plus-13.1.0",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/share_plus-13.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.10"
     },

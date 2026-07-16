@@ -6,6 +6,7 @@
 // @dart = 3.10
 
 import 'dart:io'; // flutter_ignore: dart_io_import.
+import 'package:file_selector_android/file_selector_android.dart' as file_selector_android;
 import 'package:flutter_image_compress_common/flutter_image_compress_common.dart' as flutter_image_compress_common;
 import 'package:image_picker_android/image_picker_android.dart' as image_picker_android;
 import 'package:open_file_android/open_file_android.dart' as open_file_android;
@@ -15,6 +16,7 @@ import 'package:sqflite_android/sqflite_android.dart' as sqflite_android;
 import 'package:url_launcher_android/url_launcher_android.dart' as url_launcher_android;
 import 'package:video_player_android/video_player_android.dart' as video_player_android;
 import 'package:webview_flutter_android/webview_flutter_android.dart' as webview_flutter_android;
+import 'package:file_selector_ios/file_selector_ios.dart' as file_selector_ios;
 import 'package:flutter_image_compress_common/flutter_image_compress_common.dart' as flutter_image_compress_common;
 import 'package:image_picker_ios/image_picker_ios.dart' as image_picker_ios;
 import 'package:open_file_ios/open_file_ios.dart' as open_file_ios;
@@ -61,6 +63,15 @@ class _PluginRegistrant {
   @pragma('vm:entry-point')
   static void register() {
     if (Platform.isAndroid) {
+      try {
+        file_selector_android.FileSelectorAndroid.registerWith();
+      } catch (err) {
+        print(
+          '`file_selector_android` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
       try {
         flutter_image_compress_common.FlutterImageCompressCommon.registerWith();
       } catch (err) {
@@ -143,6 +154,15 @@ class _PluginRegistrant {
       }
 
     } else if (Platform.isIOS) {
+      try {
+        file_selector_ios.FileSelectorIOS.registerWith();
+      } catch (err) {
+        print(
+          '`file_selector_ios` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
       try {
         flutter_image_compress_common.FlutterImageCompressCommon.registerWith();
       } catch (err) {

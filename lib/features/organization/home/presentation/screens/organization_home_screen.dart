@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sanad_app/core/constant/app_size.dart';
 
+import '../../../../../core/constant/app_size.dart';
 import '../sections/organization_recently_completed_section.dart';
 import '../sections/organization_your_active_events_section.dart';
 import '../widgets/organization_home_appbar_widget.dart';

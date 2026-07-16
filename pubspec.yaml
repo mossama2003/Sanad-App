@@ -32,7 +32,7 @@ dependencies:
   firebase_core: ^4.9.0
 
   # Utilities
-  share_plus: ^13.1.0
+  share_plus: ^13.2.0
   easy_date_timeline: ^2.0.9
   dropdown_button2: ^3.1.0
   pin_code_fields: ^9.4.0
@@ -47,13 +47,21 @@ dependencies:
   flutter_image_compress: ^2.4.0
   top_snackbar_flutter: ^3.3.0
   dotted_decoration: ^2.0.0
-  lottie: ^3.3.3
+  lottie: ^3.5.1
+  file_selector: ^1.1.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/logo/app_logo.png"
 
 flutter:
   uses-material-design: true

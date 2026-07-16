@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/shared/widgets/custom_svg.dart';
 import '../../../../../core/style/app_colors.dart';

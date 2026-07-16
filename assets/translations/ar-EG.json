@@ -1,11 +1,12 @@
 {
   "core": {
-    "no_content": "لا يوجد محتوى",
-    "error_title": "حدث خطأ ما",
-    "error_desc": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى أو الاتصال بالدعم إذا استمرت المشكلة.",
-    "reload": "اعادة التحميل",
-    "yes": "نعم",
-    "no": "لا",
+    "no_content": "مفيش محتوى",
+    "search": "بحث",
+    "error_title": "حصل خطأ",
+    "error_desc": "حصل خطأ غير متوقع، حاول تاني أو تواصل مع الدعم لو المشكلة استمرت.",
+    "reload": "إعادة تحميل",
+    "yes": "أيوه",
+    "no": "لأ",
     "time_ago": {
       "seconds": "منذ {value} ثانية",
       "minutes": "منذ {value} دقيقة",
@@ -18,84 +19,84 @@
   },
   "failure": {
     "code": {
-      "400": "طلب غير صالح: بناء غير صحيح.",
-      "401": "غير مصرح: مطلوب المصادقة.",
-      "403": "ممنوع: تم رفض الوصول.",
-      "404": "غير موجود: المورد غير موجود.",
-      "500": "خطأ في الخادم الداخلي: خطأ في الخادم.",
-      "default": "خطأ غير متوقع: حاول مرة أخرى لاحقًا."
+      "400": "طلب غير صالح: صيغة الطلب غير صحيحة.",
+      "401": "غير مصرح: محتاج تسجيل دخول.",
+      "403": "ممنوع: مش مسموحلك تدخل.",
+      "404": "مش موجود: البيانات المطلوبة مش موجودة.",
+      "500": "خطأ في السيرفر: حصل مشكلة في الخادم.",
+      "default": "حصل خطأ غير متوقع: حاول تاني بعدين."
     },
     "dio": {
-      "connection_timeout": "انتهت مهلة الاتصال بخادم API",
-      "send_timeout": "انتهت مهلة إرسال البيانات إلى خادم API",
-      "connection_error": "لا يوجد اتصال بالإنترنت",
-      "receive_timeout": "انتهت مهلة استقبال البيانات من خادم API",
-      "request_canceled": "تم إلغاء الطلب إلى خادم API",
-      "unexpected_error": "خطأ غير متوقع، يرجى المحاولة مرة أخرى!",
-      "ops_error": "عذرًا، حدث خطأ، يرجى المحاولة مرة أخرى"
+      "connection_timeout": "انتهى وقت الاتصال بالسيرفر",
+      "send_timeout": "انتهى وقت إرسال البيانات للسيرفر",
+      "connection_error": "مفيش اتصال بالإنترنت",
+      "receive_timeout": "انتهى وقت استقبال البيانات من السيرفر",
+      "request_canceled": "تم إلغاء الطلب للسيرفر",
+      "unexpected_error": "حصل خطأ غير متوقع، حاول تاني!",
+      "ops_error": "أوبس، حصل خطأ، حاول تاني"
     },
-    "unexpected_error": "خطأ غير متوقع، يرجى المحاولة مرة أخرى!",
-    "refresh": "اعادة التحميل",
-    "no_internet": "لا يوجد اتصال بالإنترنت"
+    "unexpected_error": "حصل خطأ غير متوقع، حاول تاني!",
+    "refresh": "تحديث",
+    "no_internet": "مفيش اتصال بالإنترنت"
   },
   "validators": {
     "required": "*مطلوب",
     "email": {
       "required": "*مطلوب",
-      "pattern": "يرجى إدخال عنوان بريد إلكتروني صالح."
+      "pattern": "من فضلك اكتب إيميل صحيح."
     },
     "password": {
       "required": "*مطلوب",
-      "identical": "كلمات المرور غير متطابقة",
-      "min_length": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
-      "contain_number": "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل",
-      "contain_upper_case": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل",
-      "contain_lower_case": "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل",
-      "contain_special_char": "يجب أن تحتوي كلمة المرور على حرف خاص واحد على الأقل",
-      "old_new_same": "كلمة المرور الجديدة لا يمكن أن تكون نفس كلمة المرور القديمة",
-      "must_include": "يجب أن تحتوي كلمة المرور على",
+      "identical": "كلمتا المرور غير متطابقتين",
+      "min_length": "كلمة المرور لازم تكون 8 حروف على الأقل",
+      "contain_number": "كلمة المرور لازم تحتوي على رقم واحد على الأقل",
+      "contain_upper_case": "كلمة المرور لازم تحتوي على حرف كبير واحد على الأقل",
+      "contain_lower_case": "كلمة المرور لازم تحتوي على حرف صغير واحد على الأقل",
+      "contain_special_char": "كلمة المرور لازم تحتوي على رمز خاص واحد على الأقل",
+      "old_new_same": "كلمة المرور الجديدة مينفعش تكون زي القديمة",
+      "must_include": "كلمة المرور لازم تحتوي على",
       "contain_special_char_summary": "رمز خاص",
       "contain_upper_case_summary": "حرف كبير",
       "contain_lower_case_summary": "حرف صغير",
       "contain_letter_summary": "حرف",
       "contain_number_summary": "رقم",
-      "min_length_summary": "8 أحرف على الأقل",
-      "no_spaces": "يجب ألا تحتوي كلمة المرور على مسافات",
-      "no_name": "يجب ألا تحتوي كلمة المرور على اسمك",
-      "no_email": "يجب ألا تحتوي كلمة المرور على عنوان بريدك الإلكتروني"
+      "min_length_summary": "8 حروف على الأقل",
+      "no_spaces": "كلمة المرور مينفعش تحتوي على مسافات",
+      "no_name": "كلمة المرور مينفعش تحتوي على اسمك",
+      "no_email": "كلمة المرور مينفعش تحتوي على الإيميل بتاعك"
     },
     "numbers": {
-      "only": "يجب أن يحتوي هذا الحقل على أرقام فقط.",
-      "range": "يجب أن يكون الرقم بين {min} و {max}.",
-      "exact_length": "يجب أن يكون هذا الحقل {length} رفم بالضبط.",
-      "greater_than": "يجب أن يكون الرقم أكبر من {min}.",
-      "less_than": "يجب أن يكون الرقم أصغر من {max}."
+      "only": "الخانة دي لازم تحتوي على أرقام بس.",
+      "range": "الرقم لازم يكون بين {min} و {max}.",
+      "exact_length": "الخانة دي لازم تكون {length} رقم بالظبط.",
+      "greater_than": "الرقم لازم يكون أكبر من {min}.",
+      "less_than": "الرقم لازم يكون أقل من {max}."
     },
     "phone": {
       "required": "*مطلوب",
-      "invalid": "رقم الهاتف غير صالح"
+      "invalid": "رقم الموبايل غير صحيح"
     },
     "OTP": {
       "required": "*مطلوب",
-      "length": "يجب أن يتكون رمز التحقق من 6 أرقام."
+      "length": "رمز التحقق لازم يكون 6 أرقام بالظبط."
     },
     "length": {
-      "min": "يجب أن يكون هذا الحقل على الأقل {length} حرفًا.",
-      "max": "يجب ألا يتجاوز هذا الحقل {length} حرفًا.",
-      "exact": "يجب أن يكون هذا الحقل {length} حرفًا بالضبط."
+      "min": "الخانة دي لازم تكون {length} حروف على الأقل.",
+      "max": "الخانة دي مينفعش تزيد عن {length} حرف.",
+      "exact": "الخانة دي لازم تكون {length} حرف بالظبط."
     }
   },
   "shared": {
     "onboarding": {
-      "make_a_difference": "اصنع فرقًا",
-      "join_thousands_of_volunteers": "انضم إلى آلاف المتطوعين الذين يصنعون تأثيرًا في المجتمعات في جميع أنحاء البلاد.",
-      "give_receive": "أعطِ واستقبل",
-      "support_causes": "ادعم القضايا التي تهتم بها من خلال التبرعات وتواصل مع من يحتاجون إلى المساعدة.",
-      "earn_achieve": "اكسب وحقق الإنجازات",
-      "track_your_impact": "تابع تأثيرك من خلال نقاط الخبرة (XP) والشارات وسلاسل الإنجاز. كل خطوة لها قيمة!",
+      "make_a_difference": "اعمل فرق",
+      "join_thousands_of_volunteers": "انضم لآلاف المتطوعين اللي بيعملوا تأثير حقيقي في المجتمعات في كل أنحاء البلد.",
+      "give_receive": "ادّي وخد",
+      "support_causes": "ادعم القضايا اللي تهمك من خلال التبرعات واتواصل مع الناس اللي محتاجة مساعدة.",
+      "earn_achieve": "اكسب وحقق",
+      "track_your_impact": "تابع تأثيرك من خلال نقاط XP والشارات وسلسلة الإنجازات. كل خطوة بتفرق!",
       "skip": "تخطي",
       "next": "التالي",
-      "get_started": "ابدأ الآن",
+      "get_started": "ابدأ",
       "dark": "داكن",
       "light": "فاتح"
     },
@@ -104,39 +105,40 @@
       "desc": "سجل دخولك عشان تكمل",
       "i_am": "أنا",
       "volunteer": "متطوع",
-      "organization": "مؤسسة",
-      "email_or_phone": "البريد الإلكتروني أو اسم المستخدم",
-      "enter_email_or_username": "أدخل البريد الإلكتروني أو اسم المستخدم",
-      "password": "كلمة السر",
-      "enter_password": "اكتب كلمة السر",
-      "forget_password": "نسيت كلمة السر؟",
-      "sign_with_google": "كمل باستخدام جوجل",
-      "sign_with_apple": "كمل باستخدام أبل",
+      "organization": "منظمة",
+      "email_or_username": "الإيميل أو اسم المستخدم",
+      "enter_email_or_username": "اكتب الإيميل أو اسم المستخدم",
+      "password": "كلمة المرور",
+      "enter_password": "اكتب كلمة المرور",
+      "forget_password": "نسيت كلمة المرور؟",
+      "sign_with_google": "المتابعة باستخدام جوجل",
+      "sign_with_apple": "المتابعة باستخدام أبل",
       "sign_in_button": "تسجيل الدخول",
       "dont_have_account": "معندكش حساب؟ ",
       "sign_up_as_volunteer": "سجل كمتطوع",
       "or": " أو ",
-      "sign_up_as_organization": "كمؤسسة",
-      "account_signed_in": "تم تسجيل الدخول بنجاح"
+      "sign_up_as_organization": "منظمة",
+      "account_signed_in": "تم تسجيل الدخول للحساب",
+      "user_role_not_found": "نوع المستخدم غير موجود"
     },
     "donations_removed": {
-      "winter_clothing_drive": "حملة ملابس الشتاء",
-      "help_provide_warm": "ساعد في توفير ملابس دافية للعائلات المحتاجة في الشتاء.",
+      "winter_clothing_drive": "حملة الملابس الشتوية",
+      "help_provide_warm": "ساعد في توفير ملابس دافئة للأسر المحتاجة في فصل الشتاء ده.",
       "resala_charity": "جمعية رسالة",
       "raised": "تم جمع 32,500 جنيه",
       "goal": "الهدف 50,000 جنيه",
-      "funded": "تم تمويل 65%",
-      "days_left": "فاضل 15 يوم",
+      "funded": "تم تمويل 65.0%",
+      "days_left": "متبقي 15 يوم",
       "EGP_12500": "12,500 جنيه",
       "8": "8"
     },
     "donations": {
-      "title": "حملات التبرعات",
-      "desc": "ادعم القضايا اللي تفرق",
+      "title": "حملات التبرع",
+      "desc": "ادعم القضايا اللي تهمك",
       "your_total_donations": "إجمالي تبرعاتك",
       "active_campaigns": "الحملات النشطة",
       "campaigns_supported": "الحملات اللي دعمتها",
-      "button": "تبرع دلوقتي",
+      "button": "تبرع الآن",
       "pop_up": {
         "donation_Amount": "مبلغ التبرع (جنيه)",
         "enter_amount": "اكتب المبلغ",
@@ -148,7 +150,7 @@
       "title": "حالات عاجلة",
       "desc": "حالات موثقة محتاجة دعم فوري",
       "all_cases_are_verified": "كل الحالات موثقة",
-      "our_team_verifies_every_case": "فريقنا بيراجع كل حالة قبل النشر عشان نضمن المصداقية.",
+      "our_team_verifies_every_case": "فريقنا بيراجع كل حالة قبل نشرها للتأكد من صحتها.",
       "button": "قدم حالة للمراجعة",
       "card": {
         "verified": "موثقة",
@@ -158,55 +160,55 @@
         "button": "ادعم الحالة دي"
       },
       "pop_up": {
-        "contact_person": "الشخص المسؤول",
-        "phone": "رقم الموبايل",
+        "contact_person": "الشخص المسؤول عن التواصل",
+        "phone": "رقم الهاتف",
         "bank_account": "الحساب البنكي",
-        "you_can_support": "تقدر تدعم الحالة دي بالتواصل المباشر أو التبرع على الحساب البنكي.",
+        "you_can_support": "تقدر تدعم الحالة دي عن طريق التواصل المباشر أو التبرع على الحساب البنكي الموضح.",
         "close": "إغلاق",
-        "call_now": "اتصل دلوقتي"
+        "call_now": "اتصل الآن"
       },
       "submit": {
-        "title": "قدم حالة للمراجعة",
-        "desc": "كل الطلبات بيتم مراجعتها قبل النشر",
-        "verification_process": "عملية المراجعة",
-        "verification_desc": "فريقنا هيراجع كل البيانات والمستندات. غالبًا ده بياخد من 24 لـ 48 ساعة. الحالات الموثقة بس هي اللي هتتنشر.",
+        "title": "تقديم حالة للمراجعة",
+        "desc": "كل الطلبات يتم مراجعتها قبل النشر",
+        "verification_process": "عملية التحقق",
+        "verification_desc": "فريقنا هيراجع كل المعلومات والمستندات الداعمة. ده بياخد عادة من 24 لـ 48 ساعة. الحالات الموثقة فقط هي اللي هتظهر على المنصة.",
         "case_title": "عنوان الحالة",
-        "hint_case_title": "عنوان مختصر وواضح للحالة",
+        "hint_case_title": "اكتب عنوان مختصر وواضح يوضح الحالة",
         "category": "التصنيف",
-        "hint_category": "اختار نوع الحالة",
+        "hint_category": "اختار تصنيف الحالة",
         "urgency_level": "درجة الاستعجال",
         "description": "وصف تفصيلي",
-        "hint_description": "اكتب تفاصيل الحالة والوضع الحالي والاحتياجات المطلوبة. الحد الأدنى 50 حرف.",
+        "hint_description": "اكتب وصف تفصيلي للحالة يشمل الخلفية والوضع الحالي والاحتياجات المطلوبة. الحد الأدنى 50 حرف.",
         "characters": "حرف",
         "case_photos": "صور الحالة",
-        "hint_case_photos": "صور واضحة توضح الحالة",
+        "hint_case_photos": "صور واضحة توضح الوضع",
         "supporting_documents": "المستندات الداعمة",
-        "hint_supporting_documents": "تقارير طبية، فواتير، تقارير رسمية... إلخ",
+        "hint_supporting_documents": "تقارير طبية، فواتير، مستندات رسمية، إلخ.",
         "contact_information": "بيانات التواصل",
         "contact_name": "اسم الشخص المسؤول",
-        "hint_contact_name": "الاسم بالكامل",
-        "contact_phone": "رقم الموبايل",
-        "banking_information": "بيانات البنك (اختياري)",
-        "banking_desc": "ضيف بيانات البنك لو الحالة محتاجة تبرعات مالية",
+        "hint_contact_name": "الاسم الكامل للشخص المسؤول",
+        "contact_phone": "رقم هاتف التواصل",
+        "banking_information": "البيانات البنكية (اختياري)",
+        "banking_desc": "اكتب بيانات البنك لو الحالة محتاجة تبرعات مالية",
         "bank_name": "اسم البنك",
         "hint_bank_name": "مثال: البنك الأهلي المصري",
         "account_number": "رقم الحساب",
-        "hint_account_number": "اكتب رقم الحساب",
-        "estimated_amount": "المبلغ المطلوب تقريبًا",
+        "hint_account_number": "رقم الحساب البنكي",
+        "estimated_amount": "المبلغ المتوقع المطلوب",
         "hint_estimated_amount": "مثال: 50,000 جنيه",
         "additional_notes": "ملاحظات إضافية (اختياري)",
         "hint_additional_notes": "أي معلومات إضافية ممكن تساعد فريق المراجعة",
         "note_label": "ملاحظة:",
-        "note_text": "بتقديمك للحالة دي، إنت بتأكد إن كل المعلومات صحيحة. أي معلومات غلط أو مضللة ممكن تسبب إيقاف الحساب.",
+        "note_text": "بتقديمك للحالة دي، أنت بتأكد إن كل المعلومات اللي قدمتها صحيحة وحقيقية. المعلومات الكاذبة أو المضللة ممكن تؤدي لإيقاف الحساب.",
         "cancel_button": "إلغاء",
         "submit_button": "إرسال للمراجعة"
       }
     },
     "cases_removed": {
-      "days_Ago": "من يومين",
-      "family_displaced_by_fire": "أسرة اتشردت بسبب حريق",
-      "a_family_of_6_lost": "أسرة مكونة من 6 أفراد فقدت بيتها بسبب حريق. محتاجين بشكل عاجل سكن وملابس واحتياجات أساسية. الحريق دمر كل ممتلكاتهم وحاليًا قاعدين عند أقاربهم.",
-      "contact": "التواصل: محمد أحمد",
+      "days_Ago": "منذ يومين",
+      "family_displaced_by_fire": "أسرة فقدت منزلها بسبب حريق",
+      "a_family_of_6_lost": "أسرة مكونة من 6 أفراد فقدت منزلها بسبب حريق في منزلهم. محتاجين بشكل عاجل لمكان للسكن وملابس واحتياجات أساسية. الحريق دمر كل ممتلكاتهم وحاليًا قاعدين عند أقاربهم.",
+      "contact": "للتواصل: محمد أحمد",
       "national_bank": "0123456789 - البنك الأهلي المصري",
       "mohamed": "محمد أحمد",
       "EGP_75000": "75,000 جنيه",
@@ -222,85 +224,70 @@
       "events": "الفعاليات"
     },
     "notifications_removed": {
-      "new_badge_earned": "بادج جديدة!",
-      "you_earned_the_social_butterfly_badge": "حصلت على بادج Social Butterfly",
-      "1h_ago": "من ساعة"
-    },
-    "profile": {
-      "level": "المستوى 12",
-      "xp": "نقاط XP",
-      "streak": "سلسلة الأيام",
-      "attended": "فعاليات حضرتها",
-      "donations": "إجمالي التبرعات",
-      "badges": "البادجات",
-      "view_all": "عرض الكل",
-      "contact_information": "بيانات التواصل",
-      "settings": {
-        "edit_profile": "تعديل الملف الشخصي",
-        "help_support": "المساعدة والدعم",
-        "privacy_policy": "سياسة الخصوصية",
-        "sign_out": "تسجيل خروج"
-      }
-    },
-    "profile_removed": {
-      "location": "القاهرة، مصر",
-      "created": "انضم في مارس 2024"
+      "new_badge_earned": "حصلت على شارة جديدة!",
+      "you_earned_the_social_butterfly_badge": "لقد حصلت على شارة الفراشة الاجتماعية",
+      "1h_ago": "منذ ساعة"
     },
     "badges": {
-      "badges": "البادجات",
-      "earn_badges": "اجمع بادجات من خلال تأثيرك ومساهماتك",
+      "badges": "الشارات",
+      "earn_badges": "اكسب شارات من خلال عمل تأثير إيجابي",
       "your_collection": "مجموعتك",
       "all": "الكل",
       "earned": "تم الحصول عليها",
-      "in_progress": "قيد الإنجاز",
-      "gold": "ذهبي",
-      "silver": "فضي",
-      "bronze": "برونزي"
+      "in_progress": "قيد التقدم",
+      "gold": "ذهبية",
+      "silver": "فضية",
+      "bronze": "برونزية"
     },
     "rewards": {
-      "rewards": "المكافآت و XP",
+      "rewards": "المكافآت ونقاط XP",
       "track_your_progress": "تابع تقدمك وافتح مكافآت جديدة",
       "current_level": "المستوى الحالي",
       "level": "المستوى",
       "active_hero": "البطل النشط",
-      "streak_tracker": "متابعة الستريك",
-      "longest": "أطول مدة: 14 يوم",
-      "volunteer_today": "اتطوع النهارده عشان تكمل الستريك!",
-      "level_rewards": "مكافآت المستويات",
-      "unlocked": "مفتوح",
-      "locked": "مقفول",
-      "recent_xp_activity": "آخر نشاط XP",
+      "streak_tracker": "متابع السلسلة",
+      "longest": "الأطول: 14 يوم",
+      "volunteer_today": "تطوع النهارده عشان تزود سلسلة إنجازاتك!",
+      "level_rewards": "مكافآت المستوى",
+      "unlocked": "مفتوحة",
+      "locked": "مقفولة",
+      "recent_xp_activity": "آخر نشاط لنقاط XP",
       "all": "الكل",
-      "weekly_leaderboard": "ترتيب الأسبوع",
-      "this_week": "الأسبوع ده"
+      "weekly_leaderboard": "المتصدرين الأسبوعيين",
+      "this_week": "هذا الأسبوع"
     }
   },
   "organization": {
     "sign_up": {
-      "title": "سجل مؤسستك",
-      "desc": "اعمل فعاليات واجمع متطوعين",
-      "organization_name": "اسم المؤسسة",
+      "title": "سجل منظمتك",
+      "desc": "اعمل فعاليات وجذب متطوعين",
+      "organization_name": "اسم المنظمة",
       "hint_organization_name": "مثال: الهلال الأحمر المصري",
       "website_link": "الموقع الإلكتروني / الرابط",
       "hint_website_link": "https://yourorganization.org",
       "official_email": "الإيميل الرسمي",
       "hint_official_email": "contact@organization.org",
-      "phone_number": "رقم الموبايل",
-      "headquarters_location": "مقر المؤسسة الرئيسي",
+      "phone_number": "رقم التليفون",
+      "headquarters_location": "مكان المقر الرئيسي",
       "hint_headquarters_location": "اختار مدينة المقر الرئيسي",
-      "branch_locations": "الفروع (اختياري)",
-      "hint_branch_locations": "أضف فرع",
+      "branch_locations": "أماكن الفروع (اختياري)",
+      "hint_branch_locations": "إضافة فرع",
       "verification_documents": "مستندات التحقق",
       "hint_verification_documents": "ارفع مستندات التسجيل",
-      "desc_verification_documents": "PDF أو صور للمستندات الرسمية أو السجل أو أوراق الجمعية",
-      "password": "كلمة السر",
-      "create_strong_password": "اعمل كلمة سر قوية",
-      "confirm_password": "تأكيد كلمة السر",
-      "confirm_your_password": "أكد كلمة السر",
-      "accept_terms": "أوافق على شروط الاستخدام وسياسة الخصوصية",
-      "sign_up_button": "إرسال للمراجعة",
+      "desc_verification_documents": "ملفات PDF أو صور من مستندات التسجيل الرسمية أو الأوراق الضريبية أو شهادة المنظمة",
+      "please_upload_verification_documents": "من فضلك ارفع مستندات التحقق",
+      "password": "كلمة المرور",
+      "create_strong_password": "أنشئ كلمة مرور قوية",
+      "confirm_password": "تأكيد كلمة المرور",
+      "confirm_your_password": "أكد كلمة المرور",
+      "accept_terms": "أنا موافق على شروط الاستخدام وسياسة الخصوصية",
+      "sign_up_button": "إرسال للتحقق",
       "already_have_account": "عندك حساب بالفعل؟ ",
-      "sign_in": "سجل دخول"
+      "sign_in": "تسجيل الدخول",
+      "created_account": "تم إنشاء الحساب بنجاح",
+      "you_must_accept_terms": "لازم توافق على شروط الاستخدام وسياسة الخصوصية",
+      "upload_logo": "ارفع اللوجو",
+      "logo_is_required": "اللوجو مطلوب"
     },
     "home": {
       "navbar": {
@@ -310,13 +297,13 @@
         "cases": "الحالات"
       },
       "dashboard": {
-        "title": "أهلاً برجوعك، ",
-        "desc": "إدارة الفعاليات والمتطوعين",
+        "title": "أهلاً بعودتك، ",
+        "desc": "إدارة فعالياتك والمتطوعين",
         "active_events": "الفعاليات النشطة",
         "completed": "المكتملة",
         "volunteers": "المتطوعين"
       },
-      "create_event_button": "اعمل فعالية جديدة",
+      "create_event_button": "إنشاء فعالية جديدة",
       "your_active_events": {
         "title": "فعالياتك النشطة",
         "volunteers": "المتطوعين",
@@ -324,120 +311,126 @@
         "edit_event_button": "تعديل الفعالية"
       },
       "recently_completed": {
-        "title": "الفعاليات المكتملة مؤخرًا"
+        "title": "المكتملة حديثًا"
       }
     },
     "home_removed": {
-      "blood_donation_drive": "حملة تبرع بالدم",
-      "blood_donation": "تبرع بالدم",
+      "blood_donation_drive": "حملة التبرع بالدم",
+      "blood_donation": "التبرع بالدم",
       "resala_charity": "جمعية رسالة",
       "dec_8_2025": "8 ديسمبر 2025",
       "date": "15 ديسمبر 2025",
       "45_60": "45 / 60",
-      "food_distribution": "توزيع وجبات",
+      "food_distribution": "توزيع الطعام",
       "members": "34 متطوع",
       "52_volunteer": "52 متطوع",
       "10am": "10:00 صباحًا",
-      "cairo_medical_canter": "مركز القاهرة الطبي"
+      "cairo_medical_canter": "المركز الطبي بالقاهرة"
     },
     "events": {
       "title": "فعالياتك",
-      "desc": "إدارة ومتابعة الفعاليات",
-      "create_event_button": "اعمل فعالية جديدة",
+      "desc": "إدارة ومتابعة فعالياتك",
+      "create_event_button": "إنشاء فعالية جديدة",
       "volunteers": "المتطوعين",
       "filter": {
         "all": "الكل",
         "upcoming": "القادمة",
-        "in_progress": "شغالة دلوقتي",
-        "completed": "المكتملة"
+        "in_progress": "جارية",
+        "completed": "مكتملة"
       }
     }
   },
   "volunteer": {
     "sign_up": {
-      "title": "Create a Volunteer Account",
-      "desc": "Start making a difference today",
-      "full_name": "Full Name",
-      "enter_full_name": "Enter your full name",
-      "email": "Email",
-      "enter_email": "Enter your email",
-      "phone_number": "Phone Number",
-      "city": "City",
-      "select_your_city": "Select your city",
-      "governorate": "Governorate",
-      "select_your_governorate": "Select your governorate",
-      "address": "Address",
-      "write_your_address": "Enter your address",
-      "gender": "Gender",
-      "male": "Male",
-      "female": "Female",
-      "birthday": "Birthday",
-      "blood_type": "Blood Type",
-      "select_blood_type": "Select blood type",
-      "skills_interests": "Skills & Interests",
-      "national_id_numbers": "National ID Number",
-      "write_national_id_numbers": "Enter National ID Number",
-      "national_id": "National ID (Front & Back)",
-      "upload_national_id_front": "Upload National ID (Front)",
-      "upload_national_id_back": "Upload National ID (Back)",
-      "password": "Password",
-      "create_strong_password": "Create a strong password",
-      "confirm_password": "Confirm Password",
-      "confirm_your_password": "Confirm your password",
-      "accept_terms": "I accept the Terms of Service and Privacy Policy",
-      "sign_up_button": "Create Account",
-      "already_have_account": "Already have an account? ",
-      "account_created": "Account created successfully!",
-      "sign_in": "Sign In"
+      "title": "انضم كمتطوع",
+      "desc": "ابدأ تعمل فرق من النهارده",
+      "full_name": "الاسم بالكامل",
+      "enter_full_name": "اكتب اسمك بالكامل",
+      "email": "الإيميل",
+      "enter_email": "اكتب الإيميل بتاعك",
+      "phone_number": "رقم التليفون",
+      "city": "المدينة",
+      "select_your_city": "اختار مدينتك",
+      "governorate": "المحافظة",
+      "select_your_governorate": "اختار محافظتك",
+      "address": "العنوان",
+      "write_your_address": "اكتب عنوانك",
+      "gender": "النوع",
+      "male": "ذكر",
+      "female": "أنثى",
+      "birthday": "تاريخ الميلاد",
+      "blood_type": "فصيلة الدم",
+      "select_blood_type": "اختار فصيلة الدم",
+      "skills_interests": "المهارات والاهتمامات",
+      "national_id_numbers": "الرقم القومي",
+      "write_national_id_numbers": "اكتب الرقم القومي",
+      "national_id": "البطاقة الشخصية (الوجه والظهر)",
+      "national_id_must_be_14_digits": "الرقم القومي لازم يكون 14 رقم",
+      "upload_national_id_front": "ارفع صورة البطاقة (الوجه)",
+      "please_upload_front_national_id": "من فضلك ارفع صورة الوجه الأمامي للبطاقة",
+      "upload_national_id_back": "ارفع صورة البطاقة (الظهر)",
+      "please_upload_back_national_id": "من فضلك ارفع صورة ظهر البطاقة",
+      "please_upload_both_ids": "من فضلك ارفع صورة الوجه والظهر للبطاقة",
+      "password": "كلمة المرور",
+      "create_strong_password": "أنشئ كلمة مرور قوية",
+      "confirm_password": "تأكيد كلمة المرور",
+      "confirm_your_password": "أكد كلمة المرور",
+      "accept_terms": "أنا موافق على شروط الاستخدام وسياسة الخصوصية",
+      "sign_up_button": "إنشاء حساب",
+      "already_have_account": "عندك حساب بالفعل؟ ",
+      "account_created": "تم إنشاء الحساب بنجاح!",
+      "sign_in": "تسجيل الدخول",
+      "you_must_accept_terms": "لازم توافق على الشروط وسياسة الخصوصية",
+      "upload_photo": "ارفع صورة"
     },
     "home": {
       "navbar": {
         "home": "الرئيسية",
         "events": "الفعاليات",
-        "community": "المجتمعات",
+        "community": "المجتمع",
         "donations": "التبرعات",
         "cases": "الحالات"
       },
       "dashboard": {
-        "title": "أهلاً برجوعك، ",
+        "title": "أهلاً بعودتك، ",
         "desc": "جاهز تعمل فرق النهارده؟",
         "xp_points": "نقاط XP",
         "day_streak": "سلسلة الأيام",
-        "badges": "البادجات"
+        "badges": "الشارات"
       },
       "options": {
         "emergency": "طوارئ",
-        "report_urgent": "بلغ عن حالة عاجلة",
+        "report_urgent": "إبلاغ عن حالة عاجلة",
         "qr_check_in": "تسجيل حضور QR",
-        "scan_to_earn": "اعمل سكان واكسب XP"
+        "scan_to_earn": "امسح لكسب نقاط XP"
       },
       "upcoming_events": {
         "title": "الفعاليات القادمة",
         "view_all": "عرض الكل"
       },
       "recently_completed": {
-        "title": "الفعاليات المكتملة مؤخرًا"
+        "title": "المكتملة حديثًا"
       }
     },
     "home_removed": {
-      "blood_donation_drive": "حملة تبرع بالدم",
-      "blood_donation_drive_date": "حملة تبرع بالدم - 15 ديسمبر",
-      "dont_forget_to_bring_your_id": "متنساش تجيب بطاقتك! • من ساعتين",
-      "blood_donation": "تبرع بالدم",
+      "blood_donation_drive": "حملة التبرع بالدم",
+      "blood_donation_drive_date": "حملة التبرع بالدم - 15 ديسمبر",
+      "dont_forget_to_bring_your_id": "متنساش تجيب البطاقة بتاعتك! • منذ ساعتين",
+      "blood_donation": "التبرع بالدم",
       "egyptian_red_crescent": "الهلال الأحمر المصري",
       "date": "15 ديسمبر 2025 • 10:00 صباحًا",
-      "cairo_medical_center": "مركز القاهرة الطبي",
-      "food_distribution": "توزيع وجبات",
+      "cairo_medical_center": "المركز الطبي بالقاهرة",
+      "food_distribution": "توزيع الطعام",
       "resala_charity": "جمعية رسالة",
       "dec_8_2025": "8 ديسمبر 2025",
       "duration": "المدة: 4 ساعات",
       "4_hours": "المدة: 4 ساعات",
-      "members": "45 متطوع • فاضل 15 مكان",
+      "members": "45 متطوع • 15 مكان متبقي",
       "help_save": "ساعد في إنقاذ الأرواح بالتبرع بالدم. كل فصائل الدم مطلوبة."
     },
     "events": {
       "title": "الفعاليات المتاحة",
-      "desc": "دور على فرص تقدر تعمل فيها فرق",
+      "desc": "لاقِ فرص تعمل فيها فرق",
       "search": "ابحث عن فعاليات...",
       "filters": "الفلاتر",
       "button": "عرض التفاصيل",
@@ -454,7 +447,7 @@
         "blood_donation": "التبرع بالدم",
         "orphanage": "دار أيتام",
         "environment": "البيئة",
-        "food_distribution": "توزيع وجبات",
+        "food_distribution": "توزيع الطعام",
         "healthcare": "الرعاية الصحية",
         "location_title": "مكان الفعالية",
         "cairo": "القاهرة",
@@ -464,10 +457,10 @@
         "aswan": "أسوان",
         "luxor": "الأقصر",
         "date_title": "تاريخ الفعالية",
-        "today": "النهارده",
-        "tomorrow": "بكره",
-        "this_week": "الأسبوع ده",
-        "this_month": "الشهر ده",
+        "today": "اليوم",
+        "tomorrow": "غدًا",
+        "this_week": "هذا الأسبوع",
+        "this_month": "هذا الشهر",
         "upcoming": "القادمة"
       }
     },
@@ -475,49 +468,70 @@
       "title": "المجتمعات",
       "desc": "اتواصل مع متطوعين تانيين",
       "search": "ابحث عن المجتمعات",
-      "expired": "انتهت: الشات بيقفل بعد 3 أيام من انتهاء الفعالية",
+      "expired": "انتهت: المحادثة بتتقفل بعد 3 أيام من الفعالية",
       "ended": "انتهت",
-      "2_min_ago": "من دقيقتين",
-      "2_days_ago": "من يومين",
-      "communities_are_automatically_created": "المجتمعات بتتعمل تلقائي لما تنضم لأي فعالية.",
-      "chat_access_remains": "تقدر تستخدم الشات لمدة 3 أيام بعد انتهاء الفعالية."
+      "2_min_ago": "منذ دقيقتين",
+      "2_days_ago": "منذ يومين",
+      "communities_are_automatically_created": "يتم إنشاء المجتمعات تلقائيًا لما تنضم لفعالية.",
+      "chat_access_remains": "الوصول للمحادثة يفضل متاح لمدة 3 أيام بعد انتهاء الفعالية."
     },
     "emergency": {
       "title": "فعاليات الطوارئ",
-      "desc": "حالات عاجلة محتاجة تدخل ومساعدة فورية",
-      "button": "بلغ عن حالة طوارئ",
+      "desc": "حالات عاجلة محتاجة مساعدة فورية",
+      "button": "الإبلاغ عن فعالية طوارئ",
       "card": {
         "critical": "حرجة",
-        "join_now": "انضم دلوقتي",
+        "join_now": "انضم الآن",
         "contact": "تواصل"
       },
       "reports": {
-        "title": "الإبلاغ عن حالة طوارئ",
-        "desc": "اكتب تفاصيل الحالة العاجلة",
-        "emergency_title": "عنوان الحالة",
+        "title": "الإبلاغ عن فعالية طوارئ",
+        "desc": "اكتب تفاصيل عن الحالة العاجلة",
+        "emergency_title": "عنوان الطوارئ",
         "brief": "عنوان مختصر للحالة",
         "description": "الوصف",
-        "detailed": "اكتب وصف تفصيلي للحالة والمساعدة المطلوبة",
+        "detailed": "وصف تفصيلي للحالة ونوع المساعدة المطلوبة",
         "urgency_level": "درجة الاستعجال",
         "critical": "حرجة",
         "high": "عالية",
         "medium": "متوسطة",
         "location": "المكان",
-        "city_specific_adress": "المدينة أو عنوان محدد",
+        "city_specific_adress": "المدينة أو العنوان بالتحديد",
         "volunteers_needed": "عدد المتطوعين المطلوب",
         "estimated_number_needed": "العدد المتوقع المطلوب",
         "contact_information": "بيانات التواصل",
-        "phone_number_for_coordination": "رقم للتنسيق",
+        "phone_number_for_coordination": "رقم التليفون للتنسيق",
         "cancel": "إلغاء",
-        "submit_emergency": "إرسال البلاغ"
+        "submit_emergency": "إرسال بلاغ الطوارئ"
       }
     },
     "emergency_removed": {
-      "flood_relief": "إغاثة سيول - المنيا",
-      "urgent_need": "مطلوب متطوعين بشكل عاجل للمساعدة في إغاثة السيول وتوزيع المساعدات ومساعدة الأسر المتضررة.",
+      "flood_relief": "مساعدة متضرري السيول - المنيا",
+      "urgent_need": "محتاجين متطوعين بشكل عاجل للمساعدة في جهود إغاثة السيول. توزيع المساعدات ومساعدة الأسر المتضررة.",
       "minya_egypt": "المنيا، مصر",
-      "volunteers_joined": "23 / 50 متطوع انضموا",
-      "posted": "تم النشر من ساعتين بواسطة الهلال الأحمر المصري"
+      "volunteers_joined": "انضم 23 / 50 متطوع",
+      "posted": "تم النشر منذ ساعتين بواسطة الهلال الأحمر المصري"
+    },
+    "profile": {
+      "level": "المستوى 12",
+      "xp": "نقاط XP",
+      "streak": "سلسلة الأيام",
+      "attended": "الفعاليات اللي حضرتها",
+      "donations": "إجمالي التبرعات",
+      "badges": "الشارات",
+      "view_all": "عرض الكل",
+      "contact_information": "بيانات التواصل",
+      "settings": {
+        "edit_profile": "تعديل الملف الشخصي",
+        "help_support": "المساعدة والدعم",
+        "privacy_policy": "سياسة الخصوصية",
+        "delete_account": "حذف الحساب",
+        "sign_out": "تسجيل الخروج"
+      }
+    },
+    "profile_removed": {
+      "location": "القاهرة، مصر",
+      "created": "انضم في مارس 2024"
     }
   }
 }

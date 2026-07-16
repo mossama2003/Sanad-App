@@ -8,6 +8,7 @@ class CustomButton extends StatelessWidget {
   const CustomButton({
     super.key,
     this.icon,
+    this.iconSize,
     this.onTap,
     this.width,
     this.height,
@@ -26,6 +27,7 @@ class CustomButton extends StatelessWidget {
   final bool loading;
   final bool enable;
   final String? icon;
+  final double? iconSize;
   final double? width;
   final double? height;
   final double? textSize;
@@ -72,8 +74,8 @@ class CustomButton extends StatelessWidget {
               if (icon != null) ...[
                 CustomIcon(
                   icon: icon!,
-                  width: AppSize.getSize(24),
-                  height: AppSize.getSize(24),
+                  width: iconSize ?? AppSize.getSize(24),
+                  height: iconSize ?? AppSize.getSize(24),
                   withColor: iconColored ?? false,
                   color: !enable
                       ? AppColors.grey300

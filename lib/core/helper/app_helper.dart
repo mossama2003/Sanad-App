@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../features/shared/auth/data/models/user_model.dart';
 import '../network/local/cache/cache_helper.dart';
-import '../shared/controllers/app/app_cubit.dart';
+import '../shared/controllers/user/app_cubit.dart';
 import 'app_navigator.dart';
 import 'app_toast.dart';
 

@@ -9,7 +9,7 @@ import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../../../shared/rewards/presentation/screens/rewards_screen.dart';
+import '../../../rewards/presentation/screens/rewards_screen.dart';
 
 class VolunteerHomeDashboardWidget extends StatelessWidget {
   const VolunteerHomeDashboardWidget({super.key});
@@ -36,9 +36,7 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
           children: [
             /// Background Image + Blur
             ImageFiltered(
-              imageFilter: ImageFilter.blur(
-                sigmaX: 2,
-              ),
+              imageFilter: ImageFilter.blur(sigmaX: 2),
               child: Image.asset(
                 AppImages.dashboardBackground,
                 fit: BoxFit.cover,
@@ -46,9 +44,7 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
             ),
 
             /// Color Overlay
-            Container(
-              color: AppColors.black.withValues(alpha: 0.2),
-            ),
+            Container(color: AppColors.black.withValues(alpha: 0.2)),
 
             /// Content
             Padding(
@@ -79,39 +75,34 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
                   SizedBox(height: AppSize.getHeight(20)),
 
                   Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
-                        onTap: ()=> AppNavigator.push(RewardsScreen()),
+                        onTap: () =>
+                            AppNavigator.push(VolunteerRewardsScreen()),
                         child: _buildStatCard(
                           icon: AppIcons.achievement,
                           value: '1,250',
-                          title:
-                          'volunteer.home.dashboard.xp_points'
-                              .tr(),
+                          title: 'volunteer.home.dashboard.xp_points'.tr(),
                         ),
                       ),
 
                       GestureDetector(
-                        onTap: ()=> AppNavigator.push(RewardsScreen()),
+                        onTap: () =>
+                            AppNavigator.push(VolunteerRewardsScreen()),
                         child: _buildStatCard(
                           icon: AppIcons.fire,
                           value: '7',
-                          title:
-                          'volunteer.home.dashboard.day_streak'
-                              .tr(),
+                          title: 'volunteer.home.dashboard.day_streak'.tr(),
                         ),
                       ),
 
                       GestureDetector(
-                        onTap: ()=> AppNavigator.push(BadgesScreen()),
+                        onTap: () => AppNavigator.push(BadgesScreen()),
                         child: _buildStatCard(
                           icon: AppIcons.badge,
                           value: '12',
-                          title:
-                          'volunteer.home.dashboard.badges'
-                              .tr(),
+                          title: 'volunteer.home.dashboard.badges'.tr(),
                         ),
                       ),
                     ],

@@ -1,13 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sanad_app/core/constant/app_assets.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:sanad_app/core/constant/app_size.dart';
+import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
-import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../../../core/helper/app_navigator.dart';
 import '../../../../shared/notification/presentation/screens/notification_screen.dart';
-import '../../../../shared/profile/presentation/screens/profile_screen.dart';
+import '../../../profile/presentation/screens/volunteer_profile_screen.dart';
 
 class VolunteerHomeAppbarWidget extends StatelessWidget {
   const VolunteerHomeAppbarWidget({super.key});
@@ -82,7 +82,7 @@ class VolunteerHomeAppbarWidget extends StatelessWidget {
           ),
           SizedBox(width: AppSize.getWidth(10)),
           GestureDetector(
-            onTap: () => AppNavigator.push(ProfileScreen()),
+            onTap: () => AppNavigator.push(const VolunteerProfileScreen()),
             child: Container(
               width: AppSize.getSize(35),
               height: AppSize.getSize(35),

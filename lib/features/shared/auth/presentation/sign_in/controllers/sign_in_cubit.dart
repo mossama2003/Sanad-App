@@ -6,6 +6,8 @@ import 'package:sanad_app/features/volunteer/home/presentation/screens/volunteer
 
 import '../../../../../../core/helper/app_navigator.dart';
 import '../../../../../../core/helper/app_toast.dart';
+import '../../../../../../core/network/local/cache/cache_helper.dart';
+import '../../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../organization/home/presentation/screens/organization_home_body.dart';
 import '../../../data/params/sign_in_param.dart';
 
@@ -35,6 +37,8 @@ class SignInCubit extends Cubit<SignInState> {
 
     emit(Loading());
 
+    final appCubit = AppCubit.get(AppNavigator.context);
+
     final api = await repo.signIn(
       SignInParam(
         email: emailController.text.trim(),
@@ -45,27 +49,47 @@ class SignInCubit extends Cubit<SignInState> {
     api.fold(
       (failure) {
         emit(Error());
+
         AppToast.error(failure.errMessage);
       },
-      (auth) {
-        emit(Success());
-        AppToast.success('shared_sign_in.account_signed_in'.tr());
 
-        final user = auth.user;
-        final role = user?.role;
+      (auth) async {
+        // Save Tokens
+        await CacheHelper.save(CacheKeys.accessToken, auth.access);
+
+        await CacheHelper.save(CacheKeys.refreshToken, auth.refresh);
+
+        debugPrint("ACCESS TOKEN => ${auth.access}");
+        debugPrint("REFRESH TOKEN => ${auth.refresh}");
+
+        // Get User Data
+        final user = await appCubit.getUser();
+
+        if (user == null) {
+          emit(Error());
+          AppToast.error('shared.sign_in.user_not_found'.tr());
+          return;
+        }
+
+        emit(Success());
+
+        AppToast.success('shared.sign_in.account_signed_in'.tr());
+
+        final role = user.role;
 
         if (role == null) {
-          AppToast.error('User role not found');
+          AppToast.error('shared.sign_in.user_role_not_found'.tr());
+
           return;
         }
 
         switch (role) {
           case 'volunteer':
-            AppNavigator.replace(const VolunteerHomeBody());
+            AppNavigator.remove(const VolunteerHomeBody());
             break;
 
           case 'organization':
-            AppNavigator.replace(const OrganizationHomeBody());
+            AppNavigator.remove(const OrganizationHomeBody());
             break;
 
           default:

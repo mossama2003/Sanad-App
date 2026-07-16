@@ -9,7 +9,9 @@ class CacheKeys {
   static const String dark = 'dark';
   static const String light = 'light';
 
-  static const String token = 'token';
+  static const String accessToken = 'access';
+  static const String refreshToken = 'refresh';
+
   static const String fcmToken = 'fcm_token';
 
   static const String firstUse = 'first_use';

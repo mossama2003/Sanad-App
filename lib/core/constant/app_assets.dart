@@ -38,6 +38,7 @@ class AppImages {
 class AppIcons {
   static String email = '$icons/email.svg';
   static String lock = '$icons/lock.svg';
+  static String password = '$icons/password.svg';
   static String eyeShow = '$icons/eye-show.svg';
   static String eyeOff = '$icons/eye-off.svg';
   static String delete = '$icons/delete.svg';
@@ -70,6 +71,7 @@ class AppIcons {
   static String emergency = '$icons/emergency.svg';
   static String completed = '$icons/completed.svg';
   static String star = '$icons/star.svg';
+  static String starOutlined = '$icons/star_outlined.svg';
   static String growthArrow = '$icons/growth-arrow.svg';
   static String rightArrow = '$icons/right_arrow.svg';
   static String arrowBack = '$icons/arrow-back.svg';
@@ -92,4 +94,14 @@ class AppIcons {
   static String pin = '$icons/pin.svg';
   static String info = '$icons/info.svg';
   static String send = '$icons/send.svg';
+  static String blood = '$icons/blood.svg';
+  static String business = '$icons/business.svg';
+  static String car = '$icons/car.svg';
+  static String experience = '$icons/experience.svg';
+  static String language = '$icons/language.svg';
+  static String skills = '$icons/skills.svg';
+  static String darkMood = '$icons/dark.svg';
+  static String lightMood = '$icons/shine.svg';
+  static String earth = '$icons/earth.svg';
+  static String contactSupport = '$icons/contact_support.svg';
 }

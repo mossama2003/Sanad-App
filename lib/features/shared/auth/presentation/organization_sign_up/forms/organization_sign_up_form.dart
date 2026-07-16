@@ -1,18 +1,23 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sanad_app/core/constant/app_assets.dart';
-import 'package:sanad_app/core/helper/app_navigator.dart';
-import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 import 'package:sanad_app/core/shared/widgets/custom_upload_file.dart';
+import 'package:sanad_app/core/shared/widgets/custom_field_phone.dart';
+import 'package:sanad_app/core/shared/widgets/custom_button.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:sanad_app/core/helper/app_navigator.dart';
+import 'package:sanad_app/core/constant/app_assets.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 
 import '../../../../../../core/constant/app_size.dart';
 import '../../../../../../core/helper/app_toast.dart';
+import '../../../../../../core/shared/widgets/custom_field_dropdown.dart';
 import '../../../../../../core/shared/widgets/custom_field_text.dart';
+import '../../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../../core/style/app_colors.dart';
 import '../../../../../../core/style/app_text_style.dart';
 import '../../../../../../core/validator/app_validators.dart';
+import '../../../data/models/governorate_model.dart';
 import '../../../data/repos/organization/organization_repo.dart';
 import '../../sign_in/screens/sign_in_screen.dart';
 import '../controllers/organization_sign_up_cubit.dart';
@@ -27,6 +32,7 @@ class OrganizationSignUpForm extends StatefulWidget {
 class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
   late OrganizationSignUpCubit _cubit;
 
+  bool showIcon = false;
   bool showTexts = false;
   bool showButtons = false;
   bool showField = false;
@@ -37,14 +43,24 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
     super.initState();
 
     _cubit = OrganizationSignUpCubit(OrganizationRepoImpel());
+    _cubit.loadLocationData();
 
     _startAnimations();
   }
 
   void _startAnimations() {
+    showIcon = false;
     showTexts = false;
     showButtons = false;
     showField = false;
+
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) {
+        setState(() {
+          showIcon = true;
+        });
+      }
+    });
 
     Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) {
@@ -89,8 +105,7 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
 
   void _onSignUp() {
     if (!acceptTerms) {
-      AppToast.error("You must accept terms");
-
+      AppToast.error('organization.sign_up.you_must_accept_terms'.tr());
       return;
     }
 
@@ -109,250 +124,418 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
 
     return BlocBuilder<OrganizationSignUpCubit, OrganizationSignUpState>(
       bloc: _cubit,
-
       builder: (context, state) {
         return AnimatedSlide(
           offset: showField ? Offset.zero : const Offset(0, .5),
-
           duration: const Duration(milliseconds: 400),
-
           curve: Curves.easeOutCubic,
-
           child: AnimatedOpacity(
             opacity: showField ? 1 : 0,
-
             duration: const Duration(milliseconds: 400),
-
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children: [
-                CustomFieldText(
-                  controller: _cubit.nameController,
-
-                  title: 'organization.sign_up.organization_name'.tr(),
-
-                  hintText: 'organization.sign_up.hint_organization_name'.tr(),
-
-                  validator: AppValidators.required,
-                ),
-
-                SizedBox(height: AppSize.getHeight(15)),
-
-                CustomFieldText(
-                  controller: _cubit.websiteController,
-
-                  title: 'organization.sign_up.website_link'.tr(),
-
-                  hintText: 'organization.sign_up.hint_website_link'.tr(),
-
-                  validator: AppValidators.required,
-                ),
-
-                SizedBox(height: AppSize.getHeight(15)),
-
-                CustomFieldText(
-                  controller: _cubit.emailController,
-
-                  title: 'organization.sign_up.official_email'.tr(),
-
-                  hintText: 'organization.sign_up.hint_official_email'.tr(),
-
-                  validator: AppValidators.email,
-                ),
-
-                SizedBox(height: AppSize.getHeight(15)),
-
-                CustomFieldText(
-                  controller: _cubit.phoneController,
-
-                  title: 'organization.sign_up.phone_number'.tr(),
-
-                  hintText: '+20 123 456 7890',
-
-                  validator: AppValidators.required,
-                ),
-
-                SizedBox(height: AppSize.getHeight(15)),
-
-                CustomFieldText(
-                  controller: _cubit.headquartersController,
-
-                  title: 'organization.sign_up.headquarters_location'.tr(),
-
-                  hintText: 'organization.sign_up.hint_headquarters_location'
-                      .tr(),
-
-                  validator: AppValidators.required,
-                ),
-
-                SizedBox(height: AppSize.getHeight(15)),
-
-                CustomUploadFile(
-                  onTap: () {},
-
-                  onRemove: () {},
-
-                  title: 'organization.sign_up.branch_locations'.tr(),
-
-                  hint: 'organization.sign_up.hint_branch_locations'.tr(),
-
-                  icon: AppIcons.add,
-                ),
-
-                SizedBox(height: AppSize.getHeight(15)),
-
-                CustomUploadFile(
-                  onTap: () {},
-
-                  onRemove: () {},
-
-                  title: 'organization.sign_up.verification_documents'.tr(),
-
-                  hint: 'organization.sign_up.hint_verification_documents'.tr(),
-
-                  icon: AppIcons.uploadFile,
-                ),
-
-                SizedBox(height: AppSize.getHeight(5)),
-
-                Text(
-                  'organization.sign_up.desc_verification_documents'.tr(),
-
-                  style: TextStyle(
-                    color: secondaryText,
-
-                    fontSize: AppSize.font(12),
-
-                    fontWeight: FontWeight.w200,
-                  ),
-                ),
-
-                SizedBox(height: AppSize.getHeight(15)),
-
-                CustomFieldText(
-                  controller: _cubit.passwordController,
-
-                  title: 'organization.sign_up.password'.tr(),
-
-                  hintText: 'organization.sign_up.create_strong_password'.tr(),
-
-                  validator: (value) => AppValidators.passwordIdentical(
-                    value,
-                    _cubit.passwordController.text,
-                  ),
-
-                  obscureText: _cubit.obscurePassword,
-
-                  iconEnd: _cubit.obscurePassword
-                      ? AppIcons.eyeShow
-                      : AppIcons.eyeOff,
-
-                  iconEndTap: () {
-                    _cubit.updateObscurePassword();
-                  },
-                ),
-
-                SizedBox(height: AppSize.getHeight(15)),
-
-                CustomFieldText(
-                  controller: _cubit.confirmPasswordController,
-
-                  title: 'organization.sign_up.confirm_password'.tr(),
-
-                  hintText: 'organization.sign_up.confirm_your_password'.tr(),
-
-                  validator: (value) => AppValidators.passwordIdentical(
-                    value,
-                    _cubit.confirmPasswordController.text,
-                  ),
-
-                  obscureText: _cubit.obscureConfirmedPassword,
-
-                  iconEnd: _cubit.obscureConfirmedPassword
-                      ? AppIcons.eyeShow
-                      : AppIcons.eyeOff,
-
-                  iconEndTap: () {
-                    _cubit.updateObscureConfirmedPassword();
-                  },
-                ),
-
-                SizedBox(height: AppSize.getHeight(15)),
-
-                Row(
-                  children: [
-                    SizedBox(
-                      width: AppSize.getSize(20),
-
-                      height: AppSize.getSize(20),
-
-                      child: Checkbox(
-                        value: acceptTerms,
-
-                        activeColor: AppColors.primary,
-
-                        onChanged: (value) {
-                          setState(() {
-                            acceptTerms = value ?? false;
-                          });
-                        },
-                      ),
-                    ),
-
-                    SizedBox(width: AppSize.getWidth(8)),
-
-                    Expanded(
-                      child: Text(
-                        'organization.sign_up.accept_terms'.tr(),
-
-                        style: TextStyle(color: textColor).xs,
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: AppSize.getHeight(10)),
-
-                CustomButton(
-                  loading: state is Loading,
-
-                  onTap: _onSignUp,
-
-                  title: 'organization.sign_up.sign_up_button'.tr(),
-
-                  bgColor: AppColors.laserBlue,
-                ),
-
-                SizedBox(height: AppSize.getHeight(8)),
-
-                Align(
-                  alignment: Alignment.center,
-
-                  child: RichText(
-                    textAlign: TextAlign.center,
-
-                    text: TextSpan(
-                      text: "organization.sign_up.already_have_account".tr(),
-
-                      style: TextStyle(color: textColor).xs,
-
+            child: Form(
+              key: _cubit.formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Column(
                       children: [
-                        TextSpan(
-                          text: "organization.sign_up.sign_in".tr(),
+                        AnimatedSlide(
+                          offset: showIcon ? Offset.zero : const Offset(0, .5),
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeOutCubic,
+                          child: AnimatedOpacity(
+                            opacity: showIcon ? 1 : 0,
+                            duration: const Duration(milliseconds: 400),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                GestureDetector(
+                                  onTap: _cubit.avatar == null
+                                      ? () => _cubit.pickLogo()
+                                      : null,
+                                  child: Container(
+                                    width: AppSize.getSize(80),
+                                    height: AppSize.getSize(80),
+                                    clipBehavior: Clip.antiAlias,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.grey100,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: AppColors.laserBlue,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    child: _cubit.avatar != null
+                                        ? Image.file(
+                                            _cubit.avatar!,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              CustomIcon(
+                                                icon: AppIcons.addPhoto,
+                                                color: AppColors.laserBlue,
+                                                width: AppSize.getSize(36),
+                                                height: AppSize.getSize(36),
+                                              ),
+                                              SizedBox(
+                                                height: AppSize.getSize(6),
+                                              ),
+                                              Text(
+                                                'organization.sign_up.upload_logo'
+                                                    .tr(),
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: AppSize.font(12),
+                                                  color: AppColors.laserBlue,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                  ),
+                                ),
 
-                          style: TextStyle(color: AppColors.laserBlue).xs,
+                                if (_cubit.avatar != null)
+                                  Positioned(
+                                    top: -6,
+                                    right: -6,
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      onTap: () {
+                                        _cubit.removeLogo();
+                                      },
+                                      child: Container(
+                                        width: AppSize.getSize(22),
+                                        height: AppSize.getSize(22),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 2,
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.close,
+                                          color: Colors.white,
+                                          size: AppSize.getSize(15),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
 
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              AppNavigator.remove(SignInScreen());
-                            },
+                        SizedBox(height: AppSize.getHeight(15)),
+
+                        AnimatedSlide(
+                          offset: showTexts ? Offset.zero : const Offset(0, .5),
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeOutCubic,
+                          child: AnimatedOpacity(
+                            opacity: showTexts ? 1 : 0,
+                            duration: const Duration(milliseconds: 400),
+                            child: Column(
+                              children: [
+                                Text(
+                                  'organization.sign_up.title'.tr(),
+                                  style: TextStyle(
+                                    color: AppColors.laserBlue,
+                                    fontSize: AppSize.font(20),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: AppSize.getHeight(5)),
+                                Text(
+                                  'organization.sign_up.desc'.tr(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: secondaryText,
+                                    fontSize: AppSize.font(15),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ],
+
+                  SizedBox(height: AppSize.getHeight(25)),
+
+                  CustomFieldText(
+                    controller: _cubit.nameController,
+                    title: 'organization.sign_up.organization_name'.tr(),
+                    hintText: 'organization.sign_up.hint_organization_name'
+                        .tr(),
+                    validator: AppValidators.required,
+                  ),
+
+                  SizedBox(height: AppSize.getHeight(15)),
+
+                  CustomFieldText(
+                    controller: _cubit.websiteController,
+                    title: 'organization.sign_up.website_link'.tr(),
+                    hintText: 'organization.sign_up.hint_website_link'.tr(),
+                    validator: AppValidators.required,
+                  ),
+
+                  SizedBox(height: AppSize.getHeight(15)),
+
+                  CustomFieldText(
+                    controller: _cubit.emailController,
+                    title: 'organization.sign_up.official_email'.tr(),
+                    hintText: 'organization.sign_up.hint_official_email'.tr(),
+                    validator: AppValidators.email,
+                  ),
+
+                  SizedBox(height: AppSize.getHeight(15)),
+
+                  CustomFieldPhone(
+                    controller: _cubit.phoneController,
+                    title: 'volunteer.sign_up.phone_number'.tr(),
+                    hintText: '123 456 7890',
+                    initialCountryCode: "EG",
+                    onPhoneChanged: _cubit.onPhoneChanged,
+                    onCountryChanged: _cubit.onCountryChanged,
+                  ),
+
+                  // SizedBox(height: AppSize.getHeight(15)),
+                  CustomFieldDropdown<GovernorateModel>(
+                    title: 'volunteer.sign_up.governorate'.tr(),
+                    hintText: 'volunteer.sign_up.select_your_governorate'.tr(),
+                    validator: AppValidators.dropdownRequired<GovernorateModel>,
+                    selected: _cubit.selectedGov,
+                    items: _cubit.governorates.map((gov) {
+                      return DropdownItem(value: gov, child: Text(gov.nameEn));
+                    }).toList(),
+                    onChanged: (gov) {
+                      if (gov != null) {
+                        _cubit.selectGovernorate(gov);
+                      }
+                    },
+                  ),
+
+                  SizedBox(height: AppSize.getHeight(15)),
+
+                  CustomFieldText(
+                    controller: _cubit.headquartersController,
+                    title: 'organization.sign_up.headquarters_location'.tr(),
+                    hintText: 'organization.sign_up.hint_headquarters_location'
+                        .tr(),
+                    validator: AppValidators.required,
+                  ),
+
+                  SizedBox(height: AppSize.getHeight(15)),
+
+                  CustomUploadFile(
+                    onTap: () {
+                      _cubit.pickDocuments();
+                    },
+                    onRemove: () {
+                      _cubit.removeAttachments();
+                    },
+                    title: 'organization.sign_up.verification_documents'.tr(),
+                    hint: 'organization.sign_up.hint_verification_documents'
+                        .tr(),
+                    icon: AppIcons.uploadFile,
+                    isRequired: true,
+                    validator: (file) {
+                      if (_cubit.attachments.isEmpty) {
+                        return 'organization.sign_up.please_upload_verification_documents'
+                            .tr();
+                      }
+                      return null;
+                    },
+                  ),
+
+                  if (_cubit.attachments.isNotEmpty) ...[
+                    SizedBox(height: AppSize.getHeight(10)),
+
+                    ..._cubit.attachments.map((file) {
+                      final fileName = file.path.split('/').last;
+
+                      final isPdf = file.path.toLowerCase().endsWith('.pdf');
+
+                      return Container(
+                        margin: AppSize.margin(bottom: 8),
+                        padding: AppSize.padding(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: AppColors.grey100,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              isPdf ? Icons.picture_as_pdf : Icons.image,
+                              color: AppColors.laserBlue,
+                            ),
+
+                            SizedBox(width: AppSize.getWidth(10)),
+
+                            Expanded(
+                              child: Text(
+                                fileName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: AppColors.black,
+                                  fontSize: AppSize.font(13),
+                                ),
+                              ),
+                            ),
+
+                            InkWell(
+                              onTap: () {
+                                _cubit.removeAttachment(file);
+                              },
+                              child: Icon(
+                                Icons.close,
+                                color: Colors.red,
+                                size: AppSize.getSize(20),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+
+                  SizedBox(height: AppSize.getHeight(5)),
+
+                  Text(
+                    'organization.sign_up.desc_verification_documents'.tr(),
+                    style: TextStyle(
+                      color: secondaryText,
+                      fontSize: AppSize.font(12),
+                      fontWeight: FontWeight.w200,
+                    ),
+                  ),
+
+                  SizedBox(height: AppSize.getHeight(15)),
+
+                  CustomFieldText(
+                    controller: _cubit.passwordController,
+
+                    title: 'organization.sign_up.password'.tr(),
+
+                    hintText: 'organization.sign_up.create_strong_password'
+                        .tr(),
+
+                    validator: (value) => AppValidators.password(value),
+
+                    obscureText: _cubit.obscurePassword,
+
+                    iconEnd: _cubit.obscurePassword
+                        ? AppIcons.eyeShow
+                        : AppIcons.eyeOff,
+
+                    iconEndTap: () {
+                      _cubit.updateObscurePassword();
+                    },
+                  ),
+
+                  SizedBox(height: AppSize.getHeight(15)),
+
+                  CustomFieldText(
+                    controller: _cubit.confirmPasswordController,
+
+                    title: 'organization.sign_up.confirm_password'.tr(),
+
+                    hintText: 'organization.sign_up.confirm_your_password'.tr(),
+
+                    validator: (value) => AppValidators.passwordIdentical(
+                      value,
+                      _cubit.passwordController.text,
+                    ),
+
+                    obscureText: _cubit.obscureConfirmedPassword,
+
+                    iconEnd: _cubit.obscureConfirmedPassword
+                        ? AppIcons.eyeShow
+                        : AppIcons.eyeOff,
+
+                    iconEndTap: () {
+                      _cubit.updateObscureConfirmedPassword();
+                    },
+                  ),
+
+                  SizedBox(height: AppSize.getHeight(15)),
+
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: AppSize.getSize(20),
+                        height: AppSize.getSize(20),
+                        child: Checkbox(
+                          value: acceptTerms,
+                          activeColor: AppColors.primary,
+                          onChanged: (value) {
+                            setState(() {
+                              acceptTerms = value ?? false;
+                            });
+                          },
+                        ),
+                      ),
+
+                      SizedBox(width: AppSize.getWidth(8)),
+
+                      Expanded(
+                        child: Text(
+                          'organization.sign_up.accept_terms'.tr(),
+                          style: TextStyle(color: textColor).xs,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: AppSize.getHeight(10)),
+
+                  CustomButton(
+                    loading: state is Loading,
+
+                    onTap: _onSignUp,
+
+                    title: 'organization.sign_up.sign_up_button'.tr(),
+
+                    bgColor: AppColors.laserBlue,
+                  ),
+
+                  SizedBox(height: AppSize.getHeight(8)),
+
+                  Align(
+                    alignment: Alignment.center,
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        text: "organization.sign_up.already_have_account".tr(),
+
+                        style: TextStyle(color: textColor).xs,
+
+                        children: [
+                          TextSpan(
+                            text: "organization.sign_up.sign_in".tr(),
+
+                            style: TextStyle(color: AppColors.laserBlue).xs,
+
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                AppNavigator.remove(SignInScreen());
+                              },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );

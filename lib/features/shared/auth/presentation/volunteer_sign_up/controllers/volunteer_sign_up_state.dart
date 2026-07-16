@@ -11,9 +11,11 @@ final class UpdateObscureConfirmedPassword extends VolunteerSignUpState {}
 
 final class UpdateInterestsState extends VolunteerSignUpState {}
 
-final class UpdateImageState extends VolunteerSignUpState {}
-
 final class UpdateLocationState extends VolunteerSignUpState {}
+
+final class UpdateNationalIDState extends VolunteerSignUpState {}
+
+final class UpdateVolunteerImageState extends VolunteerSignUpState {}
 
 class UploadLoading extends VolunteerSignUpState {
   final double progress;

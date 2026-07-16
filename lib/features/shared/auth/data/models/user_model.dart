@@ -13,7 +13,7 @@ class UserModel {
   int? unreadNotifications;
 
   UserProfileModel? profile;
-  List<UserAttachmentModel>? attachments;
+  List<UserAttachmentModel> attachments;
 
   UserModel({
     this.id,
@@ -26,7 +26,7 @@ class UserModel {
     this.role,
     this.unreadNotifications,
     this.profile,
-    this.attachments,
+    this.attachments = const [],
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -40,15 +40,14 @@ class UserModel {
       avatar: json['avatar'],
       role: json['role'],
       unreadNotifications: json['unread_notifications'],
-
       profile: json['profile'] != null
           ? UserProfileModel.fromJson(json['profile'])
           : null,
 
       attachments: json['attachments'] != null
-          ? (json['attachments'] as List)
-                .map((e) => UserAttachmentModel.fromJson(e))
-                .toList()
+          ? List<UserAttachmentModel>.from(
+              json['attachments'].map((e) => UserAttachmentModel.fromJson(e)),
+            )
           : [],
     );
   }

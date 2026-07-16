@@ -11,6 +11,12 @@ final class UpdateObscurePassword extends OrganizationSignUpState {}
 
 final class UpdateObscureConfirmedPassword extends OrganizationSignUpState {}
 
+final class UpdateLocationState extends OrganizationSignUpState {}
+
+final class UpdateOrganizationLogoState extends OrganizationSignUpState {}
+
+final class UpdateAttachmentsState extends OrganizationSignUpState {}
+
 final class Loading extends OrganizationSignUpState {}
 
 final class Error extends OrganizationSignUpState {}
