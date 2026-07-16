@@ -122,6 +122,12 @@
       "languageVersion": "2.18"
     },
     {
+      "name": "cookie_jar",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/cookie_jar-4.0.9",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
       "name": "cross_file",
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/cross_file-0.3.5+2",
       "packageUri": "lib/",
@@ -164,6 +170,12 @@
       "languageVersion": "2.18"
     },
     {
+      "name": "dio_cookie_manager",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/dio_cookie_manager-3.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
       "name": "dio_web_adapter",
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/dio_web_adapter-2.1.2",
       "packageUri": "lib/",
@@ -174,6 +186,12 @@
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/dots_indicator-4.0.1",
       "packageUri": "lib/",
       "languageVersion": "2.17"
+    },
+    {
+      "name": "dotted_border",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/dotted_border-3.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
     },
     {
       "name": "dotted_decoration",
@@ -1050,6 +1068,12 @@
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/typed_data-1.4.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
+    },
+    {
+      "name": "universal_io",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/universal_io-2.3.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
     },
     {
       "name": "url_launcher",

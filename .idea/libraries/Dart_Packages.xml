@@ -205,6 +205,13 @@
             </list>
           </value>
         </entry>
+        <entry key="dotted_border">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/dotted_border-3.1.0/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="dotted_decoration">
           <value>
             <list>
@@ -1469,6 +1476,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dio-5.9.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dio_web_adapter-2.1.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dots_indicator-4.0.1/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dotted_border-3.1.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dotted_decoration-2.0.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/dropdown_button2-3.1.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/easy_date_timeline-2.0.9/lib" />

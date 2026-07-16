@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 
 import '../../constant/app_size.dart';
 import '../../style/app_colors.dart';
-import '../../style/app_text_style.dart';
 import 'custom_icon.dart';
 
 class CustomFieldText extends StatelessWidget {

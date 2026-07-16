@@ -8,11 +8,24 @@ import '../widgets/custom_button.dart';
 import 'custom_dialog.dart';
 
 class ConfirmDialog extends StatelessWidget {
-  const ConfirmDialog({super.key, required this.title, this.onYes, this.onNo});
+  const ConfirmDialog({
+    super.key,
+    required this.title,
+    required this.message,
+    this.confirmText,
+    this.cancelText,
+    this.onConfirm,
+    this.onCancel,
+    this.isDestructive = false,
+  });
 
   final String title;
-  final Function()? onYes;
-  final Function()? onNo;
+  final String message;
+  final String? confirmText;
+  final String? cancelText;
+  final VoidCallback? onConfirm;
+  final VoidCallback? onCancel;
+  final bool isDestructive;
 
   @override
   Widget build(BuildContext context) {
@@ -20,38 +33,53 @@ class ConfirmDialog extends StatelessWidget {
       children: [
         Text(
           title,
+          textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: AppSize.font(20),
-            height: AppSize.fontHeight(20, 28),
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
             color: AppColors.grey800,
           ),
         ),
+
+        SizedBox(height: AppSize.getHeight(12)),
+
+        Text(
+          message,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: AppSize.font(14),
+            height: AppSize.fontHeight(14, 22),
+            color: AppColors.grey600,
+          ),
+        ),
+
         SizedBox(height: AppSize.getHeight(24)),
+
         Row(
           children: [
             Expanded(
               child: CustomButton(
-                title: 'core.yes'.tr(),
-                textColor: AppColors.white,
-                bgColor: AppColors.green500,
+                title: cancelText ?? 'core.cancel'.tr(),
+                bgColor: Colors.transparent,
+                borderColor: AppColors.grey300,
+                textColor: AppColors.grey800,
                 height: AppSize.getHeight(40),
                 onTap: () {
                   AppNavigator.pop();
-                  if (onYes != null) onYes!();
+                  onCancel?.call();
                 },
               ),
             ),
             SizedBox(width: AppSize.getWidth(12)),
             Expanded(
               child: CustomButton(
-                title: 'core.no'.tr(),
-                bgColor: AppColors.red500,
+                title: confirmText ?? 'core.yes'.tr(),
+                bgColor: isDestructive ? AppColors.red500 : AppColors.green500,
                 textColor: AppColors.white,
                 height: AppSize.getHeight(40),
                 onTap: () {
                   AppNavigator.pop();
-                  if (onNo != null) onNo!();
+                  onConfirm?.call();
                 },
               ),
             ),

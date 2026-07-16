@@ -1,11 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
+import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../edit_profile/presentations/screens/edit_volunteer_profile_screen.dart';
 
 class VolunteerProfileCard extends StatefulWidget {
   const VolunteerProfileCard({super.key});
@@ -79,7 +81,6 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
           ),
 
           SizedBox(height: AppSize.getHeight(16)),
-
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -90,29 +91,23 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
               mainAxisSpacing: AppSize.getHeight(10),
               childAspectRatio: 2.8,
             ),
-
             itemBuilder: (context, index) {
               final item = items[index];
-
               return Container(
                 decoration: BoxDecoration(
                   color: itemBackground,
                   borderRadius: BorderRadius.circular(20),
                 ),
-
                 padding: AppSize.padding(vertical: 10, horizontal: 15),
-
                 child: Row(
                   children: [
                     Container(
                       width: AppSize.getWidth(30),
                       height: AppSize.getHeight(30),
-
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: AppColors.primary.withValues(alpha: .1),
                       ),
-
                       child: Center(
                         child: CustomIcon(
                           icon: item['icon'] as String,
@@ -121,20 +116,15 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
                         ),
                       ),
                     ),
-
                     SizedBox(width: AppSize.getWidth(10)),
-
                     Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-
                         crossAxisAlignment: CrossAxisAlignment.start,
-
                         children: [
                           Expanded(
                             child: Text(
                               item['title'] as String,
-
                               style: TextStyle(
                                 color: secondaryTextColor,
                                 fontWeight: FontWeight.w300,
@@ -145,7 +135,6 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
 
                           Text(
                             item['value'] as String,
-
                             style: TextStyle(
                               color: textColor,
                               fontSize: AppSize.font(14),
@@ -192,22 +181,17 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
               ...List.generate(
                 3,
                 (index) => Padding(
-                  padding: EdgeInsets.only(right: AppSize.getWidth(5)),
-
+                  padding: AppSize.padding(end: AppSize.getWidth(5)),
                   child: Container(
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(
                         alpha: isDark ? .2 : .1,
                       ),
-
                       borderRadius: BorderRadius.circular(20),
                     ),
-
                     padding: AppSize.padding(vertical: 5, horizontal: 13),
-
                     child: Text(
                       'English',
-
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: AppSize.font(12),
@@ -235,7 +219,6 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
 
               Text(
                 'volunteer.profile.skills_certifications'.tr(),
-
                 style: TextStyle(
                   color: secondaryTextColor,
                   fontSize: AppSize.font(13),
@@ -244,7 +227,6 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
               ),
             ],
           ),
-
           SizedBox(height: AppSize.getHeight(10)),
 
           Row(
@@ -252,22 +234,17 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
               ...List.generate(
                 3,
                 (index) => Padding(
-                  padding: EdgeInsets.only(right: AppSize.getWidth(5)),
-
+                  padding: AppSize.padding(end: AppSize.getWidth(5)),
                   child: Container(
                     decoration: BoxDecoration(
                       color: AppColors.laserBlue.withValues(
                         alpha: isDark ? .2 : .1,
                       ),
-
                       borderRadius: BorderRadius.circular(20),
                     ),
-
                     padding: AppSize.padding(vertical: 5, horizontal: 13),
-
                     child: Text(
                       'English',
-
                       style: TextStyle(
                         color: AppColors.laserBlue,
                         fontSize: AppSize.font(12),
@@ -284,17 +261,12 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
 
           CustomButton(
             onTap: () {
-              // Handle button tap
+              AppNavigator.push(EditVolunteerProfileScreen());
             },
-
             height: AppSize.getHeight(35),
-
             bgColor: AppColors.primary.withValues(alpha: isDark ? .2 : .1),
-
             title: 'volunteer.profile.edit_volunteer_profile'.tr(),
-
             textColor: AppColors.primary,
-
             textSize: AppSize.font(13),
           ),
         ],

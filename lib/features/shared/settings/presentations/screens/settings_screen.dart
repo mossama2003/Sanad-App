@@ -9,10 +9,12 @@ import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/network/local/cache/cache_helper.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
+import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/shared/widgets/custom_button.dart';
 import '../../../../../core/shared/widgets/custom_switch.dart';
 import '../../../../../core/style/app_theme.dart';
 import '../../../../volunteer/edit_profile/presentations/screens/edit_volunteer_profile_screen.dart';
+import '../../../auth/presentation/sign_in/screens/sign_in_screen.dart';
 import '../cards/settings_card.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -175,6 +177,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               SizedBox(height: AppSize.getHeight(20)),
               CustomButton(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => ConfirmDialog(
+                      title: 'shared.settings.sign_out'.tr(),
+                      message: 'shared.settings.sign_out_desc'.tr(),
+                      confirmText: 'shared.settings.sign_out'.tr(),
+                      isDestructive: true,
+                      onConfirm: () async {
+                        await AppCubit.get(context).logOut();
+
+                        if (!context.mounted) return;
+
+                        AppNavigator.remove(const SignInScreen());
+                      },
+                    ),
+                  );
+                },
                 icon: AppIcons.signOut,
                 iconSize: AppSize.getSize(17),
                 title: 'shared.settings.sign_out'.tr(),

@@ -1,11 +1,14 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 import 'package:sanad_app/core/shared/widgets/custom_field_text.dart';
 import 'package:sanad_app/core/shared/widgets/custom_switch.dart';
 
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../cards/edit_profile_group_card.dart';
@@ -21,6 +24,41 @@ class EditVolunteerProfileScreen extends StatefulWidget {
 class _EditVolunteerProfileScreenState
     extends State<EditVolunteerProfileScreen> {
   bool isAvailable = false;
+
+  final List<String> allLanguages = [
+    'English',
+    'Arabic',
+    'French',
+    'German',
+    'Spanish',
+    'Italian',
+    'Chinese',
+    'Japanese',
+    'Turkish',
+  ];
+
+  final List<String> selectedLanguages = ['English', 'Arabic'];
+
+  final List<String> allSkills = [
+    'First Aid',
+    'CPR',
+    'Driver License',
+    'Triage',
+    'Logistics',
+    'Photography',
+    'Social Media',
+    'Teaching',
+    'Translation',
+    'Cooking',
+  ];
+
+  final List<String> selectedSkills = [
+    'First Aid',
+    'CPR',
+    'Driver License',
+    'Triage',
+    'Logistics',
+  ];
 
   Widget field({
     required TextEditingController controller,
@@ -46,6 +84,14 @@ class _EditVolunteerProfileScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
+    final unSelectedLanguages = allLanguages
+        .where((e) => !selectedLanguages.contains(e))
+        .toList();
+
+    final unSelectedSkills = allSkills
+        .where((e) => !selectedSkills.contains(e))
+        .toList();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -296,6 +342,301 @@ class _EditVolunteerProfileScreenState
                     ),
                   ),
                 ],
+              ),
+
+              SizedBox(height: AppSize.getHeight(20)),
+
+              /// Languages
+              SizedBox(
+                width: double.infinity,
+                child: EditProfileGroupCard(
+                  title: 'volunteer.edit_profile.languages'.tr(),
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// Selected
+                        Wrap(
+                          spacing: AppSize.getWidth(10),
+                          runSpacing: AppSize.getHeight(10),
+                          children: selectedLanguages.map((language) {
+                            return InkWell(
+                              borderRadius: BorderRadius.circular(20),
+                              onTap: () {
+                                setState(() {
+                                  selectedLanguages.remove(language);
+                                });
+                              },
+                              child: Container(
+                                padding: AppSize.padding(
+                                  vertical: 5,
+                                  horizontal: 13,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(
+                                    alpha: isDark ? .2 : .1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      language,
+                                      style: TextStyle(
+                                        color: AppColors.primary,
+                                        fontSize: AppSize.font(12),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    SizedBox(width: AppSize.getWidth(5)),
+                                    CustomIcon(
+                                      icon: AppIcons.close,
+                                      width: AppSize.getSize(16),
+                                      height: AppSize.getSize(16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+
+                        if (selectedLanguages.isNotEmpty &&
+                            unSelectedLanguages.isNotEmpty)
+                          SizedBox(height: AppSize.getHeight(20)),
+
+                        /// Not Selected
+                        Wrap(
+                          spacing: AppSize.getWidth(10),
+                          runSpacing: AppSize.getHeight(10),
+                          children: unSelectedLanguages.map((language) {
+                            return InkWell(
+                              borderRadius: BorderRadius.circular(20),
+                              onTap: () {
+                                setState(() {
+                                  selectedLanguages.add(language);
+                                });
+                              },
+                              child: DottedBorder(
+                                options: RoundedRectDottedBorderOptions(
+                                  radius: const Radius.circular(20),
+                                  dashPattern: const [4, 2],
+                                  color: theme.colorScheme.onSurface.withValues(
+                                    alpha: .5,
+                                  ),
+                                  strokeWidth: 1,
+                                  padding: EdgeInsets.zero,
+                                ),
+                                child: Container(
+                                  padding: AppSize.padding(
+                                    vertical: 5,
+                                    horizontal: 13,
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CustomIcon(
+                                        icon: AppIcons.add,
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: .5),
+                                        width: AppSize.getWidth(16),
+                                        height: AppSize.getHeight(16),
+                                      ),
+                                      SizedBox(width: AppSize.getWidth(5)),
+                                      Text(
+                                        language,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: .5),
+                                          fontSize: AppSize.font(12),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: AppSize.getHeight(20)),
+
+              /// Skills & Certificates
+              SizedBox(
+                width: double.infinity,
+                child: EditProfileGroupCard(
+                  title: 'volunteer.edit_profile.skills_certifications'.tr(),
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// Selected
+                        Wrap(
+                          spacing: AppSize.getWidth(10),
+                          runSpacing: AppSize.getHeight(10),
+                          children: selectedSkills.map((skill) {
+                            return InkWell(
+                              borderRadius: BorderRadius.circular(20),
+                              onTap: () {
+                                setState(() {
+                                  selectedSkills.remove(skill);
+                                });
+                              },
+                              child: Container(
+                                padding: AppSize.padding(
+                                  vertical: 5,
+                                  horizontal: 13,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.laserBlue.withValues(
+                                    alpha: isDark ? .2 : .1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      skill,
+                                      style: TextStyle(
+                                        color: AppColors.laserBlue,
+                                        fontSize: AppSize.font(12),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    SizedBox(width: AppSize.getWidth(5)),
+                                    CustomIcon(
+                                      icon: AppIcons.close,
+                                      color: AppColors.laserBlue,
+                                      width: AppSize.getSize(16),
+                                      height: AppSize.getSize(16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+
+                        if (selectedSkills.isNotEmpty &&
+                            unSelectedSkills.isNotEmpty)
+                          SizedBox(height: AppSize.getHeight(20)),
+
+                        /// Not Selected
+                        Wrap(
+                          spacing: AppSize.getWidth(10),
+                          runSpacing: AppSize.getHeight(10),
+                          children: unSelectedSkills.map((skill) {
+                            return InkWell(
+                              borderRadius: BorderRadius.circular(20),
+                              onTap: () {
+                                setState(() {
+                                  selectedSkills.add(skill);
+                                });
+                              },
+                              child: DottedBorder(
+                                options: RoundedRectDottedBorderOptions(
+                                  radius: const Radius.circular(20),
+                                  dashPattern: const [4, 2],
+                                  color: theme.colorScheme.onSurface.withValues(
+                                    alpha: .5,
+                                  ),
+                                  strokeWidth: 1,
+                                  padding: EdgeInsets.zero,
+                                ),
+                                child: Container(
+                                  padding: AppSize.padding(
+                                    vertical: 5,
+                                    horizontal: 13,
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CustomIcon(
+                                        icon: AppIcons.add,
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: .5),
+                                        width: AppSize.getWidth(16),
+                                        height: AppSize.getHeight(16),
+                                      ),
+                                      SizedBox(width: AppSize.getWidth(5)),
+                                      Text(
+                                        skill,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: .5),
+                                          fontSize: AppSize.font(12),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: AppSize.getHeight(20)),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomButton(
+                      onTap: () => AppNavigator.pop(),
+                      title: 'volunteer.edit_profile.cancel'.tr(),
+                      textColor: theme.colorScheme.primary,
+                      borderColor: theme.colorScheme.primary,
+                      bgColor: Colors.transparent,
+                    ),
+                  ),
+                  SizedBox(width: AppSize.getWidth(10)),
+                  Expanded(
+                    child: CustomButton(
+                      title: 'volunteer.edit_profile.save_changes'.tr(),
+                      onTap: () {},
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: AppSize.getHeight(10)),
+
+              CustomButton(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => ConfirmDialog(
+                      title: 'volunteer.edit_profile.delete_account'.tr(),
+                      message: 'volunteer.edit_profile.delete_account_desc'
+                          .tr(),
+                      confirmText: 'core.delete'.tr(),
+                      isDestructive: true,
+                      onConfirm: () {
+                        // TODO: Delete account API
+                      },
+                    ),
+                  );
+                },
+                title: 'volunteer.edit_profile.delete_account'.tr(),
+                icon: AppIcons.delete,
+                iconSize: AppSize.getSize(17),
+                textColor: AppColors.red,
+                textSize: AppSize.font(14),
+                bgColor: Colors.transparent,
+                borderColor: AppColors.red,
               ),
             ],
           ),

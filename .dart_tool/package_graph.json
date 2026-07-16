@@ -9,10 +9,13 @@
       "dependencies": [
         "carousel_slider",
         "connectivity_plus",
+        "cookie_jar",
         "cupertino_icons",
         "dartz",
         "dio",
+        "dio_cookie_manager",
         "dots_indicator",
+        "dotted_border",
         "dotted_decoration",
         "dropdown_button2",
         "easy_date_timeline",
@@ -68,6 +71,29 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "cookie_jar",
+      "version": "4.0.9",
+      "dependencies": [
+        "meta",
+        "universal_io"
+      ]
+    },
+    {
+      "name": "dio_cookie_manager",
+      "version": "3.4.0",
+      "dependencies": [
+        "cookie_jar",
+        "dio"
+      ]
+    },
+    {
+      "name": "dotted_border",
+      "version": "3.1.0",
+      "dependencies": [
+        "flutter"
       ]
     },
     {
@@ -1925,6 +1951,15 @@
         "collection",
         "meta",
         "pub_semver"
+      ]
+    },
+    {
+      "name": "universal_io",
+      "version": "2.3.1",
+      "dependencies": [
+        "collection",
+        "meta",
+        "typed_data"
       ]
     }
   ],
