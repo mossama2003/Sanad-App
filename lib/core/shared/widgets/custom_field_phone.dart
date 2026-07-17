@@ -15,6 +15,8 @@ class CustomFieldPhone extends StatelessWidget {
   const CustomFieldPhone({
     super.key,
     this.title,
+    this.titleSize,
+    this.titleColor,
     this.hintText,
     this.helperText,
     this.initialCountryCode,
@@ -26,22 +28,27 @@ class CustomFieldPhone extends StatelessWidget {
   });
 
   final String? title;
+  final double? titleSize;
+  final Color? titleColor;
+
   final String? hintText;
   final String? helperText;
   final String? initialCountryCode;
   final Country? selectedCountry;
   final PhoneNumber? selectedPhone;
+
   final TextEditingController controller;
+
   final Function(Country)? onCountryChanged;
   final Function(PhoneNumber)? onPhoneChanged;
 
   @override
   Widget build(BuildContext context) {
     final lang = CacheHelper.get(CacheKeys.lang);
+
     final theme = Theme.of(context);
 
-    final textColor =
-        theme.textTheme.bodyMedium?.color ?? AppColors.inputText;
+    final textColor = theme.textTheme.bodyMedium?.color ?? AppColors.inputText;
 
     final hintColor = theme.brightness == Brightness.dark
         ? AppColors.grey400
@@ -57,9 +64,12 @@ class CustomFieldPhone extends StatelessWidget {
           Text(
             title!,
             style: TextStyle(
-              color: AppColors.textSecondary,
-            ).xs,
+              color: titleColor ?? AppColors.textSecondary,
+              fontSize: titleSize ?? AppSize.font(12),
+              fontWeight: FontWeight.w500,
+            ),
           ),
+
           SizedBox(height: AppSize.getHeight(6)),
         ],
 
@@ -67,7 +77,9 @@ class CustomFieldPhone extends StatelessWidget {
           textDirection: TextDirection.ltr,
           child: IntlPhoneField(
             languageCode: lang,
+
             controller: controller,
+
             initialCountryCode: initialCountryCode ?? "EG",
 
             style: TextStyle(
@@ -77,14 +89,17 @@ class CustomFieldPhone extends StatelessWidget {
             ),
 
             showCountryFlag: false,
+
             dropdownIcon: const Icon(Icons.keyboard_arrow_down),
 
             textAlign: TextAlign.start,
+
             textInputAction: TextInputAction.next,
 
             autovalidateMode: AutovalidateMode.onUserInteraction,
 
             onChanged: onPhoneChanged,
+
             onCountryChanged: onCountryChanged,
 
             validator: (phone) => AppValidators.phone(
@@ -100,14 +115,14 @@ class CustomFieldPhone extends StatelessWidget {
 
             decoration: InputDecoration(
               filled: true,
+
               fillColor: theme.cardColor,
 
               hintText: hintText,
+
               helperText: helperText,
 
-              hintStyle: TextStyle(
-                color: hintColor,
-              ).xs,
+              hintStyle: TextStyle(color: hintColor).xs,
 
               errorStyle: TextStyle(
                 color: errorColor,
@@ -131,10 +146,7 @@ class CustomFieldPhone extends StatelessWidget {
 
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.primary,
-                  width: 1.5,
-                ),
+                borderSide: BorderSide(color: AppColors.primary, width: 1.5),
               ),
 
               errorBorder: OutlineInputBorder(
@@ -144,10 +156,7 @@ class CustomFieldPhone extends StatelessWidget {
 
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: errorColor,
-                  width: 1.5,
-                ),
+                borderSide: BorderSide(color: errorColor, width: 1.5),
               ),
 
               prefixIconConstraints: BoxConstraints(
@@ -180,13 +189,18 @@ class CustomFieldPhone extends StatelessWidget {
               ),
 
               listTilePadding: EdgeInsets.zero,
+
               listTileDivider: const SizedBox(),
+
               searchFieldPadding: EdgeInsets.zero,
 
               searchFieldInputDecoration: InputDecoration(
                 hintText: "core.search".tr(),
+
                 filled: true,
+
                 fillColor: theme.cardColor,
+
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -196,9 +210,7 @@ class CustomFieldPhone extends StatelessWidget {
             dialogType: DialogType.showModalBottomSheet,
 
             dropdownDecoration: BoxDecoration(
-              border: BorderDirectional(
-                end: BorderSide(color: borderColor),
-              ),
+              border: BorderDirectional(end: BorderSide(color: borderColor)),
             ),
 
             flagsButtonMargin: const EdgeInsets.only(right: 10),

@@ -41,13 +41,13 @@
     "no_internet": "No Internet Connection"
   },
   "validators": {
-    "required": "*required",
+    "required": "* Required",
     "email": {
-      "required": "*required",
+      "required": "* Required",
       "pattern": "Please enter a valid email address."
     },
     "password": {
-      "required": "*required",
+      "required": "* Required",
       "identical": "Passwords do not match",
       "min_length": "Password must be at least 8 characters long",
       "contain_number": "Password must contain at least one number",
@@ -74,17 +74,23 @@
       "less_than": "The number must be less than {max}."
     },
     "phone": {
-      "required": "*required",
+      "required": "* Required",
       "invalid": "Invalid phone number"
     },
     "OTP": {
-      "required": "*required",
+      "required": "* Required",
       "length": "OTP must be exactly 6 digits long."
     },
     "length": {
       "min": "This field must be at least {length} characters long.",
       "max": "This field must not exceed {length} characters.",
       "exact": "This field must be exactly {length} characters long."
+    },
+    "google_maps": {
+      "invalid": "Please enter a valid Google Maps link"
+    },
+    "url": {
+      "invalid": "Please enter a valid URL"
     }
   },
   "shared": {
@@ -305,12 +311,13 @@
       "created_account": "Account created successfully",
       "you_must_accept_terms": "You Must Accept Terms and Privacy Policy",
       "upload_logo": "Upload Logo",
-      "logo_is_required": "Logo is required"
+      "avatar_required": "Avatar is required"
     },
     "home": {
       "navbar": {
         "home": "Home",
         "events": "Events",
+        "dashboard": "Dashboard",
         "donations": "Donations",
         "cases": "Cases"
       },
@@ -349,13 +356,58 @@
       "title": "Your Events",
       "desc": "Manage and track your events",
       "create_event_button": "Create New Event",
-      "volunteers": "Volunteers",
+      "volunteers": "Volunteers joined",
+      "search": "Search events, locations...",
+      "qr_code": "QR code",
+      "chat": "Chat",
+      "edit": "Edit",
+      "delete": "Delete",
       "filter": {
         "all": "All",
         "upcoming": "Upcoming",
         "in_progress": "In Progress",
-        "completed": "Completed"
+        "completed": "Completed",
+        "drafted": "Drafted",
+        "environment": "Environment"
       }
+    },
+    "create_event": {
+      "appbar": "Create Event",
+      "upload_event_cover": "Upload Event Cover Image",
+      "event_name": "Event Name",
+      "event_name_hint": "e.g. Beach Cleanup Drive",
+      "event_category": "Event Category",
+      "select_category": "Select Category",
+      "event_description": "Event Description",
+      "event_description_hint": "Describe your event...",
+      "date": "Date",
+      "start_time": "Start Time",
+      "end_time": "End Time",
+      "please_select_start_time": "Please select start time first",
+      "please_select_end_time": "End time must be after start time",
+      "location": "Location",
+      "location_link": "Location Link",
+      "location_link_hint": "e.g. https://maps.google.com/…",
+      "location_address": "Location Address",
+      "location_address_hint": "e.g. Corniche Rd, next to the marina",
+      "governorate": "Governorate",
+      "governorate_hint": "Select",
+      "city": "City",
+      "city_hint": "e.g. Nasr City",
+      "required_volunteers": "Required Number of Volunteers",
+      "required_volunteers_hint": "Write Number of Volunteers You Need",
+      "required_skills": "Required Skills",
+      "required_skills_hint": "Selected Required Skills",
+      "save_draft": "Save Draft",
+      "publish_event": "Publish Event",
+      "pleasee_select_event_cover": "Please select event cover image",
+      "event_created_successfully": "Event created successfully",
+      "cover_required": "Event Cover Image is Required",
+      "number_must_be_positive": "The number must be 1 or greater"
+    },
+    "events_remove": {
+      "beach_cleanup": "Beach Cleanup",
+      "beach_cleanup_desc": "Join our community effort to clean Alexandria's coastline and protect marine life."
     }
   },
   "volunteer": {

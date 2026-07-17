@@ -25,6 +25,11 @@
         android:label="Sanad"
         android:requestLegacyExternalStorage="true">
 
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
         <!-- File Provider (needed for camera images) -->
         <provider
             android:name="androidx.core.content.FileProvider"

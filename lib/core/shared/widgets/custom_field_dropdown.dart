@@ -11,6 +11,8 @@ class CustomFieldDropdown<T> extends StatelessWidget {
   const CustomFieldDropdown({
     super.key,
     this.title,
+    this.titleSize,
+    this.titleColor,
     this.hintText,
     this.validator,
     this.enabled = true,
@@ -26,6 +28,9 @@ class CustomFieldDropdown<T> extends StatelessWidget {
   final bool isRequired;
 
   final String? title;
+  final double? titleSize;
+  final Color? titleColor;
+
   final String? hintText;
 
   final ValueChanged<T?> onChanged;
@@ -36,34 +41,38 @@ class CustomFieldDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = Theme.of(context).textTheme.bodyMedium?.color;
+    final theme = Theme.of(context);
 
-    final hintColor = Theme.of(
-      context,
-    ).textTheme.bodySmall?.color?.withValues(alpha: .6);
+    final textColor = theme.textTheme.bodyMedium?.color;
+
+    final hintColor = theme.textTheme.bodySmall?.color?.withValues(
+      alpha: .6,
+    );
+
+    final borderColor = theme.dividerColor;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-
       children: [
         if (title != null) ...[
           RichText(
             text: TextSpan(
               text: title!,
-
-              style: TextStyle(color: textColor).xs,
-
+              style: TextStyle(
+                color: titleColor ?? textColor,
+                fontSize: titleSize ?? AppSize.font(12),
+                fontWeight: FontWeight.w500,
+              ),
               children: isRequired
                   ? [
-                      TextSpan(
-                        text: ' *',
-                        style: TextStyle(
-                          color: AppColors.red,
-
-                          fontSize: AppSize.font(12),
-                        ),
-                      ),
-                    ]
+                TextSpan(
+                  text: ' *',
+                  style: TextStyle(
+                    color: AppColors.red,
+                    fontSize: titleSize ?? AppSize.font(12),
+                  ),
+                ),
+              ]
                   : [],
             ),
           ),
@@ -82,50 +91,43 @@ class CustomFieldDropdown<T> extends StatelessWidget {
 
           style: TextStyle(
             color: textColor,
-
             fontSize: AppSize.font(14),
-
             fontWeight: FontWeight.w600,
           ),
 
           hint: hintText != null && selected.value == null
-              ? Text(hintText!, style: TextStyle(color: hintColor).xs)
+              ? Text(
+            hintText!,
+            style: TextStyle(color: hintColor).xs,
+          )
               : null,
 
           onChanged: enabled
               ? (value) {
-                  selected.value = value;
-
-                  onChanged(value);
-                }
+            selected.value = value;
+            onChanged(value);
+          }
               : null,
 
           iconStyleData: IconStyleData(
             icon: CustomIcon(
               icon: AppIcons.downArrow,
-
               width: AppSize.getSize(12),
-
               height: AppSize.getSize(12),
-
-              color: Theme.of(context).iconTheme.color,
+              color: theme.iconTheme.color,
             ),
 
             openMenuIcon: CustomIcon(
               icon: AppIcons.upArrow,
-
               width: AppSize.getSize(12),
-
               height: AppSize.getSize(12),
-
-              color: Theme.of(context).iconTheme.color,
+              color: theme.iconTheme.color,
             ),
           ),
 
           dropdownStyleData: DropdownStyleData(
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(12),
             ),
           ),
@@ -133,42 +135,53 @@ class CustomFieldDropdown<T> extends StatelessWidget {
           decoration: InputDecoration(
             filled: true,
 
-            fillColor: Theme.of(context).cardColor,
+            fillColor: theme.cardColor,
 
             enabled: enabled,
 
-            hintStyle: TextStyle(color: hintColor).xs,
+            hintStyle: TextStyle(
+              color: hintColor,
+            ).xs,
 
-            errorStyle: TextStyle(fontSize: AppSize.font(14)),
+            errorStyle: TextStyle(
+              fontSize: AppSize.font(14),
+            ),
 
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-
-              borderSide: BorderSide(color: Theme.of(context).dividerColor),
+              borderSide: BorderSide(
+                color: borderColor,
+              ),
             ),
 
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-
-              borderSide: BorderSide(color: Theme.of(context).dividerColor),
+              borderSide: BorderSide(
+                color: borderColor,
+              ),
             ),
 
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-
-              borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+              borderSide: BorderSide(
+                color: AppColors.primary,
+                width: 1.5,
+              ),
             ),
 
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-
-              borderSide: const BorderSide(color: Colors.red),
+              borderSide: const BorderSide(
+                color: Colors.red,
+              ),
             ),
 
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-
-              borderSide: const BorderSide(color: Colors.red, width: 1.5),
+              borderSide: const BorderSide(
+                color: Colors.red,
+                width: 1.5,
+              ),
             ),
           ),
         ),

@@ -150,13 +150,13 @@ class _SignInFormState extends State<SignInForm> {
                     children: [
                       CustomFieldText(
                         controller: _cubit.emailController,
-
+                        titleSize: AppSize.font(15),
+                        titleColor:
+                            theme.textTheme.bodyMedium?.color ??
+                            AppColors.textPrimary,
                         validator: AppValidators.required,
-
                         hintText: 'shared.sign_in.enter_email_or_username'.tr(),
-
                         title: 'shared.sign_in.email_or_username'.tr(),
-
                         iconStart: AppIcons.email,
                       ),
 
@@ -164,44 +164,35 @@ class _SignInFormState extends State<SignInForm> {
 
                       CustomFieldText(
                         controller: _cubit.passwordController,
-
+                        titleSize: AppSize.font(15),
+                        titleColor:
+                            theme.textTheme.bodyMedium?.color ??
+                            AppColors.textPrimary,
                         hintText: 'shared.sign_in.enter_password'.tr(),
-
                         title: 'shared.sign_in.password'.tr(),
-
                         iconStart: AppIcons.lock,
-
                         validator: (value) => AppValidators.passwordIdentical(
                           value,
                           _cubit.passwordController.text,
                         ),
-
                         obscureText: _cubit.obscurePassword,
-
                         iconEnd: _cubit.obscurePassword
                             ? AppIcons.eyeShow
                             : AppIcons.eyeOff,
-
                         iconEndTap: () {
                           _cubit.updateObscurePassword();
                         },
                       ),
 
                       SizedBox(height: AppSize.getHeight(15)),
-
                       Text(
                         'shared.sign_in.forget_password'.tr(),
-
                         style: TextStyle(color: AppColors.primary).xs,
                       ),
-
                       SizedBox(height: AppSize.getHeight(25)),
-
                       _socialIcon(
                         svg: AppSvg.google,
-
                         text: 'shared.sign_in.sign_with_google',
-
                         onTap: () {},
                       ),
 
@@ -215,31 +206,21 @@ class _SignInFormState extends State<SignInForm> {
                       //   onTap: () {},
                       // ),
                       SizedBox(height: AppSize.getHeight(25)),
-
                       CustomButton(
                         loading: state is Loading,
-
                         onTap: () => _cubit.signIn(),
-
                         title: 'shared.sign_in.sign_in_button'.tr(),
                       ),
-
                       SizedBox(height: AppSize.getHeight(8)),
-
                       RichText(
                         textAlign: TextAlign.center,
-
                         text: TextSpan(
                           text: "shared.sign_in.dont_have_account".tr(),
-
                           style: TextStyle(color: textColor).xs,
-
                           children: [
                             TextSpan(
                               text: "shared.sign_in.sign_up_as_volunteer".tr(),
-
                               style: TextStyle(color: AppColors.primary).xs,
-
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
                                   AppNavigator.push(VolunteerSignUpScreen());
@@ -248,16 +229,13 @@ class _SignInFormState extends State<SignInForm> {
 
                             TextSpan(
                               text: "shared.sign_in.or".tr(),
-
                               style: TextStyle(color: textColor).xs,
                             ),
 
                             TextSpan(
                               text: "shared.sign_in.sign_up_as_organization"
                                   .tr(),
-
                               style: TextStyle(color: AppColors.primary).xs,
-
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
                                   AppNavigator.push(OrganizationSignUpScreen());

@@ -50,6 +50,7 @@ class AppIcons {
   static String add = '$icons/add.svg';
   static String home = '$icons/home.svg';
   static String events = '$icons/events.svg';
+  static String dashboard = '$icons/dashboard.svg';
   static String community = '$icons/community.svg';
   static String donations = '$icons/donations.svg';
   static String cases = '$icons/cases.svg';
@@ -104,4 +105,6 @@ class AppIcons {
   static String lightMood = '$icons/shine.svg';
   static String earth = '$icons/earth.svg';
   static String contactSupport = '$icons/contact_support.svg';
+  static String edit = '$icons/edit.svg';
+  static String time = '$icons/time.svg';
 }

@@ -79,29 +79,10 @@ class AppCubit extends Cubit<AppStates> {
   // ================= REFRESH TOKEN =================
   Future<bool> refreshToken() async {
     try {
-      final refresh = CacheHelper.get(CacheKeys.refreshToken);
-
-      if (refresh == null) {
-        return false;
-      }
-
-      final response = await DioHelper.post(
-        url: REFRESH_TOKEN,
-        // data: {"refresh": refresh},
-      );
+      final response = await DioHelper.post(url: REFRESH_TOKEN);
 
       if (response.statusCode == 200) {
-        final newAccess = response.data["access"];
-
-        await CacheHelper.save(CacheKeys.accessToken, newAccess);
-
-        // لو الباك بيرجع refresh جديد
-        if (response.data["refresh"] != null) {
-          await CacheHelper.save(
-            CacheKeys.refreshToken,
-            response.data["refresh"],
-          );
-        }
+        await CacheHelper.save(CacheKeys.accessToken, response.data["access"]);
 
         return true;
       }
@@ -116,23 +97,39 @@ class AppCubit extends Cubit<AppStates> {
   Future<void> logOut() async {
     try {
       final token = CacheHelper.get(CacheKeys.accessToken);
-
-      if (token != null) {
-        await DioHelper.post(
-          url: LOG_OUT,
-          headers: {"Authorization": "Bearer $token"},
-        );
-      }
+      await DioHelper.post(
+        url: LOG_OUT,
+        headers: {"Authorization": "Bearer $token"},
+      );
     } catch (e) {
       debugPrint("LOG OUT ERROR => $e");
     }
-
     await CacheHelper.remove(CacheKeys.accessToken);
-
     await CacheHelper.remove(CacheKeys.refreshToken);
-
+    await DioHelper.cookieJar.deleteAll();
     user = null;
-
     emit(UserLoggedOut());
+  }
+
+  // ================= DELETE ACCOUNT =================
+  Future<bool> deleteAccount() async {
+    try {
+      final token = CacheHelper.get(CacheKeys.accessToken);
+      final response = await DioHelper.delete(
+        url: DELETE_ACCOUNT,
+        headers: {"Authorization": "Bearer $token"},
+      );
+      if (response.statusCode == 204) {
+        await CacheHelper.remove(CacheKeys.accessToken);
+        await CacheHelper.remove(CacheKeys.refreshToken);
+        await DioHelper.cookieJar.deleteAll();
+        user = null;
+        emit(AccountDeleted());
+        return true;
+      }
+    } catch (e) {
+      debugPrint("DELETE ACCOUNT ERROR => $e");
+    }
+    return false;
   }
 }

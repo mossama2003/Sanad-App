@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../coming_soon_screen.dart';
 import '../../../../shared/donations/presentation/screens/donations_screen.dart';
 import '../../../../shared/cases/presentation/screens/cases_screen.dart';
 import '../../../events/presentation/screens/organization_events_screen.dart';
@@ -28,7 +29,7 @@ class OrganizationHomeCubit extends Cubit<OrganizationHomeState> {
   final Map<OrganizationHomeNavbarItem, Widget> _screens = {
     OrganizationHomeNavbarItem.home: const OrganizationHomeScreen(),
     OrganizationHomeNavbarItem.events: const OrganizationEventsScreen(),
-    // OrganizationHomeNavbarItem.community: const ComingSoonScreen(),
+    OrganizationHomeNavbarItem.dashboard: const ComingSoonScreen(),
     OrganizationHomeNavbarItem.donations: const DonationsScreen(),
     OrganizationHomeNavbarItem.cases: const CasesScreen(),
   };

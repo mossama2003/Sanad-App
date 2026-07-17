@@ -10,6 +10,8 @@ class ErrorState extends AppStates {}
 
 class UserLoggedOut extends AppStates {}
 
+class AccountDeleted extends AppStates {}
+
 class UserLoaded extends AppStates {
   final UserModel user;
 

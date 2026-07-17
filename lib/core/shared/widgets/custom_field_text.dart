@@ -128,31 +128,18 @@ class CustomFieldText extends StatelessWidget {
 
         TextFormField(
           controller: controller,
-
           enabled: enabled,
-
           readOnly: readOnly,
-
           onTap: onTap,
-
           onChanged: onChanged,
-
           onFieldSubmitted: onSubmit,
-
           autofocus: autofocus,
-
           obscureText: obscureText,
-
           keyboardType: keyboardType,
-
           minLines: minLines ?? 1,
-
           maxLines: maxLines ?? minLines ?? 1,
-
           validator: validator,
-
           inputFormatters: inputFormatters,
-
           autovalidateMode: AutovalidateMode.onUserInteraction,
 
           style: TextStyle(

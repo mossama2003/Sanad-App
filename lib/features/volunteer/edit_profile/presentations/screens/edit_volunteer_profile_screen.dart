@@ -8,9 +8,11 @@ import 'package:sanad_app/core/shared/widgets/custom_switch.dart';
 
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../../shared/auth/presentation/sign_in/screens/sign_in_screen.dart';
 import '../cards/edit_profile_group_card.dart';
 
 class EditVolunteerProfileScreen extends StatefulWidget {
@@ -347,246 +349,240 @@ class _EditVolunteerProfileScreenState
               SizedBox(height: AppSize.getHeight(20)),
 
               /// Languages
-              SizedBox(
-                width: double.infinity,
-                child: EditProfileGroupCard(
-                  title: 'volunteer.edit_profile.languages'.tr(),
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        /// Selected
-                        Wrap(
-                          spacing: AppSize.getWidth(10),
-                          runSpacing: AppSize.getHeight(10),
-                          children: selectedLanguages.map((language) {
-                            return InkWell(
-                              borderRadius: BorderRadius.circular(20),
-                              onTap: () {
-                                setState(() {
-                                  selectedLanguages.remove(language);
-                                });
-                              },
+              EditProfileGroupCard(
+                title: 'volunteer.edit_profile.languages'.tr(),
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// Selected
+                      Wrap(
+                        spacing: AppSize.getWidth(10),
+                        runSpacing: AppSize.getHeight(10),
+                        children: selectedLanguages.map((language) {
+                          return InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {
+                              setState(() {
+                                selectedLanguages.remove(language);
+                              });
+                            },
+                            child: Container(
+                              padding: AppSize.padding(
+                                vertical: 5,
+                                horizontal: 13,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withValues(
+                                  alpha: isDark ? .2 : .1,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    language,
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontSize: AppSize.font(12),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(width: AppSize.getWidth(5)),
+                                  CustomIcon(
+                                    icon: AppIcons.close,
+                                    width: AppSize.getSize(16),
+                                    height: AppSize.getSize(16),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+
+                      if (selectedLanguages.isNotEmpty &&
+                          unSelectedLanguages.isNotEmpty)
+                        SizedBox(height: AppSize.getHeight(20)),
+
+                      /// Not Selected
+                      Wrap(
+                        spacing: AppSize.getWidth(10),
+                        runSpacing: AppSize.getHeight(10),
+                        children: unSelectedLanguages.map((language) {
+                          return InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {
+                              setState(() {
+                                selectedLanguages.add(language);
+                              });
+                            },
+                            child: DottedBorder(
+                              options: RoundedRectDottedBorderOptions(
+                                radius: const Radius.circular(20),
+                                dashPattern: const [4, 2],
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: .5,
+                                ),
+                                strokeWidth: 1,
+                                padding: EdgeInsets.zero,
+                              ),
                               child: Container(
                                 padding: AppSize.padding(
                                   vertical: 5,
                                   horizontal: 13,
                                 ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(
-                                    alpha: isDark ? .2 : .1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
+                                    CustomIcon(
+                                      icon: AppIcons.add,
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: .5),
+                                      width: AppSize.getWidth(16),
+                                      height: AppSize.getHeight(16),
+                                    ),
+                                    SizedBox(width: AppSize.getWidth(5)),
                                     Text(
                                       language,
                                       style: TextStyle(
-                                        color: AppColors.primary,
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: .5),
                                         fontSize: AppSize.font(12),
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    SizedBox(width: AppSize.getWidth(5)),
-                                    CustomIcon(
-                                      icon: AppIcons.close,
-                                      width: AppSize.getSize(16),
-                                      height: AppSize.getSize(16),
-                                    ),
                                   ],
                                 ),
                               ),
-                            );
-                          }).toList(),
-                        ),
-
-                        if (selectedLanguages.isNotEmpty &&
-                            unSelectedLanguages.isNotEmpty)
-                          SizedBox(height: AppSize.getHeight(20)),
-
-                        /// Not Selected
-                        Wrap(
-                          spacing: AppSize.getWidth(10),
-                          runSpacing: AppSize.getHeight(10),
-                          children: unSelectedLanguages.map((language) {
-                            return InkWell(
-                              borderRadius: BorderRadius.circular(20),
-                              onTap: () {
-                                setState(() {
-                                  selectedLanguages.add(language);
-                                });
-                              },
-                              child: DottedBorder(
-                                options: RoundedRectDottedBorderOptions(
-                                  radius: const Radius.circular(20),
-                                  dashPattern: const [4, 2],
-                                  color: theme.colorScheme.onSurface.withValues(
-                                    alpha: .5,
-                                  ),
-                                  strokeWidth: 1,
-                                  padding: EdgeInsets.zero,
-                                ),
-                                child: Container(
-                                  padding: AppSize.padding(
-                                    vertical: 5,
-                                    horizontal: 13,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      CustomIcon(
-                                        icon: AppIcons.add,
-                                        color: theme.colorScheme.onSurface
-                                            .withValues(alpha: .5),
-                                        width: AppSize.getWidth(16),
-                                        height: AppSize.getHeight(16),
-                                      ),
-                                      SizedBox(width: AppSize.getWidth(5)),
-                                      Text(
-                                        language,
-                                        style: TextStyle(
-                                          color: theme.colorScheme.onSurface
-                                              .withValues(alpha: .5),
-                                          fontSize: AppSize.font(12),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ],
               ),
 
               SizedBox(height: AppSize.getHeight(20)),
 
               /// Skills & Certificates
-              SizedBox(
-                width: double.infinity,
-                child: EditProfileGroupCard(
-                  title: 'volunteer.edit_profile.skills_certifications'.tr(),
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        /// Selected
-                        Wrap(
-                          spacing: AppSize.getWidth(10),
-                          runSpacing: AppSize.getHeight(10),
-                          children: selectedSkills.map((skill) {
-                            return InkWell(
-                              borderRadius: BorderRadius.circular(20),
-                              onTap: () {
-                                setState(() {
-                                  selectedSkills.remove(skill);
-                                });
-                              },
+              EditProfileGroupCard(
+                title: 'volunteer.edit_profile.skills_certifications'.tr(),
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// Selected
+                      Wrap(
+                        spacing: AppSize.getWidth(10),
+                        runSpacing: AppSize.getHeight(10),
+                        children: selectedSkills.map((skill) {
+                          return InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {
+                              setState(() {
+                                selectedSkills.remove(skill);
+                              });
+                            },
+                            child: Container(
+                              padding: AppSize.padding(
+                                vertical: 5,
+                                horizontal: 13,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.laserBlue.withValues(
+                                  alpha: isDark ? .2 : .1,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    skill,
+                                    style: TextStyle(
+                                      color: AppColors.laserBlue,
+                                      fontSize: AppSize.font(12),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(width: AppSize.getWidth(5)),
+                                  CustomIcon(
+                                    icon: AppIcons.close,
+                                    color: AppColors.laserBlue,
+                                    width: AppSize.getSize(16),
+                                    height: AppSize.getSize(16),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+
+                      if (selectedSkills.isNotEmpty &&
+                          unSelectedSkills.isNotEmpty)
+                        SizedBox(height: AppSize.getHeight(20)),
+
+                      /// Not Selected
+                      Wrap(
+                        spacing: AppSize.getWidth(10),
+                        runSpacing: AppSize.getHeight(10),
+                        children: unSelectedSkills.map((skill) {
+                          return InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {
+                              setState(() {
+                                selectedSkills.add(skill);
+                              });
+                            },
+                            child: DottedBorder(
+                              options: RoundedRectDottedBorderOptions(
+                                radius: const Radius.circular(20),
+                                dashPattern: const [4, 2],
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: .5,
+                                ),
+                                strokeWidth: 1,
+                                padding: EdgeInsets.zero,
+                              ),
                               child: Container(
                                 padding: AppSize.padding(
                                   vertical: 5,
                                   horizontal: 13,
                                 ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.laserBlue.withValues(
-                                    alpha: isDark ? .2 : .1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
+                                    CustomIcon(
+                                      icon: AppIcons.add,
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: .5),
+                                      width: AppSize.getWidth(16),
+                                      height: AppSize.getHeight(16),
+                                    ),
+                                    SizedBox(width: AppSize.getWidth(5)),
                                     Text(
                                       skill,
                                       style: TextStyle(
-                                        color: AppColors.laserBlue,
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: .5),
                                         fontSize: AppSize.font(12),
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    SizedBox(width: AppSize.getWidth(5)),
-                                    CustomIcon(
-                                      icon: AppIcons.close,
-                                      color: AppColors.laserBlue,
-                                      width: AppSize.getSize(16),
-                                      height: AppSize.getSize(16),
-                                    ),
                                   ],
                                 ),
                               ),
-                            );
-                          }).toList(),
-                        ),
-
-                        if (selectedSkills.isNotEmpty &&
-                            unSelectedSkills.isNotEmpty)
-                          SizedBox(height: AppSize.getHeight(20)),
-
-                        /// Not Selected
-                        Wrap(
-                          spacing: AppSize.getWidth(10),
-                          runSpacing: AppSize.getHeight(10),
-                          children: unSelectedSkills.map((skill) {
-                            return InkWell(
-                              borderRadius: BorderRadius.circular(20),
-                              onTap: () {
-                                setState(() {
-                                  selectedSkills.add(skill);
-                                });
-                              },
-                              child: DottedBorder(
-                                options: RoundedRectDottedBorderOptions(
-                                  radius: const Radius.circular(20),
-                                  dashPattern: const [4, 2],
-                                  color: theme.colorScheme.onSurface.withValues(
-                                    alpha: .5,
-                                  ),
-                                  strokeWidth: 1,
-                                  padding: EdgeInsets.zero,
-                                ),
-                                child: Container(
-                                  padding: AppSize.padding(
-                                    vertical: 5,
-                                    horizontal: 13,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      CustomIcon(
-                                        icon: AppIcons.add,
-                                        color: theme.colorScheme.onSurface
-                                            .withValues(alpha: .5),
-                                        width: AppSize.getWidth(16),
-                                        height: AppSize.getHeight(16),
-                                      ),
-                                      SizedBox(width: AppSize.getWidth(5)),
-                                      Text(
-                                        skill,
-                                        style: TextStyle(
-                                          color: theme.colorScheme.onSurface
-                                              .withValues(alpha: .5),
-                                          fontSize: AppSize.font(12),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ],
               ),
 
               SizedBox(height: AppSize.getHeight(20)),
@@ -624,8 +620,12 @@ class _EditVolunteerProfileScreenState
                           .tr(),
                       confirmText: 'core.delete'.tr(),
                       isDestructive: true,
-                      onConfirm: () {
-                        // TODO: Delete account API
+                      onConfirm: () async {
+                        await AppCubit.get(context).deleteAccount();
+
+                        if (!context.mounted) return;
+
+                        AppNavigator.remove(const SignInScreen());
                       },
                     ),
                   );

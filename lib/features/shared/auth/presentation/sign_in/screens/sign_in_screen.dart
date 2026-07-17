@@ -3,9 +3,6 @@ import 'package:sanad_app/core/constant/app_size.dart';
 import 'package:sanad_app/core/style/app_colors.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../../core/network/local/cache/cache_helper.dart';
-import '../../../../../../core/style/app_text_style.dart';
-import '../../../../../../core/style/app_theme.dart';
 import '../forms/sign_in_form.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -46,26 +43,8 @@ class _SignInScreenState extends State<SignInScreen> {
     });
   }
 
-  Future<void> _toggleTheme() async {
-    final currentTheme = CacheHelper.get(CacheKeys.theme) ?? CacheKeys.light;
-
-    final isDark = currentTheme == CacheKeys.dark;
-
-    final newTheme = isDark ? CacheKeys.light : CacheKeys.dark;
-
-    await CacheHelper.save(CacheKeys.theme, newTheme);
-
-    AppTheme.setTheme(
-      newTheme == CacheKeys.dark ? AppThemeEnum.dark : AppThemeEnum.light,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final textColor = Theme.of(context).textTheme.bodyMedium?.color;
-
     final secondaryText = Theme.of(context).textTheme.bodySmall?.color;
 
     return Scaffold(
@@ -84,64 +63,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
                     child: Column(
                       children: [
-                        Align(
-                          alignment: AlignmentDirectional.topEnd,
-
-                          child: Padding(
-                            padding: AppSize.padding(
-                              horizontal: 10,
-                              vertical: 8,
-                            ),
-
-                            child: InkWell(
-                              onTap: _toggleTheme,
-
-                              borderRadius: BorderRadius.circular(30),
-
-                              child: Container(
-                                padding: AppSize.padding(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-
-                                  borderRadius: BorderRadius.circular(30),
-
-                                  border: Border.all(
-                                    color: Theme.of(context).dividerColor,
-                                  ),
-                                ),
-
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-
-                                  children: [
-                                    Icon(
-                                      isDark
-                                          ? Icons.light_mode_rounded
-                                          : Icons.dark_mode_rounded,
-
-                                      size: 18,
-
-                                      color: textColor,
-                                    ),
-
-                                    SizedBox(width: AppSize.getWidth(6)),
-
-                                    Text(
-                                      isDark ? 'Light' : 'Dark',
-
-                                      style: TextStyle(color: textColor).xs,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-
                         Container(
                           width: double.infinity,
 
@@ -250,10 +171,8 @@ class _SignInScreenState extends State<SignInScreen> {
 
                                               Text(
                                                 'shared.sign_in.desc'.tr(),
-
                                                 style: TextStyle(
                                                   color: secondaryText,
-
                                                   fontSize: AppSize.font(15),
                                                 ),
                                               ),

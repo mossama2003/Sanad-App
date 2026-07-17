@@ -6,7 +6,9 @@ import 'package:sanad_app/features/volunteer/home/presentation/screens/volunteer
 
 import '../../../../../../core/helper/app_navigator.dart';
 import '../../../../../../core/helper/app_toast.dart';
+import '../../../../../../core/network/end_points.dart';
 import '../../../../../../core/network/local/cache/cache_helper.dart';
+import '../../../../../../core/network/remote/api/dio_helper.dart';
 import '../../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../organization/home/presentation/screens/organization_home_body.dart';
 import '../../../data/params/sign_in_param.dart';
@@ -57,7 +59,14 @@ class SignInCubit extends Cubit<SignInState> {
         // Save Tokens
         await CacheHelper.save(CacheKeys.accessToken, auth.access);
 
-        await CacheHelper.save(CacheKeys.refreshToken, auth.refresh);
+        await CacheHelper.save(CacheKeys.accessToken, auth.access);
+
+        // Debug cookies
+        final cookies = await DioHelper.cookieJar.loadForRequest(
+          Uri.parse(BASE_URL),
+        );
+
+        debugPrint("LOGIN COOKIES => $cookies");
 
         debugPrint("ACCESS TOKEN => ${auth.access}");
         debugPrint("REFRESH TOKEN => ${auth.refresh}");

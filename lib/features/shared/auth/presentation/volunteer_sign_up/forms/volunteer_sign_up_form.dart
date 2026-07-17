@@ -15,7 +15,6 @@ import '../../../../../../core/shared/widgets/custom_selectable_chips.dart';
 import '../../../../../../core/shared/widgets/custom_upload_file.dart';
 import '../../../../../../core/shared/widgets/custom_field_text.dart';
 import '../../../../../../core/validator/app_validators.dart';
-import '../../../../../../core/style/app_text_style.dart';
 import '../../../../../../core/constant/app_size.dart';
 import '../../../../../../core/style/app_colors.dart';
 import '../../../data/models/city_model.dart';
@@ -109,6 +108,8 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return BlocBuilder<VolunteerSignUpCubit, VolunteerSignUpState>(
       bloc: _cubit,
 
@@ -150,8 +151,7 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                                       ? () => _cubit.pickAvatar()
                                       : null,
                                   child: Container(
-                                    width: AppSize.getSize(80),
-                                    height: AppSize.getSize(80),
+                                    padding: AppSize.padding(all: 10),
                                     clipBehavior: Clip.antiAlias,
                                     decoration: BoxDecoration(
                                       color: AppColors.grey100,
@@ -163,6 +163,8 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                                     ),
                                     child: _cubit.avatar != null
                                         ? Image.file(
+                                            height: AppSize.getSize(65),
+                                            width: AppSize.getSize(75),
                                             _cubit.avatar!,
                                             fit: BoxFit.cover,
                                           )
@@ -249,12 +251,9 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                               children: [
                                 Text(
                                   'volunteer.sign_up.title'.tr(),
-
                                   style: TextStyle(
                                     color: AppColors.primary,
-
                                     fontSize: AppSize.font(20),
-
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -263,16 +262,13 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
                                 Text(
                                   'volunteer.sign_up.desc'.tr(),
-
                                   style: TextStyle(
                                     color: Theme.of(context)
                                         .textTheme
                                         .bodyMedium
                                         ?.color
                                         ?.withValues(alpha: .5),
-
                                     fontSize: AppSize.font(15),
-
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
@@ -288,11 +284,12 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
                   CustomFieldText(
                     controller: _cubit.nameController,
-
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     title: 'volunteer.sign_up.full_name'.tr(),
-
                     hintText: 'volunteer.sign_up.enter_full_name'.tr(),
-
                     validator: AppValidators.required,
                   ),
 
@@ -300,11 +297,12 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
                   CustomFieldText(
                     controller: _cubit.emailController,
-
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     title: 'volunteer.sign_up.email'.tr(),
-
                     hintText: 'volunteer.sign_up.enter_email'.tr(),
-
                     validator: AppValidators.email,
                   ),
 
@@ -312,6 +310,10 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
                   CustomFieldPhone(
                     controller: _cubit.phoneController,
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     title: 'volunteer.sign_up.phone_number'.tr(),
                     hintText: 'volunteer.sign_up.phone_number'.tr(),
                     initialCountryCode: "EG",
@@ -321,17 +323,16 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
                   CustomFieldDropdown<GovernorateModel>(
                     title: 'volunteer.sign_up.governorate'.tr(),
-
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     hintText: 'volunteer.sign_up.select_your_governorate'.tr(),
-
                     validator: AppValidators.dropdownRequired<GovernorateModel>,
-
                     selected: _cubit.selectedGov,
-
                     items: _cubit.governorates.map((gov) {
                       return DropdownItem(value: gov, child: Text(gov.nameEn));
                     }).toList(),
-
                     onChanged: (gov) {
                       if (gov != null) {
                         _cubit.selectGovernorate(gov);
@@ -343,21 +344,19 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
                   CustomFieldDropdown<CityModel>(
                     title: 'volunteer.sign_up.city'.tr(),
-
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     hintText: 'volunteer.sign_up.select_your_city'.tr(),
-
                     validator: AppValidators.dropdownRequired<CityModel>,
-
                     selected: _cubit.selectedCity,
-
                     items: _cubit.filteredCities.map((city) {
                       return DropdownItem(
                         value: city,
-
                         child: Text(city.nameEn),
                       );
                     }).toList(),
-
                     onChanged: (city) {
                       if (city != null) {
                         _cubit.selectCity(city);
@@ -369,11 +368,12 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
                   CustomFieldText(
                     controller: _cubit.locationController,
-
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     title: 'volunteer.sign_up.address'.tr(),
-
                     hintText: 'volunteer.sign_up.write_your_address'.tr(),
-
                     validator: AppValidators.required,
                   ),
 
@@ -381,10 +381,12 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
                   Text(
                     'volunteer.sign_up.gender'.tr(),
-
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
-                    ).xs,
+                      fontSize: AppSize.font(15),
+                      color:
+                          theme.textTheme.bodyMedium?.color ??
+                          AppColors.textPrimary,
+                    ),
                   ),
 
                   SizedBox(height: AppSize.getHeight(6)),
@@ -407,8 +409,13 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
                   CustomFieldText(
                     controller: _cubit.birthdayController,
+                    iconEnd: AppIcons.calendar,
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     title: 'volunteer.sign_up.birthday'.tr(),
-                    hintText: 'dd/mm/yyyy',
+                    hintText: 'DD / MM / YYYY',
                     readOnly: true,
                     onTap: () async {
                       final DateTime? pickedDate = await showDatePicker(
@@ -431,6 +438,10 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                   CustomFieldDropdown<String>(
                     title: 'volunteer.sign_up.blood_type'.tr(),
                     hintText: 'volunteer.sign_up.select_blood_type'.tr(),
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     validator: AppValidators.dropdownRequired<String>,
                     selected: _cubit.selectedBloodType,
                     items: _cubit.bloodTypes.map((blood) {
@@ -449,14 +460,18 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                   Text(
                     'volunteer.sign_up.skills_interests'.tr(),
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
-                    ).xs,
+                      fontSize: AppSize.font(15),
+                      color:
+                          theme.textTheme.bodyMedium?.color ??
+                          AppColors.textPrimary,
+                    ),
                   ),
 
                   SizedBox(height: AppSize.getHeight(6)),
 
                   CustomSelectableChips(
                     items: _cubit.interests.map((e) => e.label).toList(),
+                    layout: ChipsLayout.wrap,
                     multiSelect: true,
                     onChanged: (selectedLabels) {
                       final selectedIds = selectedLabels.map((label) {
@@ -472,6 +487,10 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
                   CustomFieldText(
                     controller: _cubit.nationalIdNumberController,
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     title: 'volunteer.sign_up.national_id_numbers'.tr(),
                     hintText: 'volunteer.sign_up.write_national_id_numbers'
                         .tr(),
@@ -498,9 +517,12 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                     height: AppSize.getHeight(200),
                     title: 'volunteer.sign_up.national_id'.tr(),
                     hint: 'volunteer.sign_up.upload_national_id_front'.tr(),
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     icon: AppIcons.uploadFile,
                     image: _cubit.nationalIdFrontImage,
-                    isRequired: true,
                     validator: (file) {
                       if (file == null) {
                         return 'volunteer.sign_up.please_upload_front_national_id'
@@ -549,6 +571,10 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
                   CustomFieldText(
                     controller: _cubit.passwordController,
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
 
                     title: 'organization.sign_up.password'.tr(),
 
@@ -572,6 +598,10 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
 
                   CustomFieldText(
                     controller: _cubit.confirmPasswordController,
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
 
                     title: 'organization.sign_up.confirm_password'.tr(),
 
@@ -599,14 +629,10 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                     children: [
                       SizedBox(
                         width: AppSize.getSize(20),
-
                         height: AppSize.getSize(20),
-
                         child: Checkbox(
                           value: _cubit.acceptTerms,
-
                           activeColor: AppColors.primary,
-
                           onChanged: (value) {
                             setState(() {
                               _cubit.acceptTerms = value ?? false;
@@ -620,12 +646,12 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
                       Expanded(
                         child: Text(
                           'volunteer.sign_up.accept_terms'.tr(),
-
                           style: TextStyle(
-                            color: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.color,
-                          ).xs,
+                            color:
+                                theme.textTheme.bodyMedium?.color ??
+                                AppColors.textPrimary,
+                            fontSize: AppSize.font(14),
+                          ),
                         ),
                       ),
                     ],

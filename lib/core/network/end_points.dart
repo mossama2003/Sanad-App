@@ -9,9 +9,13 @@ String BASE_URL = 'https://testapi.joinsanad.org/api/';
 /// Auth
 String SIGN_UP = 'auth/registration/';
 String SIGN_IN = 'auth/login/';
-String LOG_OUT = 'auth/logout/';
 String GET_USER = 'auth/user/';
 String REFRESH_TOKEN = 'auth/token/refresh/';
+String LOG_OUT = 'auth/logout/';
+String DELETE_ACCOUNT = 'v1/users/profile/delete/';
 
 /// Skills
 String GET_SKILLS = 'v1/categories/select_category/';
+
+/// Events
+String CREATE_EVENT = 'v1/events/manage_event/';

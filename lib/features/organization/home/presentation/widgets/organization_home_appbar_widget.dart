@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/constant/app_size.dart';
@@ -13,55 +12,28 @@ class OrganizationHomeAppbarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: AppSize.padding(horizontal: 15),
       height: AppSize.getHeight(60),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            offset: Offset(0, 1.5),
-            color: AppColors.grey.withValues(alpha: 0.35),
+            offset: const Offset(0, 1.5),
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.4)
+                : AppColors.grey.withValues(alpha: 0.35),
             blurRadius: 3,
           ),
         ],
-        // border: Border(
-        //   bottom: BorderSide(
-        //     color: AppColors.grey.withValues(alpha: 0.5),
-        //     width: 0.5,
-        //   ),
-        // ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Container(
-          //   width: AppSize.getSize(35),
-          //   height: AppSize.getSize(35),
-          //   decoration: BoxDecoration(
-          //     color: AppColors.primary,
-          //     borderRadius: BorderRadius.circular(12),
-          //     boxShadow: [
-          //       BoxShadow(
-          //         color: AppColors.grey.withValues(alpha: 0.35),
-          //         blurRadius: 3,
-          //       ),
-          //     ],
-          //   ),
-          //   child: Center(
-          //     child: Text('🤝', style: TextStyle(fontSize: AppSize.font(22))),
-          //   ),
-          // ),
-          // SizedBox(width: AppSize.getWidth(10)),
-          // Text(
-          //   'Sanad',
-          //   style: TextStyle(
-          //     fontSize: AppSize.font(18),
-          //     fontWeight: FontWeight.w400,
-          //     color: AppColors.black,
-          //   ),
-          // ),
           Text(
             'Sanad',
             style: TextStyle(
@@ -71,17 +43,20 @@ class OrganizationHomeAppbarWidget extends StatelessWidget {
               letterSpacing: -0.3,
             ),
           ),
-          Spacer(),
+
+          const Spacer(),
+
           CustomIcon(
             onTap: () => AppNavigator.push(NotificationsScreen()),
             icon: AppIcons.notification,
             width: AppSize.getSize(25),
             height: AppSize.getSize(25),
-            color: AppColors.black,
+            color: isDark ? AppColors.white : AppColors.black,
           ),
+
           SizedBox(width: AppSize.getWidth(10)),
+
           GestureDetector(
-            // onTap: () => AppNavigator.push(ProfileScreen()),
             child: Container(
               width: AppSize.getSize(35),
               height: AppSize.getSize(35),
@@ -90,7 +65,9 @@ class OrganizationHomeAppbarWidget extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.grey.withValues(alpha: 0.35),
+                    color: isDark
+                        ? Colors.black.withValues(alpha: 0.5)
+                        : AppColors.grey.withValues(alpha: 0.35),
                     blurRadius: 3,
                   ),
                 ],

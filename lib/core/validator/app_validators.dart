@@ -231,4 +231,40 @@ class AppValidators {
       return null;
     }
   }
+
+  /// GOOGLE MAPS LINK VALIDATION
+  static String? googleMapsUrl(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'validators.required'.tr();
+    }
+
+    final googleMapsRegex = RegExp(
+      r'^(https?://)?((www\.)?google\.[a-z.]+/maps/.*|maps\.app\.goo\.gl/.*|goo\.gl/maps/.*)$',
+      caseSensitive: false,
+    );
+
+    if (!googleMapsRegex.hasMatch(value.trim())) {
+      return 'validators.google_maps.invalid'.tr();
+    }
+
+    return null;
+  }
+
+  /// WEBSITE URL VALIDATION
+  static String? url(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'validators.required'.tr();
+    }
+
+    final urlRegex = RegExp(
+      r'^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/.*)?$',
+      caseSensitive: false,
+    );
+
+    if (!urlRegex.hasMatch(value.trim())) {
+      return 'validators.url.invalid'.tr();
+    }
+
+    return null;
+  }
 }

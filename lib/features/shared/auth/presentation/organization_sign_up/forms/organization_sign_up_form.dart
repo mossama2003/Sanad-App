@@ -2,12 +2,10 @@ import 'package:sanad_app/core/shared/widgets/custom_upload_file.dart';
 import 'package:sanad_app/core/shared/widgets/custom_field_phone.dart';
 import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 
 import '../../../../../../core/constant/app_size.dart';
 import '../../../../../../core/helper/app_toast.dart';
@@ -15,11 +13,9 @@ import '../../../../../../core/shared/widgets/custom_field_dropdown.dart';
 import '../../../../../../core/shared/widgets/custom_field_text.dart';
 import '../../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../../core/style/app_colors.dart';
-import '../../../../../../core/style/app_text_style.dart';
 import '../../../../../../core/validator/app_validators.dart';
 import '../../../data/models/governorate_model.dart';
 import '../../../data/repos/organization/organization_repo.dart';
-import '../../sign_in/screens/sign_in_screen.dart';
 import '../controllers/organization_sign_up_cubit.dart';
 
 class OrganizationSignUpForm extends StatefulWidget {
@@ -116,9 +112,6 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final textColor =
-        theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
-
     final secondaryText =
         theme.textTheme.bodySmall?.color ?? AppColors.textSecondary;
 
@@ -155,8 +148,7 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
                                       ? () => _cubit.pickLogo()
                                       : null,
                                   child: Container(
-                                    width: AppSize.getSize(80),
-                                    height: AppSize.getSize(80),
+                                    padding: AppSize.padding(all: 10),
                                     clipBehavior: Clip.antiAlias,
                                     decoration: BoxDecoration(
                                       color: AppColors.grey100,
@@ -168,6 +160,8 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
                                     ),
                                     child: _cubit.avatar != null
                                         ? Image.file(
+                                            height: AppSize.getSize(65),
+                                            width: AppSize.getSize(75),
                                             _cubit.avatar!,
                                             fit: BoxFit.cover,
                                           )
@@ -272,6 +266,10 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
 
                   CustomFieldText(
                     controller: _cubit.nameController,
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     title: 'organization.sign_up.organization_name'.tr(),
                     hintText: 'organization.sign_up.hint_organization_name'
                         .tr(),
@@ -282,15 +280,23 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
 
                   CustomFieldText(
                     controller: _cubit.websiteController,
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     title: 'organization.sign_up.website_link'.tr(),
                     hintText: 'organization.sign_up.hint_website_link'.tr(),
-                    validator: AppValidators.required,
+                    validator: AppValidators.url,
                   ),
 
                   SizedBox(height: AppSize.getHeight(15)),
 
                   CustomFieldText(
                     controller: _cubit.emailController,
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     title: 'organization.sign_up.official_email'.tr(),
                     hintText: 'organization.sign_up.hint_official_email'.tr(),
                     validator: AppValidators.email,
@@ -300,6 +306,10 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
 
                   CustomFieldPhone(
                     controller: _cubit.phoneController,
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     title: 'volunteer.sign_up.phone_number'.tr(),
                     hintText: '123 456 7890',
                     initialCountryCode: "EG",
@@ -310,6 +320,10 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
                   // SizedBox(height: AppSize.getHeight(15)),
                   CustomFieldDropdown<GovernorateModel>(
                     title: 'volunteer.sign_up.governorate'.tr(),
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     hintText: 'volunteer.sign_up.select_your_governorate'.tr(),
                     validator: AppValidators.dropdownRequired<GovernorateModel>,
                     selected: _cubit.selectedGov,
@@ -327,6 +341,10 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
 
                   CustomFieldText(
                     controller: _cubit.headquartersController,
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     title: 'organization.sign_up.headquarters_location'.tr(),
                     hintText: 'organization.sign_up.hint_headquarters_location'
                         .tr(),
@@ -336,6 +354,7 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
                   SizedBox(height: AppSize.getHeight(15)),
 
                   CustomUploadFile(
+                    height: AppSize.getHeight(100),
                     onTap: () {
                       _cubit.pickDocuments();
                     },
@@ -343,6 +362,10 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
                       _cubit.removeAttachments();
                     },
                     title: 'organization.sign_up.verification_documents'.tr(),
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
                     hint: 'organization.sign_up.hint_verification_documents'
                         .tr(),
                     icon: AppIcons.uploadFile,
@@ -423,6 +446,10 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
 
                   CustomFieldText(
                     controller: _cubit.passwordController,
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
 
                     title: 'organization.sign_up.password'.tr(),
 
@@ -446,6 +473,10 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
 
                   CustomFieldText(
                     controller: _cubit.confirmPasswordController,
+                    titleSize: AppSize.font(15),
+                    titleColor:
+                        theme.textTheme.bodyMedium?.color ??
+                        AppColors.textPrimary,
 
                     title: 'organization.sign_up.confirm_password'.tr(),
 
@@ -490,7 +521,12 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
                       Expanded(
                         child: Text(
                           'organization.sign_up.accept_terms'.tr(),
-                          style: TextStyle(color: textColor).xs,
+                          style: TextStyle(
+                            color:
+                                theme.textTheme.bodyMedium?.color ??
+                                AppColors.textPrimary,
+                            fontSize: AppSize.font(14),
+                          ),
                         ),
                       ),
                     ],
@@ -506,33 +542,6 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
                     title: 'organization.sign_up.sign_up_button'.tr(),
 
                     bgColor: AppColors.laserBlue,
-                  ),
-
-                  SizedBox(height: AppSize.getHeight(8)),
-
-                  Align(
-                    alignment: Alignment.center,
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        text: "organization.sign_up.already_have_account".tr(),
-
-                        style: TextStyle(color: textColor).xs,
-
-                        children: [
-                          TextSpan(
-                            text: "organization.sign_up.sign_in".tr(),
-
-                            style: TextStyle(color: AppColors.laserBlue).xs,
-
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                AppNavigator.remove(SignInScreen());
-                              },
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                 ],
               ),
