@@ -11,22 +11,23 @@ class AppInterceptors extends Interceptor {
   /// On [REQUEST] API
   @override
   Future<void> onRequest(
-      RequestOptions options,
-      RequestInterceptorHandler handler,
-      ) async {
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final String? lang = CacheHelper.get('lang');
     final String? token = CacheHelper.get('token');
+
     options.headers.addAll({
-      'lang': ?lang,
+      if (lang != null) 'lang': lang,
       if (token != null) 'Authorization': 'Bearer $token',
     });
+
     return handler.next(options);
   }
 
   /// On [RESPONSE] API
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) async {
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
     return handler.next(response);
   }
 }
-

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'core/shared/controllers/user/app_cubit.dart';
+import 'core/storage/hive/hive_init.dart';
 import 'features/organization/home/data/repos/organization_home_repo.dart';
 import 'features/organization/home/presentation/controllers/organization_home_cubit.dart';
 import 'features/volunteer/home/presentation/controllers/volunteer_home_cubit.dart';
@@ -18,6 +19,9 @@ import 'core/style/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  /// HIVE INITIALIZATION
+  await HiveInit.init();
 
   /// SHARED PREFERENCE INITIALIZATION
   await CacheHelper.init();

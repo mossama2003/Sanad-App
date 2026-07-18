@@ -53,9 +53,15 @@ dependencies:
   dotted_border: ^3.1.0
   dio_cookie_manager: ^3.4.0
   cookie_jar: ^4.0.9
-  skeletonizer: ^2.1.3
+
+  #Caching
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.13
+
   flutter_test:
     sdk: flutter
 

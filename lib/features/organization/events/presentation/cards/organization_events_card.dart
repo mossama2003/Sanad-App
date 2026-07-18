@@ -9,10 +9,23 @@ import '../../../../../core/shared/widgets/custom_progress_bar.dart';
 import '../../../../../core/style/app_colors.dart';
 
 class OrganizationEventsCard extends StatelessWidget {
-  const OrganizationEventsCard({super.key, this.event, this.isLoading = false});
+  const OrganizationEventsCard({
+    super.key,
+    this.event,
+    this.isLoading = false,
+    this.onQrTap,
+    this.onChatTap,
+    this.onEditTap,
+    this.onDeleteTap,
+  });
 
   final OrganizationEventDetailsModel? event;
   final bool isLoading;
+
+  final VoidCallback? onQrTap;
+  final VoidCallback? onChatTap;
+  final VoidCallback? onEditTap;
+  final VoidCallback? onDeleteTap;
 
   String _getStatusText(String? status) {
     switch (status) {
@@ -43,13 +56,12 @@ class OrganizationEventsCard extends StatelessWidget {
 
     final description =
         event?.description ??
-        "organization.create_event.event_description_will_appear_here".tr();
+            "organization.create_event.event_description_will_appear_here".tr();
 
     final category =
         event?.category ?? "organization.create_event.event_category".tr();
 
     final status = _getStatusText(event?.status);
-
 
     final attendeesCount = event?.attendees ?? 0;
 
@@ -242,6 +254,7 @@ class OrganizationEventsCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildEventAction(
+                    onTap: onQrTap,
                     backgroundColor: AppColors.laserBlue.withValues(alpha: .1),
                     iconColor: AppColors.laserBlue,
                     icon: AppIcons.qr,
@@ -253,6 +266,7 @@ class OrganizationEventsCard extends StatelessWidget {
 
                 Expanded(
                   child: _buildEventAction(
+                    onTap: onChatTap,
                     backgroundColor: AppColors.primary.withValues(alpha: .1),
                     iconColor: AppColors.primary,
                     icon: AppIcons.chat,
@@ -264,6 +278,7 @@ class OrganizationEventsCard extends StatelessWidget {
 
                 Expanded(
                   child: _buildEventAction(
+                    onTap: onEditTap,
                     backgroundColor: AppColors.grey600.withValues(alpha: .1),
                     iconColor: AppColors.grey500,
                     icon: AppIcons.edit,
@@ -275,6 +290,7 @@ class OrganizationEventsCard extends StatelessWidget {
 
                 Expanded(
                   child: _buildEventAction(
+                    onTap: onDeleteTap,
                     backgroundColor: AppColors.red.withValues(alpha: .1),
                     iconColor: AppColors.red,
                     icon: AppIcons.delete,
@@ -313,33 +329,36 @@ class OrganizationEventsCard extends StatelessWidget {
     required String title,
     required Color iconColor,
     required Color backgroundColor,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      height: AppSize.getHeight(50),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: backgroundColor,
-      ),
-
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CustomIcon(
-            icon: icon,
-            color: iconColor,
-            width: AppSize.getSize(22),
-            height: AppSize.getSize(22),
-          ),
-
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: AppSize.font(10),
-              fontWeight: FontWeight.w500,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        height: AppSize.getHeight(50),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: backgroundColor,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CustomIcon(
+              icon: icon,
               color: iconColor,
+              width: AppSize.getSize(22),
+              height: AppSize.getSize(22),
             ),
-          ),
-        ],
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: AppSize.font(10),
+                fontWeight: FontWeight.w500,
+                color: iconColor,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

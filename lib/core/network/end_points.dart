@@ -20,3 +20,5 @@ String GET_SKILLS = 'v1/categories/select_category/';
 /// Organization Events
 String CREATE_ORGANIZATION_EVENT = 'v1/events/manage_event/';
 String GET_ORGANIZATION_EVENTS = 'v1/events/read_event/';
+
+String DELETE_ORGANIZATION_EVENT(int ID) => 'v1/events/manage_event/$ID/';

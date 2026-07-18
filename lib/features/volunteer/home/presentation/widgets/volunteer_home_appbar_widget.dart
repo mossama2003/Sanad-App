@@ -15,8 +15,8 @@ class VolunteerHomeAppbarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
       padding: AppSize.padding(horizontal: 15),
+      width: double.infinity,
       height: AppSize.getHeight(60),
       decoration: BoxDecoration(
         color: AppColors.white,

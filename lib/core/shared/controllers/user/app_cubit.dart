@@ -1,11 +1,12 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 
 import '../../../../features/shared/auth/data/models/user_model.dart';
-import '../../../network/end_points.dart';
 import '../../../network/local/cache/cache_helper.dart';
 import '../../../network/remote/api/dio_helper.dart';
+import '../../../storage/hive/hive_clear.dart';
+import '../../../network/end_points.dart';
 
 part 'app_states.dart';
 
@@ -97,6 +98,7 @@ class AppCubit extends Cubit<AppStates> {
   Future<void> logOut() async {
     try {
       final token = CacheHelper.get(CacheKeys.accessToken);
+
       await DioHelper.post(
         url: LOG_OUT,
         headers: {"Authorization": "Bearer $token"},
@@ -104,10 +106,11 @@ class AppCubit extends Cubit<AppStates> {
     } catch (e) {
       debugPrint("LOG OUT ERROR => $e");
     }
-    await CacheHelper.remove(CacheKeys.accessToken);
-    await CacheHelper.remove(CacheKeys.refreshToken);
-    await DioHelper.cookieJar.deleteAll();
+
+    await _clearLocalData();
+
     user = null;
+
     emit(UserLoggedOut());
   }
 
@@ -115,21 +118,38 @@ class AppCubit extends Cubit<AppStates> {
   Future<bool> deleteAccount() async {
     try {
       final token = CacheHelper.get(CacheKeys.accessToken);
+
       final response = await DioHelper.delete(
         url: DELETE_ACCOUNT,
         headers: {"Authorization": "Bearer $token"},
       );
+
       if (response.statusCode == 204) {
-        await CacheHelper.remove(CacheKeys.accessToken);
-        await CacheHelper.remove(CacheKeys.refreshToken);
-        await DioHelper.cookieJar.deleteAll();
+        await _clearLocalData();
+
         user = null;
+
         emit(AccountDeleted());
+
         return true;
       }
     } catch (e) {
       debugPrint("DELETE ACCOUNT ERROR => $e");
     }
+
     return false;
+  }
+
+  // ================= CLEAR ALL LOCAL DATA =================
+  Future<void> _clearLocalData() async {
+    /// REMOVE TOKENS
+    await CacheHelper.remove(CacheKeys.accessToken);
+    await CacheHelper.remove(CacheKeys.refreshToken);
+
+    /// CLEAR COOKIES
+    await DioHelper.cookieJar.deleteAll();
+
+    /// CLEAR HIVE CACHE
+    await HiveClear.clear();
   }
 }

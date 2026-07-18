@@ -22,10 +22,12 @@ class CreateOrganizationEventForm extends StatefulWidget {
   const CreateOrganizationEventForm({super.key});
 
   @override
-  State<CreateOrganizationEventForm> createState() => _CreateOrganizationEventFormState();
+  State<CreateOrganizationEventForm> createState() =>
+      _CreateOrganizationEventFormState();
 }
 
-class _CreateOrganizationEventFormState extends State<CreateOrganizationEventForm> {
+class _CreateOrganizationEventFormState
+    extends State<CreateOrganizationEventForm> {
   late OrganizationEventsCubit _cubit;
 
   @override
@@ -397,7 +399,8 @@ class _CreateOrganizationEventFormState extends State<CreateOrganizationEventFor
                           child: CustomButton(
                             loading:
                                 state is Loading &&
-                                state.action == CreateOrganizationEventAction.draft,
+                                _cubit.loadingAction ==
+                                    CreateOrganizationEventAction.draft,
                             onTap: () {
                               _cubit.createOrganizationEvent(
                                 status: 'draft',
@@ -418,7 +421,8 @@ class _CreateOrganizationEventFormState extends State<CreateOrganizationEventFor
                           child: CustomButton(
                             loading:
                                 state is Loading &&
-                                state.action == CreateOrganizationEventAction.publish,
+                                _cubit.loadingAction ==
+                                    CreateOrganizationEventAction.publish,
                             onTap: () {
                               _cubit.createOrganizationEvent(
                                 status: 'upcoming',

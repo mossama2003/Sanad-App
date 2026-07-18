@@ -13,6 +13,7 @@ import 'package:sanad_app/features/organization/events/data/models/organization_
 import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/shared/models/city_model.dart';
 import '../../../../../core/shared/models/governorate_model.dart';
+import '../../../../../core/storage/hive/hive_boxes.dart';
 import '../../data/params/create_organization_event_param.dart';
 import '../../data/repos/Organization_events_repo.dart';
 
@@ -28,7 +29,10 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   static OrganizationEventsCubit get(BuildContext context) =>
       BlocProvider.of<OrganizationEventsCubit>(context);
 
-  // ===================== Controllers =====================
+  static const String _eventsLastUpdatedKey = 'events_last_updated';
+
+  // ===================== Form =====================
+
   final formKey = GlobalKey<FormState>();
 
   final eventNameController = TextEditingController();
@@ -40,31 +44,57 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   final locationAddressController = TextEditingController();
   final requiredVolunteersController = TextEditingController();
 
-  String? selectedStatus;
-
   CreateOrganizationEventAction? loadingAction;
 
-  // ===================== Cover Image =====================
+  // ===================== Event =====================
+
   File? eventCover;
 
+  String? selectedStatus;
+
   // ===================== Time =====================
+
   TimeOfDay? startTime;
   TimeOfDay? endTime;
 
   // ===================== Location =====================
+
   List<GovernorateModel> governorates = [];
+
   List<CityModel> cities = [];
+
   List<CityModel> filteredCities = [];
 
+  final selectedGov = ValueNotifier<GovernorateModel?>(null);
+
+  final selectedCity = ValueNotifier<CityModel?>(null);
+
   // ===================== Events =====================
-  List<OrganizationEventDetailsModel> events = [];
+
+  final List<OrganizationEventDetailsModel> events = [];
+
   int currentPage = 1;
-  int totalPages = 1;
-  bool isLoadingMore = false;
+
   String? nextPage;
 
-  // ===================== Event Categories =====================
-  final eventCategories = <String>[
+  bool isLoadingMore = false;
+
+  // ===================== Hive Refresh Events =====================l
+  bool shouldRefreshEvents() {
+    final lastUpdated = HiveBoxes.cacheInfoBox.get(_eventsLastUpdatedKey);
+
+    if (lastUpdated == null) {
+      return true;
+    }
+
+    final difference = DateTime.now().difference(lastUpdated);
+
+    return difference.inMinutes > 10;
+  }
+
+  // ===================== Categories =====================
+
+  final List<String> eventCategories = [
     'Education',
     'Healthcare',
     'Environment',
@@ -85,7 +115,8 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   final selectedCategory = ValueNotifier<String?>(null);
 
   // ===================== Skills =====================
-  final skills = <String>[
+
+  final List<String> skills = [
     'Communication',
     'Leadership',
     'Teamwork',
@@ -110,71 +141,70 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
   final selectedSkills = ValueNotifier<List<String>>([]);
 
-  void updateSelectedSkills(List<String> skills) {
-    selectedSkills.value = skills;
+  // ===================== Skills Actions =====================
 
-    emit(UpdateSkillsState());
+  void updateSelectedSkills(List<String> value) {
+    selectedSkills.value = value;
   }
 
-  final ValueNotifier<GovernorateModel?> selectedGov =
-      ValueNotifier<GovernorateModel?>(null);
+  // ===================== Location Actions =====================
 
-  final ValueNotifier<CityModel?> selectedCity = ValueNotifier<CityModel?>(
-    null,
-  );
-
-  // ===================== Governorate =====================
-  void selectGovernorate(GovernorateModel gov) {
-    selectedGov.value = gov;
+  void selectGovernorate(GovernorateModel governorate) {
+    selectedGov.value = governorate;
 
     selectedCity.value = null;
-    filteredCities = [];
 
-    filteredCities = cities.where((c) => c.governorateId == gov.id).toList();
-
-    emit(UpdateLocationState());
+    filteredCities = cities
+        .where((city) => city.governorateId == governorate.id)
+        .toList();
   }
 
-  // ===================== City =====================
   void selectCity(CityModel city) {
     selectedCity.value = city;
-    emit(UpdateLocationState());
   }
 
-  // ===================== Load Data =====================
+  // ===================== Load Location Data =====================
   Future<void> loadLocationData() async {
-    emit(LoadingLocationData());
+    emit(Loading());
 
     try {
-      final govString = await rootBundle.loadString(
+      final governoratesJson = await rootBundle.loadString(
         'assets/data/governorates.json',
       );
 
-      final cityString = await rootBundle.loadString('assets/data/cities.json');
+      final citiesJson = await rootBundle.loadString('assets/data/cities.json');
 
-      final govJson = json.decode(govString);
-      final cityJson = json.decode(cityString);
+      final governoratesData = json.decode(governoratesJson);
 
-      // ================= GOV =================
-      final List govList = govJson is List ? govJson : govJson['data'];
+      final citiesData = json.decode(citiesJson);
 
-      governorates = govList.map((e) => GovernorateModel.fromJson(e)).toList();
+      final List governoratesList = governoratesData is List
+          ? governoratesData
+          : governoratesData['data'];
 
-      // ================= CITY =================
-      final List cityList = cityJson is List ? cityJson : cityJson['data'];
+      final List citiesList = citiesData is List
+          ? citiesData
+          : citiesData['data'];
 
-      cities = cityList.map((e) => CityModel.fromJson(e)).toList();
+      governorates = governoratesList
+          .map((e) => GovernorateModel.fromJson(e))
+          .toList();
+
+      cities = citiesList.map((e) => CityModel.fromJson(e)).toList();
 
       emit(Success());
     } catch (e) {
       emit(Error());
+
       AppToast.error(e.toString());
     }
   }
 
-  // ===================== Get Event DateTime =====================
+  // ===================== Event Date Time =====================
+
   DateTime getEventDateTime() {
     final date = DateFormat('dd/MM/yyyy').parse(dateController.text);
+
     return DateTime(
       date.year,
       date.month,
@@ -184,9 +214,11 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     );
   }
 
-  // ===================== Get Event Due DateTime =====================
+  // ===================== Event Due Time =====================
+
   DateTime getEventDueDateTime() {
     final date = DateFormat('dd/MM/yyyy').parse(dateController.text);
+
     return DateTime(
       date.year,
       date.month,
@@ -196,106 +228,114 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     );
   }
 
-  // ===================== Pick Event Cover =====================
+  // ===================== Pick Cover =====================
+
   Future<void> pickEventCover() async {
     try {
       final picker = ImagePicker();
-      final pickedImage = await picker.pickImage(
+
+      final image = await picker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 85,
       );
-      if (pickedImage != null) {
-        eventCover = File(pickedImage.path);
-        emit(EventCoverPicked());
-      }
+
+      if (image == null) return;
+
+      eventCover = File(image.path);
     } catch (e) {
-      emit(EventCoverError(e.toString()));
+      emit(Error());
     }
   }
 
   void removeEventCover() {
     eventCover = null;
-    emit(EventCoverRemoved());
+    emit(Success());
   }
 
   // ===================== Pick Date =====================
+
   Future<void> pickEventDate(BuildContext context) async {
     final now = DateTime.now();
+
     final firstDate = DateTime(now.year, now.month, now.day + 1);
+
     final lastDate = DateTime(
       firstDate.year,
       firstDate.month + 2,
       firstDate.day,
     );
+
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: firstDate,
       firstDate: firstDate,
       lastDate: lastDate,
     );
-    if (pickedDate != null) {
-      dateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
-      emit(EventDatePicked());
-    }
+
+    if (pickedDate == null) return;
+
+    dateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+
+    emit(Success());
   }
 
   // ===================== Pick Start Time =====================
+
   Future<void> pickStartTime(BuildContext context) async {
     final picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
-    if (picked != null) {
-      startTime = picked;
-      startTimeController.text = picked.format(context);
-      if (endTime != null) {
-        final startMinutes = startTime!.hour * 60 + startTime!.minute;
-        final endMinutes = endTime!.hour * 60 + endTime!.minute;
-        if (endMinutes <= startMinutes) {
-          endTime = null;
-          endTimeController.clear();
-        }
-      }
 
-      emit(StartTimePicked());
+    if (picked == null) return;
+
+    startTime = picked;
+    startTimeController.text = picked.format(context);
+
+    if (endTime != null) {
+      final startMinutes = picked.hour * 60 + picked.minute;
+
+      final endMinutes = endTime!.hour * 60 + endTime!.minute;
+
+      if (endMinutes <= startMinutes) {
+        endTime = null;
+        endTimeController.clear();
+      }
     }
   }
 
   // ===================== Pick End Time =====================
+
   Future<void> pickEndTime(BuildContext context) async {
     if (startTime == null) {
-      emit(
-        EventTimeError(
-          'organization.create_event.please_select_start_time'.tr(),
-        ),
-      );
+      emit(Error());
+
       return;
     }
+
     final picked = await showTimePicker(
       context: context,
       initialTime: startTime!,
     );
-    if (picked != null) {
-      final startMinutes = startTime!.hour * 60 + startTime!.minute;
-      final endMinutes = picked.hour * 60 + picked.minute;
-      if (endMinutes <= startMinutes) {
-        emit(
-          EventTimeError(
-            'organization.create_event.please_select_end_time'.tr(),
-          ),
-        );
-        return;
-      }
 
-      endTime = picked;
+    if (picked == null) return;
 
-      endTimeController.text = picked.format(context);
+    final startMinutes = startTime!.hour * 60 + startTime!.minute;
 
-      emit(EndTimePicked());
+    final endMinutes = picked.hour * 60 + picked.minute;
+
+    if (endMinutes <= startMinutes) {
+      emit(Error());
+
+      return;
     }
+
+    endTime = picked;
+
+    endTimeController.text = picked.format(context);
   }
 
-  // ===================== Create Events =====================
+  // ===================== Create Event =====================
   Future<void> createOrganizationEvent({
     required String status,
     required CreateOrganizationEventAction action,
@@ -309,9 +349,11 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       return;
     }
 
-    emit(Loading(action));
+    loadingAction = action;
 
-    final api = await repo.createOrganizationEvent(
+    emit(Loading());
+
+    final result = await repo.createOrganizationEvent(
       CreateOrganizationEventParam(
         name: eventNameController.text.trim(),
         description: eventDescriptionController.text.trim(),
@@ -328,37 +370,67 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       ),
     );
 
-    api.fold(
-      (l) {
-        emit(Error());
-        AppToast.error(l.errMessage);
-      },
+    result.fold(
+      (failure) {
+        loadingAction = null;
 
-      (r) {
+        emit(Error());
+
+        AppToast.error(failure.errMessage);
+      },
+      (_) {
+        loadingAction = null;
+
         emit(Success());
+
         AppToast.success(
           'organization.create_event.event_created_successfully'.tr(),
         );
+
         AppNavigator.pop();
       },
     );
   }
 
+  // ===================== Hive Cache =====================
+
+  Future<void> _saveEventsToCache() async {
+    final box = HiveBoxes.organizationEventsBox;
+
+    await box.clear();
+
+    await box.addAll(events);
+  }
+
+  void loadEventsFromCache() {
+    final box = HiveBoxes.organizationEventsBox;
+
+    if (box.isEmpty) return;
+
+    events
+      ..clear()
+      ..addAll(box.values);
+
+    emit(Success());
+  }
+
   // ===================== Get Organization Events =====================
+
   Future<void> getOrganizationEvents({
     bool refresh = false,
     String? status,
   }) async {
     if (refresh) {
       currentPage = 1;
-      events.clear();
-
       selectedStatus = status;
     }
 
-    emit(LoadingEvents());
+    // Load Cache First
+    if (!refresh && events.isEmpty) {
+      loadEventsFromCache();
+    }
 
-    final api = await repo.getOrganizationEvents(
+    final result = await repo.getOrganizationEvents(
       GetOrganizationEventsParam(
         page: currentPage,
         size: 10,
@@ -366,33 +438,78 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       ),
     );
 
-    api.fold(
-      (l) {
-        emit(Error());
-        AppToast.error(l.errMessage);
-      },
-
-      (r) {
-        if (refresh) {
-          events = r.results;
-        } else {
-          events.addAll(r.results);
+    result.fold(
+      (failure) {
+        if (events.isEmpty) {
+          emit(Error());
         }
 
-        nextPage = r.next;
+        AppToast.error(failure.errMessage);
+      },
 
-        emit(EventsLoaded());
+      (data) async {
+        if (refresh) {
+          events
+            ..clear()
+            ..addAll(data.results);
+        } else {
+          events
+            ..clear()
+            ..addAll(data.results);
+        }
+
+        nextPage = data.next;
+
+        await _saveEventsToCache();
+
+        await HiveBoxes.cacheInfoBox.put(_eventsLastUpdatedKey, DateTime.now());
+
+        emit(Success());
       },
     );
   }
 
-  // ===================== Load More Organization Events =====================
+  // ===================== Delete Organization Event =====================
+
+  Future<bool> deleteOrganizationEvent({required int id}) async {
+    final result = await repo.deleteOrganizationEvent(id);
+
+    return result.fold(
+      (failure) {
+        emit(Error());
+
+        AppToast.error(failure.errMessage);
+
+        return false;
+      },
+      (_) async {
+        events.removeWhere((event) => event.id == id);
+
+        final box = HiveBoxes.organizationEventsBox;
+
+        await box.clear();
+
+        await box.addAll(events);
+
+        emit(Success());
+
+        AppToast.success('organization.events.event_deleted_successfully'.tr());
+
+        return true;
+      },
+    );
+  }
+
+  // ===================== Load More =====================
+
   Future<void> loadMoreOrganizationEvents() async {
-    if (isLoadingMore || nextPage == null) return;
+    if (isLoadingMore || nextPage == null) {
+      return;
+    }
 
     isLoadingMore = true;
 
-    final api = await repo.getOrganizationEvents(
+    final result = await repo.getOrganizationEvents(
       GetOrganizationEventsParam(
         page: currentPage + 1,
         size: 10,
@@ -400,15 +517,21 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       ),
     );
 
-    api.fold(
-      (l) {
-        AppToast.error(l.errMessage);
+    result.fold(
+      (failure) {
+        AppToast.error(failure.errMessage);
       },
-      (r) {
+
+      (response) async {
         currentPage++;
-        events.addAll(r.results);
-        nextPage = r.next;
-        emit(EventsLoaded());
+
+        events.addAll(response.results);
+
+        nextPage = response.next;
+
+        await _saveEventsToCache();
+
+        emit(Success());
       },
     );
 
@@ -418,13 +541,29 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   @override
   Future<void> close() {
     eventNameController.dispose();
+
     eventDescriptionController.dispose();
+
     dateController.dispose();
+
     startTimeController.dispose();
+
     endTimeController.dispose();
+
     locationLinkController.dispose();
+
     locationAddressController.dispose();
+
     requiredVolunteersController.dispose();
+
+    selectedCategory.dispose();
+
+    selectedSkills.dispose();
+
+    selectedGov.dispose();
+
+    selectedCity.dispose();
+
     return super.close();
   }
 }
