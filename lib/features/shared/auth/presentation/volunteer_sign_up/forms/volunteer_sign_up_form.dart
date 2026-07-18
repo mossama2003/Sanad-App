@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../core/helper/app_toast.dart';
+import '../../../../../../core/shared/models/governorate_model.dart';
 import '../../../../../../core/shared/widgets/custom_field_phone.dart';
 import '../../../../../../core/shared/widgets/custom_selectable_chips.dart';
 import '../../../../../../core/shared/widgets/custom_upload_file.dart';
@@ -17,8 +18,7 @@ import '../../../../../../core/shared/widgets/custom_field_text.dart';
 import '../../../../../../core/validator/app_validators.dart';
 import '../../../../../../core/constant/app_size.dart';
 import '../../../../../../core/style/app_colors.dart';
-import '../../../data/models/city_model.dart';
-import '../../../data/models/governorate_model.dart';
+import '../../../../../../core/shared/models/city_model.dart';
 import '../controllers/volunteer_sign_up_cubit.dart';
 
 class VolunteerSignUpForm extends StatefulWidget {

@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/services.dart';
 import 'package:sanad_app/core/shared/widgets/custom_upload_file.dart';
 import 'package:sanad_app/core/shared/widgets/custom_field_text.dart';
@@ -7,26 +8,31 @@ import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../core/shared/models/city_model.dart';
+import '../../../../../core/shared/models/governorate_model.dart';
+import '../../../../../core/shared/widgets/custom_field_dropdown.dart';
+import '../../../../../core/shared/widgets/custom_field_multi_dropdown.dart';
 import '../../../../../core/validator/app_validators.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../data/repos/events_repo.dart';
-import '../controllers/events_cubit.dart';
+import '../../data/repos/Organization_events_repo.dart';
+import '../controllers/organization_events_cubit.dart';
 
-class CreateEventForm extends StatefulWidget {
-  const CreateEventForm({super.key});
+class CreateOrganizationEventForm extends StatefulWidget {
+  const CreateOrganizationEventForm({super.key});
 
   @override
-  State<CreateEventForm> createState() => _CreateEventFormState();
+  State<CreateOrganizationEventForm> createState() => _CreateOrganizationEventFormState();
 }
 
-class _CreateEventFormState extends State<CreateEventForm> {
-  late EventsCubit _cubit;
+class _CreateOrganizationEventFormState extends State<CreateOrganizationEventForm> {
+  late OrganizationEventsCubit _cubit;
 
   @override
   void initState() {
     super.initState();
-    _cubit = EventsCubit(EventsRepoImpel());
+    _cubit = OrganizationEventsCubit(OrganizationEventsRepoImpel());
+    _cubit.loadLocationData();
   }
 
   @override
@@ -39,7 +45,7 @@ class _CreateEventFormState extends State<CreateEventForm> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return BlocBuilder<EventsCubit, EventsState>(
+    return BlocBuilder<OrganizationEventsCubit, OrganizationEventsState>(
       bloc: _cubit,
       builder: (context, state) {
         return Scaffold(
@@ -112,18 +118,24 @@ class _CreateEventFormState extends State<CreateEventForm> {
 
                     SizedBox(height: AppSize.getHeight(15)),
 
-                    /// TODO Dropdown
-                    CustomFieldText(
-                      controller: _cubit.eventCategoryController,
+                    CustomFieldDropdown<String>(
                       title: 'organization.create_event.event_category'.tr(),
-                      hintText: 'organization.create_event.select_category'
-                          .tr(),
                       titleSize: AppSize.font(15),
                       titleColor:
                           theme.textTheme.bodyMedium?.color ??
                           AppColors.textPrimary,
                       borderRadius: 20,
-                      validator: AppValidators.required,
+                      hintText: 'organization.create_event.select_category'
+                          .tr(),
+                      validator: AppValidators.dropdownRequired<String>,
+                      selected: _cubit.selectedCategory,
+                      items: _cubit.eventCategories.map((category) {
+                        return DropdownItem(
+                          value: category,
+                          child: Text(category),
+                        );
+                      }).toList(),
+                      onChanged: (_) {},
                     ),
 
                     SizedBox(height: AppSize.getHeight(15)),
@@ -177,13 +189,14 @@ class _CreateEventFormState extends State<CreateEventForm> {
                         );
                         if (pickedDate != null) {
                           _cubit.dateController.text = DateFormat(
-                            'dd/mm/yyyy',
+                            'dd/MM/yyyy',
                           ).format(pickedDate);
                         }
                       },
                     ),
 
                     SizedBox(height: AppSize.getHeight(15)),
+
                     CustomFieldText(
                       controller: _cubit.startTimeController,
                       title: 'organization.create_event.start_time'.tr(),
@@ -263,43 +276,64 @@ class _CreateEventFormState extends State<CreateEventForm> {
 
                             Row(
                               children: [
-                                /// TODO Dropdown
                                 Expanded(
-                                  child: CustomFieldText(
-                                    controller: _cubit.governorateController,
+                                  child: CustomFieldDropdown<GovernorateModel>(
                                     title:
                                         'organization.create_event.governorate'
                                             .tr(),
                                     titleSize: AppSize.font(15),
+                                    borderRadius: 20,
                                     titleColor:
                                         theme.textTheme.bodyMedium?.color ??
                                         AppColors.textPrimary,
                                     hintText:
                                         'organization.create_event.governorate_hint'
                                             .tr(),
-                                    validator: AppValidators.required,
-                                    borderRadius: 20,
-                                    onTap: () {},
+                                    validator: AppValidators
+                                        .dropdownRequired<GovernorateModel>,
+                                    selected: _cubit.selectedGov,
+                                    items: _cubit.governorates.map((gov) {
+                                      return DropdownItem(
+                                        value: gov,
+                                        child: Text(gov.nameEn),
+                                      );
+                                    }).toList(),
+                                    onChanged: (gov) {
+                                      if (gov != null) {
+                                        _cubit.selectGovernorate(gov);
+                                      }
+                                    },
                                   ),
                                 ),
 
-                                SizedBox(width: AppSize.getWidth(12)),
+                                SizedBox(width: AppSize.getWidth(5)),
 
                                 Expanded(
-                                  child: CustomFieldText(
-                                    controller: _cubit.cityController,
+                                  child: CustomFieldDropdown<CityModel>(
                                     title: 'organization.create_event.city'
                                         .tr(),
                                     titleSize: AppSize.font(15),
+                                    borderRadius: 20,
                                     titleColor:
                                         theme.textTheme.bodyMedium?.color ??
                                         AppColors.textPrimary,
                                     hintText:
                                         'organization.create_event.city_hint'
                                             .tr(),
-                                    validator: AppValidators.required,
-                                    borderRadius: 20,
-                                    onTap: () {},
+                                    validator: AppValidators
+                                        .dropdownRequired<CityModel>,
+                                    selected: _cubit.selectedCity,
+                                    items: _cubit.filteredCities.map((city) {
+                                      return DropdownItem(
+                                        value: city,
+                                        child: Text(city.nameEn),
+                                      );
+                                    }).toList(),
+                                    onChanged: (city) {
+                                      if (city != null) {
+                                        _cubit.selectCity(city);
+                                      }
+                                    },
                                   ),
                                 ),
                               ],
@@ -340,18 +374,19 @@ class _CreateEventFormState extends State<CreateEventForm> {
 
                     SizedBox(height: AppSize.getHeight(15)),
 
-                    /// TODO Dropdown
-                    CustomFieldText(
-                      controller: _cubit.requiredSkillsController,
+                    CustomFieldMultiDropdown<String>(
                       title: 'organization.create_event.required_skills'.tr(),
+                      titleSize: AppSize.font(15),
+                      borderRadius: 20,
                       hintText: 'organization.create_event.required_skills_hint'
                           .tr(),
-                      titleSize: AppSize.font(15),
-                      titleColor:
-                          theme.textTheme.bodyMedium?.color ??
-                          AppColors.textPrimary,
-                      borderRadius: 20,
-                      validator: AppValidators.required,
+                      selectedItems: _cubit.selectedSkills,
+                      items: _cubit.skills.map((skill) {
+                        return DropdownItem(value: skill, child: Text(skill));
+                      }).toList(),
+                      onChanged: (skills) {
+                        _cubit.updateSelectedSkills(skills);
+                      },
                     ),
 
                     SizedBox(height: AppSize.getHeight(20)),
@@ -360,8 +395,14 @@ class _CreateEventFormState extends State<CreateEventForm> {
                       children: [
                         Expanded(
                           child: CustomButton(
+                            loading:
+                                state is Loading &&
+                                state.action == CreateOrganizationEventAction.draft,
                             onTap: () {
-                              _cubit.createEvent(status: "draft");
+                              _cubit.createOrganizationEvent(
+                                status: 'draft',
+                                action: CreateOrganizationEventAction.draft,
+                              );
                             },
                             title: 'organization.create_event.save_draft'.tr(),
                             textColor: AppColors.primary,
@@ -375,8 +416,14 @@ class _CreateEventFormState extends State<CreateEventForm> {
 
                         Expanded(
                           child: CustomButton(
+                            loading:
+                                state is Loading &&
+                                state.action == CreateOrganizationEventAction.publish,
                             onTap: () {
-                              _cubit.createEvent(status: "upcoming");
+                              _cubit.createOrganizationEvent(
+                                status: 'upcoming',
+                                action: CreateOrganizationEventAction.publish,
+                              );
                             },
                             title: 'organization.create_event.publish_event'
                                 .tr(),

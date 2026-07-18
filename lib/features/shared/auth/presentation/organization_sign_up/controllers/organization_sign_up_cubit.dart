@@ -12,7 +12,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../../../core/helper/app_navigator.dart';
 import '../../../../../../core/helper/app_toast.dart';
-import '../../../data/models/governorate_model.dart';
+import '../../../../../../core/shared/models/governorate_model.dart';
 import '../../../data/params/organization_sign_up_param.dart';
 import '../../../data/repos/organization/organization_repo.dart';
 import '../../sign_in/screens/sign_in_screen.dart';

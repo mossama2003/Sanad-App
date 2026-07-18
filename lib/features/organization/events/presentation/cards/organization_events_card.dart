@@ -2,51 +2,98 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
+import 'package:sanad_app/features/organization/events/data/models/organization_event_details_model.dart';
 
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/shared/widgets/custom_progress_bar.dart';
 import '../../../../../core/style/app_colors.dart';
 
-class OrganizationEventsCard extends StatefulWidget {
-  const OrganizationEventsCard({super.key});
+class OrganizationEventsCard extends StatelessWidget {
+  const OrganizationEventsCard({super.key, this.event, this.isLoading = false});
 
-  @override
-  State<OrganizationEventsCard> createState() => _OrganizationEventsCardState();
-}
+  final OrganizationEventDetailsModel? event;
+  final bool isLoading;
 
-class _OrganizationEventsCardState extends State<OrganizationEventsCard> {
+  String _getStatusText(String? status) {
+    switch (status) {
+      case "upcoming":
+        return "organization.events.filter.upcoming".tr();
+      case "completed":
+        return "organization.events.filter.completed".tr();
+      case "ongoing":
+        return "organization.events.filter.in_progress".tr();
+      case "draft":
+        return "organization.events.filter.drafted".tr();
+      default:
+        return "organization.events.filter.upcoming".tr();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final isDark = theme.brightness == Brightness.dark;
 
     final textColor = theme.colorScheme.onSurface;
 
-    final secondaryColor = textColor.withValues(alpha: 0.5);
+    final secondaryColor = textColor.withValues(alpha: .5);
+
+    final name = event?.name ?? "organization.create_event.event_name".tr();
+
+    final description =
+        event?.description ??
+        "organization.create_event.event_description_will_appear_here".tr();
+
+    final category =
+        event?.category ?? "organization.create_event.event_category".tr();
+
+    final status = _getStatusText(event?.status);
+
+
+    final attendeesCount = event?.attendees ?? 0;
+
+    final spots = event?.spots ?? 100;
+
+    final progress = spots == 0 ? 0.0 : attendeesCount / spots;
+
+    final date = event?.date;
+
+    final location = event?.location != null
+        ? event!.location.toString()
+        : "organization.create_event.location".tr();
 
     return Container(
       decoration: BoxDecoration(
         color: theme.cardColor,
+
         borderRadius: BorderRadius.circular(25),
+
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha: 0.4)
-                : AppColors.black.withValues(alpha: 0.15),
+                ? Colors.black.withValues(alpha: .4)
+                : AppColors.black.withValues(alpha: .15),
+
             blurRadius: 8,
           ),
         ],
       ),
+
       child: Padding(
         padding: AppSize.padding(all: 15),
+
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+
           children: [
             Row(
               children: [
                 Expanded(
                   child: Text(
-                    'organization.events_remove.beach_cleanup'.tr(),
+                    name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: AppSize.font(20),
                       fontWeight: FontWeight.w700,
@@ -58,13 +105,14 @@ class _OrganizationEventsCardState extends State<OrganizationEventsCard> {
                 Container(
                   padding: AppSize.padding(vertical: 3, horizontal: 10),
                   decoration: BoxDecoration(
-                    color: AppColors.laserBlue.withValues(alpha: .1),
+                    color: _statusColor(status).withValues(alpha: .1),
                     borderRadius: BorderRadius.circular(20),
                   ),
+
                   child: Text(
-                    'organization.events.filter.upcoming'.tr(),
+                    status,
                     style: TextStyle(
-                      color: AppColors.laserBlue,
+                      color: _statusColor(status),
                       fontSize: AppSize.font(12),
                       fontWeight: FontWeight.w500,
                     ),
@@ -82,7 +130,7 @@ class _OrganizationEventsCardState extends State<OrganizationEventsCard> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'organization.events.filter.environment'.tr(),
+                category,
                 style: TextStyle(
                   color: AppColors.primary,
                   fontSize: AppSize.font(12),
@@ -94,10 +142,11 @@ class _OrganizationEventsCardState extends State<OrganizationEventsCard> {
             SizedBox(height: AppSize.getHeight(10)),
 
             Text(
-              'organization.events_remove.beach_cleanup_desc'.tr(),
+              description,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: AppSize.font(15),
-                fontWeight: FontWeight.w400,
                 color: secondaryColor,
               ),
             ),
@@ -116,10 +165,11 @@ class _OrganizationEventsCardState extends State<OrganizationEventsCard> {
                 SizedBox(width: AppSize.getWidth(5)),
 
                 Text(
-                  '${'organization.home_removed.date'.tr()} • ${'organization.home_removed.10am'.tr()}',
+                  date != null
+                      ? DateFormat('dd MMM yyyy • hh:mm a').format(date)
+                      : "20 Jul 2026 • 10:00 AM",
                   style: TextStyle(
                     fontSize: AppSize.font(14),
-                    fontWeight: FontWeight.w400,
                     color: secondaryColor,
                   ),
                 ),
@@ -139,12 +189,15 @@ class _OrganizationEventsCardState extends State<OrganizationEventsCard> {
 
                 SizedBox(width: AppSize.getWidth(5)),
 
-                Text(
-                  'organization.home_removed.cairo_medical_canter'.tr(),
-                  style: TextStyle(
-                    fontSize: AppSize.font(14),
-                    fontWeight: FontWeight.w400,
-                    color: secondaryColor,
+                Expanded(
+                  child: Text(
+                    location,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: AppSize.font(14),
+                      color: secondaryColor,
+                    ),
                   ),
                 ),
               ],
@@ -158,7 +211,6 @@ class _OrganizationEventsCardState extends State<OrganizationEventsCard> {
                   'organization.events.volunteers'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(14),
-                    fontWeight: FontWeight.w400,
                     color: secondaryColor,
                   ),
                 ),
@@ -166,7 +218,7 @@ class _OrganizationEventsCardState extends State<OrganizationEventsCard> {
                 const Spacer(),
 
                 Text(
-                  'organization.home_removed.45_60'.tr(),
+                  '$attendeesCount / $spots',
                   style: TextStyle(
                     fontSize: AppSize.font(15),
                     color: textColor,
@@ -179,7 +231,7 @@ class _OrganizationEventsCardState extends State<OrganizationEventsCard> {
             SizedBox(height: AppSize.getHeight(6)),
 
             CustomProgressBar(
-              percent: 60,
+              percent: progress.clamp(0, 1),
               color: AppColors.primary,
               height: AppSize.getHeight(6),
             ),
@@ -237,6 +289,25 @@ class _OrganizationEventsCardState extends State<OrganizationEventsCard> {
     );
   }
 
+  Color _statusColor(String status) {
+    switch (status) {
+      case "upcoming":
+        return AppColors.laserBlue;
+
+      case "completed":
+        return AppColors.primary;
+
+      case "ongoing":
+        return AppColors.bronze;
+
+      case "draft":
+        return AppColors.primary;
+
+      default:
+        return AppColors.primary;
+    }
+  }
+
   Widget _buildEventAction({
     required String icon,
     required String title,
@@ -249,6 +320,7 @@ class _OrganizationEventsCardState extends State<OrganizationEventsCard> {
         borderRadius: BorderRadius.circular(20),
         color: backgroundColor,
       ),
+
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

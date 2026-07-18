@@ -1,6 +1,6 @@
 import 'dart:io';
 
-class CreateEventParam {
+class CreateOrganizationEventParam {
   final String name;
   final String description;
   final String category;
@@ -14,7 +14,7 @@ class CreateEventParam {
   final String status;
   final File? cover;
 
-  CreateEventParam({
+  CreateOrganizationEventParam({
     required this.name,
     required this.description,
     required this.category,

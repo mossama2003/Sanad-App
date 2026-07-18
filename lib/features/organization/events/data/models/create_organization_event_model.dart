@@ -1,4 +1,4 @@
-class CreateEventModel {
+class CreateOrganizationEventModel {
   final int id;
   final String status;
   final String locationUrl;
@@ -18,7 +18,7 @@ class CreateEventModel {
   final int? spotTotal;
   final String? qr;
 
-  CreateEventModel({
+  CreateOrganizationEventModel({
     required this.id,
     required this.status,
     required this.locationUrl,
@@ -39,8 +39,8 @@ class CreateEventModel {
     this.qr,
   });
 
-  factory CreateEventModel.fromJson(Map<String, dynamic> json) {
-    return CreateEventModel(
+  factory CreateOrganizationEventModel.fromJson(Map<String, dynamic> json) {
+    return CreateOrganizationEventModel(
       id: json['id'],
       status: json['status'],
       locationUrl: json['location_url'],

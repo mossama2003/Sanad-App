@@ -16,9 +16,9 @@ import 'package:flutter/services.dart';
 
 import '../../../../../../core/helper/app_navigator.dart';
 import '../../../../../../core/helper/app_toast.dart';
-import '../../../data/models/governorate_model.dart';
+import '../../../../../../core/shared/models/governorate_model.dart';
 import '../../sign_in/screens/sign_in_screen.dart';
-import '../../../data/models/city_model.dart';
+import '../../../../../../core/shared/models/city_model.dart';
 
 part 'volunteer_sign_up_state.dart';
 

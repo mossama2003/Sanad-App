@@ -9,12 +9,12 @@ import 'package:flutter/material.dart';
 
 import '../../../../../../core/constant/app_size.dart';
 import '../../../../../../core/helper/app_toast.dart';
+import '../../../../../../core/shared/models/governorate_model.dart';
 import '../../../../../../core/shared/widgets/custom_field_dropdown.dart';
 import '../../../../../../core/shared/widgets/custom_field_text.dart';
 import '../../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../../core/style/app_colors.dart';
 import '../../../../../../core/validator/app_validators.dart';
-import '../../../data/models/governorate_model.dart';
 import '../../../data/repos/organization/organization_repo.dart';
 import '../controllers/organization_sign_up_cubit.dart';
 
@@ -536,11 +536,8 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
 
                   CustomButton(
                     loading: state is Loading,
-
                     onTap: _onSignUp,
-
                     title: 'organization.sign_up.sign_up_button'.tr(),
-
                     bgColor: AppColors.laserBlue,
                   ),
                 ],

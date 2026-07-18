@@ -17,6 +17,7 @@ class CustomFieldDropdown<T> extends StatelessWidget {
     this.validator,
     this.enabled = true,
     this.isRequired = false,
+    this.borderRadius = 12,
     required this.items,
     required this.selected,
     required this.onChanged,
@@ -33,6 +34,8 @@ class CustomFieldDropdown<T> extends StatelessWidget {
 
   final String? hintText;
 
+  final double borderRadius;
+
   final ValueChanged<T?> onChanged;
 
   final List<DropdownItem<T>>? items;
@@ -45,9 +48,7 @@ class CustomFieldDropdown<T> extends StatelessWidget {
 
     final textColor = theme.textTheme.bodyMedium?.color;
 
-    final hintColor = theme.textTheme.bodySmall?.color?.withValues(
-      alpha: .6,
-    );
+    final hintColor = theme.textTheme.bodySmall?.color?.withValues(alpha: .6);
 
     final borderColor = theme.dividerColor;
 
@@ -65,14 +66,14 @@ class CustomFieldDropdown<T> extends StatelessWidget {
               ),
               children: isRequired
                   ? [
-                TextSpan(
-                  text: ' *',
-                  style: TextStyle(
-                    color: AppColors.red,
-                    fontSize: titleSize ?? AppSize.font(12),
-                  ),
-                ),
-              ]
+                      TextSpan(
+                        text: ' *',
+                        style: TextStyle(
+                          color: AppColors.red,
+                          fontSize: titleSize ?? AppSize.font(12),
+                        ),
+                      ),
+                    ]
                   : [],
             ),
           ),
@@ -85,6 +86,8 @@ class CustomFieldDropdown<T> extends StatelessWidget {
 
           valueListenable: selected,
 
+          isExpanded: true,
+
           validator: validator,
 
           autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -96,17 +99,14 @@ class CustomFieldDropdown<T> extends StatelessWidget {
           ),
 
           hint: hintText != null && selected.value == null
-              ? Text(
-            hintText!,
-            style: TextStyle(color: hintColor).xs,
-          )
+              ? Text(hintText!, style: TextStyle(color: hintColor).xs)
               : null,
 
           onChanged: enabled
               ? (value) {
-            selected.value = value;
-            onChanged(value);
-          }
+                  selected.value = value;
+                  onChanged(value);
+                }
               : null,
 
           iconStyleData: IconStyleData(
@@ -128,7 +128,7 @@ class CustomFieldDropdown<T> extends StatelessWidget {
           dropdownStyleData: DropdownStyleData(
             decoration: BoxDecoration(
               color: theme.cardColor,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(borderRadius),
             ),
           ),
 
@@ -139,49 +139,33 @@ class CustomFieldDropdown<T> extends StatelessWidget {
 
             enabled: enabled,
 
-            hintStyle: TextStyle(
-              color: hintColor,
-            ).xs,
+            hintStyle: TextStyle(color: hintColor).xs,
 
-            errorStyle: TextStyle(
-              fontSize: AppSize.font(14),
-            ),
+            errorStyle: TextStyle(fontSize: AppSize.font(14)),
 
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: borderColor,
-              ),
+              borderRadius: BorderRadius.circular(borderRadius),
+              borderSide: BorderSide(color: borderColor),
             ),
 
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: borderColor,
-              ),
+              borderRadius: BorderRadius.circular(borderRadius),
+              borderSide: BorderSide(color: borderColor),
             ),
 
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: AppColors.primary,
-                width: 1.5,
-              ),
+              borderRadius: BorderRadius.circular(borderRadius),
+              borderSide: BorderSide(color: AppColors.primary, width: 1.5),
             ),
 
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                color: Colors.red,
-              ),
+              borderRadius: BorderRadius.circular(borderRadius),
+              borderSide: const BorderSide(color: Colors.red),
             ),
 
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                color: Colors.red,
-                width: 1.5,
-              ),
+              borderRadius: BorderRadius.circular(borderRadius),
+              borderSide: const BorderSide(color: Colors.red, width: 1.5),
             ),
           ),
         ),

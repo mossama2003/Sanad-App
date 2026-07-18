@@ -39,6 +39,7 @@
         "pretty_dio_logger",
         "share_plus",
         "shared_preferences",
+        "skeletonizer",
         "smooth_page_indicator",
         "top_snackbar_flutter",
         "url_launcher"
@@ -71,6 +72,13 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "skeletonizer",
+      "version": "2.1.3",
+      "dependencies": [
+        "flutter"
       ]
     },
     {

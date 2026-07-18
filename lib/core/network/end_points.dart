@@ -17,5 +17,6 @@ String DELETE_ACCOUNT = 'v1/users/profile/delete/';
 /// Skills
 String GET_SKILLS = 'v1/categories/select_category/';
 
-/// Events
-String CREATE_EVENT = 'v1/events/manage_event/';
+/// Organization Events
+String CREATE_ORGANIZATION_EVENT = 'v1/events/manage_event/';
+String GET_ORGANIZATION_EVENTS = 'v1/events/read_event/';

@@ -974,6 +974,12 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "skeletonizer",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/skeletonizer-2.1.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
       "name": "sky_engine",
       "rootUri": "file:///Users/mohamed/development/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
