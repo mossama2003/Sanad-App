@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../../events/presentation/screens/events_screen.dart';
+import '../../../events/presentation/screens/volunteer_events_screen.dart';
 
 class VolunteerUpcomingEventsSection extends StatelessWidget {
   const VolunteerUpcomingEventsSection({super.key});
@@ -26,7 +26,7 @@ class VolunteerUpcomingEventsSection extends StatelessWidget {
             ),
             Spacer(),
             TextButton(
-              onPressed: () => AppNavigator.push(EventsScreen()),
+              onPressed: () => AppNavigator.push(VolunteerEventsScreen()),
               child: Text(
                 'volunteer.home.upcoming_events.view_all'.tr(),
                 style: TextStyle(

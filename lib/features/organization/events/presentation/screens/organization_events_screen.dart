@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/shared/widgets/custom_selectable_chips.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../home/presentation/widgets/organization_home_appbar_widget.dart';
-import '../../data/repos/Organization_events_repo.dart';
+import '../../data/repos/organization_events_repo.dart';
 import '../controllers/organization_events_cubit.dart';
 import '../forms/create_organization_event_form.dart';
 import '../../../../../core/constant/app_size.dart';

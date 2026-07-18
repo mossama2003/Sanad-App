@@ -111,7 +111,7 @@ class EmergencyCard extends StatelessWidget {
           Row(
             children: [
               CustomIcon(
-                icon: AppIcons.duration,
+                icon: AppIcons.time,
                 color: AppColors.grey800,
                 width: AppSize.getSize(15),
                 height: AppSize.getSize(15),

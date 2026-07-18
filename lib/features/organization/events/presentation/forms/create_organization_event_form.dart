@@ -15,7 +15,7 @@ import '../../../../../core/shared/widgets/custom_field_multi_dropdown.dart';
 import '../../../../../core/validator/app_validators.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../data/repos/Organization_events_repo.dart';
+import '../../data/repos/organization_events_repo.dart';
 import '../controllers/organization_events_cubit.dart';
 
 class CreateOrganizationEventForm extends StatefulWidget {

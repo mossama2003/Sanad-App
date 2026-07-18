@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
-import 'package:sanad_app/features/organization/events/data/models/get_organization_events_param.dart';
+import 'package:sanad_app/features/organization/events/data/params/get_organization_events_param.dart';
 import 'package:sanad_app/features/organization/events/data/models/organization_event_details_model.dart';
 
 import '../../../../../core/helper/app_toast.dart';
@@ -15,7 +15,7 @@ import '../../../../../core/shared/models/city_model.dart';
 import '../../../../../core/shared/models/governorate_model.dart';
 import '../../../../../core/storage/hive/hive_boxes.dart';
 import '../../data/params/create_organization_event_param.dart';
-import '../../data/repos/Organization_events_repo.dart';
+import '../../data/repos/organization_events_repo.dart';
 
 part 'organization_events_state.dart';
 
@@ -415,7 +415,6 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   }
 
   // ===================== Get Organization Events =====================
-
   Future<void> getOrganizationEvents({
     bool refresh = false,
     String? status,
@@ -428,6 +427,10 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     // Load Cache First
     if (!refresh && events.isEmpty) {
       loadEventsFromCache();
+
+      if (!shouldRefreshEvents() && events.isNotEmpty) {
+        return;
+      }
     }
 
     final result = await repo.getOrganizationEvents(

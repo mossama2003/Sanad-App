@@ -34,7 +34,7 @@ void main() async {
   await AppLocales.init();
 
   /// DIO INITIALIZATION
-  DioHelper.init();
+  await DioHelper.init();
 
   /// DISABLE AUTO ROTATE
   SystemChrome.setPreferredOrientations([

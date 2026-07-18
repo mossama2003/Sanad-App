@@ -12,7 +12,6 @@ class OrganizationEventsCard extends StatelessWidget {
   const OrganizationEventsCard({
     super.key,
     this.event,
-    this.isLoading = false,
     this.onQrTap,
     this.onChatTap,
     this.onEditTap,
@@ -20,7 +19,6 @@ class OrganizationEventsCard extends StatelessWidget {
   });
 
   final OrganizationEventDetailsModel? event;
-  final bool isLoading;
 
   final VoidCallback? onQrTap;
   final VoidCallback? onChatTap;

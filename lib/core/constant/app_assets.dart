@@ -63,7 +63,6 @@ class AppIcons {
   static String search = '$icons/search.svg';
   static String filter = '$icons/filter.svg';
   static String location = '$icons/location.svg';
-  static String duration = '$icons/duration.svg';
   static String chat = '$icons/chat.svg';
   static String check = '$icons/check.svg';
   static String phone = '$icons/phone.svg';
