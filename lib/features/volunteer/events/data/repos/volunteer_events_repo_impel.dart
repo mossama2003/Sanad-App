@@ -29,6 +29,51 @@ class VolunteerEventsRepoImpel implements VolunteerEventsRepo {
     }
   }
 
+  // ================= JOIN EVENT =================
+
+  @override
+  Future<Either<Failure, Unit>> joinEvent(int eventId) async {
+    try {
+      final response = await DioHelper.post(
+        url: JOIN_EVENT,
+        data: {
+          "event": eventId,
+        },
+      );
+
+      if (response.statusCode == 200 ||
+          response.statusCode == 201) {
+        return right(unit);
+      }
+
+      return left(ServerFailure.fromResponse(response));
+    } catch (e) {
+      return left(ServerFailure.fromCatchError(e));
+    }
+  }
+
+  // ================= LEAVE EVENT =================
+
+  @override
+  Future<Either<Failure, dynamic>> leaveEvent(int eventId) async {
+    try {
+      final response = await DioHelper.post(
+        url: LEAVE_EVENT,
+        data: {
+          "event": eventId,
+        },
+      );
+
+      if (response.statusCode == 201) {
+        return right(response.data);
+      }
+
+      return left(ServerFailure.fromResponse(response));
+    } catch (e) {
+      return left(ServerFailure.fromCatchError(e));
+    }
+  }
+
   // ================= HIVE =================
   Future<void> _saveEvents(List<VolunteerEventDetailsModel> events) async {
     await _eventsBox.clear();

@@ -11,6 +11,7 @@ import '../params/get_organization_events_param.dart';
 import '../models/organization_event_details_model.dart';
 import '../models/paginated_organization_event_model.dart';
 import '../params/create_organization_event_param.dart';
+import '../params/organization_event_update_param.dart';
 
 part 'organization_events_repo_impel.dart';
 
@@ -21,6 +22,10 @@ abstract class OrganizationEventsRepo {
 
   Future<Either<Failure, PaginatedOrganizationEventModel>>
   getOrganizationEvents(GetOrganizationEventsParam param);
+
+  Future<Either<Failure, CreateOrganizationEventModel>> updateOrganizationEvent(
+    OrganizationEventUpdateParam param,
+  );
 
   Future<Either<Failure, void>> deleteOrganizationEvent(int id);
 }

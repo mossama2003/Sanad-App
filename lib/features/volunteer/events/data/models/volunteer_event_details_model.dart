@@ -91,6 +91,37 @@ class VolunteerEventDetailsModel extends HiveObject {
     this.modified,
   });
 
+  VolunteerEventDetailsModel copyWith({
+    int? joiners,
+    int? attendees,
+    int? spots,
+    bool? joined,
+  }) {
+    return VolunteerEventDetailsModel(
+      id: id,
+      creator: creator,
+      location: location,
+      joiners: joiners ?? this.joiners,
+      attendees: attendees ?? this.attendees,
+      spots: spots ?? this.spots,
+      joined: joined ?? this.joined,
+      avgRating: avgRating,
+      unreadChatMessages: unreadChatMessages,
+      latestMessage: latestMessage,
+      cover: cover,
+      name: name,
+      description: description,
+      category: category,
+      date: date,
+      due: due,
+      skills: skills,
+      status: status,
+      qr: qr,
+      created: created,
+      modified: modified,
+    );
+  }
+
   factory VolunteerEventDetailsModel.fromJson(Map<String, dynamic> json) {
     return VolunteerEventDetailsModel(
       id: json['id'] ?? 0,

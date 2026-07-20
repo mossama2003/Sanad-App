@@ -5,13 +5,14 @@ import 'package:sanad_app/core/style/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/helper/app_navigator.dart';
+import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/shared/widgets/custom_search_field.dart';
 import '../../../../../core/shared/widgets/custom_selectable_chips.dart';
 import '../../../home/presentation/widgets/volunteer_home_appbar_widget.dart';
 import '../../data/repos/volunteer_events_repo.dart';
 import '../cards/volunteer_events_card.dart';
 import '../controllers/volunteer_events_cubit.dart';
-import '../dialogs/Volunteer_events_bottom_sheet.dart';
+import '../dialogs/volunteer_events_bottom_sheet.dart';
 
 class VolunteerEventsScreen extends StatefulWidget {
   const VolunteerEventsScreen({super.key});
@@ -127,40 +128,29 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                             borderColor: AppColors.primary,
                             items: [
                               'volunteer.events.filter.all'.tr(),
-                              'volunteer.events.filter.blood_donation'.tr(),
-                              'volunteer.events.filter.environment'.tr(),
-                              'volunteer.events.filter.orphanage'.tr(),
-                              'volunteer.events.filter.education'.tr(),
-                              'volunteer.events.filter.healthcare'.tr(),
+                              ..._cubit.eventCategories.map(
+                                (e) => _cubit.categoryTranslations[e]!,
+                              ),
                             ],
                             onChanged: (selected) {
                               if (selected.isEmpty) return;
 
-                              final selectedItem = selected.first;
+                              final selectedText = selected.first;
 
-                              String? category;
-
-                              if (selectedItem ==
-                                  'volunteer.events.filter.blood_donation'
-                                      .tr()) {
-                                category = 'Blood Donation';
-                              } else if (selectedItem ==
-                                  'volunteer.events.filter.environment'.tr()) {
-                                category = 'Environment';
-                              } else if (selectedItem ==
-                                  'volunteer.events.filter.orphanage'.tr()) {
-                                category = 'Children Support';
-                              } else if (selectedItem ==
-                                  'volunteer.events.filter.education'.tr()) {
-                                category = 'Education';
-                              } else if (selectedItem ==
-                                  'volunteer.events.filter.healthcare'.tr()) {
-                                category = 'Healthcare';
+                              if (selectedText ==
+                                  'volunteer.events.filter.all'.tr()) {
+                                _cubit.getVolunteerEvents(
+                                  refresh: true,
+                                  status: _cubit.selectedStatus,
+                                  category: null,
+                                );
+                                return;
                               }
 
                               _cubit.getVolunteerEvents(
                                 refresh: true,
-                                // category: category,
+                                status: _cubit.selectedStatus,
+                                category: _cubit.getCategoryKey(selectedText),
                               );
                             },
                           ),
@@ -185,7 +175,8 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                           Text(
                             'volunteer.events.showing_events'.tr(
                               namedArgs: {
-                                'count': _cubit.events.length.toString(),
+                                'count': _cubit.filteredEvents.length
+                                    .toString(),
                               },
                             ),
                             style: TextStyle(
@@ -200,7 +191,7 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                     ),
                   ),
 
-                  if (_cubit.events.isEmpty)
+                  if (_cubit.filteredEvents.isEmpty)
                     SliverFillRemaining(
                       child: Center(
                         child: Text(
@@ -218,7 +209,7 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
-                            if (index == _cubit.events.length) {
+                            if (index == _cubit.filteredEvents.length) {
                               return Padding(
                                 padding: AppSize.padding(vertical: 20),
                                 child: const Center(
@@ -227,7 +218,7 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                               );
                             }
 
-                            final event = _cubit.events[index];
+                            final event = _cubit.filteredEvents[index];
 
                             return Padding(
                               padding: AppSize.padding(bottom: 15),
@@ -240,13 +231,33 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                                   );
                                 },
                                 onJoinTap: () {
-                                  // TODO Join Event
+                                  if (event.joined) {
+                                    AppNavigator.dialog(
+                                      ConfirmDialog(
+                                        title: 'volunteer.events.leave_title'
+                                            .tr(),
+                                        message:
+                                            'volunteer.events.leave_message'
+                                                .tr(),
+                                        confirmText:
+                                            'volunteer.events.leave_confirm'
+                                                .tr(),
+                                        cancelText: 'core.cancel'.tr(),
+                                        isDestructive: true,
+                                        onConfirm: () {
+                                          _cubit.leaveEvent(event.id);
+                                        },
+                                      ),
+                                    );
+                                  } else {
+                                    _cubit.joinEvent(event.id);
+                                  }
                                 },
                               ),
                             );
                           },
                           childCount:
-                              _cubit.events.length +
+                              _cubit.filteredEvents.length +
                               (_cubit.nextPage != null ? 1 : 0),
                         ),
                       ),

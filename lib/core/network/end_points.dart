@@ -26,8 +26,13 @@ String GET_SKILLS = 'v1/categories/select_category/';
 String GET_EVENTS = 'v1/events/read_event/';
 
 /// Volunteering Events
+String JOIN_EVENT = 'v1/events/join/';
+
+String LEAVE_EVENT = 'v1/events/leave/';
 
 /// Organization Events
 String CREATE_ORGANIZATION_EVENT = 'v1/events/manage_event/';
+
+String UPDATE_ORGANIZATION_EVENT(int ID) => 'v1/events/manage_event/$ID/';
 
 String DELETE_ORGANIZATION_EVENT(int ID) => 'v1/events/manage_event/$ID/';

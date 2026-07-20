@@ -53,6 +53,7 @@ dependencies:
   dotted_border: ^3.1.0
   dio_cookie_manager: ^3.4.0
   cookie_jar: ^4.0.9
+  qr_flutter: ^4.1.0
 
   #Caching
   hive: ^2.2.3

@@ -6,15 +6,17 @@ import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
+import '../../../home/presentation/widgets/organization_home_appbar_widget.dart';
 import '../../../../../core/shared/widgets/custom_selectable_chips.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
-import '../../../home/presentation/widgets/organization_home_appbar_widget.dart';
 import '../../data/repos/organization_events_repo.dart';
 import '../controllers/organization_events_cubit.dart';
-import '../forms/create_organization_event_form.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../cards/organization_events_card.dart';
+import '../dialogs/organization_publish_dialog.dart';
+import 'organization_event_form_screen.dart';
+import 'organization_qr_code_screen.dart';
 
 class OrganizationEventsScreen extends StatefulWidget {
   const OrganizationEventsScreen({super.key});
@@ -74,13 +76,22 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
 
           floatingActionButton: FloatingActionButton(
             onPressed: () {
-              AppNavigator.push(const CreateOrganizationEventForm());
+              AppNavigator.push(
+                BlocProvider.value(
+                  value: _cubit,
+                  child: const OrganizationEventFormScreen(),
+                ),
+              );
             },
+
             backgroundColor: AppColors.primary,
+
             elevation: 5,
+
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
+
             child: CustomIcon(
               icon: AppIcons.add,
               color: AppColors.white,
@@ -104,6 +115,7 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
                 slivers: [
                   const SliverToBoxAdapter(
                     child: OrganizationHomeAppbarWidget(),
+                    // child: VolunteerHomeAppbarWidget(),
                   ),
 
                   SliverPadding(
@@ -227,21 +239,64 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
                               child: OrganizationEventsCard(
                                 event: event,
 
+                                onQrTap: () => AppNavigator.push(
+                                  OrganizationQrCodeScreen(),
+                                ),
+
+                                onPublishTap: () {
+                                  AppNavigator.dialog(
+                                    OrganizationPublishDialog(
+                                      event: event,
+                                      loading: state is Loading,
+                                      onPublish: (date) {
+                                        _cubit.publishOrganizationEvent(
+                                          id: event.id,
+                                          date: date,
+                                        );
+                                      },
+
+                                      onEditFullEvent: () {
+                                        AppNavigator.push(
+                                          BlocProvider.value(
+                                            value: _cubit,
+                                            child: OrganizationEventFormScreen(
+                                              event: event,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+
+                                onEditTap: () {
+                                  AppNavigator.push(
+                                    BlocProvider.value(
+                                      value: _cubit,
+                                      child: OrganizationEventFormScreen(
+                                        event: event,
+                                      ),
+                                    ),
+                                  );
+                                },
+
                                 onDeleteTap: () {
                                   final eventId = event.id;
-
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => ConfirmDialog(
+                                  AppNavigator.dialog(
+                                    ConfirmDialog(
                                       title: 'organization.events.delete'.tr(),
+
                                       message: 'organization.events.delete_desc'
                                           .tr(),
+
                                       confirmText: 'organization.events.delete'
                                           .tr(),
+
                                       isDestructive: true,
 
                                       onConfirm: () async {
                                         if (!context.mounted) return;
+
                                         await _cubit.deleteOrganizationEvent(
                                           id: eventId,
                                         );

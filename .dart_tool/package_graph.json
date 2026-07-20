@@ -39,6 +39,7 @@
         "permission_handler",
         "pin_code_fields",
         "pretty_dio_logger",
+        "qr_flutter",
         "share_plus",
         "shared_preferences",
         "smooth_page_indicator",
@@ -144,6 +145,14 @@
       "dependencies": [
         "crypto",
         "meta"
+      ]
+    },
+    {
+      "name": "qr_flutter",
+      "version": "4.1.0",
+      "dependencies": [
+        "flutter",
+        "qr"
       ]
     },
     {
@@ -2339,6 +2348,13 @@
         "flutter",
         "meta",
         "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "qr",
+      "version": "3.0.2",
+      "dependencies": [
+        "meta"
       ]
     }
   ],

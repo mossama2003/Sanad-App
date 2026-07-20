@@ -91,9 +91,7 @@ class OrganizationEventDetailsModel extends HiveObject {
     this.modified,
   });
 
-  factory OrganizationEventDetailsModel.fromJson(
-      Map<String, dynamic> json,
-      ) {
+  factory OrganizationEventDetailsModel.fromJson(Map<String, dynamic> json) {
     return OrganizationEventDetailsModel(
       id: json['id'] ?? 0,
 
@@ -135,9 +133,7 @@ class OrganizationEventDetailsModel extends HiveObject {
 
       date: DateTime.parse(json['date']),
 
-      due: json['due'] != null
-          ? DateTime.parse(json['due'])
-          : null,
+      due: json['due'] != null ? DateTime.parse(json['due']) : null,
 
       skills: List<String>.from(json['skills'] ?? []),
 
@@ -145,13 +141,59 @@ class OrganizationEventDetailsModel extends HiveObject {
 
       qr: json['qr'],
 
-      created: json['created'] != null
-          ? DateTime.parse(json['created'])
-          : null,
+      created: json['created'] != null ? DateTime.parse(json['created']) : null,
 
       modified: json['modified'] != null
           ? DateTime.parse(json['modified'])
           : null,
+    );
+  }
+
+  OrganizationEventDetailsModel copyWith({
+    int? id,
+    Map<String, dynamic>? creator,
+    Map<String, dynamic>? location,
+    int? joiners,
+    int? attendees,
+    int? spots,
+    bool? joined,
+    double? avgRating,
+    int? unreadChatMessages,
+    Map<String, dynamic>? latestMessage,
+    String? cover,
+    String? name,
+    String? description,
+    String? category,
+    DateTime? date,
+    DateTime? due,
+    List<String>? skills,
+    String? status,
+    String? qr,
+    DateTime? created,
+    DateTime? modified,
+  }) {
+    return OrganizationEventDetailsModel(
+      id: id ?? this.id,
+      creator: creator ?? this.creator,
+      location: location ?? this.location,
+      joiners: joiners ?? this.joiners,
+      attendees: attendees ?? this.attendees,
+      spots: spots ?? this.spots,
+      joined: joined ?? this.joined,
+      avgRating: avgRating ?? this.avgRating,
+      unreadChatMessages: unreadChatMessages ?? this.unreadChatMessages,
+      latestMessage: latestMessage ?? this.latestMessage,
+      cover: cover ?? this.cover,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      date: date ?? this.date,
+      due: due ?? this.due,
+      skills: skills ?? this.skills,
+      status: status ?? this.status,
+      qr: qr ?? this.qr,
+      created: created ?? this.created,
+      modified: modified ?? this.modified,
     );
   }
 }

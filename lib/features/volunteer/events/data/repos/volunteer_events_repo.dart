@@ -15,4 +15,8 @@ abstract class VolunteerEventsRepo {
   Future<Either<Failure, PaginatedVolunteerEventModel>> getVolunteerEvents(
     GetVolunteerEventsParam param,
   );
+
+  Future<Either<Failure, Unit>> joinEvent(int eventId);
+
+  Future<Either<Failure, dynamic>> leaveEvent(int eventId);
 }

@@ -94,6 +94,7 @@ class AppIcons {
   static String pin = '$icons/pin.svg';
   static String info = '$icons/info.svg';
   static String send = '$icons/send.svg';
+  static String publish = '$icons/publish.svg';
   static String blood = '$icons/blood.svg';
   static String business = '$icons/business.svg';
   static String car = '$icons/car.svg';
@@ -106,4 +107,6 @@ class AppIcons {
   static String contactSupport = '$icons/contact_support.svg';
   static String edit = '$icons/edit.svg';
   static String time = '$icons/time.svg';
+  static String download = '$icons/download.svg';
+  static String fullScreen = '$icons/full-screen.svg';
 }

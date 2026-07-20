@@ -1,28 +1,36 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter/material.dart';
-import 'package:sanad_app/core/helper/app_navigator.dart';
-import 'package:sanad_app/features/organization/events/data/params/get_organization_events_param.dart';
 import 'package:sanad_app/features/organization/events/data/models/organization_event_details_model.dart';
+import 'package:sanad_app/features/organization/events/data/params/get_organization_events_param.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:sanad_app/core/helper/app_navigator.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 
 import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/shared/models/city_model.dart';
 import '../../../../../core/shared/models/governorate_model.dart';
 import '../../../../../core/storage/hive/hive_boxes.dart';
 import '../../data/params/create_organization_event_param.dart';
+import '../../data/params/organization_event_update_param.dart';
 import '../../data/repos/organization_events_repo.dart';
 
 part 'organization_events_state.dart';
 
 enum CreateOrganizationEventAction { draft, publish }
 
+enum OrganizationEventFormMode { create, edit }
+
 class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
-  OrganizationEventsCubit(this.repo) : super(EventsInitial());
+  OrganizationEventsCubit(this.repo, {this.editingEvent})
+    : super(EventsInitial()) {
+    if (editingEvent != null) {
+      formMode = OrganizationEventFormMode.edit;
+    }
+  }
 
   final OrganizationEventsRepo repo;
 
@@ -37,6 +45,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
   final eventNameController = TextEditingController();
   final eventDescriptionController = TextEditingController();
+  final otherCategoryController = TextEditingController();
   final dateController = TextEditingController();
   final startTimeController = TextEditingController();
   final endTimeController = TextEditingController();
@@ -44,11 +53,21 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   final locationAddressController = TextEditingController();
   final requiredVolunteersController = TextEditingController();
 
+  // ===================== Edit Mode =====================
+
+  OrganizationEventDetailsModel? editingEvent;
+
+  OrganizationEventFormMode formMode = OrganizationEventFormMode.create;
+
+  bool get isEditMode => formMode == OrganizationEventFormMode.edit;
+
   CreateOrganizationEventAction? loadingAction;
 
   // ===================== Event =====================
 
   File? eventCover;
+
+  bool removeOldCover = false;
 
   String? selectedStatus;
 
@@ -110,9 +129,22 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     'Technology',
     'Career Development',
     'Emergency Relief',
+    'Other',
   ];
 
   final selectedCategory = ValueNotifier<String?>(null);
+
+  bool get isOtherCategory => selectedCategory.value == 'Other';
+
+  void selectCategory(String? value) {
+    selectedCategory.value = value;
+
+    if (value != 'Other') {
+      otherCategoryController.clear();
+    }
+
+    emit(Success());
+  }
 
   // ===================== Skills =====================
 
@@ -157,6 +189,8 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     filteredCities = cities
         .where((city) => city.governorateId == governorate.id)
         .toList();
+
+    emit(Success());
   }
 
   void selectCity(CityModel city) {
@@ -198,6 +232,73 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
       AppToast.error(e.toString());
     }
+  }
+
+  // ===================== Fill Edit Data =====================
+
+  Future<void> fillEventData(OrganizationEventDetailsModel event) async {
+    editingEvent = event;
+
+    formMode = OrganizationEventFormMode.edit;
+
+    eventCover = null;
+    removeOldCover = false;
+
+    eventNameController.text = event.name;
+
+    eventDescriptionController.text = event.description;
+
+    if (eventCategories.contains(event.category)) {
+      selectedCategory.value = event.category;
+      otherCategoryController.clear();
+    } else {
+      selectedCategory.value = 'Other';
+      otherCategoryController.text = event.category;
+    }
+
+    dateController.text = DateFormat('dd/MM/yyyy').format(event.date);
+
+    startTime = TimeOfDay(hour: event.date.hour, minute: event.date.minute);
+
+    startTimeController.text = startTime!.format(
+      AppNavigator.key.currentContext!,
+    );
+
+    locationLinkController.text = event.location?['url'] ?? '';
+
+    locationAddressController.text = event.location?['description'] ?? '';
+
+    requiredVolunteersController.text = event.spots.toString();
+
+    selectedSkills.value = List<String>.from(event.skills);
+
+    // ===================== Load Location Data =====================
+
+    if (governorates.isEmpty || cities.isEmpty) {
+      await loadLocationData();
+    }
+
+    final govName = event.location?['state'];
+
+    final cityName = event.location?['city'];
+
+    final gov = governorates.firstWhere(
+      (e) => e.nameEn == govName,
+      orElse: () => governorates.first,
+    );
+
+    selectedGov.value = gov;
+
+    filteredCities = cities.where((e) => e.governorateId == gov.id).toList();
+
+    final city = filteredCities.firstWhere(
+      (e) => e.nameEn == cityName,
+      orElse: () => filteredCities.first,
+    );
+
+    selectedCity.value = city;
+
+    emit(Success());
   }
 
   // ===================== Event Date Time =====================
@@ -242,6 +343,8 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       if (image == null) return;
 
       eventCover = File(image.path);
+      removeOldCover = false;
+      emit(Success());
     } catch (e) {
       emit(Error());
     }
@@ -249,6 +352,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
   void removeEventCover() {
     eventCover = null;
+    removeOldCover = true;
     emit(Success());
   }
 
@@ -344,7 +448,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
     if (eventCover == null) {
       AppToast.error(
-        'organization.create_event.pleasee_select_event_cover'.tr(),
+        'organization.create_edit_event.pleasee_select_event_cover'.tr(),
       );
       return;
     }
@@ -384,10 +488,138 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
         emit(Success());
 
         AppToast.success(
-          'organization.create_event.event_created_successfully'.tr(),
+          'organization.create_edit_event.event_created_successfully'.tr(),
         );
 
         AppNavigator.pop();
+      },
+    );
+  }
+
+  // ===================== Update Event =====================
+
+  Future<void> updateOrganizationEvent({
+    required int id,
+    bool publish = true,
+  }) async {
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
+
+    loadingAction = CreateOrganizationEventAction.publish;
+
+    emit(Loading());
+
+    final result = await repo.updateOrganizationEvent(
+      OrganizationEventUpdateParam(
+        id: id,
+
+        name: eventNameController.text.trim(),
+
+        description: eventDescriptionController.text.trim(),
+
+        category: selectedCategory.value,
+
+        locationUrl: locationLinkController.text.trim(),
+
+        locationCity: selectedCity.value?.nameEn,
+
+        locationState: selectedGov.value?.nameEn,
+
+        locationDescription: locationAddressController.text.trim(),
+
+        date: getEventDateTime(),
+
+        spots: int.tryParse(requiredVolunteersController.text),
+
+        skills: selectedSkills.value,
+
+        cover: eventCover,
+
+        status: publish ? "upcoming" : null,
+      ),
+    );
+
+    result.fold(
+      (failure) {
+        loadingAction = null;
+
+        emit(Error());
+
+        AppToast.error(failure.errMessage);
+      },
+      (_) async {
+        loadingAction = null;
+
+        final index = events.indexWhere((e) => e.id == id);
+
+        if (index != -1) {
+          final oldEvent = events[index];
+
+          events[index] = oldEvent.copyWith(
+            name: eventNameController.text.trim(),
+            description: eventDescriptionController.text.trim(),
+            category: selectedCategory.value == 'Other'
+                ? otherCategoryController.text.trim()
+                : selectedCategory.value,
+            date: getEventDateTime(),
+            spots:
+                int.tryParse(requiredVolunteersController.text) ??
+                oldEvent.spots,
+            skills: selectedSkills.value,
+            location: {
+              'url': locationLinkController.text.trim(),
+              'description': locationAddressController.text.trim(),
+              'city': selectedCity.value?.nameEn,
+              'state': selectedGov.value?.nameEn,
+            },
+            cover: eventCover != null ? eventCover!.path : oldEvent.cover,
+          );
+
+          await _saveEventsToCache();
+        }
+
+        emit(Success());
+
+        AppToast.success(
+          'organization.create_edit_event.event_updated_successfully'.tr(),
+        );
+
+        AppNavigator.pop();
+      },
+    );
+  }
+
+  // ===================== Publish Event =====================
+  Future<void> publishOrganizationEvent({
+    required int id,
+    required DateTime date,
+  }) async {
+    final result = await repo.updateOrganizationEvent(
+      OrganizationEventUpdateParam(id: id, date: date, status: "upcoming"),
+    );
+
+    result.fold(
+      (failure) {
+        AppToast.error(failure.errMessage);
+      },
+      (_) async {
+        final index = events.indexWhere((e) => e.id == id);
+
+        if (index != -1) {
+          events[index] = events[index].copyWith(
+            date: date,
+            status: "upcoming",
+          );
+
+          await _saveEventsToCache();
+        }
+
+        emit(Success());
+
+        AppToast.success(
+          'organization.events.event_published_successfully'.tr(),
+        );
       },
     );
   }
@@ -546,6 +778,8 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     eventNameController.dispose();
 
     eventDescriptionController.dispose();
+
+    otherCategoryController.dispose();
 
     dateController.dispose();
 

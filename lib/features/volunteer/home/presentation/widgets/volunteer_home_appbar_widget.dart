@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:sanad_app/core/constant/app_size.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
@@ -14,73 +13,51 @@ class VolunteerHomeAppbarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: AppSize.padding(horizontal: 15),
       width: double.infinity,
       height: AppSize.getHeight(60),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            offset: Offset(0, 1.5),
-            color: AppColors.grey.withValues(alpha: 0.35),
-            blurRadius: 3,
+            offset: const Offset(0, 1.5),
+            color: isDark
+                ? Colors.black.withValues(alpha: .35)
+                : AppColors.grey.withValues(alpha: .25),
+            blurRadius: 6,
           ),
         ],
-        // border: Border(
-        //   bottom: BorderSide(
-        //     color: AppColors.grey.withValues(alpha: 0.5),
-        //     width: 0.5,
-        //   ),
-        // ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Container(
-          //   width: AppSize.getSize(35),
-          //   height: AppSize.getSize(35),
-          //   decoration: BoxDecoration(
-          //     color: AppColors.primary,
-          //     borderRadius: BorderRadius.circular(12),
-          //     boxShadow: [
-          //       BoxShadow(
-          //         color: AppColors.grey.withValues(alpha: 0.35),
-          //         blurRadius: 3,
-          //       ),
-          //     ],
-          //   ),
-          //   child: Center(
-          //     child: Text('🤝', style: TextStyle(fontSize: AppSize.font(22))),
-          //   ),
-          // ),
-          // SizedBox(width: AppSize.getWidth(10)),
-          // Text(
-          //   'Sanad',
-          //   style: TextStyle(
-          //     fontSize: AppSize.font(18),
-          //     fontWeight: FontWeight.w400,
-          //     color: AppColors.black,
-          //   ),
-          // ),
           Text(
             'Sanad',
             style: TextStyle(
               fontSize: AppSize.font(22),
               fontWeight: FontWeight.w700,
               color: AppColors.primary,
-              letterSpacing: -0.3,
+              letterSpacing: -.3,
             ),
           ),
-          Spacer(),
+
+          const Spacer(),
+
           CustomIcon(
             onTap: () => AppNavigator.push(NotificationsScreen()),
             icon: AppIcons.notification,
             width: AppSize.getSize(25),
             height: AppSize.getSize(25),
-            color: AppColors.black,
+            color: theme.colorScheme.onSurface,
           ),
+
           SizedBox(width: AppSize.getWidth(10)),
+
           GestureDetector(
             onTap: () => AppNavigator.push(const VolunteerProfileScreen()),
             child: Container(
@@ -91,8 +68,10 @@ class VolunteerHomeAppbarWidget extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.grey.withValues(alpha: 0.35),
-                    blurRadius: 3,
+                    color: isDark
+                        ? Colors.black.withValues(alpha: .35)
+                        : AppColors.grey.withValues(alpha: .25),
+                    blurRadius: 6,
                   ),
                 ],
               ),

@@ -16,6 +16,7 @@ class OrganizationEventsCard extends StatelessWidget {
     this.onChatTap,
     this.onEditTap,
     this.onDeleteTap,
+    this.onPublishTap,
   });
 
   final OrganizationEventDetailsModel? event;
@@ -24,6 +25,7 @@ class OrganizationEventsCard extends StatelessWidget {
   final VoidCallback? onChatTap;
   final VoidCallback? onEditTap;
   final VoidCallback? onDeleteTap;
+  final VoidCallback? onPublishTap;
 
   String _getStatusText(String? status) {
     switch (status) {
@@ -40,6 +42,12 @@ class OrganizationEventsCard extends StatelessWidget {
     }
   }
 
+  bool get isDraft => event!.status == "draft";
+
+  bool get isOutdated {
+    return isDraft && event!.date.isBefore(DateTime.now());
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -50,14 +58,18 @@ class OrganizationEventsCard extends StatelessWidget {
 
     final secondaryColor = textColor.withValues(alpha: .5);
 
-    final name = event?.name ?? "organization.create_event.event_name".tr();
+    final isLocked = event?.status == 'ongoing' || event?.status == 'completed';
+
+    final name =
+        event?.name ?? "organization.create_edit_event.event_name".tr();
 
     final description =
         event?.description ??
-            "organization.create_event.event_description_will_appear_here".tr();
+        "organization.create_edit_event.event_description_will_appear_here"
+            .tr();
 
     final category =
-        event?.category ?? "organization.create_event.event_category".tr();
+        event?.category ?? "organization.create_edit_event.event_category".tr();
 
     final status = _getStatusText(event?.status);
 
@@ -70,8 +82,11 @@ class OrganizationEventsCard extends StatelessWidget {
     final date = event?.date;
 
     final location = event?.location != null
-        ? event!.location.toString()
-        : "organization.create_event.location".tr();
+        ? [
+            event!.location?['description'] ?? event!.location?['address'],
+            event!.location?['city'],
+          ].where((e) => e != null && e.toString().isNotEmpty).join(', ')
+        : "organization.create_edit_event.location".tr();
 
     return Container(
       decoration: BoxDecoration(
@@ -183,6 +198,31 @@ class OrganizationEventsCard extends StatelessWidget {
                     color: secondaryColor,
                   ),
                 ),
+
+                if (isOutdated) ...[
+                  SizedBox(width: 10),
+
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSize.getWidth(10),
+                      vertical: AppSize.getHeight(4),
+                    ),
+
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: .1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+
+                    child: Text(
+                      'Outdated',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: AppSize.font(12),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
 
@@ -250,51 +290,91 @@ class OrganizationEventsCard extends StatelessWidget {
 
             Row(
               children: [
-                Expanded(
-                  child: _buildEventAction(
-                    onTap: onQrTap,
-                    backgroundColor: AppColors.laserBlue.withValues(alpha: .1),
-                    iconColor: AppColors.laserBlue,
-                    icon: AppIcons.qr,
-                    title: 'organization.events.qr_code'.tr(),
+                if (isDraft) ...[
+                  Expanded(
+                    child: _buildEventAction(
+                      onTap: onEditTap,
+                      backgroundColor: AppColors.grey600.withValues(alpha: .1),
+                      iconColor: AppColors.grey500,
+                      icon: AppIcons.edit,
+                      title: 'organization.events.edit'.tr(),
+                    ),
                   ),
-                ),
 
-                SizedBox(width: AppSize.getWidth(8)),
+                  SizedBox(width: AppSize.getWidth(8)),
 
-                Expanded(
-                  child: _buildEventAction(
-                    onTap: onChatTap,
-                    backgroundColor: AppColors.primary.withValues(alpha: .1),
-                    iconColor: AppColors.primary,
-                    icon: AppIcons.chat,
-                    title: 'organization.events.chat'.tr(),
+                  Expanded(
+                    child: _buildEventAction(
+                      onTap: onPublishTap,
+                      backgroundColor: AppColors.primary.withValues(alpha: .1),
+                      iconColor: AppColors.primary,
+                      icon: AppIcons.publish,
+                      title: 'organization.events.publish'.tr(),
+                    ),
                   ),
-                ),
 
-                SizedBox(width: AppSize.getWidth(8)),
+                  SizedBox(width: AppSize.getWidth(8)),
 
-                Expanded(
-                  child: _buildEventAction(
-                    onTap: onEditTap,
-                    backgroundColor: AppColors.grey600.withValues(alpha: .1),
-                    iconColor: AppColors.grey500,
-                    icon: AppIcons.edit,
-                    title: 'organization.events.edit'.tr(),
+                  Expanded(
+                    child: _buildEventAction(
+                      onTap: onDeleteTap,
+                      backgroundColor: AppColors.red.withValues(alpha: .1),
+                      iconColor: AppColors.red,
+                      icon: AppIcons.delete,
+                      title: 'organization.events.delete'.tr(),
+                    ),
                   ),
-                ),
-
-                SizedBox(width: AppSize.getWidth(8)),
-
-                Expanded(
-                  child: _buildEventAction(
-                    onTap: onDeleteTap,
-                    backgroundColor: AppColors.red.withValues(alpha: .1),
-                    iconColor: AppColors.red,
-                    icon: AppIcons.delete,
-                    title: 'organization.events.delete'.tr(),
+                ] else ...[
+                  Expanded(
+                    child: _buildEventAction(
+                      onTap: onQrTap,
+                      backgroundColor: AppColors.laserBlue.withValues(
+                        alpha: .1,
+                      ),
+                      iconColor: AppColors.laserBlue,
+                      icon: AppIcons.qr,
+                      title: 'organization.events.qr_code'.tr(),
+                    ),
                   ),
-                ),
+
+                  SizedBox(width: AppSize.getWidth(8)),
+
+                  Expanded(
+                    child: _buildEventAction(
+                      onTap: onChatTap,
+                      backgroundColor: AppColors.primary.withValues(alpha: .1),
+                      iconColor: AppColors.primary,
+                      icon: AppIcons.chat,
+                      title: 'organization.events.chat'.tr(),
+                    ),
+                  ),
+
+                  SizedBox(width: AppSize.getWidth(8)),
+
+                  Expanded(
+                    child: _buildEventAction(
+                      enabled: !isLocked,
+                      onTap: onEditTap,
+                      backgroundColor: AppColors.grey600.withValues(alpha: .1),
+                      iconColor: AppColors.grey500,
+                      icon: AppIcons.edit,
+                      title: 'organization.events.edit'.tr(),
+                    ),
+                  ),
+
+                  SizedBox(width: AppSize.getWidth(8)),
+
+                  Expanded(
+                    child: _buildEventAction(
+                      enabled: !isLocked,
+                      onTap: onDeleteTap,
+                      backgroundColor: AppColors.red.withValues(alpha: .1),
+                      iconColor: AppColors.red,
+                      icon: AppIcons.delete,
+                      title: 'organization.events.delete'.tr(),
+                    ),
+                  ),
+                ],
               ],
             ),
           ],
@@ -328,34 +408,38 @@ class OrganizationEventsCard extends StatelessWidget {
     required Color iconColor,
     required Color backgroundColor,
     VoidCallback? onTap,
+    bool enabled = true,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        height: AppSize.getHeight(50),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: backgroundColor,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CustomIcon(
-              icon: icon,
-              color: iconColor,
-              width: AppSize.getSize(22),
-              height: AppSize.getSize(22),
-            ),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: AppSize.font(10),
-                fontWeight: FontWeight.w500,
+    return Opacity(
+      opacity: enabled ? 1 : .45,
+      child: InkWell(
+        onTap: enabled ? onTap : null,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          height: AppSize.getHeight(50),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: backgroundColor,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CustomIcon(
+                icon: icon,
                 color: iconColor,
+                width: AppSize.getSize(22),
+                height: AppSize.getSize(22),
               ),
-            ),
-          ],
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: AppSize.font(10),
+                  fontWeight: FontWeight.w500,
+                  color: iconColor,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

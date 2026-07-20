@@ -36,21 +36,26 @@ class VolunteerEventsCard extends StatelessWidget {
 
     final category = event?.category ?? '';
 
-    final creator = event?.creator?['name'] ?? '';
-
     final date = event?.date;
 
-    final location =
-        event?.location?['description'] ??
-        event?.location?['address'] ??
-        event?.location?['city'] ??
-        '';
+    final location = event?.location != null
+        ? [
+            event!.location?['description'] ?? event!.location?['address'],
+            event!.location?['city'],
+          ].where((e) => e != null && e.toString().isNotEmpty).join(', ')
+        : '';
 
     final joined = event?.joined ?? false;
 
     final joiners = event?.joiners ?? 0;
 
     final spots = event?.spots ?? 0;
+
+    final isCompleted = event?.status.toLowerCase() == 'completed';
+
+    final isFull = spots != 0 && joiners >= spots;
+
+    final isDisabled = !joined && (isCompleted || isFull);
 
     final spotsLeft = (spots - joiners).clamp(0, spots);
 
@@ -312,14 +317,30 @@ class VolunteerEventsCard extends StatelessWidget {
                     SizedBox(width: AppSize.getWidth(10)),
 
                     Expanded(
-                      child: CustomButton(
-                        loading: isLoading,
-                        icon: joined ? AppIcons.check : null,
-                        iconSize: AppSize.getSize(15),
-                        title: joined
-                            ? 'volunteer.events.joined'.tr()
-                            : 'volunteer.events.join_event'.tr(),
-                        onTap: joined ? null : onJoinTap,
+                      child: Opacity(
+                        opacity: isDisabled ? .45 : 1,
+
+                        child: CustomButton(
+                          loading: isLoading,
+
+                          icon: joined
+                              ? AppIcons.check
+                              : isDisabled
+                              ? AppIcons.close
+                              : null,
+
+                          iconSize: AppSize.getSize(15),
+
+                          title: joined
+                              ? 'volunteer.events.joined'.tr()
+                              : isCompleted
+                              ? 'volunteer.events.completed'.tr()
+                              : isFull
+                              ? 'volunteer.events.full'.tr()
+                              : 'volunteer.events.join_event'.tr(),
+
+                          onTap: isDisabled ? null : onJoinTap,
+                        ),
                       ),
                     ),
                   ],
