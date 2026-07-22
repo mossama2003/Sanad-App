@@ -25,10 +25,14 @@ String GET_SKILLS = 'v1/categories/select_category/';
 /// Both Volunteering and Organization
 String GET_EVENTS = 'v1/events/read_event/';
 
+String EVENT_QR(int ID) => 'v1/events/read_event/$ID/';
+
 /// Volunteering Events
 String JOIN_EVENT = 'v1/events/join/';
 
 String LEAVE_EVENT = 'v1/events/leave/';
+
+String SCAN_QR = 'v1/events/scan/';
 
 /// Organization Events
 String CREATE_ORGANIZATION_EVENT = 'v1/events/manage_event/';

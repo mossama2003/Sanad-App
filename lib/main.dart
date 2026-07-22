@@ -3,15 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'core/shared/controllers/user/app_cubit.dart';
-import 'core/storage/hive/hive_init.dart';
-import 'features/organization/home/data/repos/organization_home_repo.dart';
 import 'features/organization/home/presentation/controllers/organization_home_cubit.dart';
+import 'features/volunteer/events/data/repos/volunteer_events_repo.dart';
+import 'features/volunteer/events/presentation/controllers/volunteer_events_cubit.dart';
 import 'features/volunteer/home/presentation/controllers/volunteer_home_cubit.dart';
+import 'features/organization/home/data/repos/organization_home_repo.dart';
 import 'features/shared/splash/presentations/screens/splash_screen.dart';
 import 'features/volunteer/home/data/repos/volunteer_home_repo.dart';
+import 'core/shared/controllers/user/app_cubit.dart';
 import 'core/network/local/cache/cache_helper.dart';
 import 'core/network/remote/api/dio_helper.dart';
+import 'core/storage/hive/hive_init.dart';
 import 'core/helper/app_navigator.dart';
 import 'core/helper/app_helper.dart';
 import 'core/helper/app_locals.dart';
@@ -64,9 +66,17 @@ class MyApp extends StatelessWidget {
         return MultiBlocProvider(
           providers: [
             BlocProvider(create: (_) => AppCubit()),
+
             BlocProvider(
               create: (_) => VolunteerHomeCubit(VolunteerHomeRepoImpel()),
             ),
+
+            BlocProvider(
+              create: (_) => VolunteerEventsCubit(VolunteerEventsRepoImpel())
+                ..loadEventsFromCache()
+                ..getVolunteerEvents(),
+            ),
+
             BlocProvider(
               create: (_) => OrganizationHomeCubit(OrganizationHomeRepoImpel()),
             ),

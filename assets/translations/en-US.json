@@ -282,6 +282,7 @@
     }
   },
   "organization": {
+    "organization": "Organization",
     "sign_up": {
       "title": "Register Your Organization",
       "desc": "Create events and recruit volunteers",
@@ -323,20 +324,31 @@
       },
       "dashboard": {
         "title": "Welcome back, ",
-        "desc": "Manage your events and volunteers",
+        "desc": "Manage your events, volunteers, donations, and impact from one place.",
         "active_events": "Active Events",
         "completed": "Completed",
-        "volunteers": "Volunteers"
+        "volunteers": "Volunteers",
+        "go_to_dashboard": "Go To Dashboard"
       },
       "create_event_button": "Create New Event",
       "your_active_events": {
         "title": "Your Active Events",
-        "volunteers": "Volunteers",
-        "view_details_button": "View Details",
-        "edit_event_button": "Edit Event"
+        "see_all": "See All"
       },
       "recently_completed": {
-        "title": "Recently Completed"
+        "title": "Recently Completed",
+        "winter_clothing_drive": "Winter Clothing Drive",
+        "nov_28_2025": "Nov 28, 2025",
+        "joined": "Joined",
+        "literacy_workshop": "Literacy Workshop",
+        "nov_20_2025": "Nov 20, 2025"
+      },
+      "quick_actions": {
+        "title": "Quick Actions",
+        "create_event": "Create Event",
+        "donation_campaign": "Donation Campaign",
+        "create_case": "Create Case",
+        "emergencies": "Emergencies"
       }
     },
     "home_removed": {
@@ -377,6 +389,9 @@
       "total_scans": "Total Scans",
       "share": "Share",
       "full_screen": "Full Screen",
+      "scan_to_check_in": "Scan to check in",
+      "something_went_wrong": "Something went wrong",
+      "qr_saved_successfully": "QR saved successfully in your Gallery",
       "filter": {
         "all": "All",
         "upcoming": "Upcoming",
@@ -429,6 +444,10 @@
     "events_remove": {
       "beach_cleanup": "Beach Cleanup",
       "beach_cleanup_desc": "Join our community effort to clean Alexandria's coastline and protect marine life."
+    },
+    "profile": {
+      "verified_organization": "Verified Organization",
+      "social_media": "Social Media"
     }
   },
   "volunteer": {
@@ -495,9 +514,13 @@
         "qr_check_in": "QR Check-in",
         "scan_to_earn": "Scan to earn XP"
       },
-      "upcoming_events": {
-        "title": "Upcoming Events",
-        "view_all": "View All"
+      "my_events": {
+        "title": "My Events",
+        "title_desc": "Events you've joined",
+        "find_more": "Find more",
+        "no_events_yet": "No events joined yet",
+        "browse_available_events": "Browse available events and join one — it will show up here.",
+        "browse_events": "Browse Events"
       },
       "recently_completed": {
         "title": "Recently Completed"
@@ -569,6 +592,17 @@
         "this_week": "This Week",
         "near_me": "Near Me"
       }
+    },
+    "qr_check_in": {
+      "appbar": "Scan QR to Check In",
+      "simulate_scan": "Simulate Scan",
+      "how_why": "How & why to use it",
+      "how_why_desc1": "Point your camera at the event's QR code shown by the organizer.",
+      "how_why_desc2": "Hold steady until the code is detected inside the frame.",
+      "how_why_desc3": "Your attendance is automatically recorded for the event.",
+      "how_why_desc4": "You instantly earn XP and keep your streak going.",
+      "checked_in_successfully": "Checked in successfully",
+      "please_scan_qr_code_first": "Please scan QR code first"
     },
     "community": {
       "title": "Communities",

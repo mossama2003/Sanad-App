@@ -282,6 +282,7 @@
     }
   },
   "organization": {
+    "organization": "المنظمة",
     "sign_up": {
       "title": "سجل منظمتك",
       "desc": "اعمل فعاليات وجيب متطوعين",
@@ -322,11 +323,12 @@
         "cases": "الحالات"
       },
       "dashboard": {
-        "title": "أهلاً برجوعك، ",
-        "desc": "إدارة فعالياتك والمتطوعين",
-        "active_events": "الفعاليات الحالية",
+        "title": "مرحبًا بعودتك، ",
+        "desc": "أدر فعالياتك، المتطوعين، التبرعات، وتأثيرك من مكان واحد.",
+        "active_events": "الفعاليات النشطة",
         "completed": "المكتملة",
-        "volunteers": "المتطوعين"
+        "volunteers": "المتطوعون",
+        "go_to_dashboard": "الذهاب إلى لوحة التحكم"
       },
       "create_event_button": "اعمل فعالية جديدة",
       "your_active_events": {
@@ -336,7 +338,19 @@
         "edit_event_button": "تعديل الفعالية"
       },
       "recently_completed": {
-        "title": "الفعاليات اللي خلصت قريب"
+        "title": "المكتملة مؤخرًا",
+        "winter_clothing_drive": "حملة الملابس الشتوية",
+        "nov_28_2025": "28 نوفمبر 2025",
+        "joined": "منضم",
+        "literacy_workshop": "ورشة محو الأمية",
+        "nov_20_2025": "20 نوفمبر 2025"
+      },
+      "quick_actions": {
+        "title": "الإجراءات السريعة",
+        "create_event": "إنشاء فعالية",
+        "donation_campaign": "حملة تبرعات",
+        "create_case": "إنشاء حالة",
+        "emergencies": "الحالات الطارئة"
       }
     },
     "home_removed": {
@@ -377,6 +391,9 @@
       "total_scans": "إجمالي عمليات المسح",
       "share": "مشاركة",
       "full_screen": "ملء الشاشة",
+      "scan_to_check_in": "امسح الرمز لتسجيل الحضور",
+      "something_went_wrong": "حدث خطأ ما",
+      "qr_saved_successfully": "تم حفظ رمز QR بنجاح في معرض الصور",
       "filter": {
         "all": "الكل",
         "upcoming": "القادمة",
@@ -429,6 +446,10 @@
     "events_remove": {
       "beach_cleanup": "تنظيف الشاطئ",
       "beach_cleanup_desc": "انضم لمجهودنا المجتمعي لتنظيف شواطئ الإسكندرية وحماية الحياة البحرية."
+    },
+    "profile": {
+      "verified_organization": "منظمة موثقة",
+      "social_media": "وسائل التواصل الاجتماعي"
     }
   },
   "volunteer": {
@@ -495,9 +516,13 @@
         "qr_check_in": "تسجيل دخول QR",
         "scan_to_earn": "امسح عشان تكسب XP"
       },
-      "upcoming_events": {
-        "title": "الفعاليات القادمة",
-        "view_all": "عرض الكل"
+      "my_events": {
+        "title": "فعالياتي",
+        "title_desc": "الفعاليات التي انضممت إليها",
+        "find_more": "استكشف المزيد",
+        "no_events_yet": "لم تنضم إلى أي فعالية بعد",
+        "browse_available_events": "استعرض الفعاليات المتاحة وانضم إلى إحداها، وستظهر هنا.",
+        "browse_events": "استعرض الفعاليات"
       },
       "recently_completed": {
         "title": "الفعاليات اللي خلصت قريب"
@@ -569,6 +594,15 @@
         "this_week": "هذا الأسبوع",
         "near_me": "بالقرب مني"
       }
+    },
+    "qr_check_in": {
+      "appbar": "مسح رمز QR لتسجيل الحضور",
+      "simulate_scan": "محاكاة المسح",
+      "how_why": "كيفية استخدامه ولماذا",
+      "how_why_desc1": "وجّه الكاميرا نحو رمز QR الخاص بالفعالية الذي يعرضه المنظم.",
+      "how_why_desc2": "ثبت الكاميرا حتى يتم اكتشاف الرمز داخل الإطار.",
+      "how_why_desc3": "يتم تسجيل حضورك تلقائيًا في الفعالية.",
+      "how_why_desc4": "تحصل فورًا على نقاط الخبرة (XP) وتحافظ على سلسلة إنجازاتك."
     },
     "community": {
       "title": "المجتمعات",

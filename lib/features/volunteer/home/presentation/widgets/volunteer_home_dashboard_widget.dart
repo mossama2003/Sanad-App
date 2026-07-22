@@ -1,15 +1,14 @@
 import 'dart:ui';
 
+import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sanad_app/features/shared/badges/presentation/screens/badges_screen.dart';
 
-import '../../../../../core/helper/app_navigator.dart';
-import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../../rewards/presentation/screens/rewards_screen.dart';
+import '../../../qr_check_in/presentation/screens/qr_check_in_screen.dart';
 
 class VolunteerHomeDashboardWidget extends StatelessWidget {
   const VolunteerHomeDashboardWidget({super.key});
@@ -17,13 +16,13 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: AppSize.getHeight(165),
       width: double.infinity,
-      height: AppSize.getHeight(230),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            offset: const Offset(0, 0),
+            offset: Offset.zero,
             color: AppColors.grey.withValues(alpha: 0.8),
             blurRadius: 8,
           ),
@@ -34,17 +33,17 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            /// Background Image + Blur
+            /// Background
             ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 2),
+              imageFilter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
               child: Image.asset(
                 AppImages.dashboardBackground,
                 fit: BoxFit.cover,
               ),
             ),
 
-            /// Color Overlay
-            Container(color: AppColors.black.withValues(alpha: 0.2)),
+            /// Overlay
+            Container(color: AppColors.black.withValues(alpha: 0.3)),
 
             /// Content
             Padding(
@@ -53,11 +52,11 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${'volunteer.home.dashboard.title'.tr()}Ahmed Hassan!',
+                    '${'volunteer.home.dashboard.title'.tr()} Ahmed Hassan!',
                     style: TextStyle(
                       color: AppColors.white,
                       fontSize: AppSize.font(20),
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
 
@@ -68,41 +67,32 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
                     style: TextStyle(
                       color: AppColors.white,
                       fontSize: AppSize.font(15),
-                      fontWeight: FontWeight.w300,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
 
                   SizedBox(height: AppSize.getHeight(20)),
 
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      GestureDetector(
-                        onTap: () =>
-                            AppNavigator.push(VolunteerRewardsScreen()),
-                        child: _buildStatCard(
-                          icon: AppIcons.achievement,
-                          value: '1,250',
-                          title: 'volunteer.home.dashboard.xp_points'.tr(),
+                      Expanded(
+                        child: CustomButton(
+                          onTap: () => AppNavigator.push(QrCheckInScreen()),
+                          icon: AppIcons.qr,
+                          iconSize: AppSize.getSize(20),
+                          bgColor: AppColors.bronze,
+                          textColor: AppColors.white,
+                          title: 'volunteer.home.options.qr_check_in'.tr(),
                         ),
                       ),
-
-                      GestureDetector(
-                        onTap: () =>
-                            AppNavigator.push(VolunteerRewardsScreen()),
-                        child: _buildStatCard(
-                          icon: AppIcons.fire,
-                          value: '7',
-                          title: 'volunteer.home.dashboard.day_streak'.tr(),
-                        ),
-                      ),
-
-                      GestureDetector(
-                        onTap: () => AppNavigator.push(BadgesScreen()),
-                        child: _buildStatCard(
-                          icon: AppIcons.badge,
-                          value: '12',
-                          title: 'volunteer.home.dashboard.badges'.tr(),
+                      SizedBox(width: AppSize.getWidth(10)),
+                      Expanded(
+                        child: CustomButton(
+                          icon: AppIcons.warning,
+                          iconSize: AppSize.getSize(20),
+                          bgColor: AppColors.red,
+                          textColor: AppColors.white,
+                          title: 'volunteer.home.options.emergency'.tr(),
                         ),
                       ),
                     ],
@@ -112,54 +102,6 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard({
-    required String icon,
-    required String value,
-    required String title,
-  }) {
-    return Container(
-      width: AppSize.getWidth(100),
-      height: AppSize.getHeight(100),
-      padding: AppSize.padding(all: 10),
-      decoration: BoxDecoration(
-        color: AppColors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CustomIcon(
-            icon: icon,
-            color: AppColors.white,
-            width: AppSize.getWidth(20),
-            height: AppSize.getHeight(20),
-          ),
-
-          SizedBox(height: AppSize.getHeight(5)),
-
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: AppSize.font(20),
-              fontWeight: FontWeight.w500,
-              color: AppColors.white,
-            ),
-          ),
-
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: AppSize.font(10),
-              fontWeight: FontWeight.w300,
-              color: AppColors.white,
-            ),
-          ),
-        ],
       ),
     );
   }

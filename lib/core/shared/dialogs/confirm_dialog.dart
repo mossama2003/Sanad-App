@@ -29,15 +29,25 @@ class ConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final textColor = theme.colorScheme.onSurface;
+
+    final secondaryTextColor = textColor.withValues(alpha: .6);
+
+    final borderColor = textColor.withValues(alpha: .15);
+
     return CustomDialog(
       children: [
         Text(
           title,
+
           textAlign: TextAlign.center,
+
           style: TextStyle(
             fontSize: AppSize.font(20),
             fontWeight: FontWeight.w600,
-            color: AppColors.grey800,
+            color: textColor,
           ),
         ),
 
@@ -45,11 +55,15 @@ class ConfirmDialog extends StatelessWidget {
 
         Text(
           message,
+
           textAlign: TextAlign.center,
+
           style: TextStyle(
             fontSize: AppSize.font(14),
+
             height: AppSize.fontHeight(14, 22),
-            color: AppColors.grey600,
+
+            color: secondaryTextColor,
           ),
         ),
 
@@ -60,25 +74,38 @@ class ConfirmDialog extends StatelessWidget {
             Expanded(
               child: CustomButton(
                 title: cancelText ?? 'core.cancel'.tr(),
+
                 bgColor: Colors.transparent,
-                borderColor: AppColors.grey300,
-                textColor: AppColors.grey800,
+
+                borderColor: borderColor,
+
+                textColor: textColor,
+
                 height: AppSize.getHeight(40),
+
                 onTap: () {
                   AppNavigator.pop();
+
                   onCancel?.call();
                 },
               ),
             ),
+
             SizedBox(width: AppSize.getWidth(12)),
+
             Expanded(
               child: CustomButton(
                 title: confirmText ?? 'core.yes'.tr(),
+
                 bgColor: isDestructive ? AppColors.red500 : AppColors.green500,
-                textColor: AppColors.white,
+
+                textColor: Colors.white,
+
                 height: AppSize.getHeight(40),
+
                 onTap: () {
                   AppNavigator.pop();
+
                   onConfirm?.call();
                 },
               ),

@@ -11,13 +11,13 @@ import '../../data/models/volunteer_event_details_model.dart';
 class VolunteerEventsCard extends StatelessWidget {
   const VolunteerEventsCard({
     super.key,
-    this.event,
+    required this.event,
     this.onDetailsTap,
     this.onJoinTap,
     this.isLoading = false,
   });
 
-  final VolunteerEventDetailsModel? event;
+  final VolunteerEventDetailsModel event;
   final VoidCallback? onDetailsTap;
   final VoidCallback? onJoinTap;
   final bool isLoading;
@@ -30,28 +30,28 @@ class VolunteerEventsCard extends StatelessWidget {
 
     final secondaryColor = textColor.withValues(alpha: .5);
 
-    final name = event?.name ?? '';
+    final name = event.name;
 
-    final description = event?.description ?? '';
+    final description = event.description;
 
-    final category = event?.category ?? '';
+    final category = event.category;
 
-    final date = event?.date;
+    final date = event.date;
 
-    final location = event?.location != null
+    final location = event.location != null
         ? [
-            event!.location?['description'] ?? event!.location?['address'],
-            event!.location?['city'],
+            event.location?['description'] ?? event.location?['address'],
+            event.location?['city'],
           ].where((e) => e != null && e.toString().isNotEmpty).join(', ')
         : '';
 
-    final joined = event?.joined ?? false;
+    final joined = event.joined;
 
-    final joiners = event?.joiners ?? 0;
+    final joiners = event.joiners;
 
-    final spots = event?.spots ?? 0;
+    final spots = event.spots;
 
-    final isCompleted = event?.status.toLowerCase() == 'completed';
+    final isCompleted = event.status.toLowerCase() == 'completed';
 
     final isFull = spots != 0 && joiners >= spots;
 
@@ -59,7 +59,7 @@ class VolunteerEventsCard extends StatelessWidget {
 
     final spotsLeft = (spots - joiners).clamp(0, spots);
 
-    final cover = event?.cover;
+    final cover = event.cover;
 
     return Container(
       decoration: BoxDecoration(
@@ -202,9 +202,7 @@ class VolunteerEventsCard extends StatelessWidget {
                     SizedBox(width: AppSize.getWidth(5)),
 
                     Text(
-                      date != null
-                          ? DateFormat('dd MMM yyyy').format(date)
-                          : '--',
+                      DateFormat('dd MMM yyyy').format(date),
                       style: TextStyle(
                         color: secondaryColor,
                         fontSize: AppSize.font(14),
@@ -223,7 +221,7 @@ class VolunteerEventsCard extends StatelessWidget {
                     SizedBox(width: AppSize.getWidth(5)),
 
                     Text(
-                      date != null ? DateFormat('hh:mm a').format(date) : '--',
+                      DateFormat('hh:mm a').format(date),
                       style: TextStyle(
                         color: secondaryColor,
                         fontSize: AppSize.font(14),

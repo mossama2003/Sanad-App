@@ -656,6 +656,12 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "image_gallery_saver_plus",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/image_gallery_saver_plus-4.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
       "name": "image_picker",
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/image_picker-1.2.2",
       "packageUri": "lib/",
@@ -816,6 +822,12 @@
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/mime-2.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "mobile_scanner",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/mobile_scanner-7.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
     },
     {
       "name": "nested",
@@ -1072,6 +1084,12 @@
     {
       "name": "rxdart",
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/rxdart-0.28.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "screenshot",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/screenshot-3.0.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },

@@ -240,7 +240,7 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
                                 event: event,
 
                                 onQrTap: () => AppNavigator.push(
-                                  OrganizationQrCodeScreen(),
+                                  OrganizationQrCodeScreen(event: event),
                                 ),
 
                                 onPublishTap: () {

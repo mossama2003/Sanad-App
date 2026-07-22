@@ -13,7 +13,7 @@ import '../../../../shared/auth/presentation/sign_in/screens/sign_in_screen.dart
 import '../../../../shared/settings/presentations/screens/settings_screen.dart';
 import '../../../rewards/presentation/screens/rewards_screen.dart';
 import '../cards/badges_card.dart';
-import '../cards/contact_card.dart';
+import '../../../../../core/shared/widgets/contact_info_card.dart';
 import '../cards/past_roles_card.dart';
 import '../cards/reliability_score_card.dart';
 import '../cards/stats_card.dart';
@@ -132,7 +132,7 @@ class VolunteerProfileScreen extends StatelessWidget {
 
                   SizedBox(height: AppSize.getHeight(16)),
 
-                  ContactCard(
+                  ContactInfoCard(
                     email: user?.email ?? '',
                     phone: user?.phone ?? '',
                   ),

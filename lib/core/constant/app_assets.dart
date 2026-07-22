@@ -109,4 +109,10 @@ class AppIcons {
   static String time = '$icons/time.svg';
   static String download = '$icons/download.svg';
   static String fullScreen = '$icons/full-screen.svg';
+  static String camera = '$icons/camera.svg';
+  static String organization = '$icons/company.svg';
+  static String verified = '$icons/verified.svg';
+  static String pound = '$icons/pound.svg';
+  static String fileDone = '$icons/file-done.svg';
+  static String website = '$icons/website.svg';
 }

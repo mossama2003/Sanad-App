@@ -9,7 +9,6 @@ import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/shared/widgets/custom_search_field.dart';
 import '../../../../../core/shared/widgets/custom_selectable_chips.dart';
 import '../../../home/presentation/widgets/volunteer_home_appbar_widget.dart';
-import '../../data/repos/volunteer_events_repo.dart';
 import '../cards/volunteer_events_card.dart';
 import '../controllers/volunteer_events_cubit.dart';
 import '../dialogs/volunteer_events_bottom_sheet.dart';
@@ -29,17 +28,9 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
   void initState() {
     super.initState();
 
-    _cubit = VolunteerEventsCubit(VolunteerEventsRepoImpel());
+    _cubit = VolunteerEventsCubit.get(context);
 
     _scrollController = ScrollController()..addListener(_onScroll);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _cubit.loadEventsFromCache();
-
-      if (_cubit.shouldRefreshEvents()) {
-        _cubit.getVolunteerEvents(refresh: false);
-      }
-    });
   }
 
   void _onScroll() {
@@ -54,7 +45,6 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
-    _cubit.close();
     super.dispose();
   }
 

@@ -1,83 +1,172 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/constant/app_size.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
+import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../../../shared/notification/presentation/screens/notification_screen.dart';
+import '../../../profile/presentation/screens/organization_profile_screen.dart';
 
 class OrganizationHomeAppbarWidget extends StatelessWidget {
   const OrganizationHomeAppbarWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final appCubit = AppCubit.get(context);
+
+    final organizationName = appCubit.user?.name?.trim() ?? '';
+
+    final firstLetter = organizationName.isNotEmpty
+        ? organizationName[0].toUpperCase()
+        : 'O';
+
     final theme = Theme.of(context);
+
     final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       width: double.infinity,
+
       padding: AppSize.padding(horizontal: 15),
+
       height: AppSize.getHeight(60),
+
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
+
         boxShadow: [
           BoxShadow(
             offset: const Offset(0, 1.5),
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.4)
-                : AppColors.grey.withValues(alpha: 0.35),
+
+            color: Colors.black.withValues(alpha: isDark ? .4 : .12),
+
             blurRadius: 3,
           ),
         ],
       ),
+
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
+
         children: [
-          Text(
-            'Sanad',
-            style: TextStyle(
-              fontSize: AppSize.font(22),
-              fontWeight: FontWeight.w700,
+          Container(
+            width: AppSize.getSize(35),
+
+            height: AppSize.getSize(35),
+
+            decoration: BoxDecoration(
               color: AppColors.primary,
-              letterSpacing: -0.3,
+
+              shape: BoxShape.circle,
+            ),
+
+            child: Center(
+              child: CustomIcon(
+                onTap: () => AppNavigator.push(NotificationsScreen()),
+
+                icon: AppIcons.organization,
+
+                width: AppSize.getSize(25),
+
+                height: AppSize.getSize(25),
+
+                color: AppColors.white,
+              ),
             ),
           ),
 
-          const Spacer(),
+          SizedBox(width: AppSize.getWidth(10)),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              mainAxisAlignment: MainAxisAlignment.center,
+
+              children: [
+                Text(
+                  organizationName,
+
+                  maxLines: 1,
+
+                  overflow: TextOverflow.ellipsis,
+
+                  style: TextStyle(
+                    fontSize: AppSize.font(20),
+
+                    fontWeight: FontWeight.w700,
+
+                    color: theme.colorScheme.onSurface,
+
+                    letterSpacing: -0.3,
+                  ),
+                ),
+
+                Text(
+                  'organization.organization'.tr(),
+
+                  style: TextStyle(
+                    fontSize: AppSize.font(12),
+
+                    fontWeight: FontWeight.w300,
+
+                    color: theme.colorScheme.onSurface.withValues(alpha: .6),
+
+                    letterSpacing: -0.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
 
           CustomIcon(
             onTap: () => AppNavigator.push(NotificationsScreen()),
+
             icon: AppIcons.notification,
+
             width: AppSize.getSize(25),
+
             height: AppSize.getSize(25),
-            color: isDark ? AppColors.white : AppColors.black,
+
+            color: theme.colorScheme.onSurface,
           ),
 
           SizedBox(width: AppSize.getWidth(10)),
 
           GestureDetector(
+            onTap: () => AppNavigator.push(OrganizationProfileScreen()),
+
             child: Container(
               width: AppSize.getSize(35),
+
               height: AppSize.getSize(35),
+
               decoration: BoxDecoration(
                 color: AppColors.primary,
+
                 shape: BoxShape.circle,
+
                 boxShadow: [
                   BoxShadow(
-                    color: isDark
-                        ? Colors.black.withValues(alpha: 0.5)
-                        : AppColors.grey.withValues(alpha: 0.35),
+                    color: Colors.black.withValues(alpha: isDark ? .5 : .15),
+
                     blurRadius: 3,
                   ),
                 ],
               ),
+
               child: Center(
                 child: Text(
-                  'A',
+                  firstLetter,
+
                   style: TextStyle(
                     fontSize: AppSize.font(20),
+
                     fontWeight: FontWeight.w500,
+
                     color: AppColors.white,
                   ),
                 ),
