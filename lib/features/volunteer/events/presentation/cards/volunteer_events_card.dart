@@ -27,15 +27,11 @@ class VolunteerEventsCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     final textColor = theme.colorScheme.onSurface;
-
     final secondaryColor = textColor.withValues(alpha: .5);
 
     final name = event.name;
-
     final description = event.description;
-
     final category = event.category;
-
     final date = event.date;
 
     final location = event.location != null
@@ -47,17 +43,25 @@ class VolunteerEventsCard extends StatelessWidget {
 
     final joined = event.joined;
 
-    final joiners = event.joiners;
-
     final spots = event.spots;
 
-    final isCompleted = event.status.toLowerCase() == 'completed';
+    final joiners = event.joiners;
 
-    final isFull = spots != 0 && joiners >= spots;
+    final status = event.status.toLowerCase();
 
-    final isDisabled = !joined && (isCompleted || isFull);
+    final isUpcoming = status == 'upcoming';
+    final isOngoing = status == 'ongoing';
+    final isCompleted = status == 'completed';
 
     final spotsLeft = (spots - joiners).clamp(0, spots);
+
+    final isFull = joiners >= spots;
+
+    final canJoin = !joined && isUpcoming && !isFull;
+
+    final canLeave = joined && isUpcoming;
+
+    final isDisabled = !canJoin && !canLeave;
 
     final cover = event.cover;
 
@@ -85,6 +89,7 @@ class VolunteerEventsCard extends StatelessWidget {
                 SizedBox(
                   height: AppSize.getHeight(200),
                   width: double.infinity,
+
                   child: cover != null && cover.isNotEmpty
                       ? Image.network(
                           cover,
@@ -110,10 +115,12 @@ class VolunteerEventsCard extends StatelessWidget {
                     children: [
                       Container(
                         padding: AppSize.padding(horizontal: 12, vertical: 2),
+
                         decoration: BoxDecoration(
                           color: AppColors.brand50,
                           borderRadius: BorderRadius.circular(15),
                         ),
+
                         child: Text(
                           category,
                           style: TextStyle(
@@ -127,10 +134,12 @@ class VolunteerEventsCard extends StatelessWidget {
                       if (joined)
                         Container(
                           padding: AppSize.padding(horizontal: 12, vertical: 2),
+
                           decoration: BoxDecoration(
                             color: AppColors.grey200,
                             borderRadius: BorderRadius.circular(15),
                           ),
+
                           child: Row(
                             children: [
                               CustomIcon(
@@ -139,7 +148,9 @@ class VolunteerEventsCard extends StatelessWidget {
                                 height: AppSize.getSize(14),
                                 color: AppColors.primary,
                               ),
+
                               SizedBox(width: AppSize.getWidth(5)),
+
                               Text(
                                 'volunteer.events.joined'.tr(),
                                 style: TextStyle(
@@ -280,10 +291,12 @@ class VolunteerEventsCard extends StatelessWidget {
                               color: textColor,
                             ),
                           ),
+
                           TextSpan(
                             text: ' • ',
                             style: TextStyle(color: secondaryColor),
                           ),
+
                           TextSpan(
                             text:
                                 '$spotsLeft ${'volunteer.events.spot_left'.tr()}',
@@ -291,6 +304,7 @@ class VolunteerEventsCard extends StatelessWidget {
                           ),
                         ],
                       ),
+
                       style: TextStyle(fontSize: AppSize.font(13)),
                     ),
                   ],
@@ -321,7 +335,7 @@ class VolunteerEventsCard extends StatelessWidget {
                         child: CustomButton(
                           loading: isLoading,
 
-                          icon: joined
+                          icon: canLeave
                               ? AppIcons.check
                               : isDisabled
                               ? AppIcons.close
@@ -329,12 +343,16 @@ class VolunteerEventsCard extends StatelessWidget {
 
                           iconSize: AppSize.getSize(15),
 
-                          title: joined
-                              ? 'volunteer.events.joined'.tr()
-                              : isCompleted
+                          title: isCompleted
                               ? 'volunteer.events.completed'.tr()
-                              : isFull
+                              : isOngoing
+                              ? (joined
+                                    ? 'volunteer.events.joined'.tr()
+                                    : 'volunteer.events.started'.tr())
+                              : isFull && !joined
                               ? 'volunteer.events.full'.tr()
+                              : joined
+                              ? 'volunteer.events.joined'.tr()
                               : 'volunteer.events.join_event'.tr(),
 
                           onTap: isDisabled ? null : onJoinTap,

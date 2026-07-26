@@ -7,14 +7,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../../../home/presentation/widgets/organization_home_appbar_widget.dart';
-import '../../../../../core/shared/widgets/custom_selectable_chips.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../data/repos/organization_events_repo.dart';
 import '../controllers/organization_events_cubit.dart';
+import '../dialogs/organization_publish_dialog.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../cards/organization_events_card.dart';
-import '../dialogs/organization_publish_dialog.dart';
 import 'organization_event_form_screen.dart';
 import 'organization_qr_code_screen.dart';
 
@@ -29,6 +28,11 @@ class OrganizationEventsScreen extends StatefulWidget {
 class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
   late final OrganizationEventsCubit _cubit;
   late final ScrollController _scrollController;
+
+  bool upcoming = false;
+  bool ongoing = false;
+  bool completed = false;
+  bool draft = false;
 
   @override
   void initState() {
@@ -76,12 +80,7 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
 
           floatingActionButton: FloatingActionButton(
             onPressed: () {
-              AppNavigator.push(
-                BlocProvider.value(
-                  value: _cubit,
-                  child: const OrganizationEventFormScreen(),
-                ),
-              );
+              AppNavigator.push(const OrganizationEventFormScreen());
             },
 
             backgroundColor: AppColors.primary,
@@ -106,7 +105,7 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
               onRefresh: () async {
                 await _cubit.getOrganizationEvents(
                   refresh: true,
-                  status: _cubit.selectedStatus,
+                  statuses: _cubit.selectedStatuses,
                 );
               },
               child: CustomScrollView(
@@ -115,7 +114,6 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
                 slivers: [
                   const SliverToBoxAdapter(
                     child: OrganizationHomeAppbarWidget(),
-                    // child: VolunteerHomeAppbarWidget(),
                   ),
 
                   SliverPadding(
@@ -143,57 +141,213 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
 
                           SizedBox(height: AppSize.getHeight(20)),
 
-                          CustomSearchField(
-                            hint: 'organization.events.search'.tr(),
-                            borderColor: AppColors.grey300,
-                            borderRadius: 20,
-                            borderWidth: 1,
-                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CustomSearchField(
+                                  controller: _cubit.searchController,
+                                  hint: 'organization.events.search'.tr(),
+                                  borderColor: AppColors.grey300,
+                                  borderRadius: 20,
+                                  borderWidth: 1,
+                                  onChanged: _cubit.onSearchChanged,
+                                ),
+                              ),
 
-                          SizedBox(height: AppSize.getHeight(15)),
+                              SizedBox(width: AppSize.getWidth(10)),
 
-                          CustomSelectableChips(
-                            multiSelect: false,
-                            initialSelected: [
-                              'organization.events.filter.all'.tr(),
+                              MenuAnchor(
+                                style: MenuStyle(
+                                  backgroundColor: WidgetStatePropertyAll(
+                                    theme.cardColor,
+                                  ),
+                                  elevation: const WidgetStatePropertyAll(6),
+                                  padding: const WidgetStatePropertyAll(
+                                    EdgeInsets.zero,
+                                  ),
+                                  side: WidgetStatePropertyAll(
+                                    BorderSide(
+                                      color: AppColors.grey300,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  shape: WidgetStatePropertyAll(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                ),
+
+                                menuChildren: [
+                                  StatefulBuilder(
+                                    builder: (context, menuSetState) {
+                                      void applyFilters() {
+                                        final statuses = <String>[];
+
+                                        if (upcoming) {
+                                          statuses.add('upcoming');
+                                        }
+
+                                        if (ongoing) {
+                                          statuses.add('ongoing');
+                                        }
+
+                                        if (completed) {
+                                          statuses.add('completed');
+                                        }
+
+                                        if (draft) {
+                                          statuses.add('draft');
+                                        }
+
+                                        _cubit.getOrganizationEvents(
+                                          refresh: true,
+                                          statuses: statuses.isEmpty
+                                              ? null
+                                              : statuses,
+                                        );
+                                      }
+
+                                      return ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxWidth: AppSize.getWidth(280),
+                                          maxHeight: AppSize.getHeight(380),
+                                        ),
+
+                                        child: SingleChildScrollView(
+                                          primary: false,
+                                          padding: AppSize.padding(all: 16),
+
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+
+                                            mainAxisSize: MainAxisSize.min,
+
+                                            children: [
+                                              Center(
+                                                child: Text(
+                                                  'organization.events.filter.title'
+                                                      .tr(),
+                                                  style: TextStyle(
+                                                    fontSize: AppSize.font(18),
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                              ),
+
+                                              const Divider(thickness: .2),
+
+                                              Text(
+                                                'organization.events.filter.status'
+                                                    .tr(),
+                                                style: TextStyle(
+                                                  fontSize: AppSize.font(15),
+                                                  fontWeight: FontWeight.w800,
+                                                ),
+                                              ),
+
+                                              buildFilterItem(
+                                                title:
+                                                    'organization.events.filter.upcoming'
+                                                        .tr(),
+                                                selected: upcoming,
+                                                onTap: () {
+                                                  menuSetState(() {
+                                                    upcoming = !upcoming;
+                                                  });
+
+                                                  applyFilters();
+                                                },
+                                              ),
+
+                                              buildFilterItem(
+                                                title:
+                                                    'organization.events.filter.in_progress'
+                                                        .tr(),
+                                                selected: ongoing,
+                                                onTap: () {
+                                                  menuSetState(() {
+                                                    ongoing = !ongoing;
+                                                  });
+
+                                                  applyFilters();
+                                                },
+                                              ),
+
+                                              buildFilterItem(
+                                                title:
+                                                    'organization.events.filter.completed'
+                                                        .tr(),
+                                                selected: completed,
+                                                onTap: () {
+                                                  menuSetState(() {
+                                                    completed = !completed;
+                                                  });
+
+                                                  applyFilters();
+                                                },
+                                              ),
+
+                                              buildFilterItem(
+                                                title:
+                                                    'organization.events.filter.drafted'
+                                                        .tr(),
+                                                selected: draft,
+                                                onTap: () {
+                                                  menuSetState(() {
+                                                    draft = !draft;
+                                                  });
+
+                                                  applyFilters();
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+
+                                builder: (context, controller, child) {
+                                  return InkWell(
+                                    borderRadius: BorderRadius.circular(100),
+
+                                    onTap: () {
+                                      controller.isOpen
+                                          ? controller.close()
+                                          : controller.open();
+                                    },
+
+                                    child: Container(
+                                      width: AppSize.getSize(48),
+                                      height: AppSize.getSize(48),
+
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+
+                                        border: Border.all(
+                                          color: AppColors.grey300,
+                                        ),
+                                      ),
+
+                                      child: Center(
+                                        child: CustomIcon(
+                                          icon: AppIcons.filter,
+
+                                          color: AppColors.primary,
+
+                                          width: AppSize.getSize(20),
+
+                                          height: AppSize.getSize(20),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                             ],
-                            selectedColor: AppColors.primary,
-                            backgroundColor: Colors.transparent,
-                            borderColor: AppColors.primary,
-                            items: [
-                              'organization.events.filter.all'.tr(),
-                              'organization.events.filter.upcoming'.tr(),
-                              'organization.events.filter.in_progress'.tr(),
-                              'organization.events.filter.completed'.tr(),
-                              'organization.events.filter.drafted'.tr(),
-                            ],
-                            onChanged: (selected) {
-                              if (selected.isEmpty) return;
-
-                              final selectedItem = selected.first;
-
-                              String? status;
-
-                              if (selectedItem ==
-                                  'organization.events.filter.upcoming'.tr()) {
-                                status = "upcoming";
-                              } else if (selectedItem ==
-                                  'organization.events.filter.in_progress'
-                                      .tr()) {
-                                status = "ongoing";
-                              } else if (selectedItem ==
-                                  'organization.events.filter.completed'.tr()) {
-                                status = "completed";
-                              } else if (selectedItem ==
-                                  'organization.events.filter.drafted'.tr()) {
-                                status = "draft";
-                              }
-
-                              _cubit.getOrganizationEvents(
-                                refresh: true,
-                                status: status,
-                              );
-                            },
                           ),
 
                           SizedBox(height: AppSize.getHeight(20)),
@@ -222,7 +376,7 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
                           (context, index) {
                             if (index == _cubit.events.length) {
                               return Padding(
-                                padding: EdgeInsets.symmetric(
+                                padding: AppSize.padding(
                                   vertical: AppSize.getHeight(20),
                                 ),
                                 child: const Center(
@@ -235,10 +389,8 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
 
                             return Padding(
                               padding: AppSize.padding(bottom: 15),
-
                               child: OrganizationEventsCard(
                                 event: event,
-
                                 onQrTap: () => AppNavigator.push(
                                   OrganizationQrCodeScreen(event: event),
                                 ),
@@ -271,12 +423,7 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
 
                                 onEditTap: () {
                                   AppNavigator.push(
-                                    BlocProvider.value(
-                                      value: _cubit,
-                                      child: OrganizationEventFormScreen(
-                                        event: event,
-                                      ),
-                                    ),
+                                    OrganizationEventFormScreen(event: event),
                                   );
                                 },
 
@@ -320,6 +467,49 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget buildFilterItem({
+    required String title,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: AppSize.padding(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.grey200 : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: AppSize.font(14),
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ),
+
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 180),
+              opacity: selected ? 1 : 0,
+              child: CustomIcon(
+                icon: AppIcons.check,
+                color: AppColors.primary,
+                width: AppSize.getSize(18),
+                height: AppSize.getSize(18),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

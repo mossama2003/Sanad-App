@@ -393,6 +393,8 @@
       "something_went_wrong": "Something went wrong",
       "qr_saved_successfully": "QR saved successfully in your Gallery",
       "filter": {
+        "title": "Sort By",
+        "status": "Status",
         "all": "All",
         "upcoming": "Upcoming",
         "in_progress": "In Progress",
@@ -451,6 +453,7 @@
     }
   },
   "volunteer": {
+    "volunteer": "Volunteer",
     "sign_up": {
       "title": "Join as a Volunteer",
       "desc": "Start making a difference today",
@@ -565,13 +568,24 @@
       "leave_title": "Leave Event?",
       "leave_message": "Are you sure you want to leave this event? Your spot will be cancelled.",
       "leave_confirm": "Leave",
+      "started": "Event Started",
       "bottom_sheet": {
         "date_time": "Date & Time",
         "duration": "Duration",
         "location": "Location",
-        "volunteers": "Volunteers"
+        "volunteers": "Volunteers",
+        "members": "{joined} joined / {needed} needed · {spots} spots left",
+        "skills": "Skills",
+        "contact": "Contact",
+        "phone": "Phone",
+        "note": "Note",
+        "join_event": "Join Event",
+        "joined": "Joined - Tap to leave",
+        "phone_copied": "Phone Copied",
+        "cannot_open_phone_app": "Cannot open phone app"
       },
       "filter": {
+        "category": "Category",
         "all": "All",
         "education": "Education",
         "healthcare": "Healthcare",
@@ -589,13 +603,19 @@
         "career_development": "Career Development",
         "emergency_relief": "Emergency Relief",
         "other": "Others",
+        "quick_filters": "Quick Filters",
         "this_week": "This Week",
-        "near_me": "Near Me"
+        "near_me": "Near Me",
+        "sort_by": "Sort By",
+        "soonest_first": "Soonest First",
+        "most_spots_available": "Most spots Available",
+        "most_popular": "Most popular"
       }
     },
     "qr_check_in": {
       "appbar": "Scan QR to Check In",
       "simulate_scan": "Simulate Scan",
+      "qr_ready": "QR Ready",
       "how_why": "How & why to use it",
       "how_why_desc1": "Point your camera at the event's QR code shown by the organizer.",
       "how_why_desc2": "Hold steady until the code is detected inside the frame.",

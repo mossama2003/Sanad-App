@@ -73,11 +73,11 @@ class OrganizationEventsCard extends StatelessWidget {
 
     final status = _getStatusText(event?.status);
 
-    final attendeesCount = event?.attendees ?? 0;
+    final joinersCount = event?.joiners ?? 0;
 
-    final spots = event?.spots ?? 100;
+    final spots = event?.spots ?? 0;
 
-    final progress = spots == 0 ? 0.0 : attendeesCount / spots;
+    final progress = spots == 0 ? 0.0 : joinersCount / spots;
 
     final date = event?.date;
 
@@ -268,7 +268,7 @@ class OrganizationEventsCard extends StatelessWidget {
                 const Spacer(),
 
                 Text(
-                  '$attendeesCount / $spots',
+                  '$joinersCount / $spots',
                   style: TextStyle(
                     fontSize: AppSize.font(15),
                     color: textColor,
@@ -281,7 +281,7 @@ class OrganizationEventsCard extends StatelessWidget {
             SizedBox(height: AppSize.getHeight(6)),
 
             CustomProgressBar(
-              percent: progress.clamp(0, 1),
+              percent: (progress * 100).clamp(0, 100),
               color: AppColors.primary,
               height: AppSize.getHeight(6),
             ),

@@ -177,7 +177,7 @@ class _QrCheckInScreenState extends State<QrCheckInScreen> {
 
                   if (scannedQr != null)
                     Text(
-                      "QR Ready",
+                      'volunteer.qr_check_in.qr_ready'.tr(),
 
                       style: TextStyle(
                         color: AppColors.primary,

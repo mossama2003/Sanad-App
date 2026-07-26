@@ -16,6 +16,7 @@ import '../../../../../core/validator/app_validators.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../data/models/organization_event_details_model.dart';
+import '../../data/repos/organization_events_repo.dart';
 import '../controllers/organization_events_cubit.dart';
 
 class OrganizationEventFormScreen extends StatefulWidget {
@@ -38,7 +39,7 @@ class _OrganizationEventFormScreenState
   void initState() {
     super.initState();
 
-    _cubit = context.read<OrganizationEventsCubit>();
+    _cubit = OrganizationEventsCubit(OrganizationEventsRepoImpel());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _init();
@@ -55,6 +56,7 @@ class _OrganizationEventFormScreenState
 
   @override
   void dispose() {
+    _cubit.close();
     super.dispose();
   }
 
@@ -298,7 +300,7 @@ class _OrganizationEventFormScreenState
                           initialDate: currentDate.isBefore(firstDate)
                               ? firstDate
                               : currentDate,
-                          firstDate: widget.isEdit ? DateTime(2020) : firstDate,
+                          firstDate: firstDate,
                           lastDate: lastDate,
                         );
 
@@ -366,6 +368,64 @@ class _OrganizationEventFormScreenState
 
                             SizedBox(height: AppSize.getHeight(20)),
 
+                            CustomFieldDropdown<GovernorateModel>(
+                              title:
+                                  'organization.create_edit_event.governorate'
+                                      .tr(),
+                              titleSize: AppSize.font(15),
+                              borderRadius: 20,
+                              titleColor:
+                                  theme.textTheme.bodyMedium?.color ??
+                                  AppColors.textPrimary,
+                              hintText:
+                                  'organization.create_edit_event.governorate_hint'
+                                      .tr(),
+                              validator: AppValidators
+                                  .dropdownRequired<GovernorateModel>,
+                              selected: _cubit.selectedGov,
+                              items: _cubit.governorates.map((gov) {
+                                return DropdownItem(
+                                  value: gov,
+                                  child: Text(gov.nameEn),
+                                );
+                              }).toList(),
+                              onChanged: (gov) {
+                                if (gov != null) {
+                                  _cubit.selectGovernorate(gov);
+                                }
+                              },
+                            ),
+
+                            SizedBox(height: AppSize.getHeight(15)),
+
+                            CustomFieldDropdown<CityModel>(
+                              title: 'organization.create_edit_event.city'.tr(),
+                              titleSize: AppSize.font(15),
+                              borderRadius: 20,
+                              titleColor:
+                                  theme.textTheme.bodyMedium?.color ??
+                                  AppColors.textPrimary,
+                              hintText:
+                                  'organization.create_edit_event.city_hint'
+                                      .tr(),
+                              validator:
+                                  AppValidators.dropdownRequired<CityModel>,
+                              selected: _cubit.selectedCity,
+                              items: _cubit.filteredCities.map((city) {
+                                return DropdownItem(
+                                  value: city,
+                                  child: Text(city.nameEn),
+                                );
+                              }).toList(),
+                              onChanged: (city) {
+                                if (city != null) {
+                                  _cubit.selectCity(city);
+                                }
+                              },
+                            ),
+
+                            SizedBox(height: AppSize.getHeight(15)),
+
                             CustomFieldText(
                               controller: _cubit.locationLinkController,
 
@@ -410,73 +470,6 @@ class _OrganizationEventFormScreenState
                               borderRadius: 20,
 
                               validator: AppValidators.required,
-                            ),
-
-                            SizedBox(height: AppSize.getHeight(15)),
-
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: CustomFieldDropdown<GovernorateModel>(
-                                    title:
-                                        'organization.create_edit_event.governorate'
-                                            .tr(),
-                                    titleSize: AppSize.font(15),
-                                    borderRadius: 20,
-                                    titleColor:
-                                        theme.textTheme.bodyMedium?.color ??
-                                        AppColors.textPrimary,
-                                    hintText:
-                                        'organization.create_edit_event.governorate_hint'
-                                            .tr(),
-                                    validator: AppValidators
-                                        .dropdownRequired<GovernorateModel>,
-                                    selected: _cubit.selectedGov,
-                                    items: _cubit.governorates.map((gov) {
-                                      return DropdownItem(
-                                        value: gov,
-                                        child: Text(gov.nameEn),
-                                      );
-                                    }).toList(),
-                                    onChanged: (gov) {
-                                      if (gov != null) {
-                                        _cubit.selectGovernorate(gov);
-                                      }
-                                    },
-                                  ),
-                                ),
-
-                                SizedBox(width: AppSize.getWidth(5)),
-
-                                Expanded(
-                                  child: CustomFieldDropdown<CityModel>(
-                                    title: 'organization.create_edit_event.city'
-                                        .tr(),
-                                    titleSize: AppSize.font(15),
-                                    borderRadius: 20,
-                                    titleColor:
-                                        theme.textTheme.bodyMedium?.color ??
-                                        AppColors.textPrimary,
-                                    hintText:
-                                        'organization.create_edit_event.city_hint'
-                                            .tr(),
-                                    validator: AppValidators
-                                        .dropdownRequired<CityModel>,
-                                    selected: _cubit.selectedCity,
-                                    items: _cubit.filteredCities.map((city) {
-                                      return DropdownItem(
-                                        value: city,
-                                        child: Text(city.nameEn),
-                                      );
-                                    }).toList(),
-                                    onChanged: (city) {
-                                      if (city != null) {
-                                        _cubit.selectCity(city);
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
                             ),
                           ],
                         ),
@@ -553,19 +546,60 @@ class _OrganizationEventFormScreenState
 
                     /// Buttons
                     if (widget.isEdit)
-                      CustomButton(
-                        loading: state is Loading,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomButton(
+                              loading: state is Loading,
 
-                        onTap: () {
-                          _cubit.updateOrganizationEvent(id: widget.event!.id);
-                        },
+                              bgColor: Colors.transparent,
 
-                        title: 'organization.create_edit_event.save_changes'
-                            .tr(),
+                              textColor: AppColors.primary,
 
-                        textColor: AppColors.white,
+                              borderColor: AppColors.primary,
 
-                        height: AppSize.getHeight(40),
+                              onTap: () {
+                                _cubit.updateOrganizationEvent(
+                                  id: widget.event!.id,
+                                );
+                              },
+
+                              title:
+                                  'organization.create_edit_event.save_changes'
+                                      .tr(),
+
+                              height: AppSize.getHeight(40),
+                            ),
+                          ),
+
+                          if (widget.event?.status == 'draft') ...[
+                            SizedBox(width: AppSize.getWidth(12)),
+
+                            Expanded(
+                              child: CustomButton(
+                                loading:
+                                    state is Loading &&
+                                    _cubit.loadingAction ==
+                                        CreateOrganizationEventAction.publish,
+
+                                onTap: () {
+                                  _cubit.updateOrganizationEvent(
+                                    id: widget.event!.id,
+                                    publish: true,
+                                  );
+                                },
+
+                                title:
+                                    'organization.create_edit_event.publish_event'
+                                        .tr(),
+
+                                textColor: AppColors.white,
+
+                                height: AppSize.getHeight(40),
+                              ),
+                            ),
+                          ],
+                        ],
                       )
                     else
                       Row(

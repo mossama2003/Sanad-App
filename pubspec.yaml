@@ -57,6 +57,7 @@ dependencies:
   screenshot: ^3.0.0
   image_gallery_saver_plus: ^4.0.1
   mobile_scanner: ^7.4.0
+  geolocator: ^14.0.3
 
   #Caching
   hive: ^2.2.3

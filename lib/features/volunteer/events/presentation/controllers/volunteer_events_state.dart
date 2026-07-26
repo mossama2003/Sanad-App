@@ -9,4 +9,6 @@ final class Loading extends VolunteerEventsState {}
 
 final class Success extends VolunteerEventsState {}
 
+class EventsUpdated extends VolunteerEventsState {}
+
 final class Error extends VolunteerEventsState {}

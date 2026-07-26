@@ -1,5 +1,5 @@
 class GetVolunteerEventsParam {
-  final String? category;
+  List<String>? category;
   final int? creator;
   final String? dateAfter;
   final String? dateBefore;

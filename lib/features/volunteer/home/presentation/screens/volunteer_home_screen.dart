@@ -6,7 +6,6 @@ import '../../../../shared/badges/presentation/screens/badges_screen.dart';
 import '../../../events/presentation/controllers/volunteer_events_cubit.dart';
 import '../../../rewards/presentation/screens/rewards_screen.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
-import '../sections/volunteer_upcoming_events_section.dart';
 import '../widgets/volunteer_home_dashboard_widget.dart';
 import '../../../../../core/helper/app_navigator.dart';
 import '../widgets/volunteer_home_appbar_widget.dart';
@@ -22,10 +21,10 @@ class VolunteerHomeScreen extends StatefulWidget {
 }
 
 class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -33,22 +32,22 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
 
     return BlocBuilder<VolunteerEventsCubit, VolunteerEventsState>(
       builder: (context, state) {
-        final eventsCubit = VolunteerEventsCubit.get(context);
+        // final eventsCubit = VolunteerEventsCubit.get(context);
 
-        final myActiveEvents =
-            eventsCubit.events
-                .where(
-                  (e) =>
-                      e.joined &&
-                      (e.status == 'ongoing' || e.status == 'upcoming'),
-                )
-                .toList()
-              ..sort((a, b) {
-                if (a.status == 'ongoing' && b.status != 'ongoing') return -1;
-                if (a.status != 'ongoing' && b.status == 'ongoing') return 1;
-
-                return a.date.compareTo(b.date);
-              });
+        // final myActiveEvents =
+        //     eventsCubit.events
+        //         .where(
+        //           (e) =>
+        //               e.joined &&
+        //               (e.status == 'ongoing' || e.status == 'upcoming'),
+        //         )
+        //         .toList()
+        //       ..sort((a, b) {
+        //         if (a.status == 'ongoing' && b.status != 'ongoing') return -1;
+        //         if (a.status != 'ongoing' && b.status == 'ongoing') return 1;
+        //
+        //         return a.date.compareTo(b.date);
+        //       });
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
@@ -130,7 +129,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                         SizedBox(height: AppSize.getHeight(15)),
 
                         /// Upcoming Events
-                        MyEventsSection(events: myActiveEvents),
+                        // VolunteerMyEventsSection(events: myActiveEvents),
                       ],
                     ),
                   ),

@@ -7,12 +7,25 @@ class VolunteerEventsRepoImpel implements VolunteerEventsRepo {
   // ================= GET EVENTS =================
   @override
   Future<Either<Failure, PaginatedVolunteerEventModel>> getVolunteerEvents(
-    GetVolunteerEventsParam param,
-  ) async {
+      GetVolunteerEventsParam param,
+      ) async {
     try {
+      Map<String, dynamic>? headers;
+
+      if (param.nearBy == true) {
+        final location = await AppLocationHelper.getCurrentLocationHeader();
+
+        if (location != null) {
+          headers = {
+            'Current-Location': location,
+          };
+        }
+      }
+
       final response = await DioHelper.get(
         url: GET_EVENTS,
         query: param.toQuery(),
+        headers: headers,
       );
 
       if (response.statusCode == 200) {

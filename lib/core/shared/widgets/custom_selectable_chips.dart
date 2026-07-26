@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../constant/app_size.dart';
@@ -51,6 +52,17 @@ class _CustomSelectableChipsState extends State<CustomSelectableChips> {
     selectedItems = List.from(widget.initialSelected ?? []);
   }
 
+  @override
+  void didUpdateWidget(covariant CustomSelectableChips oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (!listEquals(oldWidget.initialSelected, widget.initialSelected)) {
+      setState(() {
+        selectedItems = List.from(widget.initialSelected ?? []);
+      });
+    }
+  }
+
   void _onTap(String item) {
     setState(() {
       if (widget.multiSelect) {
@@ -70,7 +82,7 @@ class _CustomSelectableChipsState extends State<CustomSelectableChips> {
       }
     });
 
-    widget.onChanged?.call(selectedItems);
+    widget.onChanged?.call(List.from(selectedItems));
   }
 
   Widget _buildChip(String item) {

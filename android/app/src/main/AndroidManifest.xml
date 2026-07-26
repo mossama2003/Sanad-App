@@ -5,6 +5,10 @@
     <!-- Camera -->
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- Location -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <!-- Storage (Android 12 and below) -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
@@ -69,10 +73,19 @@
     </application>
 
     <queries>
+
+        <!-- Text processing -->
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />
             <data android:mimeType="text/plain" />
         </intent>
+
+        <!-- Phone calls -->
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
+        </intent>
+
     </queries>
 
 </manifest>

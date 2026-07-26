@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -53,6 +54,26 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   final locationAddressController = TextEditingController();
   final requiredVolunteersController = TextEditingController();
 
+  // ===================== Search =====================
+
+  final TextEditingController searchController = TextEditingController();
+
+  Timer? debounce;
+
+  String? search;
+
+  void onSearchChanged(String value) {
+    debounce?.cancel();
+
+    debounce = Timer(const Duration(milliseconds: 500), () {
+      getOrganizationEvents(
+        refresh: true,
+        statuses: selectedStatuses,
+        searchText: value,
+      );
+    });
+  }
+
   // ===================== Edit Mode =====================
 
   OrganizationEventDetailsModel? editingEvent;
@@ -69,7 +90,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
   bool removeOldCover = false;
 
-  String? selectedStatus;
+  List<String>? selectedStatuses;
 
   // ===================== Time =====================
 
@@ -315,20 +336,6 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     );
   }
 
-  // ===================== Event Due Time =====================
-
-  DateTime getEventDueDateTime() {
-    final date = DateFormat('dd/MM/yyyy').parse(dateController.text);
-
-    return DateTime(
-      date.year,
-      date.month,
-      date.day,
-      endTime?.hour ?? 0,
-      endTime?.minute ?? 0,
-    );
-  }
-
   // ===================== Pick Cover =====================
 
   Future<void> pickEventCover() async {
@@ -440,6 +447,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   }
 
   // ===================== Create Event =====================
+  // ===================== Create Event =====================
   Future<void> createOrganizationEvent({
     required String status,
     required CreateOrganizationEventAction action,
@@ -461,7 +469,9 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       CreateOrganizationEventParam(
         name: eventNameController.text.trim(),
         description: eventDescriptionController.text.trim(),
-        category: selectedCategory.value ?? '',
+        category: selectedCategory.value == 'Other'
+            ? otherCategoryController.text.trim()
+            : selectedCategory.value ?? '',
         locationUrl: locationLinkController.text.trim(),
         locationCity: selectedCity.value?.nameEn ?? '',
         locationState: selectedGov.value?.nameEn ?? '',
@@ -482,8 +492,59 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
         AppToast.error(failure.errMessage);
       },
-      (_) {
+      (createdEvent) async {
         loadingAction = null;
+
+        final newEvent = OrganizationEventDetailsModel(
+          id: createdEvent.id,
+
+          name: createdEvent.name,
+
+          description: createdEvent.description,
+
+          category: createdEvent.category,
+
+          date: createdEvent.date,
+
+          status: createdEvent.status,
+
+          skills: createdEvent.skills,
+
+          spots: createdEvent.spots,
+
+          cover: createdEvent.cover,
+
+          location: {
+            'url': createdEvent.locationUrl,
+            'description': createdEvent.locationDescription,
+            'city': createdEvent.locationCity,
+            'state': createdEvent.locationState,
+          },
+
+          joiners: 0,
+
+          attendees: 0,
+
+          joined: false,
+
+          avgRating: 0.0,
+
+          unreadChatMessages: 0,
+
+          qr: createdEvent.qr,
+
+          due: createdEvent.due,
+
+          created: createdEvent.created,
+
+          modified: createdEvent.modified,
+        );
+
+        events.insert(0, newEvent);
+
+        await _saveEventsToCache();
+
+        await HiveBoxes.cacheInfoBox.put(_eventsLastUpdatedKey, DateTime.now());
 
         emit(Success());
 
@@ -649,11 +710,15 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   // ===================== Get Organization Events =====================
   Future<void> getOrganizationEvents({
     bool refresh = false,
-    String? status,
+    List<String>? statuses,
+    String? searchText,
   }) async {
     if (refresh) {
       currentPage = 1;
-      selectedStatus = status;
+
+      selectedStatuses = statuses;
+
+      search = searchText;
     }
 
     // Load Cache First
@@ -669,7 +734,8 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       GetOrganizationEventsParam(
         page: currentPage,
         size: 10,
-        status: selectedStatus == null ? null : [selectedStatus!],
+        status: selectedStatuses,
+        search: search?.trim().isEmpty ?? true ? null : search,
       ),
     );
 
@@ -681,17 +747,10 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
         AppToast.error(failure.errMessage);
       },
-
       (data) async {
-        if (refresh) {
-          events
-            ..clear()
-            ..addAll(data.results);
-        } else {
-          events
-            ..clear()
-            ..addAll(data.results);
-        }
+        events
+          ..clear()
+          ..addAll(data.results);
 
         nextPage = data.next;
 
@@ -748,7 +807,8 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       GetOrganizationEventsParam(
         page: currentPage + 1,
         size: 10,
-        status: selectedStatus == null ? null : [selectedStatus!],
+        status: selectedStatuses,
+        search: search,
       ),
     );
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
@@ -22,9 +24,80 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
   String? selectedStatus;
 
+  bool nearBy = false;
+
+  String? selectedOrdering;
+
+  bool mostAvailableSpots = false;
+
+  bool thisWeek = false;
+
+  DateTime? dateAfter;
+
+  DateTime? dateBefore;
+
+  // ===================== Events Search =====================
+
+  final TextEditingController searchController = TextEditingController();
+
+  Timer? debounce;
+
+  String? search;
+
+  void onSearchChanged(String value) {
+    debounce?.cancel();
+
+    debounce = Timer(const Duration(milliseconds: 500), () {
+      getVolunteerEvents(
+        refresh: true,
+        status: selectedStatus,
+        categories: selectedCategories,
+        nearByFilter: nearBy,
+        startDate: dateAfter,
+        endDate: dateBefore,
+        searchText: value,
+        ordering: selectedOrdering,
+        mostAvailableSpots: mostAvailableSpots,
+      );
+    });
+  }
+
+  // ===================== QUICK Filter =====================
+
+  void updateQuickFilters({
+    bool? nearMe,
+    bool? thisWeekFilter,
+  }) {
+    nearBy = nearMe ?? nearBy;
+    thisWeek = thisWeekFilter ?? thisWeek;
+
+    if (thisWeek) {
+      final now = DateTime.now();
+
+      dateAfter = now;
+
+      dateBefore = now.add(const Duration(days: 7));
+    } else {
+      dateAfter = null;
+      dateBefore = null;
+    }
+
+    getVolunteerEvents(
+      refresh: true,
+      status: selectedStatus,
+      categories: selectedCategories,
+      nearByFilter: nearBy,
+      startDate: dateAfter,
+      endDate: dateBefore,
+      searchText: searchController.text,
+      ordering: selectedOrdering,
+      mostAvailableSpots: mostAvailableSpots,
+    );
+  }
+
   // ===================== Events Category =====================
 
-  String? selectedCategory;
+  final Set<String> selectedCategories = {};
 
   final List<String> eventCategories = [
     'Education',
@@ -45,7 +118,7 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
     'Other',
   ];
 
-  bool get isOtherSelected => selectedCategory == 'Other';
+  bool get isOtherSelected => selectedCategories.contains('Other');
 
   bool isKnownCategory(String? category) {
     if (category == null) return false;
@@ -54,15 +127,19 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
   }
 
   List<VolunteerEventDetailsModel> get filteredEvents {
-    if (selectedCategory == null) {
+    if (selectedCategories.isEmpty) {
       return events;
     }
 
-    if (selectedCategory == 'Other') {
-      return events.where((e) => !isKnownCategory(e.category)).toList();
-    }
+    return events.where((event) {
+      if (selectedCategories.contains('Other')) {
+        if (!isKnownCategory(event.category)) {
+          return true;
+        }
+      }
 
-    return events.where((e) => e.category == selectedCategory).toList();
+      return selectedCategories.contains(event.category);
+    }).toList();
   }
 
   final Map<String, String> categoryTranslations = {
@@ -140,54 +217,75 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
   }
 
   // ===================== Get Organization Events =====================
-
   Future<void> getVolunteerEvents({
     bool refresh = false,
     String? status,
-    String? category,
+    Set<String>? categories,
+    bool? nearByFilter,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? searchText,
+    String? ordering,
+    bool? mostAvailableSpots,
   }) async {
     if (refresh) {
       currentPage = 1;
+
       selectedStatus = status;
-      selectedCategory = category;
-    }
+      selectedCategories
+        ..clear()
+        ..addAll(categories ?? {});
+      nearBy = nearByFilter ?? false;
 
-    if (!refresh && events.isEmpty) {
-      loadEventsFromCache();
+      dateAfter = startDate;
+      dateBefore = endDate;
 
-      if (!shouldRefreshEvents() && events.isNotEmpty) {
-        return;
-      }
+      search = searchText;
+
+      selectedOrdering = ordering;
+
+      this.mostAvailableSpots = mostAvailableSpots ?? false;
     }
 
     final result = await repo.getVolunteerEvents(
       GetVolunteerEventsParam(
         page: currentPage,
         size: 10,
-        category: selectedCategory == 'Other' ? null : selectedCategory,
+
+        category: selectedCategories.isEmpty
+            ? null
+            : selectedCategories.where((e) => e != 'Other').toList(),
+
         status: selectedStatus == null ? null : [selectedStatus!],
+
+        nearBy: nearBy ? true : null,
+
+        mostAvailableSpots: mostAvailableSpots,
+
+        ordering: selectedOrdering,
+
+        dateAfter: dateAfter == null
+            ? null
+            : DateFormat('yyyy-MM-dd').format(dateAfter!),
+
+        dateBefore: dateBefore == null
+            ? null
+            : DateFormat('yyyy-MM-dd').format(dateBefore!),
+
+        search: search?.trim().isEmpty ?? true ? null : search,
       ),
     );
 
     result.fold(
       (l) {
-        if (events.isEmpty) {
-          emit(Error());
-        }
-
         AppToast.error(l.errMessage);
       },
-
-      (r) async {
+      (r) {
         events
           ..clear()
           ..addAll(r.results);
 
         nextPage = r.next;
-
-        await _saveEventsToCache();
-
-        await HiveBoxes.cacheInfoBox.put(_eventsLastUpdatedKey, DateTime.now());
 
         emit(Success());
       },
@@ -211,7 +309,6 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
           events[index] = event.copyWith(
             attendees: event.attendees + 1,
-            spots: event.spots > 0 ? event.spots - 1 : 0,
             joined: true,
             joiners: event.joiners + 1,
           );
@@ -225,6 +322,8 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
       },
     );
   }
+
+  // ===================== Leave Event =====================
 
   // ===================== Leave Event =====================
 
@@ -242,51 +341,14 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
         if (index != -1) {
           final event = events[index];
 
-          final updatedEvent = VolunteerEventDetailsModel(
-            id: event.id,
-            creator: event.creator,
-            location: event.location,
-
-            joiners: event.joiners > 0 ? event.joiners - 1 : 0,
-
-            attendees: event.attendees,
-
-            spots: event.spots + 1,
-
+          events[index] = event.copyWith(
             joined: false,
-
-            avgRating: event.avgRating,
-
-            unreadChatMessages: event.unreadChatMessages,
-
-            latestMessage: event.latestMessage,
-
-            cover: event.cover,
-
-            name: event.name,
-
-            description: event.description,
-
-            category: event.category,
-
-            date: event.date,
-
-            due: event.due,
-
-            skills: event.skills,
-
-            status: event.status,
-
-            qr: event.qr,
-
-            created: event.created,
-
-            modified: event.modified,
+            joiners: event.joiners > 0 ? event.joiners - 1 : 0,
           );
 
-          events[index] = updatedEvent;
-
           await _saveEventsToCache();
+
+          emit(EventsUpdated());
         }
 
         AppToast.success('volunteer.events.successfully_left_event'.tr());
@@ -309,8 +371,28 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
       GetVolunteerEventsParam(
         page: currentPage + 1,
         size: 10,
-        category: selectedCategory == 'Other' ? null : selectedCategory,
+
+        category: selectedCategories.isEmpty
+            ? null
+            : selectedCategories.where((e) => e != 'Other').toList(),
+
         status: selectedStatus == null ? null : [selectedStatus!],
+
+        nearBy: nearBy ? true : null,
+
+        mostAvailableSpots: mostAvailableSpots,
+
+        ordering: selectedOrdering,
+
+        dateAfter: dateAfter == null
+            ? null
+            : DateFormat('yyyy-MM-dd').format(dateAfter!),
+
+        dateBefore: dateBefore == null
+            ? null
+            : DateFormat('yyyy-MM-dd').format(dateBefore!),
+
+        search: search,
       ),
     );
 
@@ -318,7 +400,6 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
       (failure) {
         AppToast.error(failure.errMessage);
       },
-
       (response) async {
         currentPage++;
 
@@ -333,5 +414,12 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
     );
 
     isLoadingMore = false;
+  }
+
+  @override
+  Future<void> close() {
+    debounce?.cancel();
+    searchController.dispose();
+    return super.close();
   }
 }

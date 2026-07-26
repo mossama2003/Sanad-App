@@ -332,10 +332,8 @@
       },
       "create_event_button": "اعمل فعالية جديدة",
       "your_active_events": {
-        "title": "فعالياتك الحالية",
-        "volunteers": "المتطوعين",
-        "view_details_button": "عرض التفاصيل",
-        "edit_event_button": "تعديل الفعالية"
+        "title": "فعالياتك النشطة",
+        "see_all": "عرض الكل"
       },
       "recently_completed": {
         "title": "المكتملة مؤخرًا",
@@ -395,6 +393,8 @@
       "something_went_wrong": "حدث خطأ ما",
       "qr_saved_successfully": "تم حفظ رمز QR بنجاح في معرض الصور",
       "filter": {
+        "title": "ترتيب حسب",
+        "status": "الحالة",
         "all": "الكل",
         "upcoming": "القادمة",
         "in_progress": "قيد التنفيذ",
@@ -453,6 +453,7 @@
     }
   },
   "volunteer": {
+    "volunteer": "متطوع",
     "sign_up": {
       "title": "انضم كمتطوع",
       "desc": "ابدأ تعمل فرق من النهارده",
@@ -567,13 +568,24 @@
       "leave_title": "مغادرة الفعالية",
       "leave_message": "هل أنت متأكد أنك تريد مغادرة هذه الفعالية؟ سيتم إلغاء حجز مكانك.",
       "leave_confirm": "مغادرة",
+      "started": "بدأت الفعالية",
       "bottom_sheet": {
         "date_time": "التاريخ والوقت",
         "duration": "المدة",
         "location": "الموقع",
-        "volunteers": "المتطوعون"
+        "volunteers": "المتطوعون",
+        "members": "{joined} انضموا / {needed} مطلوب · {spots} أماكن متبقية",
+        "skills": "المهارات",
+        "contact": "جهة التواصل",
+        "phone": "الهاتف",
+        "note": "ملاحظة",
+        "join_event": "انضم إلى الفعالية",
+        "joined": "تم الانضمام - اضغط للمغادرة",
+        "phone_copied": "تم نسخ رقم الهاتف",
+        "cannot_open_phone_app": "تعذر فتح تطبيق الاتصال"
       },
       "filter": {
+        "category": "الفئة",
         "all": "الكل",
         "education": "التعليم",
         "healthcare": "الرعاية الصحية",
@@ -589,20 +601,28 @@
         "arts_culture": "الفنون والثقافة",
         "technology": "التكنولوجيا",
         "career_development": "التطوير المهني",
-        "emergency_relief": "الإغاثة الطارئة",
+        "emergency_relief": "الإغاثة في حالات الطوارئ",
         "other": "أخرى",
+        "quick_filters": "فلاتر سريعة",
         "this_week": "هذا الأسبوع",
-        "near_me": "بالقرب مني"
+        "near_me": "بالقرب مني",
+        "sort_by": "ترتيب حسب",
+        "soonest_first": "الأقرب موعدًا",
+        "most_spots_available": "الأكثر توفرًا للمقاعد",
+        "most_popular": "الأكثر شعبية"
       }
     },
     "qr_check_in": {
       "appbar": "مسح رمز QR لتسجيل الحضور",
       "simulate_scan": "محاكاة المسح",
-      "how_why": "كيفية استخدامه ولماذا",
+      "qr_ready": "رمز QR جاهز",
+      "how_why": "كيفية الاستخدام ولماذا",
       "how_why_desc1": "وجّه الكاميرا نحو رمز QR الخاص بالفعالية الذي يعرضه المنظم.",
-      "how_why_desc2": "ثبت الكاميرا حتى يتم اكتشاف الرمز داخل الإطار.",
+      "how_why_desc2": "ثبّت الكاميرا حتى يتم اكتشاف الرمز داخل الإطار.",
       "how_why_desc3": "يتم تسجيل حضورك تلقائيًا في الفعالية.",
-      "how_why_desc4": "تحصل فورًا على نقاط الخبرة (XP) وتحافظ على سلسلة إنجازاتك."
+      "how_why_desc4": "تحصل فورًا على نقاط XP وتحافظ على استمرار سلسلة إنجازاتك.",
+      "checked_in_successfully": "تم تسجيل الحضور بنجاح",
+      "please_scan_qr_code_first": "يرجى مسح رمز QR أولًا"
     },
     "community": {
       "title": "المجتمعات",

@@ -8,6 +8,7 @@
 import 'dart:io'; // flutter_ignore: dart_io_import.
 import 'package:file_selector_android/file_selector_android.dart' as file_selector_android;
 import 'package:flutter_image_compress_common/flutter_image_compress_common.dart' as flutter_image_compress_common;
+import 'package:geolocator_android/geolocator_android.dart' as geolocator_android;
 import 'package:image_picker_android/image_picker_android.dart' as image_picker_android;
 import 'package:open_file_android/open_file_android.dart' as open_file_android;
 import 'package:path_provider_android/path_provider_android.dart' as path_provider_android;
@@ -18,6 +19,7 @@ import 'package:video_player_android/video_player_android.dart' as video_player_
 import 'package:webview_flutter_android/webview_flutter_android.dart' as webview_flutter_android;
 import 'package:file_selector_ios/file_selector_ios.dart' as file_selector_ios;
 import 'package:flutter_image_compress_common/flutter_image_compress_common.dart' as flutter_image_compress_common;
+import 'package:geolocator_apple/geolocator_apple.dart' as geolocator_apple;
 import 'package:image_picker_ios/image_picker_ios.dart' as image_picker_ios;
 import 'package:open_file_ios/open_file_ios.dart' as open_file_ios;
 import 'package:path_provider_foundation/path_provider_foundation.dart' as path_provider_foundation;
@@ -28,6 +30,7 @@ import 'package:video_player_avfoundation/video_player_avfoundation.dart' as vid
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart' as webview_flutter_wkwebview;
 import 'package:connectivity_plus/connectivity_plus.dart' as connectivity_plus;
 import 'package:file_selector_linux/file_selector_linux.dart' as file_selector_linux;
+import 'package:geolocator_linux/geolocator_linux.dart' as geolocator_linux;
 import 'package:image_picker_linux/image_picker_linux.dart' as image_picker_linux;
 import 'package:open_file_linux/open_file_linux.dart' as open_file_linux;
 import 'package:package_info_plus/package_info_plus.dart' as package_info_plus;
@@ -38,6 +41,7 @@ import 'package:url_launcher_linux/url_launcher_linux.dart' as url_launcher_linu
 import 'package:wakelock_plus/wakelock_plus.dart' as wakelock_plus;
 import 'package:file_selector_macos/file_selector_macos.dart' as file_selector_macos;
 import 'package:flutter_image_compress_macos/flutter_image_compress_macos.dart' as flutter_image_compress_macos;
+import 'package:geolocator_apple/geolocator_apple.dart' as geolocator_apple;
 import 'package:image_picker_macos/image_picker_macos.dart' as image_picker_macos;
 import 'package:open_file_mac/open_file_mac.dart' as open_file_mac;
 import 'package:path_provider_foundation/path_provider_foundation.dart' as path_provider_foundation;
@@ -77,6 +81,15 @@ class _PluginRegistrant {
       } catch (err) {
         print(
           '`flutter_image_compress_common` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
+        geolocator_android.GeolocatorAndroid.registerWith();
+      } catch (err) {
+        print(
+          '`geolocator_android` threw an error: $err. '
           'The app may not function as expected until you remove this plugin from pubspec.yaml'
         );
       }
@@ -173,6 +186,15 @@ class _PluginRegistrant {
       }
 
       try {
+        geolocator_apple.GeolocatorApple.registerWith();
+      } catch (err) {
+        print(
+          '`geolocator_apple` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
         image_picker_ios.ImagePickerIOS.registerWith();
       } catch (err) {
         print(
@@ -264,6 +286,15 @@ class _PluginRegistrant {
       }
 
       try {
+        geolocator_linux.GeolocatorLinux.registerWith();
+      } catch (err) {
+        print(
+          '`geolocator_linux` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
         image_picker_linux.ImagePickerLinux.registerWith();
       } catch (err) {
         print(
@@ -350,6 +381,15 @@ class _PluginRegistrant {
       } catch (err) {
         print(
           '`flutter_image_compress_macos` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
+        geolocator_apple.GeolocatorApple.registerWith();
+      } catch (err) {
+        print(
+          '`geolocator_apple` threw an error: $err. '
           'The app may not function as expected until you remove this plugin from pubspec.yaml'
         );
       }

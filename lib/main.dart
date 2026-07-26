@@ -111,10 +111,10 @@ class MyApp extends StatelessWidget {
 class AppBehavior extends ScrollBehavior {
   @override
   Widget buildOverscrollIndicator(
-    BuildContext context,
-    Widget child,
-    ScrollableDetails details,
-  ) {
+      BuildContext context,
+      Widget child,
+      ScrollableDetails details,
+      ) {
     return child;
   }
 }
