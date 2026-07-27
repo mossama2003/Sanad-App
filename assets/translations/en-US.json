@@ -393,8 +393,7 @@
       "something_went_wrong": "Something went wrong",
       "qr_saved_successfully": "QR saved successfully in your Gallery",
       "filter": {
-        "title": "Sort By",
-        "status": "Status",
+        "title": "Sort by status",
         "all": "All",
         "upcoming": "Upcoming",
         "in_progress": "In Progress",

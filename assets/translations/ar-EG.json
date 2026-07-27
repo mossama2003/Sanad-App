@@ -393,13 +393,12 @@
       "something_went_wrong": "حدث خطأ ما",
       "qr_saved_successfully": "تم حفظ رمز QR بنجاح في معرض الصور",
       "filter": {
-        "title": "ترتيب حسب",
-        "status": "الحالة",
+        "title": "الترتيب حسب الحالة",
         "all": "الكل",
-        "upcoming": "القادمة",
+        "upcoming": "قادم",
         "in_progress": "قيد التنفيذ",
-        "completed": "المكتملة",
-        "drafted": "المسودات",
+        "completed": "مكتمل",
+        "drafted": "مسودة",
         "environment": "البيئة"
       }
     },

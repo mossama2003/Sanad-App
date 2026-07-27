@@ -6,7 +6,6 @@ import '../../../../shared/badges/presentation/screens/badges_screen.dart';
 import '../../../events/presentation/controllers/volunteer_events_cubit.dart';
 import '../../../rewards/presentation/screens/rewards_screen.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
-import '../sections/volunteer_my_events_section.dart';
 import '../widgets/volunteer_home_dashboard_widget.dart';
 import '../../../../../core/helper/app_navigator.dart';
 import '../widgets/volunteer_home_appbar_widget.dart';

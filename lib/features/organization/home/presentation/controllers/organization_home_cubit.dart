@@ -23,7 +23,10 @@ part 'organization_home_state.dart';
 
 class OrganizationHomeCubit extends Cubit<OrganizationHomeState> {
   OrganizationHomeCubit(this.repo) : super(HomeInitial()) {
-    eventsCubit = OrganizationEventsCubit(OrganizationEventsRepoImpel());
+    eventsCubit = OrganizationEventsCubit(
+      OrganizationEventsRepoImpel(),
+      homeCubit: this,
+    );
 
     _screens = {
       OrganizationHomeNavbarItem.home: const OrganizationHomeScreen(),
@@ -44,23 +47,23 @@ class OrganizationHomeCubit extends Cubit<OrganizationHomeState> {
 
   late final OrganizationEventsCubit eventsCubit;
 
-  OrganizationHomeNavbarItem selectedItem = OrganizationHomeNavbarItem.home;
-
-  Widget get currentScreen => _screens[selectedItem]!;
-
   final _homeBox = HiveBoxes.organizationHomeBox;
 
   OrganizationHomeModel? home;
 
   late final Map<OrganizationHomeNavbarItem, Widget> _screens;
 
-  // ============= get Organization Event =================
+  OrganizationHomeNavbarItem selectedItem = OrganizationHomeNavbarItem.home;
+
+  Widget get currentScreen => _screens[selectedItem]!;
+
+  // ===================== Get Home =====================
+
   Future<void> getOrganizationHome() async {
     final cachedHome = _homeBox.get('home');
 
     if (cachedHome != null) {
       home = cachedHome;
-
       emit(Success());
     } else {
       emit(Loading());
@@ -76,18 +79,118 @@ class OrganizationHomeCubit extends Cubit<OrganizationHomeState> {
 
         AppToast.error(failure.errMessage);
       },
-
           (data) async {
         home = data;
 
-        await _homeBox.put('home', data);
+        await _saveHome();
 
         emit(Success());
       },
     );
   }
 
-  // ============= Delete Organization Event =================
+  // ===================== Save Home =====================
+
+  Future<void> _saveHome() async {
+    if (home != null) {
+      await _homeBox.put('home', home!);
+    }
+  }
+
+  // ===================== Insert Event (Optimistic Create) =====================
+
+  Future<void> insertHomeEvent(OrganizationEventDetailsModel event) async {
+    if (home == null) return;
+
+    home = home!.copyWith(
+      activeEventsCount: home!.activeEventsCount + 1,
+      activeEvents: [event, ...home!.activeEvents],
+    );
+
+    await _saveHome();
+
+    emit(HomeUpdated());
+  }
+
+  // ===================== Replace Event (After API Confirms Creation) =====================
+
+  Future<void> replaceHomeEvent(
+      int oldId,
+      OrganizationEventDetailsModel newEvent,
+      ) async {
+    if (home == null) return;
+
+    final activeEvents = home!.activeEvents.map((e) {
+      return e.id == oldId ? newEvent : e;
+    }).toList();
+
+    home = home!.copyWith(activeEvents: activeEvents);
+
+    await _saveHome();
+
+    emit(HomeUpdated());
+  }
+
+  // ===================== Remove Event (Rollback On Failure) =====================
+
+  Future<void> removeHomeEvent(int id) async {
+    if (home == null) return;
+
+    final wasPresent = home!.activeEvents.any((e) => e.id == id);
+
+    if (!wasPresent) return;
+
+    home = home!.copyWith(
+      activeEventsCount: (home!.activeEventsCount - 1).clamp(0, 999999),
+      activeEvents: home!.activeEvents.where((e) => e.id != id).toList(),
+    );
+
+    await _saveHome();
+
+    emit(HomeUpdated());
+  }
+
+  // ===================== Update Event In Home =====================
+
+  Future<void> updateHomeEvent(
+      OrganizationEventDetailsModel updatedEvent,
+      ) async {
+    if (home == null) return;
+
+    bool updated = false;
+
+    final activeEvents = home!.activeEvents.map((event) {
+      if (event.id == updatedEvent.id) {
+        updated = true;
+        return updatedEvent;
+      }
+      return event;
+    }).toList();
+
+    final recentCompletedEvents = home!.recentCompletedEvents.map((event) {
+      if (event.id == updatedEvent.id) {
+        updated = true;
+        return updatedEvent;
+      }
+      return event;
+    }).toList();
+
+    if (!updated) {
+      return;
+    }
+
+    home = home!.copyWith(
+      activeEvents: activeEvents,
+      recentCompletedEvents: recentCompletedEvents,
+    );
+
+    await _saveHome();
+
+    emit(HomeUpdated());
+  }
+
+  // ===================== Delete Event =====================
+
   Future<bool> deleteOrganizationEvent({required int id}) async {
     final result = await repo.deleteOrganizationEvent(id);
 
@@ -99,30 +202,20 @@ class OrganizationHomeCubit extends Cubit<OrganizationHomeState> {
 
         return false;
       },
-
           (_) async {
         if (home != null) {
-          home = OrganizationHomeModel(
-            activeEventsCount: home!.activeEventsCount - 1,
-            completedEventsCount: home!.completedEventsCount,
-            attendanceCount: home!.attendanceCount,
-            organizationName: home!.organizationName,
+          home = home!.copyWith(
+            activeEventsCount: (home!.activeEventsCount - 1).clamp(0, 999999),
 
             activeEvents: home!.activeEvents
                 .where((event) => event.id != id)
                 .toList(),
-
-            recentCompletedEvents: home!.recentCompletedEvents,
           );
 
-          await _homeBox.put('home', home!);
+          await _saveHome();
         }
 
-        final box = HiveBoxes.organizationEventsBox;
-
-        if (box.isNotEmpty) {
-          await box.delete(id);
-        }
+        await HiveBoxes.organizationEventsBox.delete(id);
 
         emit(Success());
 
@@ -134,36 +227,25 @@ class OrganizationHomeCubit extends Cubit<OrganizationHomeState> {
   }
 
   // ===================== Publish Event =====================
+
   Future<void> publishOrganizationEvent({
     required int id,
     required DateTime date,
   }) async {
     final result = await repo.updateOrganizationEvent(
-      OrganizationEventUpdateParam(id: id, date: date, status: "upcoming"),
+      OrganizationEventUpdateParam(id: id, date: date, status: 'upcoming'),
     );
 
     result.fold(
           (failure) {
         AppToast.error(failure.errMessage);
       },
-
           (_) async {
-        // Update home cache
-        if (home != null) {
-          home = home!.copyWith(
-            activeEvents: home!.activeEvents.map((event) {
-              if (event.id == id) {
-                return event.copyWith(date: date, status: "upcoming");
-              }
+        final event = home?.activeEvents.where((e) => e.id == id).firstOrNull;
 
-              return event;
-            }).toList(),
-          );
-
-          await _homeBox.put('home', home!);
+        if (event != null) {
+          await updateHomeEvent(event.copyWith(date: date, status: 'upcoming'));
         }
-
-        emit(Success());
 
         AppToast.success(
           'organization.events.event_published_successfully'.tr(),
@@ -172,10 +254,15 @@ class OrganizationHomeCubit extends Cubit<OrganizationHomeState> {
     );
   }
 
+  // ===================== Bottom Navigation =====================
+
   void updateSelectedNavbarItem(OrganizationHomeNavbarItem item) {
     selectedItem = item;
+
     emit(BottomNavChange());
   }
+
+  // ===================== Open Form =====================
 
   void openEventForm(OrganizationEventDetailsModel? event) {
     if (event == null) {
@@ -193,6 +280,7 @@ class OrganizationHomeCubit extends Cubit<OrganizationHomeState> {
   @override
   Future<void> close() {
     eventsCubit.close();
+
     return super.close();
   }
 }

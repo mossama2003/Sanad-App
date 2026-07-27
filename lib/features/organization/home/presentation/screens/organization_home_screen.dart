@@ -20,79 +20,90 @@ class OrganizationHomeScreen extends StatefulWidget {
 }
 
 class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
-  late final OrganizationHomeCubit cubit;
-
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
 
-    cubit = OrganizationHomeCubit.get(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cubit = OrganizationHomeCubit.get(context);
 
-    if (cubit.home == null) {
       cubit.getOrganizationHome();
-    }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<OrganizationHomeCubit, OrganizationHomeState>(
       builder: (context, state) {
-        return SingleChildScrollView(
-          child: Padding(
-            padding: AppSize.padding(horizontal: 12, vertical: 15),
+        final cubit = OrganizationHomeCubit.get(context);
 
-            child: Column(
-              children: [
-                OrganizationHomeDashboardWidget(
-                  organizationName: cubit.home?.organizationName ?? '',
-                ),
+        final home = cubit.home;
 
-                SizedBox(height: AppSize.getHeight(15)),
+        return RefreshIndicator(
+          onRefresh: () async {
+            await cubit.getOrganizationHome();
+          },
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildStatCard(
-                      context,
-                      icon: AppIcons.events,
-                      iconColor: AppColors.primary,
-                      iconBg: AppColors.primary.withValues(alpha: .2),
-                      value: cubit.home?.activeEventsCount.toString() ?? '0',
-                      title: 'organization.home.dashboard.active_events'.tr(),
-                    ),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
 
-                    _buildStatCard(
-                      context,
-                      icon: AppIcons.completed,
-                      iconColor: AppColors.green,
-                      iconBg: AppColors.green.withValues(alpha: .2),
-                      value: cubit.home?.completedEventsCount.toString() ?? '0',
-                      title: 'organization.home.dashboard.completed'.tr(),
-                    ),
+            child: Padding(
+              padding: AppSize.padding(horizontal: 12, vertical: 15),
 
-                    _buildStatCard(
-                      context,
-                      icon: AppIcons.community,
-                      iconColor: AppColors.laserBlue,
-                      iconBg: AppColors.laserBlue.withValues(alpha: .2),
-                      value: cubit.home?.attendanceCount.toString() ?? '0',
-                      title: 'organization.home.dashboard.volunteers'.tr(),
-                    ),
-                  ],
-                ),
+              child: Column(
+                children: [
+                  OrganizationHomeDashboardWidget(
+                    organizationName: home?.organizationName ?? '',
+                  ),
 
-                SizedBox(height: AppSize.getHeight(15)),
+                  SizedBox(height: AppSize.getHeight(15)),
 
-                const OrganizationQuickActionsSection(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
 
-                SizedBox(height: AppSize.getHeight(15)),
+                    children: [
+                      _buildStatCard(
+                        context,
+                        icon: AppIcons.events,
+                        iconColor: AppColors.primary,
+                        iconBg: AppColors.primary.withValues(alpha: .2),
+                        value: home?.activeEventsCount.toString() ?? '0',
+                        title: 'organization.home.dashboard.active_events'.tr(),
+                      ),
 
-                OrganizationYourActiveEventsSection(cubit: cubit),
+                      _buildStatCard(
+                        context,
+                        icon: AppIcons.completed,
+                        iconColor: AppColors.green,
+                        iconBg: AppColors.green.withValues(alpha: .2),
+                        value: home?.completedEventsCount.toString() ?? '0',
+                        title: 'organization.home.dashboard.completed'.tr(),
+                      ),
 
-                SizedBox(height: AppSize.getHeight(8)),
+                      _buildStatCard(
+                        context,
+                        icon: AppIcons.community,
+                        iconColor: AppColors.laserBlue,
+                        iconBg: AppColors.laserBlue.withValues(alpha: .2),
+                        value: home?.attendanceCount.toString() ?? '0',
+                        title: 'organization.home.dashboard.volunteers'.tr(),
+                      ),
+                    ],
+                  ),
 
-                OrganizationRecentlyCompletedSection(cubit: cubit),
-              ],
+                  SizedBox(height: AppSize.getHeight(15)),
+
+                  const OrganizationQuickActionsSection(),
+
+                  SizedBox(height: AppSize.getHeight(15)),
+
+                  OrganizationYourActiveEventsSection(cubit: cubit),
+
+                  SizedBox(height: AppSize.getHeight(8)),
+
+                  OrganizationRecentlyCompletedSection(cubit: cubit),
+                ],
+              ),
             ),
           ),
         );
@@ -112,10 +123,12 @@ class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
 
     return Container(
       width: AppSize.getWidth(100),
+
       padding: AppSize.padding(all: 10),
 
       decoration: BoxDecoration(
         color: theme.cardColor,
+
         borderRadius: BorderRadius.circular(20),
 
         border: Border.all(
@@ -125,7 +138,9 @@ class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: .08),
+
             blurRadius: 8,
+
             offset: const Offset(0, 2),
           ),
         ],
@@ -152,6 +167,7 @@ class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
 
           Text(
             value,
+
             style: TextStyle(
               fontSize: AppSize.font(20),
               fontWeight: FontWeight.w500,
@@ -161,6 +177,7 @@ class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
 
           Text(
             title,
+
             textAlign: TextAlign.center,
 
             style: TextStyle(
