@@ -1,13 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../controllers/organization_home_cubit.dart';
 import '../sections/organization_quick_actions_section.dart';
 import '../sections/organization_recently_completed_section.dart';
-import '../widgets/organization_home_appbar_widget.dart';
+import '../sections/organization_your_active_events_section.dart';
 import '../widgets/organization_home_dashboard_widget.dart';
 
 class OrganizationHomeScreen extends StatefulWidget {
@@ -18,201 +20,174 @@ class OrganizationHomeScreen extends StatefulWidget {
 }
 
 class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
-  // late final OrganizationEventsCubit _cubit;
-
   @override
-  // void initState() {
-  //   super.initState();
-  // _cubit = OrganizationEventsCubit(OrganizationEventsRepoImpel());
-  // WidgetsBinding.instance.addPostFrameCallback((_) {
-  //   _cubit.loadEventsFromCache();
-  //
-  //   if (_cubit.shouldRefreshEvents()) {
-  //     _cubit.getOrganizationEvents();
-  //   }
-  // });
-  // }
-  // @override
-  // void dispose() {
-  //   _cubit.close();
-  //   super.dispose();
-  // }
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cubit = OrganizationHomeCubit.get(context);
+
+      cubit.getOrganizationHome();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // return BlocBuilder<OrganizationEventsCubit, OrganizationEventsState>(
-    // bloc: _cubit,
+    return BlocBuilder<OrganizationHomeCubit, OrganizationHomeState>(
+      builder: (context, state) {
+        final cubit = OrganizationHomeCubit.get(context);
 
-    // builder: (context, state) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        final home = cubit.home;
 
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const OrganizationHomeAppbarWidget(),
+        return RefreshIndicator(
+          onRefresh: () async {
+            await cubit.getOrganizationHome();
+          },
 
-              SizedBox(height: AppSize.getHeight(15)),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
 
-              Padding(
-                padding: AppSize.padding(horizontal: 12),
+            child: Padding(
+              padding: AppSize.padding(horizontal: 12, vertical: 15),
 
-                child: Column(
-                  children: [
-                    OrganizationHomeDashboardWidget(),
+              child: Column(
+                children: [
+                  OrganizationHomeDashboardWidget(
+                    organizationName: home?.organizationName ?? '',
+                  ),
 
-                    SizedBox(height: AppSize.getHeight(15)),
+                  SizedBox(height: AppSize.getHeight(15)),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
 
-                      children: [
-                        _buildStatCard(
-                          context,
+                    children: [
+                      _buildStatCard(
+                        context,
+                        icon: AppIcons.events,
+                        iconColor: AppColors.primary,
+                        iconBg: AppColors.primary.withValues(alpha: .2),
+                        value: home?.activeEventsCount.toString() ?? '0',
+                        title: 'organization.home.dashboard.active_events'.tr(),
+                      ),
 
-                          icon: AppIcons.events,
-                          iconColor: AppColors.primary,
-                          iconBg: AppColors.primary.withValues(alpha: .2),
-                          value: '12',
-                          title: 'organization.home.dashboard.active_events'
-                              .tr(),
-                        ),
+                      _buildStatCard(
+                        context,
+                        icon: AppIcons.completed,
+                        iconColor: AppColors.green,
+                        iconBg: AppColors.green.withValues(alpha: .2),
+                        value: home?.completedEventsCount.toString() ?? '0',
+                        title: 'organization.home.dashboard.completed'.tr(),
+                      ),
 
-                        _buildStatCard(
-                          context,
+                      _buildStatCard(
+                        context,
+                        icon: AppIcons.community,
+                        iconColor: AppColors.laserBlue,
+                        iconBg: AppColors.laserBlue.withValues(alpha: .2),
+                        value: home?.attendanceCount.toString() ?? '0',
+                        title: 'organization.home.dashboard.volunteers'.tr(),
+                      ),
+                    ],
+                  ),
 
-                          icon: AppIcons.completed,
-                          iconColor: AppColors.green,
-                          iconBg: AppColors.green.withValues(alpha: .2),
-                          value: '48',
-                          title: 'organization.home.dashboard.completed'.tr(),
-                        ),
+                  SizedBox(height: AppSize.getHeight(15)),
 
-                        _buildStatCard(
-                          context,
+                  const OrganizationQuickActionsSection(),
 
-                          icon: AppIcons.community,
-                          iconColor: AppColors.laserBlue,
-                          iconBg: AppColors.laserBlue.withValues(alpha: .2),
-                          value: '1.2K',
-                          title: 'organization.home.dashboard.volunteers'.tr(),
-                        ),
-                      ],
-                    ),
+                  SizedBox(height: AppSize.getHeight(15)),
 
-                    SizedBox(height: AppSize.getHeight(15)),
+                  OrganizationYourActiveEventsSection(cubit: cubit),
 
-                    const OrganizationQuickActionsSection(),
+                  SizedBox(height: AppSize.getHeight(8)),
 
-                    SizedBox(height: AppSize.getHeight(15)),
-
-                    // OrganizationYourActiveEventsSection(cubit: _cubit),
-                    SizedBox(height: AppSize.getHeight(8)),
-
-                    const OrganizationRecentlyCompletedSection(),
-                  ],
-                ),
+                  OrganizationRecentlyCompletedSection(cubit: cubit),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  // ,
+  Widget _buildStatCard(
+    BuildContext context, {
+    required String icon,
+    required Color iconColor,
+    required Color iconBg,
+    required String value,
+    required String title,
+  }) {
+    final theme = Theme.of(context);
 
-  // );
-}
+    return Container(
+      width: AppSize.getWidth(100),
 
-Widget _buildStatCard(
-  BuildContext context, {
+      padding: AppSize.padding(all: 10),
 
-  required String icon,
-  required Color iconColor,
-  required Color iconBg,
-  required String value,
-  required String title,
-}) {
-  final theme = Theme.of(context);
+      decoration: BoxDecoration(
+        color: theme.cardColor,
 
-  return Container(
-    width: AppSize.getWidth(100),
+        borderRadius: BorderRadius.circular(20),
 
-    padding: AppSize.padding(all: 10),
+        border: Border.all(
+          color: theme.colorScheme.onSurface.withValues(alpha: .08),
+        ),
 
-    decoration: BoxDecoration(
-      color: theme.cardColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: .08),
 
-      borderRadius: BorderRadius.circular(20),
+            blurRadius: 8,
 
-      border: Border.all(
-        color: theme.colorScheme.onSurface.withValues(alpha: .08),
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
 
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(
-            alpha: theme.brightness == Brightness.dark ? .35 : .08,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+
+        children: [
+          Container(
+            padding: AppSize.padding(all: 8),
+
+            decoration: BoxDecoration(shape: BoxShape.circle, color: iconBg),
+
+            child: CustomIcon(
+              icon: icon,
+              color: iconColor,
+              width: AppSize.getSize(20),
+              height: AppSize.getSize(20),
+            ),
           ),
 
-          blurRadius: 8,
+          SizedBox(height: AppSize.getHeight(5)),
 
-          offset: const Offset(0, 2),
-        ),
-      ],
-    ),
+          Text(
+            value,
 
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-
-      children: [
-        Container(
-          padding: AppSize.padding(all: 8),
-
-          decoration: BoxDecoration(shape: BoxShape.circle, color: iconBg),
-
-          child: CustomIcon(
-            icon: icon,
-
-            color: iconColor,
-
-            width: AppSize.getSize(20),
-
-            height: AppSize.getSize(20),
+            style: TextStyle(
+              fontSize: AppSize.font(20),
+              fontWeight: FontWeight.w500,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
-        ),
 
-        SizedBox(height: AppSize.getHeight(5)),
+          Text(
+            title,
 
-        Text(
-          value,
+            textAlign: TextAlign.center,
 
-          style: TextStyle(
-            fontSize: AppSize.font(20),
-
-            fontWeight: FontWeight.w500,
-
-            color: theme.colorScheme.onSurface,
+            style: TextStyle(
+              fontSize: AppSize.font(10),
+              fontWeight: FontWeight.w300,
+              color: theme.colorScheme.onSurface.withValues(alpha: .6),
+            ),
           ),
-        ),
-
-        Text(
-          title,
-
-          textAlign: TextAlign.center,
-
-          style: TextStyle(
-            fontSize: AppSize.font(10),
-
-            fontWeight: FontWeight.w300,
-
-            color: theme.colorScheme.onSurface.withValues(alpha: .6),
-          ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }
-
-// }

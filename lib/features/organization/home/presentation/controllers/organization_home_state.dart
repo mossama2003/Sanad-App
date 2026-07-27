@@ -11,3 +11,5 @@ class Loading extends OrganizationHomeState {}
 class Success extends OrganizationHomeState {}
 
 class Error extends OrganizationHomeState {}
+
+class HomeUpdated extends OrganizationHomeState {}

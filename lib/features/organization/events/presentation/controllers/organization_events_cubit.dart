@@ -8,10 +8,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/shared/models/governorate_model.dart';
+import '../../../home/presentation/controllers/organization_home_cubit.dart';
 import '../../data/params/create_organization_event_param.dart';
 import '../../data/params/organization_event_update_param.dart';
 import '../../../../../core/shared/models/city_model.dart';
@@ -26,7 +28,7 @@ enum CreateOrganizationEventAction { draft, publish }
 enum OrganizationEventFormMode { create, edit }
 
 class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
-  OrganizationEventsCubit(this.repo, {this.editingEvent})
+  OrganizationEventsCubit(this.repo, {this.editingEvent, this.homeCubit})
     : super(EventsInitial()) {
     if (editingEvent != null) {
       formMode = OrganizationEventFormMode.edit;
@@ -34,6 +36,8 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   }
 
   final OrganizationEventsRepo repo;
+
+  final OrganizationHomeCubit? homeCubit;
 
   static OrganizationEventsCubit get(BuildContext context) =>
       BlocProvider.of<OrganizationEventsCubit>(context);
@@ -571,9 +575,15 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
           modified: createdEvent.modified,
         );
 
+        // ===================== Hive وقتها بس بعد نجاح الـ API =====================
+
         events.insert(0, newEvent);
 
         await saveEventsToCache();
+
+        if (homeCubit != null) {
+          await homeCubit!.insertHomeEvent(newEvent);
+        }
 
         emit(Success());
 
@@ -645,13 +655,12 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       (_) async {
         loadingAction = null;
 
-        final index = events.indexWhere((e) => e.id == id);
+        final baseEvent =
+            events.firstWhereOrNull((e) => e.id == id) ?? editingEvent;
 
-        if (index != -1) {
-          final oldEvent = events[index];
-
-          events[index] = oldEvent.copyWith(
-            status: publish ? "upcoming" : oldEvent.status,
+        if (baseEvent != null) {
+          final updatedEvent = baseEvent.copyWith(
+            status: publish ? "upcoming" : baseEvent.status,
             name: eventNameController.text.trim(),
             description: eventDescriptionController.text.trim(),
             category: selectedCategory.value == 'Other'
@@ -660,7 +669,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
             date: getEventDateTime(),
             spots:
                 int.tryParse(requiredVolunteersController.text) ??
-                oldEvent.spots,
+                baseEvent.spots,
             skills: selectedSkills.value,
             location: {
               'url': locationLinkController.text.trim(),
@@ -668,10 +677,22 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
               'city': selectedCity.value?.nameEn,
               'state': selectedGov.value?.nameEn,
             },
-            cover: eventCover != null ? eventCover!.path : oldEvent.cover,
+            cover: eventCover != null ? eventCover!.path : baseEvent.cover,
           );
 
-          await saveEventsToCache();
+          // تحديث الليست المحلي بتاع شاشة الـ Events (لو الـ event موجود فيها أصلاً)
+          final index = events.indexWhere((e) => e.id == id);
+
+          if (index != -1) {
+            events[index] = updatedEvent;
+
+            await saveEventsToCache();
+          }
+
+          // تحديث الهوم دايمًا، سواء الـ event كان موجود في الليست المحلي أو لأ
+          if (homeCubit != null) {
+            await homeCubit!.updateHomeEvent(updatedEvent);
+          }
         }
 
         emit(Success());
@@ -708,6 +729,10 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
           );
 
           await saveEventsToCache();
+
+          if (homeCubit != null) {
+            await homeCubit!.updateHomeEvent(events[index]);
+          }
         }
 
         emit(Success());
@@ -731,16 +756,18 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     await HiveBoxes.cacheInfoBox.put(_eventsLastUpdatedKey, DateTime.now());
   }
 
-  void loadEventsFromCache() {
+  bool loadEventsFromCache() {
     final box = HiveBoxes.organizationEventsBox;
 
-    if (box.isEmpty) return;
+    if (box.isEmpty) return false;
 
     events
       ..clear()
       ..addAll(box.values);
 
     emit(Success());
+
+    return true;
   }
 
   // ===================== Get Organization Events =====================
@@ -751,20 +778,17 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   }) async {
     if (refresh) {
       currentPage = 1;
-
       selectedStatuses = statuses;
-
       search = searchText;
     }
 
-    // Load Cache First
+    // ================= Cache First =================
+
     if (!refresh && events.isEmpty) {
       loadEventsFromCache();
-
-      if (!shouldRefreshEvents() && events.isNotEmpty) {
-        return;
-      }
     }
+
+    // ================= API Background Refresh =================
 
     final result = await repo.getOrganizationEvents(
       GetOrganizationEventsParam(
@@ -783,6 +807,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
         AppToast.error(failure.errMessage);
       },
+
       (data) async {
         events
           ..clear()
