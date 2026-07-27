@@ -64,10 +64,7 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
   // ===================== QUICK Filter =====================
 
-  void updateQuickFilters({
-    bool? nearMe,
-    bool? thisWeekFilter,
-  }) {
+  void updateQuickFilters({bool? nearMe, bool? thisWeekFilter}) {
     nearBy = nearMe ?? nearBy;
     thisWeek = thisWeekFilter ?? thisWeek;
 
@@ -202,6 +199,8 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
     await box.clear();
 
     await box.addAll(events);
+
+    await HiveBoxes.cacheInfoBox.put(_eventsLastUpdatedKey, DateTime.now());
   }
 
   void loadEventsFromCache() {
@@ -216,7 +215,7 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
     emit(Success());
   }
 
-  // ===================== Get Organization Events =====================
+  // ===================== Get Volunteer Events =====================
   Future<void> getVolunteerEvents({
     bool refresh = false,
     String? status,
@@ -245,6 +244,12 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
       selectedOrdering = ordering;
 
       this.mostAvailableSpots = mostAvailableSpots ?? false;
+    }
+
+    // ================= Cache First =================
+
+    if (!refresh && events.isEmpty) {
+      loadEventsFromCache();
     }
 
     final result = await repo.getVolunteerEvents(
@@ -278,14 +283,20 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
     result.fold(
       (l) {
+        if (events.isEmpty) {
+          emit(Error());
+        }
+
         AppToast.error(l.errMessage);
       },
-      (r) {
+      (r) async {
         events
           ..clear()
           ..addAll(r.results);
 
         nextPage = r.next;
+
+        await _saveEventsToCache();
 
         emit(Success());
       },
@@ -325,8 +336,6 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
   // ===================== Leave Event =====================
 
-  // ===================== Leave Event =====================
-
   Future<void> leaveEvent(int eventId) async {
     final result = await repo.leaveEvent(eventId);
 
@@ -334,7 +343,6 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
       (failure) {
         AppToast.error(failure.errMessage);
       },
-
       (_) async {
         final index = events.indexWhere((event) => event.id == eventId);
 
@@ -347,8 +355,6 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
           );
 
           await _saveEventsToCache();
-
-          emit(EventsUpdated());
         }
 
         AppToast.success('volunteer.events.successfully_left_event'.tr());

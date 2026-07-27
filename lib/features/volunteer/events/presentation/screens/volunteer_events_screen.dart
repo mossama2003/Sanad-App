@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
-import '../../../home/presentation/widgets/volunteer_home_appbar_widget.dart';
 import '../../../../../core/shared/widgets/custom_search_field.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/helper/app_navigator.dart';
@@ -43,6 +42,10 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
     _cubit = VolunteerEventsCubit.get(context);
 
     _scrollController = ScrollController()..addListener(_onScroll);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _cubit.getVolunteerEvents();
+    });
   }
 
   void _onScroll() {
@@ -68,495 +71,470 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
     return BlocBuilder<VolunteerEventsCubit, VolunteerEventsState>(
       bloc: _cubit,
       builder: (context, state) {
-        return Scaffold(
-          backgroundColor: theme.scaffoldBackgroundColor,
+        return RefreshIndicator(
+          color: AppColors.primary,
+          onRefresh: () async {
+            await _cubit.getVolunteerEvents(
+              refresh: true,
+              status: _cubit.selectedStatus,
+              categories: _cubit.selectedCategories,
+              nearByFilter: _cubit.nearBy,
+              startDate: _cubit.dateAfter,
+              endDate: _cubit.dateBefore,
+              ordering: _cubit.selectedOrdering,
+              mostAvailableSpots: _cubit.mostAvailableSpots,
+            );
+          },
+          child: CustomScrollView(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverPadding(
+                padding: AppSize.padding(horizontal: 12, top: 15),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'volunteer.events.title'.tr(),
+                        style: TextStyle(
+                          fontSize: AppSize.font(22),
+                          fontWeight: FontWeight.w700,
+                          color: textColor,
+                        ),
+                      ),
 
-          body: SafeArea(
-            child: RefreshIndicator(
-              color: AppColors.primary,
-              onRefresh: () async {
-                await _cubit.getVolunteerEvents(
-                  refresh: true,
-                  status: _cubit.selectedStatus,
-                  categories: _cubit.selectedCategories,
-                  nearByFilter: _cubit.nearBy,
-                  startDate: _cubit.dateAfter,
-                  endDate: _cubit.dateBefore,
-                  ordering: _cubit.selectedOrdering,
-                  mostAvailableSpots: _cubit.mostAvailableSpots,
-                );
-              },
-              child: CustomScrollView(
-                controller: _scrollController,
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  const SliverToBoxAdapter(child: VolunteerHomeAppbarWidget()),
+                      Text(
+                        'volunteer.events.desc'.tr(),
+                        style: TextStyle(
+                          fontSize: AppSize.font(15),
+                          color: textColor.withValues(alpha: .5),
+                        ),
+                      ),
 
-                  SliverPadding(
-                    padding: AppSize.padding(horizontal: 12, top: 15),
-                    sliver: SliverToBoxAdapter(
-                      child: Column(
+                      SizedBox(height: AppSize.getHeight(20)),
+
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'volunteer.events.title'.tr(),
-                            style: TextStyle(
-                              fontSize: AppSize.font(22),
-                              fontWeight: FontWeight.w700,
-                              color: textColor,
-                            ),
-                          ),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                CustomSearchField(
+                                  controller: _cubit.searchController,
+                                  hint: 'volunteer.events.search'.tr(),
+                                  borderColor: AppColors.grey300,
+                                  borderRadius: 20,
+                                  borderWidth: 1,
+                                  onChanged: _cubit.onSearchChanged,
+                                ),
+                                SizedBox(height: AppSize.getHeight(10)),
+                                CustomSelectableChips(
+                                  multiSelect: true,
+                                  initialSelected: [
+                                    if (_cubit.nearBy)
+                                      'volunteer.events.filter.near_me'.tr(),
 
-                          Text(
-                            'volunteer.events.desc'.tr(),
-                            style: TextStyle(
-                              fontSize: AppSize.font(15),
-                              color: textColor.withValues(alpha: .5),
-                            ),
-                          ),
-
-                          SizedBox(height: AppSize.getHeight(20)),
-
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    CustomSearchField(
-                                      controller: _cubit.searchController,
-                                      hint: 'volunteer.events.search'.tr(),
-                                      borderColor: AppColors.grey300,
-                                      borderRadius: 20,
-                                      borderWidth: 1,
-                                      onChanged: _cubit.onSearchChanged,
-                                    ),
-                                    SizedBox(height: AppSize.getHeight(10)),
-                                    CustomSelectableChips(
-                                      multiSelect: true,
-                                      initialSelected: [
-                                        if (_cubit.nearBy)
-                                          'volunteer.events.filter.near_me'
-                                              .tr(),
-
-                                        if (_cubit.thisWeek)
-                                          'volunteer.events.filter.this_week'
-                                              .tr(),
-                                      ],
-                                      items: [
+                                    if (_cubit.thisWeek)
+                                      'volunteer.events.filter.this_week'.tr(),
+                                  ],
+                                  items: [
+                                    'volunteer.events.filter.near_me'.tr(),
+                                    'volunteer.events.filter.this_week'.tr(),
+                                  ],
+                                  onChanged: (selected) {
+                                    _cubit.updateQuickFilters(
+                                      nearMe: selected.contains(
                                         'volunteer.events.filter.near_me'.tr(),
+                                      ),
+                                      thisWeekFilter: selected.contains(
                                         'volunteer.events.filter.this_week'
                                             .tr(),
-                                      ],
-                                      onChanged: (selected) {
-                                        _cubit.updateQuickFilters(
-                                          nearMe: selected.contains(
-                                            'volunteer.events.filter.near_me'
-                                                .tr(),
-                                          ),
-                                          thisWeekFilter: selected.contains(
-                                            'volunteer.events.filter.this_week'
-                                                .tr(),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          SizedBox(width: AppSize.getWidth(10)),
+
+                          MenuAnchor(
+                            style: MenuStyle(
+                              backgroundColor: WidgetStatePropertyAll(
+                                theme.cardColor,
+                              ),
+                              elevation: const WidgetStatePropertyAll(6),
+                              padding: const WidgetStatePropertyAll(
+                                EdgeInsets.zero,
+                              ),
+                              side: WidgetStatePropertyAll(
+                                BorderSide(color: AppColors.grey300, width: 1),
+                              ),
+                              shape: WidgetStatePropertyAll(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
+                            ),
 
-                              SizedBox(width: AppSize.getWidth(10)),
+                            menuChildren: [
+                              StatefulBuilder(
+                                builder: (context, menuSetState) {
+                                  void applyFilters() {
+                                    DateTime? startDate;
+                                    DateTime? endDate;
 
-                              MenuAnchor(
-                                style: MenuStyle(
-                                  backgroundColor: WidgetStatePropertyAll(
-                                    theme.cardColor,
-                                  ),
-                                  elevation: const WidgetStatePropertyAll(6),
-                                  padding: const WidgetStatePropertyAll(
-                                    EdgeInsets.zero,
-                                  ),
-                                  side: WidgetStatePropertyAll(
-                                    BorderSide(
-                                      color: AppColors.grey300,
-                                      width: 1,
+                                    if (_cubit.thisWeek) {
+                                      final now = DateTime.now();
+
+                                      startDate = DateTime(
+                                        now.year,
+                                        now.month,
+                                        now.day,
+                                      );
+
+                                      endDate = startDate.add(
+                                        const Duration(days: 6),
+                                      );
+                                    }
+
+                                    _cubit.getVolunteerEvents(
+                                      refresh: true,
+
+                                      status: _cubit.selectedStatus,
+
+                                      categories: selectedCategories,
+
+                                      nearByFilter: _cubit.nearBy,
+
+                                      startDate: startDate,
+
+                                      endDate: endDate,
+
+                                      searchText: _cubit.search,
+
+                                      ordering: selectedSort == 'popular'
+                                          ? 'popular'
+                                          : null,
+
+                                      mostAvailableSpots: mostAvailableSpots,
+                                    );
+                                  }
+
+                                  return ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth: AppSize.getWidth(280),
+                                      maxHeight: AppSize.getHeight(380),
                                     ),
-                                  ),
-                                  shape: WidgetStatePropertyAll(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                ),
 
-                                menuChildren: [
-                                  StatefulBuilder(
-                                    builder: (context, menuSetState) {
-                                      void applyFilters() {
-                                        DateTime? startDate;
-                                        DateTime? endDate;
+                                    child: SingleChildScrollView(
+                                      padding: AppSize.padding(all: 16),
+                                      primary: false,
 
-                                        if (_cubit.thisWeek) {
-                                          final now = DateTime.now();
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            'volunteer.events.filter.sort_by'
+                                                .tr(),
+                                            style: TextStyle(
+                                              fontSize: AppSize.font(15),
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
 
-                                          startDate = DateTime(
-                                            now.year,
-                                            now.month,
-                                            now.day,
-                                          );
-
-                                          endDate = startDate.add(
-                                            const Duration(days: 6),
-                                          );
-                                        }
-
-                                        _cubit.getVolunteerEvents(
-                                          refresh: true,
-
-                                          status: _cubit.selectedStatus,
-
-                                          categories: selectedCategories,
-
-                                          nearByFilter: _cubit.nearBy,
-
-                                          startDate: startDate,
-
-                                          endDate: endDate,
-
-                                          searchText: _cubit.search,
-
-                                          ordering: selectedSort == 'popular'
-                                              ? 'popular'
-                                              : null,
-
-                                          mostAvailableSpots:
-                                              mostAvailableSpots,
-                                        );
-                                      }
-
-                                      return ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          maxWidth: AppSize.getWidth(280),
-                                          maxHeight: AppSize.getHeight(380),
-                                        ),
-
-                                        child: SingleChildScrollView(
-                                          padding: AppSize.padding(all: 16),
-                                          primary: false,
-
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(
-                                                'volunteer.events.filter.sort_by'
+                                          buildFilterItem(
+                                            title:
+                                                'volunteer.events.filter.soonest_first'
                                                     .tr(),
-                                                style: TextStyle(
-                                                  fontSize: AppSize.font(15),
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                              ),
 
-                                              buildFilterItem(
-                                                title:
-                                                    'volunteer.events.filter.soonest_first'
-                                                        .tr(),
+                                            selected: selectedSort == 'soonest',
 
-                                                selected:
-                                                    selectedSort == 'soonest',
+                                            onTap: () {
+                                              menuSetState(() {
+                                                selectedSort = 'soonest';
+                                                mostAvailableSpots = false;
+                                              });
 
-                                                onTap: () {
-                                                  menuSetState(() {
-                                                    selectedSort = 'soonest';
-                                                    mostAvailableSpots = false;
-                                                  });
+                                              applyFilters();
+                                            },
+                                          ),
 
-                                                  applyFilters();
-                                                },
-                                              ),
-
-                                              buildFilterItem(
-                                                title:
-                                                    'volunteer.events.filter.most_spots_available'
-                                                        .tr(),
-
-                                                selected:
-                                                    selectedSort == 'available',
-
-                                                onTap: () {
-                                                  menuSetState(() {
-                                                    selectedSort = 'available';
-                                                    mostAvailableSpots = true;
-                                                  });
-
-                                                  applyFilters();
-                                                },
-                                              ),
-
-                                              buildFilterItem(
-                                                title:
-                                                    'volunteer.events.filter.most_popular'
-                                                        .tr(),
-
-                                                selected:
-                                                    selectedSort == 'popular',
-
-                                                onTap: () {
-                                                  menuSetState(() {
-                                                    selectedSort = 'popular';
-                                                    mostAvailableSpots = false;
-                                                  });
-
-                                                  applyFilters();
-                                                },
-                                              ),
-
-                                              const Divider(thickness: .2),
-
-                                              Text(
-                                                'volunteer.events.filter.quick_filters'
+                                          buildFilterItem(
+                                            title:
+                                                'volunteer.events.filter.most_spots_available'
                                                     .tr(),
-                                                style: TextStyle(
-                                                  fontSize: AppSize.font(15),
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                              ),
 
-                                              buildFilterItem(
-                                                title:
-                                                    'volunteer.events.filter.near_me'
-                                                        .tr(),
-                                                selected: _cubit.nearBy,
-                                                onTap: () {
-                                                  _cubit.updateQuickFilters(
-                                                    nearMe: !_cubit.nearBy,
-                                                    thisWeekFilter:
-                                                        _cubit.thisWeek,
-                                                  );
+                                            selected:
+                                                selectedSort == 'available',
 
-                                                  menuSetState(() {});
-                                                },
-                                              ),
+                                            onTap: () {
+                                              menuSetState(() {
+                                                selectedSort = 'available';
+                                                mostAvailableSpots = true;
+                                              });
 
-                                              buildFilterItem(
-                                                title:
-                                                    'volunteer.events.filter.this_week'
-                                                        .tr(),
-                                                selected: _cubit.thisWeek,
-                                                onTap: () {
-                                                  menuSetState(() {
-                                                    _cubit.thisWeek =
-                                                        !_cubit.thisWeek;
-                                                  });
+                                              applyFilters();
+                                            },
+                                          ),
 
-                                                  applyFilters();
-                                                },
-                                              ),
-                                              const Divider(thickness: .2),
-
-                                              Text(
-                                                'volunteer.events.filter.category'
+                                          buildFilterItem(
+                                            title:
+                                                'volunteer.events.filter.most_popular'
                                                     .tr(),
-                                                style: TextStyle(
-                                                  fontSize: AppSize.font(15),
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                              ),
 
-                                              ..._cubit.eventCategories.map((
-                                                category,
-                                              ) {
-                                                final selected =
-                                                    selectedCategories.contains(
+                                            selected: selectedSort == 'popular',
+
+                                            onTap: () {
+                                              menuSetState(() {
+                                                selectedSort = 'popular';
+                                                mostAvailableSpots = false;
+                                              });
+
+                                              applyFilters();
+                                            },
+                                          ),
+
+                                          const Divider(thickness: .2),
+
+                                          Text(
+                                            'volunteer.events.filter.quick_filters'
+                                                .tr(),
+                                            style: TextStyle(
+                                              fontSize: AppSize.font(15),
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+
+                                          buildFilterItem(
+                                            title:
+                                                'volunteer.events.filter.near_me'
+                                                    .tr(),
+                                            selected: _cubit.nearBy,
+                                            onTap: () {
+                                              _cubit.updateQuickFilters(
+                                                nearMe: !_cubit.nearBy,
+                                                thisWeekFilter: _cubit.thisWeek,
+                                              );
+
+                                              menuSetState(() {});
+                                            },
+                                          ),
+
+                                          buildFilterItem(
+                                            title:
+                                                'volunteer.events.filter.this_week'
+                                                    .tr(),
+                                            selected: _cubit.thisWeek,
+                                            onTap: () {
+                                              menuSetState(() {
+                                                _cubit.thisWeek =
+                                                    !_cubit.thisWeek;
+                                              });
+
+                                              applyFilters();
+                                            },
+                                          ),
+                                          const Divider(thickness: .2),
+
+                                          Text(
+                                            'volunteer.events.filter.category'
+                                                .tr(),
+                                            style: TextStyle(
+                                              fontSize: AppSize.font(15),
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+
+                                          ..._cubit.eventCategories.map((
+                                            category,
+                                          ) {
+                                            final selected = selectedCategories
+                                                .contains(category);
+
+                                            return buildFilterItem(
+                                              title: _cubit
+                                                  .categoryTranslations[category]!,
+                                              selected: selected,
+                                              onTap: () {
+                                                menuSetState(() {
+                                                  if (selectedCategories
+                                                      .contains(category)) {
+                                                    selectedCategories.remove(
                                                       category,
                                                     );
+                                                  } else {
+                                                    selectedCategories.add(
+                                                      category,
+                                                    );
+                                                  }
+                                                });
 
-                                                return buildFilterItem(
-                                                  title: _cubit
-                                                      .categoryTranslations[category]!,
-                                                  selected: selected,
-                                                  onTap: () {
-                                                    menuSetState(() {
-                                                      if (selectedCategories
-                                                          .contains(category)) {
-                                                        selectedCategories
-                                                            .remove(category);
-                                                      } else {
-                                                        selectedCategories.add(
-                                                          category,
-                                                        );
-                                                      }
-                                                    });
-
-                                                    applyFilters();
-                                                  },
-                                                );
-                                              }),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
-
-                                builder: (context, controller, child) {
-                                  return InkWell(
-                                    borderRadius: BorderRadius.circular(100),
-                                    onTap: () {
-                                      controller.isOpen
-                                          ? controller.close()
-                                          : controller.open();
-                                    },
-                                    child: Container(
-                                      width: AppSize.getSize(48),
-                                      height: AppSize.getSize(48),
-
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: AppColors.grey300,
-                                        ),
-                                      ),
-
-                                      child: Center(
-                                        child: CustomIcon(
-                                          icon: AppIcons.filter,
-                                          color: AppColors.primary,
-                                          width: AppSize.getSize(20),
-                                          height: AppSize.getSize(20),
-                                        ),
+                                                applyFilters();
+                                              },
+                                            );
+                                          }),
+                                        ],
                                       ),
                                     ),
                                   );
                                 },
                               ),
                             ],
+
+                            builder: (context, controller, child) {
+                              return InkWell(
+                                borderRadius: BorderRadius.circular(100),
+                                onTap: () {
+                                  controller.isOpen
+                                      ? controller.close()
+                                      : controller.open();
+                                },
+                                child: Container(
+                                  width: AppSize.getSize(48),
+                                  height: AppSize.getSize(48),
+
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.grey300,
+                                    ),
+                                  ),
+
+                                  child: Center(
+                                    child: CustomIcon(
+                                      icon: AppIcons.filter,
+                                      color: AppColors.primary,
+                                      width: AppSize.getSize(20),
+                                      height: AppSize.getSize(20),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-
-                          SizedBox(height: AppSize.getHeight(15)),
-
-                          Text(
-                            'volunteer.events.showing_events'.tr(
-                              namedArgs: {
-                                'count': _cubit.filteredEvents.length
-                                    .toString(),
-                              },
-                            ),
-                            style: TextStyle(
-                              fontSize: AppSize.font(15),
-                              color: textColor.withValues(alpha: .5),
-                            ),
-                          ),
-
-                          SizedBox(height: AppSize.getHeight(20)),
                         ],
+                      ),
+
+                      SizedBox(height: AppSize.getHeight(15)),
+
+                      Text(
+                        'volunteer.events.showing_events'.tr(
+                          namedArgs: {
+                            'count': _cubit.filteredEvents.length.toString(),
+                          },
+                        ),
+                        style: TextStyle(
+                          fontSize: AppSize.font(15),
+                          color: textColor.withValues(alpha: .5),
+                        ),
+                      ),
+
+                      SizedBox(height: AppSize.getHeight(20)),
+                    ],
+                  ),
+                ),
+              ),
+
+              if (_cubit.filteredEvents.isEmpty)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      'volunteer.events.no_events_found'.tr(),
+                      style: TextStyle(
+                        color: textColor.withValues(alpha: .5),
+                        fontSize: AppSize.font(16),
                       ),
                     ),
                   ),
+                )
+              else
+                SliverPadding(
+                  padding: AppSize.padding(horizontal: 12),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        if (index == _cubit.filteredEvents.length) {
+                          return Padding(
+                            padding: AppSize.padding(vertical: 20),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
 
-                  if (_cubit.filteredEvents.isEmpty)
-                    SliverFillRemaining(
-                      child: Center(
-                        child: Text(
-                          'volunteer.events.no_events_found'.tr(),
-                          style: TextStyle(
-                            color: textColor.withValues(alpha: .5),
-                            fontSize: AppSize.font(16),
-                          ),
-                        ),
-                      ),
-                    )
-                  else
-                    SliverPadding(
-                      padding: AppSize.padding(horizontal: 12),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            if (index == _cubit.filteredEvents.length) {
-                              return Padding(
-                                padding: AppSize.padding(vertical: 20),
-                                child: const Center(
-                                  child: CircularProgressIndicator(),
+                        final event = _cubit.filteredEvents[index];
+
+                        return Padding(
+                          padding: AppSize.padding(bottom: 15),
+                          child: VolunteerEventsCard(
+                            event: event,
+                            onDetailsTap: () {
+                              AppNavigator.sheet(
+                                VolunteerEventsBottomSheet(
+                                  event: event,
+                                  onJoinTap: () {
+                                    if (event.joined) {
+                                      AppNavigator.dialog(
+                                        ConfirmDialog(
+                                          title: 'volunteer.events.leave_title'
+                                              .tr(),
+                                          message:
+                                              'volunteer.events.leave_message'
+                                                  .tr(),
+                                          confirmText:
+                                              'volunteer.events.leave_confirm'
+                                                  .tr(),
+                                          cancelText: 'core.cancel'.tr(),
+                                          isDestructive: true,
+                                          onConfirm: () {
+                                            _cubit.leaveEvent(event.id);
+                                            AppNavigator.pop();
+                                          },
+                                        ),
+                                      );
+                                    } else {
+                                      AppNavigator.pop();
+                                      _cubit.joinEvent(event.id);
+                                    }
+                                  },
                                 ),
                               );
-                            }
-
-                            final event = _cubit.filteredEvents[index];
-
-                            return Padding(
-                              padding: AppSize.padding(bottom: 15),
-                              child: VolunteerEventsCard(
-                                event: event,
-                                onDetailsTap: () {
-                                  AppNavigator.sheet(
-                                    VolunteerEventsBottomSheet(
-                                      event: event,
-                                      onJoinTap: () {
-                                        if (event.joined) {
-                                          AppNavigator.dialog(
-                                            ConfirmDialog(
-                                              title:
-                                                  'volunteer.events.leave_title'
-                                                      .tr(),
-                                              message:
-                                                  'volunteer.events.leave_message'
-                                                      .tr(),
-                                              confirmText:
-                                                  'volunteer.events.leave_confirm'
-                                                      .tr(),
-                                              cancelText: 'core.cancel'.tr(),
-                                              isDestructive: true,
-                                              onConfirm: () {
-                                                _cubit.leaveEvent(event.id);
-                                                AppNavigator.pop();
-                                              },
-                                            ),
-                                          );
-                                        } else {
-                                          AppNavigator.pop();
-                                          _cubit.joinEvent(event.id);
-                                        }
-                                      },
-                                    ),
-                                  );
-                                },
-                                onJoinTap: () {
-                                  if (event.joined) {
-                                    AppNavigator.dialog(
-                                      ConfirmDialog(
-                                        title: 'volunteer.events.leave_title'
-                                            .tr(),
-                                        message:
-                                            'volunteer.events.leave_message'
-                                                .tr(),
-                                        confirmText:
-                                            'volunteer.events.leave_confirm'
-                                                .tr(),
-                                        cancelText: 'core.cancel'.tr(),
-                                        isDestructive: true,
-                                        onConfirm: () {
-                                          _cubit.leaveEvent(event.id);
-                                        },
-                                      ),
-                                    );
-                                  } else {
-                                    _cubit.joinEvent(event.id);
-                                  }
-                                },
-                              ),
-                            );
-                          },
-                          childCount:
-                              _cubit.filteredEvents.length +
-                              (_cubit.nextPage != null ? 1 : 0),
-                        ),
-                      ),
+                            },
+                            onJoinTap: () {
+                              if (event.joined) {
+                                AppNavigator.dialog(
+                                  ConfirmDialog(
+                                    title: 'volunteer.events.leave_title'.tr(),
+                                    message: 'volunteer.events.leave_message'
+                                        .tr(),
+                                    confirmText:
+                                        'volunteer.events.leave_confirm'.tr(),
+                                    cancelText: 'core.cancel'.tr(),
+                                    isDestructive: true,
+                                    onConfirm: () {
+                                      _cubit.leaveEvent(event.id);
+                                    },
+                                  ),
+                                );
+                              } else {
+                                _cubit.joinEvent(event.id);
+                              }
+                            },
+                          ),
+                        );
+                      },
+                      childCount:
+                          _cubit.filteredEvents.length +
+                          (_cubit.nextPage != null ? 1 : 0),
                     ),
-                ],
-              ),
-            ),
+                  ),
+                ),
+            ],
           ),
         );
       },

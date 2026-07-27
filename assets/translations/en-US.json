@@ -333,7 +333,10 @@
       "create_event_button": "Create New Event",
       "your_active_events": {
         "title": "Your Active Events",
-        "see_all": "See All"
+        "see_all": "See All",
+        "no_events_yet": "No upcoming events yet",
+        "description": "Create your first event or publish a draft to start engaging volunteers and your community.",
+        "manage_events": "Manage Events"
       },
       "recently_completed": {
         "title": "Recently Completed",
