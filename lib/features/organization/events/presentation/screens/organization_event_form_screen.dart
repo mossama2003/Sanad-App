@@ -16,7 +16,6 @@ import '../../../../../core/validator/app_validators.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../data/models/organization_event_details_model.dart';
-import '../../data/repos/organization_events_repo.dart';
 import '../controllers/organization_events_cubit.dart';
 
 class OrganizationEventFormScreen extends StatefulWidget {
@@ -38,8 +37,7 @@ class _OrganizationEventFormScreenState
   @override
   void initState() {
     super.initState();
-
-    _cubit = OrganizationEventsCubit(OrganizationEventsRepoImpel());
+    _cubit = OrganizationEventsCubit.get(context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _init();
@@ -56,7 +54,6 @@ class _OrganizationEventFormScreenState
 
   @override
   void dispose() {
-    _cubit.close();
     super.dispose();
   }
 

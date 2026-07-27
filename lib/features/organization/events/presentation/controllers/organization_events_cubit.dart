@@ -11,13 +11,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../core/helper/app_toast.dart';
-import '../../../../../core/shared/models/city_model.dart';
 import '../../../../../core/shared/models/governorate_model.dart';
-import '../../../../../core/storage/hive/hive_boxes.dart';
 import '../../data/params/create_organization_event_param.dart';
 import '../../data/params/organization_event_update_param.dart';
+import '../../../../../core/shared/models/city_model.dart';
+import '../../../../../core/storage/hive/hive_boxes.dart';
 import '../../data/repos/organization_events_repo.dart';
+import '../../../../../core/helper/app_toast.dart';
 
 part 'organization_events_state.dart';
 
@@ -220,6 +220,11 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
   // ===================== Load Location Data =====================
   Future<void> loadLocationData() async {
+    // Already loaded
+    if (governorates.isNotEmpty && cities.isNotEmpty) {
+      return;
+    }
+
     emit(Loading());
 
     try {
@@ -230,7 +235,6 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       final citiesJson = await rootBundle.loadString('assets/data/cities.json');
 
       final governoratesData = json.decode(governoratesJson);
-
       final citiesData = json.decode(citiesJson);
 
       final List governoratesList = governoratesData is List
@@ -320,6 +324,33 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     selectedCity.value = city;
 
     emit(Success());
+  }
+
+  // ===================== Reset Create Form =====================
+  void resetForm() {
+    eventCover = null;
+    removeOldCover = false;
+
+    eventNameController.clear();
+    eventDescriptionController.clear();
+    otherCategoryController.clear();
+    dateController.clear();
+    startTimeController.clear();
+    endTimeController.clear();
+    locationLinkController.clear();
+    locationAddressController.clear();
+    requiredVolunteersController.clear();
+
+    selectedCategory.value = null;
+    selectedSkills.value = [];
+    selectedGov.value = null;
+    selectedCity.value = null;
+
+    startTime = null;
+    endTime = null;
+
+    editingEvent = null;
+    formMode = OrganizationEventFormMode.create;
   }
 
   // ===================== Event Date Time =====================
@@ -542,9 +573,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
         events.insert(0, newEvent);
 
-        await _saveEventsToCache();
-
-        await HiveBoxes.cacheInfoBox.put(_eventsLastUpdatedKey, DateTime.now());
+        await saveEventsToCache();
 
         emit(Success());
 
@@ -561,13 +590,15 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
   Future<void> updateOrganizationEvent({
     required int id,
-    bool publish = true,
+    bool publish = false,
   }) async {
     if (!formKey.currentState!.validate()) {
       return;
     }
 
-    loadingAction = CreateOrganizationEventAction.publish;
+    loadingAction = publish
+        ? CreateOrganizationEventAction.publish
+        : CreateOrganizationEventAction.draft;
 
     emit(Loading());
 
@@ -579,7 +610,9 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
         description: eventDescriptionController.text.trim(),
 
-        category: selectedCategory.value,
+        category: selectedCategory.value == 'Other'
+            ? otherCategoryController.text.trim()
+            : selectedCategory.value,
 
         locationUrl: locationLinkController.text.trim(),
 
@@ -618,6 +651,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
           final oldEvent = events[index];
 
           events[index] = oldEvent.copyWith(
+            status: publish ? "upcoming" : oldEvent.status,
             name: eventNameController.text.trim(),
             description: eventDescriptionController.text.trim(),
             category: selectedCategory.value == 'Other'
@@ -637,7 +671,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
             cover: eventCover != null ? eventCover!.path : oldEvent.cover,
           );
 
-          await _saveEventsToCache();
+          await saveEventsToCache();
         }
 
         emit(Success());
@@ -673,7 +707,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
             status: "upcoming",
           );
 
-          await _saveEventsToCache();
+          await saveEventsToCache();
         }
 
         emit(Success());
@@ -687,12 +721,14 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
   // ===================== Hive Cache =====================
 
-  Future<void> _saveEventsToCache() async {
+  Future<void> saveEventsToCache() async {
     final box = HiveBoxes.organizationEventsBox;
 
     await box.clear();
 
     await box.addAll(events);
+
+    await HiveBoxes.cacheInfoBox.put(_eventsLastUpdatedKey, DateTime.now());
   }
 
   void loadEventsFromCache() {
@@ -754,9 +790,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
         nextPage = data.next;
 
-        await _saveEventsToCache();
-
-        await HiveBoxes.cacheInfoBox.put(_eventsLastUpdatedKey, DateTime.now());
+        await saveEventsToCache();
 
         emit(Success());
       },
@@ -779,11 +813,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       (_) async {
         events.removeWhere((event) => event.id == id);
 
-        final box = HiveBoxes.organizationEventsBox;
-
-        await box.clear();
-
-        await box.addAll(events);
+        await saveEventsToCache();
 
         emit(Success());
 
@@ -824,7 +854,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
         nextPage = response.next;
 
-        await _saveEventsToCache();
+        await saveEventsToCache();
 
         emit(Success());
       },
@@ -860,6 +890,8 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     selectedGov.dispose();
 
     selectedCity.dispose();
+
+    debounce?.cancel();
 
     return super.close();
   }
