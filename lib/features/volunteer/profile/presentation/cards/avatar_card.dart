@@ -38,41 +38,38 @@ class AvatarCard extends StatelessWidget {
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF2ECFA0),
-                    Color(0xFF1BB88A),
-                  ],
+                  colors: [Color(0xFF2ECFA0), Color(0xFF1BB88A)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
               ),
               child: image != null && image!.isNotEmpty
                   ? ClipOval(
-                child: Image.network(
-                  image!,
-                  fit: BoxFit.cover,
-                  width: AppSize.getWidth(88),
-                  height: AppSize.getWidth(88),
-                  errorBuilder: (context, error, stackTrace) {
-                    return Center(
+                      child: Image.network(
+                        image!,
+                        fit: BoxFit.cover,
+                        width: AppSize.getWidth(88),
+                        height: AppSize.getWidth(88),
+                        errorBuilder: (context, error, stackTrace) {
+                          return Center(
+                            child: CustomIcon(
+                              icon: AppIcons.profile,
+                              color: AppColors.white,
+                              width: AppSize.getSize(50),
+                              height: AppSize.getSize(50),
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  : Center(
                       child: CustomIcon(
                         icon: AppIcons.profile,
                         color: AppColors.white,
                         width: AppSize.getSize(50),
                         height: AppSize.getSize(50),
                       ),
-                    );
-                  },
-                ),
-              )
-                  : Center(
-                child: CustomIcon(
-                  icon: AppIcons.profile,
-                  color: AppColors.white,
-                  width: AppSize.getSize(50),
-                  height: AppSize.getSize(50),
-                ),
-              ),
+                    ),
             ),
 
             Positioned(
@@ -110,6 +107,7 @@ class AvatarCard extends StatelessWidget {
 
         Text(
           name,
+          textAlign: TextAlign.center,
           style: TextStyle(
             color: Theme.of(context).textTheme.titleLarge?.color,
             fontSize: AppSize.font(22),
@@ -118,7 +116,7 @@ class AvatarCard extends StatelessWidget {
           ),
         ),
 
-        SizedBox(height: AppSize.getHeight(4)),
+        SizedBox(height: AppSize.getHeight(6)),
 
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

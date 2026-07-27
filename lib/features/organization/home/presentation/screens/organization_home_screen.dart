@@ -20,6 +20,7 @@ class OrganizationHomeScreen extends StatefulWidget {
 }
 
 class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
+
   @override
   void initState() {
     super.initState();

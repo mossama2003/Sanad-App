@@ -1,17 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 
-import '../../../../../core/helper/app_toast.dart';
 import '../../../../shared/donations/presentation/screens/donations_screen.dart';
-import '../../../events/data/repos/volunteer_events_repo.dart';
 import '../../../events/presentation/screens/volunteer_events_screen.dart';
 import '../../../../shared/cases/presentation/screens/cases_screen.dart';
-import '../../../events/data/models/volunteer_event_details_model.dart';
 import '../../../community/presentation/screens/community_screen.dart';
 import '../../../../../core/storage/hive/hive_boxes.dart';
 import '../../data/enums/volunteer_home_navbar_enum.dart';
+import '../../data/models/volunteer_home_model.dart';
+import '../../../../../core/helper/app_toast.dart';
 import '../../data/repos/volunteer_home_repo.dart';
 import '../screens/volunteer_home_screen.dart';
 
@@ -25,14 +23,11 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
   static VolunteerHomeCubit get(BuildContext context) =>
       BlocProvider.of(context);
 
-  final VolunteerEventsRepo _eventsRepo = VolunteerEventsRepoImpel();
-
-  final Box<VolunteerEventDetailsModel> _eventsBox =
-      HiveBoxes.volunteerEventsBox;
-
-  List<VolunteerEventDetailsModel> joinedEvents = [];
+  VolunteerHomeModel? home;
 
   VolunteerHomeNavbarItem selectedItem = VolunteerHomeNavbarItem.home;
+
+  final _homeBox = HiveBoxes.volunteerHomeBox;
 
   Widget get currentScreen => _screens[selectedItem]!;
 
@@ -44,70 +39,116 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
     VolunteerHomeNavbarItem.cases: const CasesScreen(),
   };
 
-  void loadJoinedEvents() {
-    joinedEvents = _eventsBox.values.where((e) => e.joined).toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
+  // ===================== Get Home (Cache First, API Background) =====================
 
-    emit(Success());
+  Future<void> getVolunteerHome() async {
+    final cachedHome = _homeBox.get('home');
+
+    if (cachedHome != null) {
+      home = cachedHome;
+      emit(Success());
+    } else {
+      emit(Loading());
+    }
+
+    final result = await repo.getVolunteerHome();
+
+    result.fold(
+      (failure) {
+        if (home == null) {
+          emit(Error());
+        }
+
+        AppToast.error(failure.errMessage);
+      },
+      (data) async {
+        home = data;
+
+        await _homeBox.put('home', data);
+
+        emit(Success());
+      },
+    );
   }
 
   Future<void> joinEvent(int eventId) async {
-    final result = await _eventsRepo.joinEvent(eventId);
+    final result = await repo.joinEvent(eventId);
 
-    result.fold((failure) => AppToast.error(failure.errMessage), (_) async {
-      final index = _eventsBox.values.toList().indexWhere(
-        (e) => e.id == eventId,
-      );
+    result.fold(
+      (failure) {
+        AppToast.error(failure.errMessage);
+      },
+      (_) async {
+        _updateEventJoinStatus(eventId, joined: true);
 
-      if (index != -1) {
-        final event = _eventsBox.getAt(index)!;
+        await _saveHomeCache();
 
-        await _eventsBox.putAt(
-          index,
-          event.copyWith(
-            joined: true,
-            joiners: event.joiners + 1,
-            attendees: event.attendees + 1,
-            spots: event.spots > 0 ? event.spots - 1 : 0,
-          ),
-        );
-      }
+        AppToast.success('volunteer.events.successfully_joined_event'.tr());
 
-      loadJoinedEvents();
-
-      AppToast.success('volunteer.events.successfully_joined_event'.tr());
-    });
+        emit(Success());
+      },
+    );
   }
 
   Future<void> leaveEvent(int eventId) async {
-    final result = await _eventsRepo.leaveEvent(eventId);
+    final result = await repo.leaveEvent(eventId);
 
-    result.fold((failure) => AppToast.error(failure.errMessage), (_) async {
-      final index = _eventsBox.values.toList().indexWhere(
-        (e) => e.id == eventId,
-      );
+    result.fold(
+      (failure) {
+        AppToast.error(failure.errMessage);
+      },
+      (_) async {
+        _updateEventJoinStatus(eventId, joined: false);
 
-      if (index != -1) {
-        final event = _eventsBox.getAt(index)!;
+        await _saveHomeCache();
 
-        await _eventsBox.putAt(
-          index,
-          event.copyWith(
-            joined: false,
-            joiners: event.joiners > 0 ? event.joiners - 1 : 0,
-            spots: event.spots + 1,
-          ),
-        );
-      }
+        AppToast.success('volunteer.events.successfully_left_event'.tr());
 
-      loadJoinedEvents();
-
-      AppToast.success('volunteer.events.successfully_left_event'.tr());
-    });
+        emit(Success());
+      },
+    );
   }
 
   void updateSelectedNavbarItem(VolunteerHomeNavbarItem item) {
     selectedItem = item;
     emit(BottomNavChange());
+  }
+
+  void _updateEventJoinStatus(int eventId, {required bool joined}) {
+    if (home == null) return;
+
+    final index = home!.activeEvents.indexWhere((event) => event.id == eventId);
+
+    if (index == -1) return;
+
+    final event = home!.activeEvents[index];
+
+    home!.activeEvents[index] = event.copyWith(
+      joined: joined,
+
+      joiners: joined
+          ? event.joiners + 1
+          : event.joiners > 0
+          ? event.joiners - 1
+          : 0,
+
+      attendees: joined
+          ? event.attendees + 1
+          : event.attendees > 0
+          ? event.attendees - 1
+          : 0,
+
+      spots: joined
+          ? event.spots > 0
+                ? event.spots - 1
+                : 0
+          : event.spots + 1,
+    );
+  }
+
+  Future<void> _saveHomeCache() async {
+    if (home == null) return;
+
+    await _homeBox.put('home', home!);
   }
 }

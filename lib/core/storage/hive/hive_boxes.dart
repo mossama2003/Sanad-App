@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 import '../../../features/organization/events/data/models/organization_event_details_model.dart';
 import '../../../features/organization/home/data/models/organization_home_model.dart';
 import '../../../features/volunteer/events/data/models/volunteer_event_details_model.dart';
+import '../../../features/volunteer/home/data/models/volunteer_home_model.dart';
 
 class HiveBoxes {
   static const String organizationEvents = 'organization_events_box';
@@ -21,7 +22,7 @@ class HiveBoxes {
     await Hive.openBox<VolunteerEventDetailsModel>(volunteerEvents);
 
     /// VOLUNTEER HOME
-    // await Hive.openBox<VolunteerHomeModel>(volunteerHome);
+    await Hive.openBox<VolunteerHomeModel>(volunteerHome);
 
     /// ORGANIZATION HOME
     await Hive.openBox<OrganizationHomeModel>(organizationHome);
@@ -38,9 +39,9 @@ class HiveBoxes {
     return Hive.box<VolunteerEventDetailsModel>(volunteerEvents);
   }
 
-  // static Box<VolunteerHomeModel> get volunteerHomeBox {
-  //   return Hive.box<VolunteerHomeModel>(volunteerHome);
-  // }
+  static Box<VolunteerHomeModel> get volunteerHomeBox {
+    return Hive.box<VolunteerHomeModel>(volunteerHome);
+  }
 
   static Box<OrganizationHomeModel> get organizationHomeBox {
     return Hive.box<OrganizationHomeModel>(organizationHome);

@@ -7,6 +7,7 @@ import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
+import '../../../../../core/shared/widgets/custom_button.dart';
 import '../../../events/presentation/cards/organization_events_card.dart';
 import '../../../events/presentation/dialogs/organization_publish_dialog.dart';
 import '../../../events/presentation/screens/organization_event_form_screen.dart';
@@ -22,6 +23,9 @@ class OrganizationYourActiveEventsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final cardColor = theme.cardColor;
+    final secondaryColor = textColor.withValues(alpha: .6);
 
     final activeEvents = cubit.home?.activeEvents ?? [];
 
@@ -80,18 +84,81 @@ class OrganizationYourActiveEventsSection extends StatelessWidget {
         SizedBox(height: AppSize.getHeight(12)),
 
         if (displayedEvents.isEmpty)
-          Center(
-            child: Padding(
-              padding: AppSize.padding(vertical: 30),
+          Container(
+            width: double.infinity,
+            padding: AppSize.padding(all: 20),
 
-              child: Text(
-                'organization.events.no_events_found'.tr(),
-
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface.withValues(alpha: .6),
-                  fontSize: AppSize.font(14),
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: textColor.withValues(alpha: .12)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: theme.brightness == Brightness.dark ? .35 : .12,
+                  ),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
-              ),
+              ],
+            ),
+
+            child: Column(
+              children: [
+                Container(
+                  height: AppSize.getHeight(40),
+                  width: AppSize.getWidth(40),
+                  decoration: BoxDecoration(
+                    color: textColor.withValues(alpha: .1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: CustomIcon(
+                      icon: AppIcons.calendar,
+                      color: textColor.withValues(alpha: .5),
+                      width: AppSize.getSize(20),
+                      height: AppSize.getSize(20),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: AppSize.getHeight(15)),
+
+                Text(
+                  'organization.home.your_active_events.no_events_yet'.tr(),
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: AppSize.font(16),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+
+                SizedBox(height: AppSize.getHeight(15)),
+
+                Text(
+                  'organization.home.your_active_events.description'.tr(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: secondaryColor,
+                    fontSize: AppSize.font(14),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                SizedBox(height: AppSize.getHeight(15)),
+
+                CustomButton(
+                  width: AppSize.getWidth(140),
+                  height: AppSize.getHeight(40),
+                  title: 'organization.home.your_active_events.manage_events'
+                      .tr(),
+                  onTap: () {
+                    cubit.updateSelectedNavbarItem(
+                      OrganizationHomeNavbarItem.events,
+                    );
+                  },
+                ),
+              ],
             ),
           )
         else

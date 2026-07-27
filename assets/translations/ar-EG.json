@@ -333,7 +333,10 @@
       "create_event_button": "اعمل فعالية جديدة",
       "your_active_events": {
         "title": "فعالياتك النشطة",
-        "see_all": "عرض الكل"
+        "see_all": "عرض الكل",
+        "no_events_yet": "لا توجد فعاليات قادمة حتى الآن",
+        "description": "أنشئ أول فعالية أو انشر مسودة موجودة لبدء إشراك المتطوعين وخدمة مجتمعك.",
+        "manage_events": "إدارة الفعاليات"
       },
       "recently_completed": {
         "title": "المكتملة مؤخرًا",

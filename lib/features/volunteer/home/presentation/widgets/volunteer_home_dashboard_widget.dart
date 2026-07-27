@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/helper/app_navigator.dart';
+import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../../qr_check_in/presentation/screens/qr_check_in_screen.dart';
 
@@ -15,6 +16,8 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = AppCubit.get(context).user;
+
     return Container(
       height: AppSize.getHeight(165),
       width: double.infinity,
@@ -52,7 +55,7 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${'volunteer.home.dashboard.title'.tr()} Ahmed Hassan!',
+                    '${'volunteer.home.dashboard.title'.tr()} ${user?.name ?? ''}!',
                     style: TextStyle(
                       color: AppColors.white,
                       fontSize: AppSize.font(20),
