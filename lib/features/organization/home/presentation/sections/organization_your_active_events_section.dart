@@ -8,7 +8,6 @@ import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../events/presentation/cards/organization_events_card.dart';
-import '../../../events/presentation/controllers/organization_events_cubit.dart';
 import '../../../events/presentation/dialogs/organization_publish_dialog.dart';
 import '../../../events/presentation/screens/organization_event_form_screen.dart';
 import '../../../events/presentation/screens/organization_qr_code_screen.dart';
@@ -18,27 +17,13 @@ import '../controllers/organization_home_cubit.dart';
 class OrganizationYourActiveEventsSection extends StatelessWidget {
   const OrganizationYourActiveEventsSection({super.key, required this.cubit});
 
-  final OrganizationEventsCubit cubit;
+  final OrganizationHomeCubit cubit;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final activeEvents =
-        cubit.events
-            .where((e) => e.status == 'ongoing' || e.status == 'upcoming')
-            .toList()
-          ..sort((a, b) {
-            if (a.status == 'ongoing' && b.status != 'ongoing') {
-              return -1;
-            }
-
-            if (a.status != 'ongoing' && b.status == 'ongoing') {
-              return 1;
-            }
-
-            return a.date.compareTo(b.date);
-          });
+    final activeEvents = cubit.home?.activeEvents ?? [];
 
     final displayedEvents = activeEvents.take(2).toList();
 
@@ -62,11 +47,10 @@ class OrganizationYourActiveEventsSection extends StatelessWidget {
 
             GestureDetector(
               onTap: () {
-                OrganizationHomeCubit.get(
-                  context,
-                ).updateSelectedNavbarItem(OrganizationHomeNavbarItem.events);
+                cubit.updateSelectedNavbarItem(
+                  OrganizationHomeNavbarItem.events,
+                );
               },
-
               child: Row(
                 children: [
                   Text(
@@ -148,7 +132,7 @@ class OrganizationYourActiveEventsSection extends StatelessWidget {
                         onEditFullEvent: () {
                           AppNavigator.push(
                             BlocProvider.value(
-                              value: cubit,
+                              value: cubit.eventsCubit,
 
                               child: OrganizationEventFormScreen(event: event),
                             ),
@@ -161,7 +145,7 @@ class OrganizationYourActiveEventsSection extends StatelessWidget {
                   onEditTap: () {
                     AppNavigator.push(
                       BlocProvider.value(
-                        value: cubit,
+                        value: cubit.eventsCubit,
 
                         child: OrganizationEventFormScreen(event: event),
                       ),

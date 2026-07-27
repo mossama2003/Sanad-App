@@ -6,7 +6,6 @@ import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
-import '../../../home/presentation/widgets/organization_home_appbar_widget.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../data/models/organization_event_details_model.dart';
 import '../../data/repos/organization_events_repo.dart';
@@ -101,12 +100,12 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
             },
             child: CustomScrollView(
               controller: _scrollController,
-              physics: const BouncingScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
               slivers: [
-                const SliverToBoxAdapter(child: OrganizationHomeAppbarWidget()),
-
                 SliverPadding(
-                  padding: AppSize.padding(horizontal: 12, top: 15),
+                  padding: AppSize.padding(horizontal: 12, vertical: 15),
                   sliver: SliverToBoxAdapter(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

@@ -27,16 +27,20 @@ String GET_EVENTS = 'v1/events/read_event/';
 
 String EVENT_QR(int ID) => 'v1/events/read_event/$ID/';
 
-/// Volunteering Events
+/// Volunteering Endpoints
 String JOIN_EVENT = 'v1/events/join/';
 
 String LEAVE_EVENT = 'v1/events/leave/';
 
 String SCAN_QR = 'v1/events/scan/';
 
-/// Organization Events
+String VOLUNTEER_HOME = 'v1/dashboard/home/volunteer/';
+
+/// Organization Endpoints
 String CREATE_ORGANIZATION_EVENT = 'v1/events/manage_event/';
 
 String UPDATE_ORGANIZATION_EVENT(int ID) => 'v1/events/manage_event/$ID/';
 
 String DELETE_ORGANIZATION_EVENT(int ID) => 'v1/events/manage_event/$ID/';
+
+String ORGANIZATION_HOME = 'v1/dashboard/home/organization/';
