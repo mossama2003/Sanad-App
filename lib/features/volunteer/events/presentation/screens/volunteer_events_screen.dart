@@ -34,8 +34,6 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
 
   String selectedSort = 'soonest';
 
-  bool mostAvailableSpots = false;
-
   @override
   void initState() {
     super.initState();
@@ -210,12 +208,14 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                                       endDate: endDate,
                                       searchText: _cubit.search,
 
-                                      ordering: selectedSort == 'popular'
-                                          ? 'popular'
-                                          : null,
+                                      ordering: null,
 
                                       mostAvailableSpots:
-                                          selectedSort == 'available',
+                                          selectedSort == 'available'
+                                          ? true
+                                          : selectedSort == 'popular'
+                                          ? false
+                                          : null,
                                     );
                                   }
 

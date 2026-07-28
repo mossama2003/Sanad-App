@@ -28,7 +28,7 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
   String? selectedOrdering;
 
-  bool mostAvailableSpots = false;
+  bool? mostAvailableSpots;
 
   bool thisWeek = false;
 
@@ -71,13 +71,17 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
     if (thisWeek) {
       final now = DateTime.now();
 
-      dateAfter = now;
+      dateAfter = DateTime.utc(now.year, now.month, now.day);
 
-      dateBefore = now.add(const Duration(days: 7));
+      dateBefore = DateTime.utc(now.year, now.month, now.day + 6);
     } else {
       dateAfter = null;
       dateBefore = null;
     }
+
+    // Reset sorting filters
+    selectedOrdering = null;
+    mostAvailableSpots = null;
 
     getVolunteerEvents(
       refresh: true,
@@ -231,9 +235,11 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
       currentPage = 1;
 
       selectedStatus = status;
+
       selectedCategories
         ..clear()
         ..addAll(categories ?? {});
+
       nearBy = nearByFilter ?? false;
 
       dateAfter = startDate;
@@ -243,7 +249,7 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
       selectedOrdering = ordering;
 
-      this.mostAvailableSpots = mostAvailableSpots ?? false;
+      this.mostAvailableSpots = mostAvailableSpots;
     }
 
     // ================= Cache First =================
@@ -257,25 +263,28 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
         page: currentPage,
         size: 10,
 
+        // Category comma separated
         category: selectedCategories.isEmpty
             ? null
-            : selectedCategories.where((e) => e != 'Other').toList(),
+            : selectedCategories.toList(),
 
         status: selectedStatus == null ? null : [selectedStatus!],
 
+        // send only when true
         nearBy: nearBy ? true : null,
 
-        mostAvailableSpots: mostAvailableSpots,
+        // send only true/false when selected from filter
+        mostAvailableSpots: this.mostAvailableSpots,
 
         ordering: selectedOrdering,
 
         dateAfter: dateAfter == null
             ? null
-            : DateFormat('yyyy-MM-dd').format(dateAfter!),
+            : DateFormat('yyyy-MM-dd', 'en_US').format(dateAfter!),
 
         dateBefore: dateBefore == null
             ? null
-            : DateFormat('yyyy-MM-dd').format(dateBefore!),
+            : DateFormat('yyyy-MM-dd', 'en_US').format(dateBefore!),
 
         search: search?.trim().isEmpty ?? true ? null : search,
       ),
@@ -380,7 +389,7 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
         category: selectedCategories.isEmpty
             ? null
-            : selectedCategories.where((e) => e != 'Other').toList(),
+            : selectedCategories.toList(),
 
         status: selectedStatus == null ? null : [selectedStatus!],
 
@@ -392,11 +401,11 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
         dateAfter: dateAfter == null
             ? null
-            : DateFormat('yyyy-MM-dd').format(dateAfter!),
+            : DateFormat('yyyy-MM-dd', 'en_US').format(dateAfter!),
 
         dateBefore: dateBefore == null
             ? null
-            : DateFormat('yyyy-MM-dd').format(dateBefore!),
+            : DateFormat('yyyy-MM-dd', 'en_US').format(dateBefore!),
 
         search: search,
       ),
