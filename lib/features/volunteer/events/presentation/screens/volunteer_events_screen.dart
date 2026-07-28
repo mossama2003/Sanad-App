@@ -26,14 +26,6 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
   late final VolunteerEventsCubit _cubit;
   late final ScrollController _scrollController;
 
-  final Set<String> selectedCategories = {};
-
-  bool upcoming = false;
-  bool ongoing = false;
-  bool completed = false;
-
-  String selectedSort = 'soonest';
-
   @override
   void initState() {
     super.initState();
@@ -73,16 +65,7 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
         return RefreshIndicator(
           color: AppColors.primary,
           onRefresh: () async {
-            await _cubit.getVolunteerEvents(
-              refresh: true,
-              status: _cubit.selectedStatus,
-              categories: _cubit.selectedCategories,
-              nearByFilter: _cubit.nearBy,
-              startDate: _cubit.dateAfter,
-              endDate: _cubit.dateBefore,
-              ordering: _cubit.selectedOrdering,
-              mostAvailableSpots: _cubit.mostAvailableSpots,
-            );
+            await _cubit.getVolunteerEvents(refresh: true);
           },
           child: CustomScrollView(
             controller: _scrollController,
@@ -181,44 +164,6 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                             menuChildren: [
                               StatefulBuilder(
                                 builder: (context, menuSetState) {
-                                  void applyFilters() {
-                                    DateTime? startDate;
-                                    DateTime? endDate;
-
-                                    if (_cubit.thisWeek) {
-                                      final now = DateTime.now();
-
-                                      startDate = DateTime(
-                                        now.year,
-                                        now.month,
-                                        now.day,
-                                      );
-
-                                      endDate = startDate.add(
-                                        const Duration(days: 6),
-                                      );
-                                    }
-
-                                    _cubit.getVolunteerEvents(
-                                      refresh: true,
-                                      status: _cubit.selectedStatus,
-                                      categories: selectedCategories,
-                                      nearByFilter: _cubit.nearBy,
-                                      startDate: startDate,
-                                      endDate: endDate,
-                                      searchText: _cubit.search,
-
-                                      ordering: null,
-
-                                      mostAvailableSpots:
-                                          selectedSort == 'available'
-                                          ? true
-                                          : selectedSort == 'popular'
-                                          ? false
-                                          : null,
-                                    );
-                                  }
-
                                   return ConstrainedBox(
                                     constraints: BoxConstraints(
                                       maxWidth: AppSize.getWidth(280),
@@ -247,15 +192,11 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                                             title:
                                                 'volunteer.events.filter.soonest_first'
                                                     .tr(),
-
-                                            selected: selectedSort == 'soonest',
-
+                                            selected:
+                                                _cubit.sortType == 'soonest',
                                             onTap: () {
-                                              menuSetState(() {
-                                                selectedSort = 'soonest';
-                                              });
-
-                                              applyFilters();
+                                              _cubit.setSort('soonest');
+                                              menuSetState(() {});
                                             },
                                           ),
 
@@ -264,13 +205,10 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                                                 'volunteer.events.filter.most_spots_available'
                                                     .tr(),
                                             selected:
-                                                selectedSort == 'available',
+                                                _cubit.sortType == 'available',
                                             onTap: () {
-                                              menuSetState(() {
-                                                selectedSort = 'available';
-                                              });
-
-                                              applyFilters();
+                                              _cubit.setSort('available');
+                                              menuSetState(() {});
                                             },
                                           ),
 
@@ -278,13 +216,11 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                                             title:
                                                 'volunteer.events.filter.most_popular'
                                                     .tr(),
-                                            selected: selectedSort == 'popular',
+                                            selected:
+                                                _cubit.sortType == 'popular',
                                             onTap: () {
-                                              menuSetState(() {
-                                                selectedSort = 'popular';
-                                              });
-
-                                              applyFilters();
+                                              _cubit.setSort('popular');
+                                              menuSetState(() {});
                                             },
                                           ),
 
@@ -307,9 +243,7 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                                             onTap: () {
                                               _cubit.updateQuickFilters(
                                                 nearMe: !_cubit.nearBy,
-                                                thisWeekFilter: _cubit.thisWeek,
                                               );
-
                                               menuSetState(() {});
                                             },
                                           ),
@@ -320,14 +254,14 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                                                     .tr(),
                                             selected: _cubit.thisWeek,
                                             onTap: () {
-                                              menuSetState(() {
-                                                _cubit.thisWeek =
-                                                    !_cubit.thisWeek;
-                                              });
-
-                                              applyFilters();
+                                              _cubit.updateQuickFilters(
+                                                thisWeekFilter:
+                                                    !_cubit.thisWeek,
+                                              );
+                                              menuSetState(() {});
                                             },
                                           ),
+
                                           const Divider(thickness: .2),
 
                                           Text(
@@ -342,7 +276,8 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                                           ..._cubit.eventCategories.map((
                                             category,
                                           ) {
-                                            final selected = selectedCategories
+                                            final selected = _cubit
+                                                .selectedCategories
                                                 .contains(category);
 
                                             return buildFilterItem(
@@ -350,20 +285,8 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                                                   .categoryTranslations[category]!,
                                               selected: selected,
                                               onTap: () {
-                                                menuSetState(() {
-                                                  if (selectedCategories
-                                                      .contains(category)) {
-                                                    selectedCategories.remove(
-                                                      category,
-                                                    );
-                                                  } else {
-                                                    selectedCategories.add(
-                                                      category,
-                                                    );
-                                                  }
-                                                });
-
-                                                applyFilters();
+                                                _cubit.toggleCategory(category);
+                                                menuSetState(() {});
                                               },
                                             );
                                           }),

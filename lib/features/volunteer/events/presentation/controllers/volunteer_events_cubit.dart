@@ -26,15 +26,15 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
   bool nearBy = false;
 
-  String? selectedOrdering;
-
-  bool? mostAvailableSpots;
-
   bool thisWeek = false;
 
   DateTime? dateAfter;
 
   DateTime? dateBefore;
+
+  String sortType = 'soonest';
+
+  bool? mostAvailableSpots;
 
   // ===================== Events Search =====================
 
@@ -48,52 +48,43 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
     debounce?.cancel();
 
     debounce = Timer(const Duration(milliseconds: 500), () {
-      getVolunteerEvents(
-        refresh: true,
-        status: selectedStatus,
-        categories: selectedCategories,
-        nearByFilter: nearBy,
-        startDate: dateAfter,
-        endDate: dateBefore,
-        searchText: value,
-        ordering: selectedOrdering,
-        mostAvailableSpots: mostAvailableSpots,
-      );
+      search = value;
+      _refreshWithCurrentFilters();
     });
+  }
+
+  // ===================== Sort =====================
+
+  void setSort(String type) {
+    sortType = type;
+    _refreshWithCurrentFilters();
   }
 
   // ===================== QUICK Filter =====================
 
   void updateQuickFilters({bool? nearMe, bool? thisWeekFilter}) {
-    nearBy = nearMe ?? nearBy;
-    thisWeek = thisWeekFilter ?? thisWeek;
+    if (nearMe != null) {
+      nearBy = nearMe;
+    }
+
+    if (thisWeekFilter != null) {
+      thisWeek = thisWeekFilter;
+    }
+
+    // ================= This Week =================
 
     if (thisWeek) {
       final now = DateTime.now();
 
-      dateAfter = DateTime.utc(now.year, now.month, now.day);
+      dateAfter = DateTime(now.year, now.month, now.day);
 
-      dateBefore = DateTime.utc(now.year, now.month, now.day + 6);
+      dateBefore = dateAfter!.add(const Duration(days: 6));
     } else {
       dateAfter = null;
       dateBefore = null;
     }
 
-    // Reset sorting filters
-    selectedOrdering = null;
-    mostAvailableSpots = null;
-
-    getVolunteerEvents(
-      refresh: true,
-      status: selectedStatus,
-      categories: selectedCategories,
-      nearByFilter: nearBy,
-      startDate: dateAfter,
-      endDate: dateBefore,
-      searchText: searchController.text,
-      ordering: selectedOrdering,
-      mostAvailableSpots: mostAvailableSpots,
-    );
+    _refreshWithCurrentFilters();
   }
 
   // ===================== Events Category =====================
@@ -125,6 +116,16 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
     if (category == null) return false;
 
     return eventCategories.where((e) => e != 'Other').contains(category);
+  }
+
+  void toggleCategory(String category) {
+    if (selectedCategories.contains(category)) {
+      selectedCategories.remove(category);
+    } else {
+      selectedCategories.add(category);
+    }
+
+    _refreshWithCurrentFilters();
   }
 
   List<VolunteerEventDetailsModel> get filteredEvents {
@@ -219,6 +220,25 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
     emit(Success());
   }
 
+  Future<void> _refreshWithCurrentFilters() {
+    mostAvailableSpots = sortType == 'available'
+        ? true
+        : sortType == 'popular'
+        ? false
+        : null;
+
+    return getVolunteerEvents(
+      refresh: true,
+      status: selectedStatus,
+      categories: Set<String>.from(selectedCategories),
+      nearByFilter: nearBy,
+      startDate: dateAfter,
+      endDate: dateBefore,
+      searchText: search,
+      mostAvailableSpots: mostAvailableSpots,
+    );
+  }
+
   // ===================== Get Volunteer Events =====================
   Future<void> getVolunteerEvents({
     bool refresh = false,
@@ -247,8 +267,6 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
       search = searchText;
 
-      selectedOrdering = ordering;
-
       this.mostAvailableSpots = mostAvailableSpots;
     }
 
@@ -276,7 +294,7 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
         // send only true/false when selected from filter
         mostAvailableSpots: this.mostAvailableSpots,
 
-        ordering: selectedOrdering,
+        ordering: null,
 
         dateAfter: dateAfter == null
             ? null
@@ -397,7 +415,7 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
         mostAvailableSpots: mostAvailableSpots,
 
-        ordering: selectedOrdering,
+        ordering: null,
 
         dateAfter: dateAfter == null
             ? null
