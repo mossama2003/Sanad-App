@@ -14,6 +14,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../../core/helper/app_toast.dart';
 import '../../data/models/organization_event_details_model.dart';
 
@@ -179,110 +180,118 @@ class _OrganizationQrCodeScreenState extends State<OrganizationQrCodeScreen> {
 
       clipBehavior: Clip.antiAlias,
 
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
+      // لف الكارت كله (الهيدر + الـ QR + التاريخ واللوكيشن) بالـ Screenshot
+      // عشان الـ Download/Share ياخدوا نفس الكارت اللي ظاهر في الـ UI بالظبط
+      child: Screenshot(
+        controller: _screenshotController,
 
-            padding: AppSize.padding(vertical: 24),
+        child: Container(
+          color: theme.cardColor,
 
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [darkTeal, primaryGreen],
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
 
-                begin: Alignment.topLeft,
+                padding: AppSize.padding(vertical: 24),
 
-                end: Alignment.bottomRight,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [darkTeal, primaryGreen],
+
+                    begin: Alignment.topLeft,
+
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+
+                child: Column(
+                  children: [
+                    Text(
+                      widget.event.name,
+
+                      style: TextStyle(
+                        color: Colors.white,
+
+                        fontSize: AppSize.font(20),
+
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    SizedBox(height: AppSize.getHeight(5)),
+
+                    Text(
+                      'organization.events.scan_to_check_in'.tr(),
+
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: .8),
+
+                        fontSize: AppSize.font(15),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            child: Column(
-              children: [
-                Text(
-                  widget.event.name,
+              Padding(
+                padding: AppSize.padding(all: 20),
 
-                  style: TextStyle(
-                    color: Colors.white,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: AppSize.padding(all: 10),
 
-                    fontSize: AppSize.font(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
 
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                        borderRadius: BorderRadius.circular(16),
 
-                SizedBox(height: AppSize.getHeight(5)),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
 
-                Text(
-                  'organization.events.scan_to_check_in'.tr(),
+                      child: QrImageView(
+                        data: qrData,
 
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: .8),
+                        version: QrVersions.auto,
 
-                    fontSize: AppSize.font(15),
-                  ),
-                ),
-              ],
-            ),
-          ),
+                        size: 220,
 
-          Padding(
-            padding: AppSize.padding(all: 20),
+                        gapless: true,
 
-            child: Column(
-              children: [
-                Screenshot(
-                  controller: _screenshotController,
-
-                  child: Container(
-                    padding: AppSize.padding(all: 10),
-
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-
-                      borderRadius: BorderRadius.circular(16),
-
-                      border: Border.all(color: Colors.grey.shade200),
+                        backgroundColor: Colors.white,
+                      ),
                     ),
 
-                    child: QrImageView(
-                      data: qrData,
+                    SizedBox(height: AppSize.getHeight(20)),
 
-                      version: QrVersions.auto,
+                    _infoRow(
+                      AppIcons.calendar,
 
-                      size: 220,
-
-                      gapless: true,
-
-                      backgroundColor: Colors.white,
+                      DateFormat(
+                        'dd MMM yyyy • hh:mm a',
+                      ).format(widget.event.date),
                     ),
-                  ),
+
+                    SizedBox(height: AppSize.getHeight(8)),
+
+                    _infoRow(
+                      AppIcons.location,
+
+                      [
+                            widget.event.location?['description'],
+
+                            widget.event.location?['city'],
+                          ]
+                          .where((e) => e != null && e.toString().isNotEmpty)
+                          .join(', '),
+                    ),
+                  ],
                 ),
-
-                SizedBox(height: AppSize.getHeight(20)),
-
-                _infoRow(
-                  AppIcons.calendar,
-
-                  DateFormat('dd MMM yyyy • hh:mm a').format(widget.event.date),
-                ),
-
-                SizedBox(height: AppSize.getHeight(8)),
-
-                _infoRow(
-                  AppIcons.location,
-
-                  [
-                        widget.event.location?['description'],
-
-                        widget.event.location?['city'],
-                      ]
-                      .where((e) => e != null && e.toString().isNotEmpty)
-                      .join(', '),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -440,7 +449,7 @@ class _OrganizationQrCodeScreenState extends State<OrganizationQrCodeScreen> {
           SizedBox(height: AppSize.getHeight(10)),
 
           Text(
-            '${widget.event.attendees}',
+            widget.event.attendees.compact,
 
             style: TextStyle(
               color: theme.colorScheme.onSurface,

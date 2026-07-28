@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_app/core/helper/app_number_formatter.dart';
 
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
@@ -20,7 +21,6 @@ class OrganizationHomeScreen extends StatefulWidget {
 }
 
 class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -68,7 +68,7 @@ class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
                         icon: AppIcons.events,
                         iconColor: AppColors.primary,
                         iconBg: AppColors.primary.withValues(alpha: .2),
-                        value: home?.activeEventsCount.toString() ?? '0',
+                        value: home?.activeEventsCount.compact ?? '0',
                         title: 'organization.home.dashboard.active_events'.tr(),
                       ),
 
@@ -77,7 +77,7 @@ class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
                         icon: AppIcons.completed,
                         iconColor: AppColors.green,
                         iconBg: AppColors.green.withValues(alpha: .2),
-                        value: home?.completedEventsCount.toString() ?? '0',
+                        value: home?.completedEventsCount.compact ?? '0',
                         title: 'organization.home.dashboard.completed'.tr(),
                       ),
 
@@ -86,7 +86,7 @@ class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
                         icon: AppIcons.community,
                         iconColor: AppColors.laserBlue,
                         iconBg: AppColors.laserBlue.withValues(alpha: .2),
-                        value: home?.attendanceCount.toString() ?? '0',
+                        value: home?.attendanceCount.compact ?? '0',
                         title: 'organization.home.dashboard.volunteers'.tr(),
                       ),
                     ],

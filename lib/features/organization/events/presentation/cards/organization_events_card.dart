@@ -5,6 +5,7 @@ import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 import 'package:sanad_app/features/organization/events/data/models/organization_event_details_model.dart';
 
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../../core/shared/widgets/custom_progress_bar.dart';
 import '../../../../../core/style/app_colors.dart';
 
@@ -79,6 +80,9 @@ class OrganizationEventsCard extends StatelessWidget {
 
     final progress = spots == 0 ? 0.0 : joinersCount / spots;
 
+    final formattedJoinersCount = joinersCount.compact;
+    final formattedSpots = spots.compact;
+
     final date = event?.date;
 
     final location = event?.location != null
@@ -87,6 +91,8 @@ class OrganizationEventsCard extends StatelessWidget {
             event!.location?['city'],
           ].where((e) => e != null && e.toString().isNotEmpty).join(', ')
         : "organization.create_edit_event.location".tr();
+
+    final locale = context.locale.languageCode;
 
     return Container(
       decoration: BoxDecoration(
@@ -191,8 +197,8 @@ class OrganizationEventsCard extends StatelessWidget {
 
                 Text(
                   date != null
-                      ? DateFormat('dd MMM yyyy • hh:mm a').format(date)
-                      : "20 Jul 2026 • 10:00 AM",
+                      ? DateFormat('dd MMM yyyy • hh:mm a', locale).format(date)
+                      : '',
                   style: TextStyle(
                     fontSize: AppSize.font(14),
                     color: secondaryColor,
@@ -268,7 +274,7 @@ class OrganizationEventsCard extends StatelessWidget {
                 const Spacer(),
 
                 Text(
-                  '$joinersCount / $spots',
+                  '$formattedJoinersCount / $formattedSpots',
                   style: TextStyle(
                     fontSize: AppSize.font(15),
                     color: textColor,

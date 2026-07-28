@@ -36,10 +36,6 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
   @override
   void initState() {
     super.initState();
-
-    // نستخدم نفس الـ Cubit المشترك الجاي من OrganizationHomeCubit
-    // (اللي بيتلف حوالين الشاشة عن طريق BlocProvider.value)
-    // بدل ما نعمل instance جديد منفصل
     _cubit = OrganizationEventsCubit.get(context);
 
     _scrollController = ScrollController()..addListener(_onScroll);
@@ -61,13 +57,11 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
-    // متعملش _cubit.close() هنا؛ الـ Cubit ده ملك OrganizationHomeCubit
-    // مش ملك الشاشة دي، وهيتقفل مع قفل الـ Home cubit
     super.dispose();
   }
 
   void _openForm({OrganizationEventDetailsModel? event}) {
-    if (event == null) {
+    if (event == null && _cubit.isEditMode) {
       _cubit.resetForm();
     }
 

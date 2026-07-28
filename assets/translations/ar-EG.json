@@ -343,6 +343,7 @@
         "winter_clothing_drive": "حملة الملابس الشتوية",
         "nov_28_2025": "28 نوفمبر 2025",
         "joined": "منضم",
+        "attendees": "الحضور",
         "literacy_workshop": "ورشة محو الأمية",
         "nov_20_2025": "20 نوفمبر 2025"
       },
@@ -396,7 +397,7 @@
       "something_went_wrong": "حدث خطأ ما",
       "qr_saved_successfully": "تم حفظ رمز QR بنجاح في معرض الصور",
       "filter": {
-        "title": "الترتيب حسب الحالة",
+        "title": "تصفية حسب الحالة",
         "all": "الكل",
         "upcoming": "قادم",
         "in_progress": "قيد التنفيذ",
@@ -578,6 +579,7 @@
         "volunteers": "المتطوعون",
         "members": "{joined} انضموا / {needed} مطلوب · {spots} أماكن متبقية",
         "skills": "المهارات",
+        "no_skills_needed": "لا توجد مهارات مطلوبة",
         "contact": "جهة التواصل",
         "phone": "الهاتف",
         "note": "ملاحظة",

@@ -343,6 +343,7 @@
         "winter_clothing_drive": "Winter Clothing Drive",
         "nov_28_2025": "Nov 28, 2025",
         "joined": "Joined",
+        "attendees": "Attendees",
         "literacy_workshop": "Literacy Workshop",
         "nov_20_2025": "Nov 20, 2025"
       },
@@ -396,7 +397,7 @@
       "something_went_wrong": "Something went wrong",
       "qr_saved_successfully": "QR saved successfully in your Gallery",
       "filter": {
-        "title": "Sort by status",
+        "title": "Filter by status",
         "all": "All",
         "upcoming": "Upcoming",
         "in_progress": "In Progress",
@@ -578,6 +579,7 @@
         "volunteers": "Volunteers",
         "members": "{joined} joined / {needed} needed · {spots} spots left",
         "skills": "Skills",
+        "no_skills_needed": "No Skills needed",
         "contact": "Contact",
         "phone": "Phone",
         "note": "Note",

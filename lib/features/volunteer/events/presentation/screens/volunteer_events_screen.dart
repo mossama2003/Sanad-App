@@ -6,11 +6,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/constant/app_assets.dart';
+import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/shared/widgets/custom_search_field.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/helper/app_navigator.dart';
-import '../dialogs/volunteer_events_bottom_sheet.dart';
+import '../dialogs/volunteer_event_details_bottom_sheet.dart';
 import '../controllers/volunteer_events_cubit.dart';
 import '../cards/volunteer_events_card.dart';
 
@@ -202,24 +203,19 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
 
                                     _cubit.getVolunteerEvents(
                                       refresh: true,
-
                                       status: _cubit.selectedStatus,
-
                                       categories: selectedCategories,
-
                                       nearByFilter: _cubit.nearBy,
-
                                       startDate: startDate,
-
                                       endDate: endDate,
-
                                       searchText: _cubit.search,
 
                                       ordering: selectedSort == 'popular'
                                           ? 'popular'
                                           : null,
 
-                                      mostAvailableSpots: mostAvailableSpots,
+                                      mostAvailableSpots:
+                                          selectedSort == 'available',
                                     );
                                   }
 
@@ -257,7 +253,6 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                                             onTap: () {
                                               menuSetState(() {
                                                 selectedSort = 'soonest';
-                                                mostAvailableSpots = false;
                                               });
 
                                               applyFilters();
@@ -268,14 +263,11 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                                             title:
                                                 'volunteer.events.filter.most_spots_available'
                                                     .tr(),
-
                                             selected:
                                                 selectedSort == 'available',
-
                                             onTap: () {
                                               menuSetState(() {
                                                 selectedSort = 'available';
-                                                mostAvailableSpots = true;
                                               });
 
                                               applyFilters();
@@ -286,13 +278,10 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                                             title:
                                                 'volunteer.events.filter.most_popular'
                                                     .tr(),
-
                                             selected: selectedSort == 'popular',
-
                                             onTap: () {
                                               menuSetState(() {
                                                 selectedSort = 'popular';
-                                                mostAvailableSpots = false;
                                               });
 
                                               applyFilters();
@@ -425,7 +414,7 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                       Text(
                         'volunteer.events.showing_events'.tr(
                           namedArgs: {
-                            'count': _cubit.filteredEvents.length.toString(),
+                            'count': _cubit.filteredEvents.length.compact,
                           },
                         ),
                         style: TextStyle(
@@ -475,7 +464,7 @@ class _VolunteerEventsScreenState extends State<VolunteerEventsScreen> {
                             event: event,
                             onDetailsTap: () {
                               AppNavigator.sheet(
-                                VolunteerEventsBottomSheet(
+                                VolunteerEventDetailsBottomSheet(
                                   event: event,
                                   onJoinTap: () {
                                     if (event.joined) {

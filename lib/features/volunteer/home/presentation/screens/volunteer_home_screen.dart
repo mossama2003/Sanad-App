@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/constant/app_assets.dart';
+import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../shared/badges/presentation/screens/badges_screen.dart';
 import '../../../rewards/presentation/screens/rewards_screen.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
@@ -67,7 +68,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                           iconColor: AppColors.sportyViolet,
                           titleColor: AppColors.sportyViolet,
                           icon: AppIcons.achievement,
-                          value: (cubit.home?.xp ?? 0).toString(),
+                          value: (cubit.home?.xp ?? 0).compact,
                           title: 'volunteer.home.dashboard.xp_points'.tr(),
                         ),
                       ),
@@ -83,7 +84,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                           iconColor: AppColors.brand600,
                           titleColor: AppColors.brand600,
                           icon: AppIcons.fire,
-                          value: (cubit.home?.streak ?? 0).toString(),
+                          value: (cubit.home?.streak ?? 0).compact,
                           title: 'volunteer.home.dashboard.day_streak'.tr(),
                         ),
                       ),
@@ -100,7 +101,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                           iconColor: AppColors.secondary400,
                           titleColor: AppColors.secondary400,
                           icon: AppIcons.badge,
-                          value: (cubit.home?.badgeCount ?? 0).toString(),
+                          value: (cubit.home?.badgeCount ?? 0).compact,
                           title: 'volunteer.home.dashboard.badges'.tr(),
                         ),
                       ),

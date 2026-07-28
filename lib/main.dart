@@ -12,6 +12,7 @@ import 'features/shared/splash/presentations/screens/splash_screen.dart';
 import 'features/volunteer/home/data/repos/volunteer_home_repo.dart';
 import 'core/shared/controllers/user/app_cubit.dart';
 import 'core/network/local/cache/cache_helper.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'core/network/remote/api/dio_helper.dart';
 import 'core/storage/hive/hive_init.dart';
 import 'core/helper/app_navigator.dart';
@@ -33,6 +34,11 @@ void main() async {
 
   /// LANGUAGE INIT
   await EasyLocalization.ensureInitialized();
+
+  /// LANGUAGE INIT
+  await EasyLocalization.ensureInitialized();
+  await initializeDateFormatting('ar');
+  await initializeDateFormatting('en');
   await AppLocales.init();
 
   /// DIO INITIALIZATION

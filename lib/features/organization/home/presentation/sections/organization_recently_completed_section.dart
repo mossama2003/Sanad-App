@@ -4,6 +4,7 @@ import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../controllers/organization_home_cubit.dart';
 
@@ -168,7 +169,7 @@ class OrganizationRecentlyCompletedSection extends StatelessWidget {
                       SizedBox(width: AppSize.getWidth(8)),
 
                       Text(
-                        '${event.attendees} ${'organization.home.recently_completed.joined'.tr()}',
+                        '${event.attendees.compact} ${'organization.home.recently_completed.attendees'.tr()}',
 
                         textAlign: TextAlign.end,
 

@@ -1,15 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
-import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
-import 'package:sanad_app/features/organization/events/presentation/screens/organization_event_form_screen.dart';
 
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../../events/data/repos/organization_events_repo.dart';
-import '../../../events/presentation/controllers/organization_events_cubit.dart';
+import '../controllers/organization_home_cubit.dart';
 
 class OrganizationQuickActionsSection extends StatelessWidget {
   const OrganizationQuickActionsSection({super.key});
@@ -40,15 +36,7 @@ class OrganizationQuickActionsSection extends StatelessWidget {
                 context,
 
                 onTap: () {
-                  AppNavigator.push(
-                    BlocProvider(
-                      create: (_) => OrganizationEventsCubit(
-                        OrganizationEventsRepoImpel(),
-                      ),
-
-                      child: const OrganizationEventFormScreen(),
-                    ),
-                  );
+                  OrganizationHomeCubit.get(context).openEventForm(null);
                 },
 
                 icon: AppIcons.events,

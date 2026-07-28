@@ -36,6 +36,7 @@
         "image_cropper",
         "image_gallery_saver_plus",
         "image_picker",
+        "intl",
         "lottie",
         "mobile_scanner",
         "open_file",
@@ -498,6 +499,15 @@
         "open_file_platform_interface",
         "open_file_web",
         "open_file_windows"
+      ]
+    },
+    {
+      "name": "intl",
+      "version": "0.20.2",
+      "dependencies": [
+        "clock",
+        "meta",
+        "path"
       ]
     },
     {
@@ -1483,15 +1493,6 @@
         "flutter",
         "html",
         "logging"
-      ]
-    },
-    {
-      "name": "intl",
-      "version": "0.20.2",
-      "dependencies": [
-        "clock",
-        "meta",
-        "path"
       ]
     },
     {

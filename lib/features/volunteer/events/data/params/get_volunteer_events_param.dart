@@ -33,7 +33,8 @@ class GetVolunteerEventsParam {
 
   Map<String, dynamic> toQuery() {
     return {
-      if (category != null) "category": category,
+      if (category != null && category!.isNotEmpty)
+        "category": category!.join(','),
 
       if (creator != null) "creator": creator,
 
@@ -41,9 +42,10 @@ class GetVolunteerEventsParam {
 
       if (dateBefore != null) "date_before": dateBefore,
 
-      if (attendees != null) "attendees": attendees,
+      if (attendees != null && attendees!.isNotEmpty)
+        "attendees": attendees!.join(','),
 
-      if (joiners != null) "joiners": joiners,
+      if (joiners != null && joiners!.isNotEmpty) "joiners": joiners!.join(','),
 
       if (mostAvailableSpots != null)
         "most_available_spots": mostAvailableSpots,
@@ -60,7 +62,7 @@ class GetVolunteerEventsParam {
 
       if (state != null) "state": state,
 
-      if (status != null) "status": status!.join(','),
+      if (status != null && status!.isNotEmpty) "status": status!.join(','),
     };
   }
 }

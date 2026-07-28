@@ -482,7 +482,6 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   }
 
   // ===================== Create Event =====================
-  // ===================== Create Event =====================
   Future<void> createOrganizationEvent({
     required String status,
     required CreateOrganizationEventAction action,
@@ -584,6 +583,10 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
         if (homeCubit != null) {
           await homeCubit!.insertHomeEvent(newEvent);
         }
+
+        // ===================== مسح الفورم دلوقتي بس بعد نجاح الإنشاء الفعلي =====================
+
+        resetForm();
 
         emit(Success());
 

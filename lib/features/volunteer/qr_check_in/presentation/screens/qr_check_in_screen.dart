@@ -8,7 +8,6 @@ import 'package:sanad_app/features/volunteer/qr_check_in/presentation/controller
 
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/helper/app_toast.dart';
-import '../../../../../core/shared/widgets/custom_button.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../widgets/qr_camera_scanner.dart';
 
@@ -21,6 +20,8 @@ class QrCheckInScreen extends StatefulWidget {
 
 class _QrCheckInScreenState extends State<QrCheckInScreen> {
   late final VolunteerQrCubit _cubit;
+
+  bool canScan = true;
 
   @override
   void initState() {
@@ -35,35 +36,18 @@ class _QrCheckInScreenState extends State<QrCheckInScreen> {
     super.dispose();
   }
 
-  String? scannedQr;
-
-  bool canScan = true;
-
-  void _onQrDetected(String code) {
-    if (!canScan) return;
-
+  Future<void> _onQrDetected(String code) async {
     setState(() {
-      scannedQr = code;
       canScan = false;
     });
 
-    debugPrint("QR CODE => $code");
-  }
-
-  Future<void> _handleScan() async {
-    if (scannedQr == null) {
-      AppToast.error("volunteer.qr_check_in.please_scan_qr_code_first".tr());
-      return;
-    }
-
     try {
-      final qrParts = scannedQr!.split(':');
+      final qrParts = code.split(':');
 
       if (qrParts.length != 2) {
         AppToast.error("volunteer.qr_check_in.invalid_qr_code".tr());
 
         setState(() {
-          scannedQr = null;
           canScan = true;
         });
 
@@ -76,7 +60,6 @@ class _QrCheckInScreenState extends State<QrCheckInScreen> {
         AppToast.error("volunteer.qr_check_in.invalid_event".tr());
 
         setState(() {
-          scannedQr = null;
           canScan = true;
         });
 
@@ -89,18 +72,14 @@ class _QrCheckInScreenState extends State<QrCheckInScreen> {
       debugPrint("QR VALUE => $qrCode");
 
       await _cubit.checkIn(qr: qrCode, eventId: eventId);
-
-      setState(() {
-        scannedQr = null;
-        canScan = true;
-      });
     } catch (e) {
       debugPrint("CHECK IN ERROR => $e");
-
-      setState(() {
-        scannedQr = null;
-        canScan = true;
-      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          canScan = true;
+        });
+      }
     }
   }
 
@@ -110,8 +89,16 @@ class _QrCheckInScreenState extends State<QrCheckInScreen> {
 
     final textColor = theme.colorScheme.onSurface;
 
-    return BlocBuilder<VolunteerQrCubit, VolunteerQrState>(
+    return BlocConsumer<VolunteerQrCubit, VolunteerQrState>(
       bloc: _cubit,
+
+      listener: (context, state) {
+        if (state is Success || state is Error) {
+          setState(() {
+            canScan = true;
+          });
+        }
+      },
 
       builder: (context, state) {
         return Scaffold(
@@ -162,29 +149,26 @@ class _QrCheckInScreenState extends State<QrCheckInScreen> {
                       ],
                     ),
 
-                    child: QrCameraScanner(onDetect: _onQrDetected),
-                  ),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        QrCameraScanner(
+                          onDetect: _onQrDetected,
+                          canScan: canScan,
+                        ),
 
-                  SizedBox(height: AppSize.getHeight(24)),
-
-                  CustomButton(
-                    onTap: _handleScan,
-
-                    title: 'volunteer.qr_check_in.simulate_scan'.tr(),
-                  ),
-
-                  SizedBox(height: AppSize.getHeight(10)),
-
-                  if (scannedQr != null)
-                    Text(
-                      'volunteer.qr_check_in.qr_ready'.tr(),
-
-                      style: TextStyle(
-                        color: AppColors.primary,
-
-                        fontWeight: FontWeight.w600,
-                      ),
+                        if (state is Loading)
+                          Container(
+                            color: Colors.black.withValues(alpha: .35),
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
+                  ),
 
                   SizedBox(height: AppSize.getHeight(24)),
 

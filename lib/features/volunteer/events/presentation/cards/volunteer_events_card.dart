@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../../core/shared/widgets/custom_button.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/constant/app_assets.dart';
@@ -285,7 +286,8 @@ class VolunteerEventsCard extends StatelessWidget {
                       TextSpan(
                         children: [
                           TextSpan(
-                            text: '$joiners ${'volunteer.events.joined'.tr()}',
+                            text:
+                                '${joiners.compact} ${'volunteer.events.joined'.tr()}',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: textColor,
@@ -299,7 +301,7 @@ class VolunteerEventsCard extends StatelessWidget {
 
                           TextSpan(
                             text:
-                                '$spotsLeft ${'volunteer.events.spot_left'.tr()}',
+                                '${spotsLeft.compact} ${'volunteer.events.spot_left'.tr()}',
                             style: TextStyle(color: secondaryColor),
                           ),
                         ],

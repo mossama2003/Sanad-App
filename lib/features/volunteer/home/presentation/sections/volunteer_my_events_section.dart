@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:flutter/material.dart';
 
-import '../../../events/presentation/dialogs/volunteer_events_bottom_sheet.dart';
+import '../../../events/presentation/dialogs/volunteer_event_details_bottom_sheet.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/shared/widgets/custom_button.dart';
 import '../../data/enums/volunteer_home_navbar_enum.dart';
@@ -189,7 +189,7 @@ class VolunteerMyEventsSection extends StatelessWidget {
 
                   onDetailsTap: () {
                     AppNavigator.sheet(
-                      VolunteerEventsBottomSheet(
+                      VolunteerEventDetailsBottomSheet(
                         event: event,
                         onJoinTap: () {
                           if (event.joined) {

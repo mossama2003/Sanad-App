@@ -3,17 +3,22 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:sanad_app/features/volunteer/qr_check_in/presentation/widgets/scanner_overlay_widget.dart';
 
 class QrCameraScanner extends StatefulWidget {
-  const QrCameraScanner({super.key, required this.onDetect});
+  const QrCameraScanner({
+    super.key,
+    required this.onDetect,
+    required this.canScan,
+  });
 
   final Function(String code) onDetect;
+
+  /// بيتحكم فيه من الشاشة الأب: true يبقى بيقرأ، false يبقى متوقف مؤقتًا
+  final bool canScan;
 
   @override
   State<QrCameraScanner> createState() => _QrCameraScannerState();
 }
 
 class _QrCameraScannerState extends State<QrCameraScanner> {
-  bool scanned = false;
-
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -24,13 +29,12 @@ class _QrCameraScannerState extends State<QrCameraScanner> {
           MobileScanner(
             fit: BoxFit.cover,
             onDetect: (capture) {
-              if (scanned) return;
+              if (!widget.canScan) return;
 
               final barcode = capture.barcodes.firstOrNull;
               final value = barcode?.rawValue;
 
               if (value != null) {
-                scanned = true;
                 widget.onDetect(value);
               }
             },
