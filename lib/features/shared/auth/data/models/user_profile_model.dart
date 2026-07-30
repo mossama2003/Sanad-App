@@ -3,11 +3,7 @@ class UserProfileModel {
   String? type;
   String? created;
 
-  UserProfileModel({
-    this.id,
-    this.type,
-    this.created,
-  });
+  UserProfileModel({this.id, this.type, this.created});
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
     if (json.containsKey('nid')) {
@@ -29,6 +25,7 @@ class VolunteerProfileModel extends UserProfileModel {
   String? address;
 
   VolunteerProfileModel({
+    super.id,
     this.gender,
     this.dob,
     this.bloodGroup,
@@ -42,6 +39,7 @@ class VolunteerProfileModel extends UserProfileModel {
 
   factory VolunteerProfileModel.fromJson(Map<String, dynamic> json) {
     return VolunteerProfileModel(
+      id: json['id'],
       created: json['created'],
       gender: json['gender'],
       dob: json['dob'],
@@ -60,11 +58,16 @@ class OrganizationProfileModel extends UserProfileModel {
   String? state;
   String? headquarters;
 
-  OrganizationProfileModel({this.website, this.state, this.headquarters})
-    : super(type: "organization");
+  OrganizationProfileModel({
+    super.id,
+    this.website,
+    this.state,
+    this.headquarters,
+  }) : super(type: "organization");
 
   factory OrganizationProfileModel.fromJson(Map<String, dynamic> json) {
     return OrganizationProfileModel(
+      id: json['id'],
       website: json['website'],
       state: json['state'],
       headquarters: json['headquarters'],

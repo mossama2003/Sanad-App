@@ -116,4 +116,5 @@ class AppIcons {
   static String fileDone = '$icons/file-done.svg';
   static String website = '$icons/website.svg';
   static String note = '$icons/note.svg';
+  static String image = '$icons/image.svg';
 }

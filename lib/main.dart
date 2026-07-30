@@ -2,8 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sanad_app/features/volunteer/community/presentation/controllers/volunteer_community_cubit.dart';
 
 import 'features/organization/home/presentation/controllers/organization_home_cubit.dart';
+import 'features/volunteer/community/data/repos/volunteer_community_repo.dart';
 import 'features/volunteer/events/presentation/controllers/volunteer_events_cubit.dart';
 import 'features/volunteer/home/presentation/controllers/volunteer_home_cubit.dart';
 import 'features/organization/home/data/repos/organization_home_repo.dart';
@@ -85,6 +87,11 @@ class MyApp extends StatelessWidget {
 
             BlocProvider(
               create: (_) => OrganizationHomeCubit(OrganizationHomeRepoImpel()),
+            ),
+
+            BlocProvider(
+              create: (_) =>
+                  VolunteerCommunityCubit(VolunteerCommunityRepoImpel()),
             ),
           ],
           child: GestureDetector(

@@ -36,6 +36,8 @@ String SCAN_QR = 'v1/events/scan/';
 
 String VOLUNTEER_HOME = 'v1/dashboard/home/volunteer/';
 
+String VOLUNTEER_COMMUNITIES = 'v1/events/read_event/';
+
 /// Organization Endpoints
 String CREATE_ORGANIZATION_EVENT = 'v1/events/manage_event/';
 

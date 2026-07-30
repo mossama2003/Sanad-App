@@ -54,13 +54,14 @@ class VolunteerEventsCard extends StatelessWidget {
     final isOngoing = status == 'ongoing';
     final isCompleted = status == 'completed';
 
+    final isFull = spots > 0 && joiners >= spots;
+
     final spotsLeft = (spots - joiners).clamp(0, spots);
 
-    final isFull = joiners >= spots;
+    final canJoin =
+        !joined && !isCompleted && !isFull && (isUpcoming || isOngoing);
 
-    final canJoin = !joined && isUpcoming && !isFull;
-
-    final canLeave = joined && isUpcoming;
+    final canLeave = joined && !isCompleted && (isUpcoming || isOngoing);
 
     final isDisabled = !canJoin && !canLeave;
 
@@ -95,14 +96,9 @@ class VolunteerEventsCard extends StatelessWidget {
                       ? Image.network(
                           cover,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) {
-                            return Image.asset(
-                              AppImages.eventsImage,
-                              fit: BoxFit.cover,
-                            );
-                          },
+                          errorBuilder: (_, _, _) => _buildPlaceholder(context),
                         )
-                      : Image.asset(AppImages.eventsImage, fit: BoxFit.cover),
+                      : _buildPlaceholder(context),
                 ),
 
                 Positioned(
@@ -337,20 +333,12 @@ class VolunteerEventsCard extends StatelessWidget {
                         child: CustomButton(
                           loading: isLoading,
 
-                          icon: canLeave
-                              ? AppIcons.check
-                              : isDisabled
-                              ? AppIcons.close
-                              : null,
+                          icon: joined ? AppIcons.check : null,
 
                           iconSize: AppSize.getSize(15),
 
                           title: isCompleted
                               ? 'volunteer.events.completed'.tr()
-                              : isOngoing
-                              ? (joined
-                                    ? 'volunteer.events.joined'.tr()
-                                    : 'volunteer.events.started'.tr())
                               : isFull && !joined
                               ? 'volunteer.events.full'.tr()
                               : joined
@@ -367,6 +355,43 @@ class VolunteerEventsCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: AppSize.padding(all: 16),
+              decoration: BoxDecoration(
+                color: AppColors.grey200,
+                shape: BoxShape.circle,
+              ),
+              child: CustomIcon(
+                icon: AppIcons.image,
+                width: AppSize.getSize(30),
+                height: AppSize.getSize(30),
+                color: AppColors.grey,
+              ),
+            ),
+            SizedBox(height: AppSize.getHeight(12)),
+            Text(
+              'volunteer.events.no_cover'.tr(),
+              style: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontSize: AppSize.font(14),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

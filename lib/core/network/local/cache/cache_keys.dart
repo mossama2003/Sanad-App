@@ -15,4 +15,6 @@ class CacheKeys {
   static const String fcmToken = 'fcm_token';
 
   static const String firstUse = 'first_use';
+
+  static const String profileId = 'profile_id';
 }

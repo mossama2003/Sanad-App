@@ -7,11 +7,11 @@ import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/helper/app_number_formatter.dart';
+import '../../data/models/volunteer_event_details_model.dart';
+import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../data/models/volunteer_event_details_model.dart';
 
 class VolunteerEventDetailsBottomSheet extends StatelessWidget {
   const VolunteerEventDetailsBottomSheet({
@@ -267,46 +267,73 @@ class _EventImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Stack(
       children: [
-        ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        SizedBox(
+          height: AppSize.getHeight(250),
+          width: double.infinity,
           child: imageUrl != null && imageUrl!.isNotEmpty
               ? Image.network(
                   imageUrl!,
-                  width: double.infinity,
-                  height: 220,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) {
-                    return Image.asset(
-                      AppImages.eventsImage,
-                      height: 220,
-                      fit: BoxFit.cover,
-                    );
-                  },
+                  errorBuilder: (_, _, _) => _buildPlaceholder(context),
                 )
-              : Image.asset(
-                  AppImages.eventsImage,
-                  height: 220,
-                  fit: BoxFit.cover,
-                ),
+              : _buildPlaceholder(context),
         ),
 
         Positioned(
-          top: 10,
-          right: 10,
-          child: CircleAvatar(
-            backgroundColor: theme.cardColor,
-            child: CustomIcon(
-              onTap: onClose,
-              icon: AppIcons.close,
-              color: Theme.of(context).colorScheme.onSurface,
+          top: AppSize.getHeight(16),
+          left: AppSize.getWidth(16),
+          child: GestureDetector(
+            onTap: onClose,
+            child: Container(
+              padding: AppSize.padding(all: 8),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: .4),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.close, color: Colors.white),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPlaceholder(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: AppSize.padding(all: 16),
+              decoration: const BoxDecoration(
+                color: AppColors.grey200,
+                shape: BoxShape.circle,
+              ),
+              child: CustomIcon(
+                icon: AppIcons.image,
+                width: AppSize.getSize(30),
+                height: AppSize.getSize(30),
+                color: AppColors.grey,
+              ),
+            ),
+            SizedBox(height: AppSize.getHeight(12)),
+            Text(
+              'volunteer.events.no_cover'.tr(),
+              style: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontSize: AppSize.font(14),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

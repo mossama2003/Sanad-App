@@ -32,7 +32,6 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
   DateTime? dateBefore;
 
-  // مفيش قيمة مختارة تلقائيًا
   String? sortType;
 
   bool? mostAvailableSpots;
@@ -225,10 +224,6 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
   }
 
   Future<void> _refreshWithCurrentFilters() {
-    // soonest first => ordering=-date
-    // available => most_available_spots=true
-    // popular => most_available_spots=false
-    // مفيش اختيار => من غير أي باراميتر من الاتنين
     mostAvailableSpots = sortType == 'available'
         ? true
         : sortType == 'popular'

@@ -146,6 +146,9 @@ class AppCubit extends Cubit<AppStates> {
     await CacheHelper.remove(CacheKeys.accessToken);
     await CacheHelper.remove(CacheKeys.refreshToken);
 
+    /// REMOVE PROFILE
+    await CacheHelper.remove(CacheKeys.profileId);
+
     /// CLEAR COOKIES
     await DioHelper.cookieJar.deleteAll();
 

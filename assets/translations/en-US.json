@@ -572,6 +572,7 @@
       "leave_message": "Are you sure you want to leave this event? Your spot will be cancelled.",
       "leave_confirm": "Leave",
       "started": "Event Started",
+      "no_cover": "No Image Available",
       "bottom_sheet": {
         "date_time": "Date & Time",
         "duration": "Duration",
@@ -635,12 +636,13 @@
       "title": "Communities",
       "desc": "Connect with other volunteers",
       "search": "Search communities",
-      "expired": "Expired: Chat ends 3 days after event",
+      "active": "Active",
       "ended": "Ended",
-      "2_min_ago": "2 min ago",
-      "2_days_ago": "2 days ago",
       "communities_are_automatically_created": "Communities are automatically created when you join an event.",
-      "chat_access_remains": "Chat access remains for 3 days after the event ends."
+      "chat_access_remains": "Chat access remains for 3 days after the event ends.",
+      "no_communities": "No communities yet",
+      "join_event_to_access_chat": "Join volunteer events to access community chats and connect with other volunteers.",
+      "browse_events": "Browse Events"
     },
     "emergency": {
       "title": "Emergency Events",

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../shared/donations/presentation/screens/donations_screen.dart';
 import '../../../events/presentation/screens/volunteer_events_screen.dart';
 import '../../../../shared/cases/presentation/screens/cases_screen.dart';
-import '../../../community/presentation/screens/community_screen.dart';
+import '../../../community/presentation/screens/volunteer_community_screen.dart';
 import '../../../../../core/storage/hive/hive_boxes.dart';
 import '../../data/enums/volunteer_home_navbar_enum.dart';
 import '../../data/models/volunteer_home_model.dart';
@@ -34,7 +34,7 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
   final Map<VolunteerHomeNavbarItem, Widget> _screens = {
     VolunteerHomeNavbarItem.home: const VolunteerHomeScreen(),
     VolunteerHomeNavbarItem.events: const VolunteerEventsScreen(),
-    VolunteerHomeNavbarItem.community: const CommunityScreen(),
+    VolunteerHomeNavbarItem.community: const VolunteerCommunityScreen(),
     VolunteerHomeNavbarItem.donations: const DonationsScreen(),
     VolunteerHomeNavbarItem.cases: const CasesScreen(),
   };
