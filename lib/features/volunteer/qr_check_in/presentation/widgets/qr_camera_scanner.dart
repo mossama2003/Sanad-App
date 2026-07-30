@@ -2,23 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:sanad_app/features/volunteer/qr_check_in/presentation/widgets/scanner_overlay_widget.dart';
 
-class QrCameraScanner extends StatefulWidget {
+class QrCameraScanner extends StatelessWidget {
   const QrCameraScanner({
     super.key,
+    required this.controller,
     required this.onDetect,
-    required this.canScan,
+    required this.active,
   });
 
+  final MobileScannerController controller;
   final Function(String code) onDetect;
+  final bool active;
 
-  /// بيتحكم فيه من الشاشة الأب: true يبقى بيقرأ، false يبقى متوقف مؤقتًا
-  final bool canScan;
-
-  @override
-  State<QrCameraScanner> createState() => _QrCameraScannerState();
-}
-
-class _QrCameraScannerState extends State<QrCameraScanner> {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -27,20 +22,17 @@ class _QrCameraScannerState extends State<QrCameraScanner> {
         fit: StackFit.expand,
         children: [
           MobileScanner(
+            controller: controller,
             fit: BoxFit.cover,
             onDetect: (capture) {
-              if (!widget.canScan) return;
-
+              if (!active) return;
               final barcode = capture.barcodes.firstOrNull;
               final value = barcode?.rawValue;
-
-              if (value != null) {
-                widget.onDetect(value);
-              }
+              if (value != null) onDetect(value);
             },
           ),
 
-          const IgnorePointer(child: ScannerOverlayWidget()),
+          IgnorePointer(child: ScannerOverlayWidget(active: active)),
         ],
       ),
     );

@@ -625,8 +625,11 @@
       "how_why_desc2": "Hold steady until the code is detected inside the frame.",
       "how_why_desc3": "Your attendance is automatically recorded for the event.",
       "how_why_desc4": "You instantly earn XP and keep your streak going.",
-      "checked_in_successfully": "Checked in successfully",
-      "please_scan_qr_code_first": "Please scan QR code first"
+      "please_scan_qr_code_first": "Please scan QR code first",
+      "check_in_failed": "Check in failed",
+      "checked_in_successfully": "You've checked in successfully",
+      "scan_next": "Scan next",
+      "scan_again": "Scan again"
     },
     "community": {
       "title": "Communities",

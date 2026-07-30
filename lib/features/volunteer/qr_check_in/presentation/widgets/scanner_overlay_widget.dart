@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../../../core/style/app_colors.dart';
 
 class ScannerOverlayWidget extends StatefulWidget {
-  const ScannerOverlayWidget({super.key});
+  const ScannerOverlayWidget({super.key, required this.active});
+
+  final bool active;
 
   @override
   State<ScannerOverlayWidget> createState() => _ScannerOverlayState();
@@ -21,11 +23,23 @@ class _ScannerOverlayState extends State<ScannerOverlayWidget>
   @override
   void initState() {
     super.initState();
-
     controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1800),
-    )..repeat(reverse: true);
+    );
+    if (widget.active) controller.repeat(reverse: true);
+  }
+
+  @override
+  void didUpdateWidget(covariant ScannerOverlayWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.active == oldWidget.active) return;
+
+    if (widget.active) {
+      controller.repeat(reverse: true);
+    } else {
+      controller.stop();
+    }
   }
 
   @override
@@ -36,6 +50,8 @@ class _ScannerOverlayState extends State<ScannerOverlayWidget>
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.active) return const SizedBox.shrink();
+
     return LayoutBuilder(
       builder: (_, constraints) {
         return Stack(

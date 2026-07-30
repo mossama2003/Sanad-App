@@ -32,9 +32,12 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
   DateTime? dateBefore;
 
-  String sortType = 'soonest';
+  // مفيش قيمة مختارة تلقائيًا
+  String? sortType;
 
   bool? mostAvailableSpots;
+
+  String? ordering;
 
   // ===================== Events Search =====================
 
@@ -56,7 +59,8 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
   // ===================== Sort =====================
 
   void setSort(String type) {
-    sortType = type;
+    sortType = sortType == type ? null : type;
+
     _refreshWithCurrentFilters();
   }
 
@@ -221,11 +225,17 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
   }
 
   Future<void> _refreshWithCurrentFilters() {
+    // soonest first => ordering=-date
+    // available => most_available_spots=true
+    // popular => most_available_spots=false
+    // مفيش اختيار => من غير أي باراميتر من الاتنين
     mostAvailableSpots = sortType == 'available'
         ? true
         : sortType == 'popular'
         ? false
         : null;
+
+    ordering = sortType == 'soonest' ? '-date' : null;
 
     return getVolunteerEvents(
       refresh: true,
@@ -235,6 +245,7 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
       startDate: dateAfter,
       endDate: dateBefore,
       searchText: search,
+      ordering: ordering,
       mostAvailableSpots: mostAvailableSpots,
     );
   }
@@ -268,6 +279,8 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
       search = searchText;
 
       this.mostAvailableSpots = mostAvailableSpots;
+
+      this.ordering = ordering;
     }
 
     // ================= Cache First =================
@@ -294,7 +307,7 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
         // send only true/false when selected from filter
         mostAvailableSpots: this.mostAvailableSpots,
 
-        ordering: null,
+        ordering: this.ordering,
 
         dateAfter: dateAfter == null
             ? null
@@ -415,7 +428,7 @@ class VolunteerEventsCubit extends Cubit<VolunteerEventsState> {
 
         mostAvailableSpots: mostAvailableSpots,
 
-        ordering: null,
+        ordering: ordering,
 
         dateAfter: dateAfter == null
             ? null

@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 import 'package:sanad_app/features/volunteer/qr_check_in/data/repos/volunteer_qr_repo.dart';
@@ -11,6 +12,8 @@ import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../widgets/qr_camera_scanner.dart';
 
+enum _ScanStatus { scanning, processing, success, error }
+
 class QrCheckInScreen extends StatefulWidget {
   const QrCheckInScreen({super.key});
 
@@ -20,26 +23,33 @@ class QrCheckInScreen extends StatefulWidget {
 
 class _QrCheckInScreenState extends State<QrCheckInScreen> {
   late final VolunteerQrCubit _cubit;
+  late final MobileScannerController _scannerController;
 
-  bool canScan = true;
+  _ScanStatus _status = _ScanStatus.scanning;
 
   @override
   void initState() {
     super.initState();
 
     _cubit = VolunteerQrCubit(VolunteerQrRepoImpl());
+    _scannerController = MobileScannerController();
   }
 
   @override
   void dispose() {
     _cubit.close();
+    _scannerController.dispose();
     super.dispose();
   }
 
   Future<void> _onQrDetected(String code) async {
+    if (_status != _ScanStatus.scanning) return;
+
     setState(() {
-      canScan = false;
+      _status = _ScanStatus.processing;
     });
+
+    await _scannerController.stop();
 
     try {
       final qrParts = code.split(':');
@@ -48,7 +58,7 @@ class _QrCheckInScreenState extends State<QrCheckInScreen> {
         AppToast.error("volunteer.qr_check_in.invalid_qr_code".tr());
 
         setState(() {
-          canScan = true;
+          _status = _ScanStatus.error;
         });
 
         return;
@@ -60,7 +70,7 @@ class _QrCheckInScreenState extends State<QrCheckInScreen> {
         AppToast.error("volunteer.qr_check_in.invalid_event".tr());
 
         setState(() {
-          canScan = true;
+          _status = _ScanStatus.error;
         });
 
         return;
@@ -74,13 +84,20 @@ class _QrCheckInScreenState extends State<QrCheckInScreen> {
       await _cubit.checkIn(qr: qrCode, eventId: eventId);
     } catch (e) {
       debugPrint("CHECK IN ERROR => $e");
-    } finally {
-      if (mounted) {
-        setState(() {
-          canScan = true;
-        });
-      }
+
+      setState(() {
+        _status = _ScanStatus.error;
+      });
     }
+  }
+
+  Future<void> _scanAgain() async {
+    setState(() {
+      _status = _ScanStatus.scanning;
+    });
+
+    // بيفتح الكاميرا تاني بس لما اليوزر يدوس بنفسه
+    await _scannerController.start();
   }
 
   @override
@@ -93,9 +110,13 @@ class _QrCheckInScreenState extends State<QrCheckInScreen> {
       bloc: _cubit,
 
       listener: (context, state) {
-        if (state is Success || state is Error) {
+        if (state is Success) {
           setState(() {
-            canScan = true;
+            _status = _ScanStatus.success;
+          });
+        } else if (state is Error) {
+          setState(() {
+            _status = _ScanStatus.error;
           });
         }
       },
@@ -153,18 +174,37 @@ class _QrCheckInScreenState extends State<QrCheckInScreen> {
                       fit: StackFit.expand,
                       children: [
                         QrCameraScanner(
+                          controller: _scannerController,
                           onDetect: _onQrDetected,
-                          canScan: canScan,
+                          active: _status == _ScanStatus.scanning,
                         ),
 
-                        if (state is Loading)
+                        if (_status == _ScanStatus.processing)
                           Container(
-                            color: Colors.black.withValues(alpha: .35),
+                            color: Colors.black.withValues(alpha: .45),
                             child: const Center(
                               child: CircularProgressIndicator(
                                 color: Colors.white,
                               ),
                             ),
+                          ),
+
+                        // في حالة النجاح: نعرض النتيجة من غير زرار Scan Again خالص
+                        if (_status == _ScanStatus.success)
+                          _buildSuccessOverlay(
+                            message:
+                            'volunteer.qr_check_in.checked_in_successfully'
+                                .tr(),
+                          ),
+
+                        if (_status == _ScanStatus.error)
+                          _buildResultOverlay(
+                            icon: Icons.cancel_rounded,
+                            color: AppColors.red,
+                            message: 'volunteer.qr_check_in.check_in_failed'
+                                .tr(),
+                            buttonLabel: 'volunteer.qr_check_in.scan_again'
+                                .tr(),
                           ),
                       ],
                     ),
@@ -259,6 +299,154 @@ class _QrCheckInScreenState extends State<QrCheckInScreen> {
           ),
         );
       },
+    );
+  }
+
+  /// أوفرلاي النجاح: أيقونة + رسالة بس، من غير أي زرار
+  Widget _buildSuccessOverlay({required String message}) {
+    return Container(
+      color: Colors.black.withValues(alpha: .75),
+
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+
+          children: [
+            Container(
+              width: AppSize.getSize(90),
+
+              height: AppSize.getSize(90),
+
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+
+                color: AppColors.green.withValues(alpha: .15),
+              ),
+
+              child: Icon(
+                Icons.check_circle_rounded,
+                color: AppColors.green,
+                size: AppSize.getSize(60),
+              ),
+            ),
+
+            SizedBox(height: AppSize.getHeight(16)),
+
+            Padding(
+              padding: AppSize.padding(horizontal: 24),
+
+              child: Text(
+                message,
+
+                textAlign: TextAlign.center,
+
+                style: TextStyle(
+                  color: Colors.white,
+
+                  fontSize: AppSize.font(16),
+
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResultOverlay({
+    required IconData icon,
+    required Color color,
+    required String message,
+    required String buttonLabel,
+  }) {
+    return Container(
+      color: Colors.black.withValues(alpha: .75),
+
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+
+          children: [
+            Container(
+              width: AppSize.getSize(90),
+
+              height: AppSize.getSize(90),
+
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+
+                color: color.withValues(alpha: .15),
+              ),
+
+              child: Icon(icon, color: color, size: AppSize.getSize(60)),
+            ),
+
+            SizedBox(height: AppSize.getHeight(16)),
+
+            Padding(
+              padding: AppSize.padding(horizontal: 24),
+
+              child: Text(
+                message,
+
+                textAlign: TextAlign.center,
+
+                style: TextStyle(
+                  color: Colors.white,
+
+                  fontSize: AppSize.font(16),
+
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+
+            SizedBox(height: AppSize.getHeight(20)),
+
+            GestureDetector(
+              onTap: _scanAgain,
+
+              child: Container(
+                padding: AppSize.padding(horizontal: 20, vertical: 10),
+
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: .15),
+
+                  borderRadius: BorderRadius.circular(30),
+
+                  border: Border.all(color: Colors.white.withValues(alpha: .4)),
+                ),
+
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+
+                  children: [
+                    const Icon(
+                      Icons.refresh_rounded,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+
+                    SizedBox(width: AppSize.getWidth(8)),
+
+                    Text(
+                      buttonLabel,
+
+                      style: const TextStyle(
+                        color: Colors.white,
+
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

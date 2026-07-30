@@ -30,6 +30,7 @@ class OrganizationQrCodeScreen extends StatefulWidget {
 
 class _OrganizationQrCodeScreenState extends State<OrganizationQrCodeScreen> {
   int selectedAction = 0;
+  bool isDownloading = false;
 
   static const Color primaryGreen = Color(0xFF2ECC9B);
   static const Color darkTeal = Color(0xFF17A398);
@@ -180,8 +181,6 @@ class _OrganizationQrCodeScreenState extends State<OrganizationQrCodeScreen> {
 
       clipBehavior: Clip.antiAlias,
 
-      // لف الكارت كله (الهيدر + الـ QR + التاريخ واللوكيشن) بالـ Screenshot
-      // عشان الـ Download/Share ياخدوا نفس الكارت اللي ظاهر في الـ UI بالظبط
       child: Screenshot(
         controller: _screenshotController,
 
@@ -279,11 +278,14 @@ class _OrganizationQrCodeScreenState extends State<OrganizationQrCodeScreen> {
                       AppIcons.location,
 
                       [
-                            widget.event.location?['description'],
+                        widget.event.location?['description'],
 
-                            widget.event.location?['city'],
-                          ]
-                          .where((e) => e != null && e.toString().isNotEmpty)
+                        widget.event.location?['city'],
+                      ]
+                          .where((e) =>
+                      e != null && e
+                          .toString()
+                          .isNotEmpty)
                           .join(', '),
                     ),
                   ],
@@ -349,7 +351,17 @@ class _OrganizationQrCodeScreenState extends State<OrganizationQrCodeScreen> {
 
                 switch (i) {
                   case 0:
-                    await _downloadQr();
+                    if (isDownloading) return;
+
+                    setState(() => isDownloading = true);
+
+                    try {
+                      await _downloadQr();
+                    } finally {
+                      if (mounted) {
+                        setState(() => isDownloading = false);
+                      }
+                    }
                     break;
 
                   case 1:
@@ -373,13 +385,18 @@ class _OrganizationQrCodeScreenState extends State<OrganizationQrCodeScreen> {
 
                 child: Column(
                   children: [
-                    CustomIcon(
-                      icon: actions[i].$1,
-
-                      color: AppColors.primary,
-
+                    isDownloading && i == 0
+                        ? SizedBox(
                       width: AppSize.getSize(20),
-
+                      height: AppSize.getHeight(20),
+                      child: const CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
+                    )
+                        : CustomIcon(
+                      icon: actions[i].$1,
+                      color: AppColors.primary,
+                      width: AppSize.getSize(20),
                       height: AppSize.getHeight(20),
                     ),
 

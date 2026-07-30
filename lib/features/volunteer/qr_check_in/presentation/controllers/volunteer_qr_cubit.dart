@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sanad_app/core/helper/app_navigator.dart';
 
 import '../../../../../core/helper/app_toast.dart';
 import '../../data/params/qr_check_in_param.dart';
@@ -29,8 +28,8 @@ class VolunteerQrCubit extends Cubit<VolunteerQrState> {
 
       (r) {
         AppToast.success("volunteer.qr_check_in.checked_in_successfully".tr());
+
         emit(Success());
-        AppNavigator.pop();
       },
     );
   }
