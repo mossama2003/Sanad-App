@@ -1,25 +1,39 @@
-import 'package:flutter/material.dart';
-import 'package:sanad_app/core/constant/app_assets.dart';
-import 'package:sanad_app/core/constant/app_size.dart';
-import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:sanad_app/core/shared/widgets/custom_field_text.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
+import 'package:sanad_app/core/helper/app_navigator.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:sanad_app/core/constant/app_assets.dart';
+import 'package:sanad_app/core/constant/app_size.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 
+import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../dialogs/members_bottom_sheet.dart';
 import '../../data/models/chat_model.dart';
-import 'members.dart';
+import '../../data/repos/chat_repo.dart';
+import '../controllers/chat_cubit.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  final int eventId;
+  final int currentUserId;
+  final ChatEventModel event;
+
+  const ChatScreen({
+    super.key,
+    required this.eventId,
+    required this.currentUserId,
+    required this.event,
+  });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  bool _pinnedExpanded = true;
-
-  // ── Data ────────────────────────────────────────────────────────────────────
+  bool _pinnedExpanded = false;
+  bool _isFirstLoad = true;
+  double? _prevMaxScrollExtent;
 
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -28,77 +42,65 @@ class _ChatScreenState extends State<ChatScreen> {
     PinnedMessage(
       title: 'Welcome to Beach Cleanup Drive 👋',
       body:
-          "So glad you're here! This community brings together everyone joining Beach Cleanup Drive. Say hi, ask questions, and let's make this event amazing together.",
+      "So glad you're here! This community brings together everyone joining Beach Cleanup Drive. Say hi, ask questions, and let's make this event amazing together.",
       icon: AppIcons.donations,
       color: AppColors.primary,
     ),
     PinnedMessage(
       title: 'Quick Guidance',
       body:
-          'Arrive 15 minutes early • Bring your ID for QR check-in • Wear comfortable clothes • Coordinate carpooling here if you can.',
+      'Arrive 15 minutes early • Bring your ID for QR check-in • Wear comfortable clothes • Coordinate carpooling here if you can.',
       icon: AppIcons.info,
       color: AppColors.laserBlue,
     ),
     PinnedMessage(
       title: 'Community Notes',
       body:
-          'Be kind & respectful • No spam or promotions • Use channels to coordinate not chat • Admins are always around if you need help.',
+      'Be kind & respectful • No spam or promotions • Use channels to coordinate not chat • Admins are always around if you need help.',
       icon: AppIcons.sparkle,
       color: AppColors.bronze,
     ),
   ];
 
-  static final _messages = [
-    ChatModel(
-      senderName: 'Sanad Team',
-      badge: 'Sanad Admin',
-      badgeColor: AppColors.primary,
-      badgeIcon: AppIcons.check,
-      text:
-          "Hi everyone! 👋 I'm here from Sanad if you need any help or have feedback about the event.",
-      time: '9:00 AM',
-      avatarColor: Color(0xFF3DAB8E),
-      avatarLetter: 'S',
-    ),
-    ChatModel(
-      senderName: 'Layla Mostafa',
-      badge: 'Organizer',
-      badgeColor: AppColors.bronze,
-      badgeIcon: AppIcons.crown,
-      text:
-          "Hello team! Excited to have you all on board for the Beach Cleanup Drive. I'll share location pin tonight.",
-      time: '9:12 AM',
-      avatarColor: Color(0xFFE8824A),
-      avatarLetter: 'L',
-    ),
-    ChatModel(
-      senderName: 'Nour Ali',
-      text: 'So excited! Is there parking nearby?',
-      time: '9:24 AM',
-      avatarColor: Color(0xFF718096),
-      avatarLetter: 'N',
-      reactionEmoji: '❤️',
-      reactionCount: 2,
-    ),
-    ChatModel(
-      senderName: 'Layla Mostafa',
-      badge: 'Organizer',
-      badgeColor: AppColors.bronze,
-      badgeIcon: AppIcons.crown,
-      text: "Yes, free parking at the main entrance. I'll add a map shortly.",
-      time: '9:31 AM',
-      avatarColor: Color(0xFFE8824A),
-      avatarLetter: 'L',
-    ),
-  ];
-
   final List<String> _reactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
 
-  void _showReactionPicker(
-    BuildContext context,
-    Offset position,
-    ChatModel msg,
-  ) {
+  late final ChatCubit _chatCubit;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _chatCubit = ChatCubit(
+      chatRepo: ChatRepoImpel(),
+      eventId: widget.eventId,
+      currentUserId: widget.currentUserId,
+    )
+      ..initChat();
+
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    _messageController.dispose();
+    _chatCubit.close();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    if (_scrollController.position.pixels <=
+        _scrollController.position.minScrollExtent + 80) {
+      _prevMaxScrollExtent = _scrollController.position.maxScrollExtent;
+      _chatCubit.loadMoreHistory();
+    }
+  }
+
+  void _showReactionPicker(BuildContext context,
+      Offset position,
+      ChatModel msg,) {
     final overlay = Overlay.of(context);
 
     late OverlayEntry entry;
@@ -114,15 +116,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: GestureDetector(
                     behavior: HitTestBehavior.translucent,
                     onTap: () {
-                      if (entry.mounted) {
-                        entry.remove();
-                      }
+                      if (entry.mounted) entry.remove();
                     },
                     child: Container(color: Colors.transparent),
                   ),
                 ),
-
-                // 👇 البوب أب نفسه
                 Positioned(
                   left: position.dx - 100,
                   top: position.dy - 65,
@@ -163,10 +161,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     msg.reactionCount = 1;
                                   }
                                 });
-
-                                if (entry.mounted) {
-                                  entry.remove();
-                                }
+                                if (entry.mounted) entry.remove();
                               },
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 150),
@@ -204,10 +199,15 @@ class _ChatScreenState extends State<ChatScreen> {
     );
 
     overlay.insert(entry);
-
     Future.delayed(const Duration(seconds: 5), () {
-      if (entry.mounted) {
-        entry.remove();
+      if (entry.mounted) entry.remove();
+    });
+  }
+
+  void _jumpToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
       }
     });
   }
@@ -224,38 +224,139 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  // ── Build ────────────────────────────────────────────────────────────────────
+  void _onSendPressed() {
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+
+    _chatCubit.sendMessage(text);
+    _messageController.clear();
+    _scrollToBottom();
+  }
+
+  String _dateDividerLabel(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final target = DateTime(date.year, date.month, date.day);
+
+    final diff = today
+        .difference(target)
+        .inDays;
+
+    if (diff == 0) return 'volunteer.chat.today'.tr();
+    if (diff == 1) return 'volunteer.chat.yesterday'.tr();
+
+    if (diff < 7) {
+      return DateFormat('EEEE').format(date);
+    }
+
+    return DateFormat('d MMM yyyy').format(date);
+  }
+
+  // ── Build ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildAppBar(context),
-            _buildEventBanner(),
-            Expanded(
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                child: Column(
-                  children: [
-                    _buildPinnedSection(),
-                    _buildDateDivider('Today'),
-                    ..._messages.map(_buildChatMessage),
-                    const SizedBox(height: 12),
-                  ],
+    return BlocProvider.value(
+      value: _chatCubit,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F5F7),
+        body: SafeArea(
+          child: Column(
+            children: [
+              _buildAppBar(context),
+              _buildEventBanner(),
+              _buildPinnedSection(),
+
+              Expanded(
+                child: BlocConsumer<ChatCubit, ChatState>(
+                  listener: (context, state) {
+                    if (state is ChatError) {
+                      AppToast.error(state.message);
+                      return;
+                    }
+
+                    if (state is! ChatLoaded) return;
+
+                    if (state.isLoadingMore) return;
+
+                    if (_prevMaxScrollExtent != null) {
+                      final storedExtent = _prevMaxScrollExtent!;
+                      _prevMaxScrollExtent = null;
+
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (!_scrollController.hasClients) return;
+                        final diff =
+                            _scrollController.position.maxScrollExtent -
+                                storedExtent;
+                        if (diff > 0) {
+                          _scrollController.jumpTo(
+                            _scrollController.offset + diff,
+                          );
+                        }
+                      });
+                      return;
+                    }
+
+                    if (_isFirstLoad) {
+                      _jumpToBottom();
+                      if (!state.isSyncing) _isFirstLoad = false;
+                      return;
+                    }
+
+                    _scrollToBottom();
+                  },
+                  builder: (context, state) {
+                    if (state is ChatLoading || state is ChatInitial) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (state is ChatError) {
+                      return _buildErrorState(state.message);
+                    }
+
+                    final chatState = state as ChatLoaded;
+
+                    if (chatState.messages.isEmpty &&
+                        !chatState.isSyncing &&
+                        !chatState.isLoadingMore) {
+                      return _buildEmptyState();
+                    }
+
+                    return SingleChildScrollView(
+                      controller: _scrollController,
+                      child: Column(
+                        children: [
+                          if (chatState.isSyncing) _buildSyncingBanner(),
+                          if (chatState.isLoadingMore)
+                            Padding(
+                              padding: AppSize.padding(vertical: 10),
+                              child: const Center(
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ..._buildMessagesWithDividers(chatState.messages),
+                          SizedBox(height: AppSize.getHeight(12)),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
-            ),
-            _buildMessageInput(),
-          ],
+              _buildMessageInput(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // ── AppBar ───────────────────────────────────────────────────────────────────
+  // ── AppBar ───────────────────────────────────────────────────────────────
 
   Widget _buildAppBar(BuildContext context) {
     return Container(
@@ -269,7 +370,6 @@ class _ChatScreenState extends State<ChatScreen> {
             onTap: () => AppNavigator.pop(),
           ),
           SizedBox(width: AppSize.getWidth(10)),
-          // Avatar
           Container(
             width: AppSize.getWidth(40),
             height: AppSize.getHeight(40),
@@ -279,7 +379,11 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             alignment: Alignment.center,
             child: Text(
-              'B',
+              widget.event.name
+                  .trim()
+                  .isNotEmpty
+                  ? widget.event.name.trim()[0].toUpperCase()
+                  : '',
               style: TextStyle(
                 color: AppColors.white,
                 fontWeight: FontWeight.bold,
@@ -293,7 +397,7 @@ class _ChatScreenState extends State<ChatScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Beach Cleanup Drive',
+                  widget.event.name,
                   style: TextStyle(
                     fontSize: AppSize.font(16),
                     fontWeight: FontWeight.w600,
@@ -302,6 +406,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 SizedBox(height: AppSize.getHeight(1)),
                 Text(
+                  // TODO: يتربط بـ Ably presence count (channel.presence.get())
                   '6 online • 8 members',
                   style: TextStyle(
                     fontSize: AppSize.font(12),
@@ -314,9 +419,7 @@ class _ChatScreenState extends State<ChatScreen> {
           CustomIcon(
             icon: AppIcons.community,
             color: AppColors.grey600,
-            onTap: () {
-              MembersBottomSheet.show(context);
-            },
+            onTap: () => MembersBottomSheet.show(context),
           ),
           SizedBox(width: AppSize.getWidth(10)),
           CustomIcon(
@@ -329,64 +432,130 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // ── Event Banner ─────────────────────────────────────────────────────────────
+  // ── Event Banner ─────────────────────────────────────────────────────────
 
   Widget _buildEventBanner() {
     return Container(
       color: AppColors.white,
-      padding: AppSize.padding(horizontal: 16, vertical: 10),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            width: AppSize.getSize(36),
-            height: AppSize.getSize(36),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: CustomIcon(icon: AppIcons.sparkle, color: AppColors.primary),
-          ),
-          SizedBox(width: AppSize.getWidth(10)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: AppSize.padding(horizontal: 16, vertical: 10),
+            child: Row(
               children: [
-                Text(
-                  'Green Earth Foundation',
-                  style: TextStyle(
-                    fontSize: AppSize.font(13),
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.black,
+                Container(
+                  width: AppSize.getSize(36),
+                  height: AppSize.getSize(36),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: CustomIcon(
+                    icon: AppIcons.sparkle,
+                    color: AppColors.primary,
                   ),
                 ),
-                SizedBox(height: AppSize.getHeight(2)),
-                Text(
-                  'Dec 15, 2025 • 9:00 AM',
-                  style: TextStyle(
-                    fontSize: AppSize.font(11),
-                    color: AppColors.grey500,
+                SizedBox(width: AppSize.getWidth(10)),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.event.name,
+                        style: TextStyle(
+                          fontSize: AppSize.font(13),
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.black,
+                        ),
+                      ),
+                      SizedBox(height: AppSize.getHeight(2)),
+                      Text(
+                        DateFormat(
+                          'MMM d, yyyy • h:mm a',
+                          context.locale.languageCode,
+                        ).format(widget.event.date),
+                        style: TextStyle(
+                          fontSize: AppSize.font(11),
+                          color: AppColors.grey500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    // TODO: Navigate لصفحة تفاصيل الإيفينت (widget.eventId)
+                  },
+                  child: Container(
+                    padding: AppSize.padding(horizontal: 14, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      'volunteer.chat.view_event'.tr(),
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: AppSize.font(13),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          Container(
-            padding: AppSize.padding(horizontal: 14, vertical: 7),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
+          // _buildPinnedSection(),
+        ],
+      ),
+    );
+  }
+
+  // ── Error State ──────────────────────────────────────────────────────────
+
+  Widget _buildErrorState(String message) {
+    return Center(
+      child: Padding(
+        padding: AppSize.padding(all: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomIcon(
+              icon: AppIcons.info,
+              color: AppColors.grey500,
+              width: AppSize.getSize(40),
+              height: AppSize.getSize(40),
             ),
-            child: Text(
-              'View Event',
+            SizedBox(height: AppSize.getHeight(10)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
               style: TextStyle(
-                color: AppColors.primary,
                 fontSize: AppSize.font(13),
-                fontWeight: FontWeight.w600,
+                color: AppColors.grey500,
               ),
             ),
-          ),
-        ],
+            SizedBox(height: AppSize.getHeight(14)),
+            GestureDetector(
+              onTap: () => _chatCubit.initChat(),
+              child: Container(
+                padding: AppSize.padding(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  'volunteer.chat.retry'.tr(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -466,8 +635,6 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
           ),
-
-          // Expandable Content
           ClipRect(
             child: AnimatedSize(
               duration: const Duration(milliseconds: 300),
@@ -483,7 +650,6 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
           ),
-
           SizedBox(height: AppSize.getHeight(4)),
         ],
       ),
@@ -544,7 +710,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // ── Date Divider ─────────────────────────────────────────────────────────────
+  // ── Date Divider ─────────────────────────────────────────────────────────
 
   Widget _buildDateDivider(String label) {
     return Padding(
@@ -571,7 +737,29 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // ── Chat Message ─────────────────────────────────────────────────────────────
+  List<Widget> _buildMessagesWithDividers(List<ChatModel> messages) {
+    final widgets = <Widget>[];
+    DateTime? lastDate;
+
+    for (final msg in messages) {
+      final msgDate = DateTime(
+        msg.createdAt.year,
+        msg.createdAt.month,
+        msg.createdAt.day,
+      );
+
+      if (lastDate == null || msgDate != lastDate) {
+        widgets.add(_buildDateDivider(_dateDividerLabel(msg.createdAt)));
+        lastDate = msgDate;
+      }
+
+      widgets.add(_buildChatMessage(msg));
+    }
+
+    return widgets;
+  }
+
+  // ── Chat Message ─────────────────────────────────────────────────────────
 
   Widget _buildAvatar(ChatModel msg) {
     return Container(
@@ -609,16 +797,13 @@ class _ChatScreenState extends State<ChatScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isMe) _buildAvatar(msg),
-
           if (!isMe) SizedBox(width: AppSize.getWidth(10)),
-
           Flexible(
             child: Column(
               crossAxisAlignment: isMe
                   ? CrossAxisAlignment.end
                   : CrossAxisAlignment.start,
               children: [
-                // NAME + BADGE
                 Row(
                   mainAxisAlignment: isMe
                       ? MainAxisAlignment.end
@@ -633,12 +818,10 @@ class _ChatScreenState extends State<ChatScreen> {
                           color: AppColors.black,
                         ),
                       ),
-
                     if (!isMe && msg.badge != null) ...[
                       SizedBox(width: AppSize.getWidth(6)),
                       _buildBadge(msg),
                     ],
-
                     if (isMe) ...[
                       if (msg.badge != null) _buildBadge(msg),
                       SizedBox(width: AppSize.getWidth(6)),
@@ -653,10 +836,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     ],
                   ],
                 ),
-
                 SizedBox(height: AppSize.getHeight(5)),
-
-                // BUBBLE
                 GestureDetector(
                   onLongPressStart: (details) {
                     _showReactionPicker(context, details.globalPosition, msg);
@@ -686,8 +866,6 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                         ),
                       ),
-
-                      // REACTIONS
                       if (msg.reactionEmoji != null)
                         Padding(
                           padding: AppSize.padding(top: 6),
@@ -696,9 +874,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     ],
                   ),
                 ),
-
                 SizedBox(height: AppSize.getHeight(4)),
-
                 Text(
                   msg.time,
                   style: TextStyle(
@@ -709,9 +885,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ],
             ),
           ),
-
           if (isMe) SizedBox(width: AppSize.getWidth(10)),
-
           if (isMe) _buildAvatar(msg),
         ],
       ),
@@ -795,25 +969,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           SizedBox(width: AppSize.getWidth(10)),
           GestureDetector(
-            onTap: () {
-              final text = _messageController.text.trim();
-              if (text.isEmpty) return;
-
-              setState(() {
-                _messages.add(
-                  ChatModel(
-                    senderName: 'You',
-                    text: text,
-                    time: 'Now',
-                    avatarColor: AppColors.primary,
-                    avatarLetter: 'Y',
-                  ),
-                );
-              });
-
-              _messageController.clear();
-              _scrollToBottom();
-            },
+            onTap: _onSendPressed,
             child: Container(
               width: AppSize.getSize(42),
               height: AppSize.getSize(42),
@@ -822,6 +978,80 @@ class _ChatScreenState extends State<ChatScreen> {
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.send, color: Colors.white, size: 18),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: AppSize.padding(all: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: AppSize.getSize(70),
+              height: AppSize.getSize(70),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: CustomIcon(
+                icon: AppIcons.chat,
+                color: AppColors.primary,
+                width: AppSize.getSize(32),
+                height: AppSize.getSize(32),
+              ),
+            ),
+            SizedBox(height: AppSize.getHeight(14)),
+            Text(
+              'volunteer.chat.no_messages_title'.tr(),
+              style: TextStyle(
+                fontSize: AppSize.font(15),
+                fontWeight: FontWeight.w600,
+                color: AppColors.black,
+              ),
+            ),
+            SizedBox(height: AppSize.getHeight(6)),
+            Text(
+              'volunteer.chat.no_messages_subtitle'.tr(),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: AppSize.font(13),
+                color: AppColors.grey500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSyncingBanner() {
+    return Padding(
+      padding: AppSize.padding(vertical: 8, horizontal: 14),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 12,
+            height: 12,
+            child: CircularProgressIndicator(
+              strokeWidth: 1.5,
+              color: AppColors.grey500,
+            ),
+          ),
+          SizedBox(width: AppSize.getWidth(6)),
+          Text(
+            'volunteer.chat.syncing_messages'.tr(),
+            style: TextStyle(
+              fontSize: AppSize.font(11),
+              color: AppColors.grey500,
             ),
           ),
         ],

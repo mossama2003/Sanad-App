@@ -1,0 +1,43 @@
+{
+  "name": "ably_flutter",
+  "version": "1.2.44",
+  "summary": "Ably Cocoa platform support for our Flutter plugin.",
+  "homepage": "https://www.ably.com/",
+  "license": "Apache 2.0",
+  "authors": {
+    "Ably": "support@ably.com"
+  },
+  "source": {
+    "path": "."
+  },
+  "source_files": "Classes/**/*",
+  "public_header_files": "Classes/**/*.h",
+  "dependencies": {
+    "Flutter": [],
+    "Ably": [
+      "1.2.53"
+    ]
+  },
+  "platforms": {
+    "ios": "10.0"
+  },
+  "pod_target_xcconfig": {
+    "DEFINES_MODULE": "YES",
+    "GCC_PREPROCESSOR_DEFINITIONS": "FLUTTER_PACKAGE_PLUGIN_VERSION=\\@\\\"1.2.44\\\""
+  },
+  "resource_bundles": {
+    "ably_flutter": [
+      "Resources/PrivacyInfo.xcprivacy"
+    ]
+  },
+  "swift_versions": "5.0",
+  "testspecs": [
+    {
+      "name": "Tests",
+      "test_type": "unit",
+      "source_files": "Tests/**/*.{h,m}",
+      "frameworks": "XCTest"
+    }
+  ],
+  "swift_version": "5.0"
+}

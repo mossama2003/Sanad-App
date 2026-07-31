@@ -4,6 +4,21 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>Ably-Ably.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>Ably.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>AblyDeltaCodec.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>Flutter.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -39,6 +54,16 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>ably_flutter-ably_flutter.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>ably_flutter.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>flutter_image_compress_common.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -50,6 +75,11 @@
 			<false/>
 		</dict>
 		<key>libwebp.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>msgpack.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>

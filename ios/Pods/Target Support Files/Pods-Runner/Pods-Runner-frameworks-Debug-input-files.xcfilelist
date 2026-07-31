@@ -1,8 +1,12 @@
 ${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh
+${BUILT_PRODUCTS_DIR}/Ably/Ably.framework
+${BUILT_PRODUCTS_DIR}/AblyDeltaCodec/AblyDeltaCodec.framework
 ${BUILT_PRODUCTS_DIR}/Mantle/Mantle.framework
 ${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework
 ${BUILT_PRODUCTS_DIR}/SDWebImageWebPCoder/SDWebImageWebPCoder.framework
+${BUILT_PRODUCTS_DIR}/ably_flutter/ably_flutter.framework
 ${BUILT_PRODUCTS_DIR}/flutter_image_compress_common/flutter_image_compress_common.framework
 ${BUILT_PRODUCTS_DIR}/image_gallery_saver_plus/image_gallery_saver_plus.framework
 ${BUILT_PRODUCTS_DIR}/libwebp/libwebp.framework
+${BUILT_PRODUCTS_DIR}/msgpack/msgpack.framework
 ${BUILT_PRODUCTS_DIR}/open_file_ios/open_file_ios.framework

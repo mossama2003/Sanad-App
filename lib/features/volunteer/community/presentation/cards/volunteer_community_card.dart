@@ -1,12 +1,15 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
 
+import '../../../../../core/helper/app_helper.dart';
 import '../../../../../core/helper/app_number_formatter.dart';
+import '../../../../../core/network/local/cache/cache_helper.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../../shared/chat/data/models/chat_model.dart';
 import '../../../../shared/chat/presentation/screens/chat_screen.dart';
 import '../../../events/data/models/volunteer_event_details_model.dart';
 
@@ -17,7 +20,7 @@ class VolunteerCommunityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final latestMessage = event.latestMessage?.toString() ?? '';
+    final latestMessage = event.latestMessage?['message']?.toString() ?? '';
 
     final unread = event.unreadChatMessages;
 
@@ -30,7 +33,13 @@ class VolunteerCommunityCard extends StatelessWidget {
     final isEnded = status == 'completed';
 
     return GestureDetector(
-      onTap: () => AppNavigator.push(ChatScreen()),
+      onTap: () => AppNavigator.push(
+        ChatScreen(
+          eventId: event.id,
+          currentUserId: CacheHelper.get(CacheKeys.profileId),
+          event: event.toChatEvent(),
+        ),
+      ),
       child: Container(
         padding: AppSize.padding(all: 15),
         decoration: BoxDecoration(
@@ -89,7 +98,7 @@ class VolunteerCommunityCard extends StatelessWidget {
                           SizedBox(width: AppSize.getWidth(10)),
 
                           Text(
-                            DateFormat('hh:mm a').format(date),
+                            AppHelper.timeAgoShort(date),
                             style: TextStyle(
                               fontSize: AppSize.font(11),
                               color: AppColors.black.withValues(alpha: .55),
@@ -120,7 +129,8 @@ class VolunteerCommunityCard extends StatelessWidget {
                             ),
                           ),
 
-                          if (unread > 0)
+                          if (unread > 0) ...[
+                            SizedBox(width: AppSize.getWidth(5)),
                             Container(
                               constraints: BoxConstraints(
                                 minWidth: AppSize.getSize(20),
@@ -141,25 +151,8 @@ class VolunteerCommunityCard extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                            )
-                          else if (isEnded)
-                            Container(
-                              padding: AppSize.padding(
-                                horizontal: 10,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: AppColors.primary),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                'volunteer.community.ended'.tr(),
-                                style: TextStyle(
-                                  color: AppColors.primary,
-                                  fontSize: AppSize.font(12),
-                                ),
-                              ),
                             ),
+                          ],
                         ],
                       ),
 
@@ -219,7 +212,7 @@ class VolunteerCommunityCard extends StatelessWidget {
 
                       Text(
                         latestMessage.isEmpty
-                            ? 'No messages yet'
+                            ? 'volunteer.community.no_messages_yet'.tr()
                             : latestMessage,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

@@ -642,7 +642,17 @@
       "chat_access_remains": "Chat access remains for 3 days after the event ends.",
       "no_communities": "No communities yet",
       "join_event_to_access_chat": "Join volunteer events to access community chats and connect with other volunteers.",
-      "browse_events": "Browse Events"
+      "browse_events": "Browse Events",
+      "no_messages_yet": "No messages yet"
+    },
+    "chat": {
+      "no_messages_title": "No messages yet",
+      "no_messages_subtitle": "Start the conversation and be the first to say hi",
+      "syncing_messages": "Syncing messages...",
+      "retry": "Retry",
+      "view_event": "View Event",
+      "today": "Today",
+      "yesterday": "Yesterday"
     },
     "emergency": {
       "title": "Emergency Events",

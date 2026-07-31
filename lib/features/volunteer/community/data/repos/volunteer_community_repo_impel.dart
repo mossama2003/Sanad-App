@@ -5,12 +5,14 @@ class VolunteerCommunityRepoImpel implements VolunteerCommunityRepo {
   Future<Either<Failure, List<VolunteerEventDetailsModel>>> getCommunities({
     required int volunteerId,
     String search = '',
+    String ordering = '-date',
   }) async {
     try {
       final response = await DioHelper.get(
         url: VOLUNTEER_COMMUNITIES,
         query: {
           'joiners': volunteerId,
+          'ordering': '-date',
           if (search.trim().isNotEmpty) 'search': search.trim(),
         },
       );

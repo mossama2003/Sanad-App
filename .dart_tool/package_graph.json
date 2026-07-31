@@ -7,6 +7,7 @@
       "name": "sanad_app",
       "version": "1.0.0+1",
       "dependencies": [
+        "ably_flutter",
         "carousel_slider",
         "connectivity_plus",
         "cookie_jar",
@@ -48,6 +49,7 @@
         "share_plus",
         "shared_preferences",
         "smooth_page_indicator",
+        "timeago",
         "top_snackbar_flutter",
         "url_launcher"
       ],
@@ -149,6 +151,22 @@
       "version": "2.2.3",
       "dependencies": [
         "crypto",
+        "meta"
+      ]
+    },
+    {
+      "name": "timeago",
+      "version": "3.7.1",
+      "dependencies": [
+        "intl"
+      ]
+    },
+    {
+      "name": "ably_flutter",
+      "version": "1.2.44",
+      "dependencies": [
+        "collection",
+        "flutter",
         "meta"
       ]
     },

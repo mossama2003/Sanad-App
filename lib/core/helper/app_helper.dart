@@ -86,4 +86,48 @@ class AppHelper {
     String formattedTime = DateFormat(format, lang).format(parsedTime);
     return formattedTime;
   }
+
+  static String timeAgoShort(DateTime date) {
+    final diff = DateTime.now().difference(date);
+
+    // Future date
+    if (diff.isNegative) {
+      final future = date.difference(DateTime.now());
+
+      if (future.inMinutes < 60) {
+        return '${future.inMinutes} m';
+      }
+
+      if (future.inHours < 24) {
+        return '${future.inHours} H';
+      }
+
+      if (future.inDays < 365) {
+        return '${future.inDays} D';
+      }
+
+      final years = (future.inDays / 365).floor();
+      return '$years year${years > 1 ? 's' : ''}';
+    }
+
+    // Past date
+    if (diff.inMinutes < 1) {
+      return 'now';
+    }
+
+    if (diff.inMinutes < 60) {
+      return '${diff.inMinutes} m';
+    }
+
+    if (diff.inHours < 24) {
+      return '${diff.inHours} H';
+    }
+
+    if (diff.inDays < 365) {
+      return '${diff.inDays} D';
+    }
+
+    final years = (diff.inDays / 365).floor();
+    return '$years year${years > 1 ? 's' : ''}';
+  }
 }

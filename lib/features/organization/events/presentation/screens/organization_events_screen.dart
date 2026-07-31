@@ -1,3 +1,4 @@
+import 'package:sanad_app/core/network/local/cache/cache_helper.dart';
 import 'package:sanad_app/core/shared/widgets/custom_search_field.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
@@ -7,6 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
+import '../../../../shared/chat/data/models/chat_model.dart';
+import '../../../../shared/chat/presentation/screens/chat_screen.dart';
 import '../../data/models/organization_event_details_model.dart';
 import '../controllers/organization_events_cubit.dart';
 import '../dialogs/organization_publish_dialog.dart';
@@ -323,6 +326,15 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
                           padding: AppSize.padding(bottom: 15),
                           child: OrganizationEventsCard(
                             event: event,
+                            onChatTap: () => AppNavigator.push(
+                              ChatScreen(
+                                eventId: event.id,
+                                currentUserId: CacheHelper.get(
+                                  CacheKeys.profileId,
+                                ),
+                                event: event.toChatEvent(),
+                              ),
+                            ),
                             onQrTap: () => AppNavigator.push(
                               OrganizationQrCodeScreen(event: event),
                             ),

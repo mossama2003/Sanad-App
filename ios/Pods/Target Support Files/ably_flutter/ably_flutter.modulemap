@@ -1,0 +1,6 @@
+framework module ably_flutter {
+  umbrella header "ably_flutter-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -27,6 +27,15 @@ String GET_EVENTS = 'v1/events/read_event/';
 
 String EVENT_QR(int ID) => 'v1/events/read_event/$ID/';
 
+/// Chat
+String GET_CHAT_TOKEN(int eventId) =>
+    'v1/events/read_event/$eventId/chat_token/';
+
+String GET_CHAT_HISTORY = 'v1/events/event_chat/';
+
+String EVENT_MEMBER_BATCH_UPDATE(int eventId) =>
+    'v1/events/event_member_batch_update/$eventId/';
+
 /// Volunteering Endpoints
 String JOIN_EVENT = 'v1/events/join/';
 

@@ -59,6 +59,8 @@ dependencies:
   image_gallery_saver_plus: ^4.0.1
   mobile_scanner: ^7.4.0
   geolocator: ^14.0.3
+  ably_flutter: ^1.2.44
+  timeago: ^3.7.1
 
   #Caching
   hive: ^2.2.3

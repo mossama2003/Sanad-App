@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 
 import '../../../features/organization/events/data/models/organization_event_details_model.dart';
 import '../../../features/organization/home/data/models/organization_home_model.dart';
+import '../../../features/shared/chat/data/models/chat_model.dart';
 import '../../../features/volunteer/community/data/model/volunteer_communities_cache.dart';
 import '../../../features/volunteer/events/data/models/volunteer_event_details_model.dart';
 import '../../../features/volunteer/home/data/models/volunteer_home_model.dart';
@@ -18,6 +19,8 @@ class HiveBoxes {
   static const String organizationHome = 'organization_home_box';
 
   static const String cacheInfo = 'cache_info_box';
+
+  static String eventChatBox(int eventId) => 'chat_messages_${eventId}_box';
 
   static Future<void> init() async {
     await Hive.openBox<OrganizationEventDetailsModel>(organizationEvents);
@@ -49,4 +52,8 @@ class HiveBoxes {
       Hive.box<OrganizationHomeModel>(organizationHome);
 
   static Box get cacheInfoBox => Hive.box(cacheInfo);
+
+  static Future<Box<EventChatDetailModel>> openEventChatBox(int eventId) {
+    return Hive.openBox<EventChatDetailModel>(eventChatBox(eventId));
+  }
 }

@@ -14,6 +14,12 @@
       "languageVersion": "3.6"
     },
     {
+      "name": "ably_flutter",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/ably_flutter-1.2.44",
+      "packageUri": "lib/",
+      "languageVersion": "2.14"
+    },
+    {
       "name": "analyzer",
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/analyzer-6.4.1",
       "packageUri": "lib/",
@@ -1314,6 +1320,12 @@
       "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/test_api-0.7.11",
       "packageUri": "lib/",
       "languageVersion": "3.7"
+    },
+    {
+      "name": "timeago",
+      "rootUri": "file:///Users/mohamed/.pub-cache/hosted/pub.dev/timeago-3.7.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "timing",

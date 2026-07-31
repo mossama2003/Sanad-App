@@ -1,4 +1,15 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
+
+import '../../../../../core/constant/app_assets.dart';
+import '../../../../../core/style/app_colors.dart';
+import '../../../../organization/events/data/models/organization_event_details_model.dart';
+import '../../../../volunteer/events/data/models/volunteer_event_details_model.dart';
+import '../enums/member_role_enum.dart';
+
+import 'package:hive/hive.dart';
+
+part 'chat_model.g.dart';
 
 class ChatModel {
   final String senderName;
@@ -7,6 +18,7 @@ class ChatModel {
   final String? badgeIcon;
   final String text;
   final String time;
+  final DateTime createdAt;
   final Color avatarColor;
   final String avatarLetter;
   String? reactionEmoji;
@@ -19,11 +31,189 @@ class ChatModel {
     this.badgeIcon,
     required this.text,
     required this.time,
+    required this.createdAt,
     required this.avatarColor,
     required this.avatarLetter,
     this.reactionEmoji,
     this.reactionCount = 0,
   });
+}
+
+class ChatEventModel {
+  final int id;
+  final String name;
+  final DateTime date;
+  final String? cover;
+  final String status;
+
+  const ChatEventModel({
+    required this.id,
+    required this.name,
+    required this.date,
+    this.cover,
+    required this.status,
+  });
+}
+
+class ChatTokenModel {
+  final String keyName;
+  final String clientId;
+  final int timestamp;
+  final String nonce;
+  final String mac;
+  final int ttl;
+  final String capability;
+
+  ChatTokenModel({
+    required this.keyName,
+    required this.clientId,
+    required this.timestamp,
+    required this.nonce,
+    required this.mac,
+    required this.ttl,
+    required this.capability,
+  });
+
+  factory ChatTokenModel.fromJson(Map<String, dynamic> json) {
+    return ChatTokenModel(
+      keyName: json['keyName'] ?? '',
+      clientId: json['clientId'] ?? '',
+      timestamp: json['timestamp'] ?? 0,
+      nonce: json['nonce'] ?? '',
+      mac: json['mac'] ?? '',
+      ttl: json['ttl'] ?? 0,
+      capability: json['capability'] ?? '',
+    );
+  }
+}
+
+@HiveType(typeId: 6)
+class EventChatCreatorModel {
+  @HiveField(0)
+  final int id;
+  @HiveField(1)
+  final String name;
+  @HiveField(2)
+  final String? avatar;
+
+  EventChatCreatorModel({required this.id, required this.name, this.avatar});
+
+  factory EventChatCreatorModel.fromJson(Map<String, dynamic> json) {
+    return EventChatCreatorModel(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? json['full_name'] ?? '',
+      avatar: json['avatar'] ?? json['image'],
+    );
+  }
+}
+
+@HiveType(typeId: 7)
+class EventChatDetailModel extends HiveObject {
+  @HiveField(0)
+  final int id;
+  @HiveField(1)
+  final EventChatCreatorModel creator;
+  @HiveField(2)
+  final String role; // "admin" | "organizer" | "volunteer"
+  @HiveField(3)
+  final DateTime created;
+  @HiveField(4)
+  final DateTime modified;
+  @HiveField(5)
+  final String message;
+
+  EventChatDetailModel({
+    required this.id,
+    required this.creator,
+    required this.role,
+    required this.created,
+    required this.modified,
+    required this.message,
+  });
+
+  factory EventChatDetailModel.fromJson(Map<String, dynamic> json) {
+    return EventChatDetailModel(
+      id: json['id'] ?? 0,
+      creator: EventChatCreatorModel.fromJson(json['creator'] ?? {}),
+      role: (json['role'] ?? '').toString(),
+      created: DateTime.tryParse(json['created'] ?? '') ?? DateTime.now(),
+      modified: DateTime.tryParse(json['modified'] ?? '') ?? DateTime.now(),
+      message: json['message'] ?? '',
+    );
+  }
+
+  MemberRoleEnum get roleEnum {
+    switch (role.toLowerCase()) {
+      case 'admin':
+        return MemberRoleEnum.admin;
+      case 'organizer':
+        return MemberRoleEnum.organizer;
+      default:
+        return MemberRoleEnum.volunteer;
+    }
+  }
+
+  ChatModel toUiModel({required int currentUserId}) {
+    final isMe = creator.id == currentUserId;
+
+    return ChatModel(
+      senderName: isMe ? 'You' : creator.name,
+      badge: roleEnum == MemberRoleEnum.admin
+          ? 'Sanad Admin'
+          : roleEnum == MemberRoleEnum.organizer
+          ? 'Organizer'
+          : null,
+      badgeColor: roleEnum == MemberRoleEnum.admin
+          ? AppColors.primary
+          : roleEnum == MemberRoleEnum.organizer
+          ? AppColors.bronze
+          : null,
+      badgeIcon: roleEnum == MemberRoleEnum.admin
+          ? AppIcons.check
+          : roleEnum == MemberRoleEnum.organizer
+          ? AppIcons.crown
+          : null,
+      text: message,
+      time: DateFormat('h:mm a').format(created.toLocal()),
+      createdAt: created.toLocal(),
+      avatarColor: _avatarColorFor(creator.id),
+      avatarLetter: creator.name.isNotEmpty
+          ? creator.name[0].toUpperCase()
+          : '?',
+    );
+  }
+
+  Color _avatarColorFor(int id) {
+    const colors = [AppColors.primary, AppColors.bronze, AppColors.laserBlue];
+    return colors[id % colors.length];
+  }
+}
+
+class PaginatedEventChatModel {
+  final int count;
+  final String? next;
+  final String? previous;
+  final List<EventChatDetailModel> results;
+
+  PaginatedEventChatModel({
+    required this.count,
+    this.next,
+    this.previous,
+    required this.results,
+  });
+
+  factory PaginatedEventChatModel.fromJson(Map<String, dynamic> json) {
+    return PaginatedEventChatModel(
+      count: json['count'] ?? 0,
+      next: json['next'],
+      previous: json['previous'],
+      results: (json['results'] as List<dynamic>? ?? [])
+          .map((e) => EventChatDetailModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  bool get hasMore => next != null;
 }
 
 class PinnedMessage {
@@ -38,4 +228,28 @@ class PinnedMessage {
     required this.icon,
     required this.color,
   });
+}
+
+extension VolunteerEventChatMapper on VolunteerEventDetailsModel {
+  ChatEventModel toChatEvent() {
+    return ChatEventModel(
+      id: id,
+      name: name,
+      date: date,
+      cover: cover,
+      status: status,
+    );
+  }
+}
+
+extension OrganizationEventChatMapper on OrganizationEventDetailsModel {
+  ChatEventModel toChatEvent() {
+    return ChatEventModel(
+      id: id,
+      name: name,
+      date: date,
+      cover: cover,
+      status: status,
+    );
+  }
 }

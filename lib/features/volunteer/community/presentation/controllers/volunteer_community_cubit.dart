@@ -30,6 +30,7 @@ class VolunteerCommunityCubit extends Cubit<VolunteerCommunityState> {
   Future<void> getCommunities({
     required int volunteerId,
     String search = '',
+    String ordering = '-date',
     bool forceRefresh = false,
   }) async {
     /// ================= LOAD CACHE =================
@@ -49,6 +50,7 @@ class VolunteerCommunityCubit extends Cubit<VolunteerCommunityState> {
     final result = await repo.getCommunities(
       volunteerId: volunteerId,
       search: search,
+      ordering: ordering,
     );
 
     result.fold(

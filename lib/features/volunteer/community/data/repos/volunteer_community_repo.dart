@@ -11,5 +11,6 @@ abstract class VolunteerCommunityRepo {
   Future<Either<Failure, List<VolunteerEventDetailsModel>>> getCommunities({
     required int volunteerId,
     String search = '',
+    String ordering = '-date',
   });
 }
