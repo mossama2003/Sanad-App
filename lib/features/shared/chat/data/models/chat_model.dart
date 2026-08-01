@@ -11,10 +11,15 @@ import 'package:hive/hive.dart';
 
 part 'chat_model.g.dart';
 
+enum ChatMessageStatus { sending, sent, failed }
+
 class ChatModel {
+  final int? id;
+  final String? localId;
   final String senderName;
   final String? badge;
   final Color? badgeColor;
+  final Color? badgeTextColor;
   final String? badgeIcon;
   final String text;
   final String time;
@@ -23,11 +28,15 @@ class ChatModel {
   final String avatarLetter;
   String? reactionEmoji;
   int reactionCount;
+  final ChatMessageStatus status;
 
   ChatModel({
+    this.id,
+    this.localId,
     required this.senderName,
     this.badge,
     this.badgeColor,
+    this.badgeTextColor,
     this.badgeIcon,
     required this.text,
     required this.time,
@@ -36,7 +45,28 @@ class ChatModel {
     required this.avatarLetter,
     this.reactionEmoji,
     this.reactionCount = 0,
+    this.status = ChatMessageStatus.sent,
   });
+
+  ChatModel copyWith({int? id, ChatMessageStatus? status}) {
+    return ChatModel(
+      id: id ?? this.id,
+      localId: localId,
+      senderName: senderName,
+      badge: badge,
+      badgeColor: badgeColor,
+      badgeTextColor: badgeTextColor,
+      badgeIcon: badgeIcon,
+      text: text,
+      time: time,
+      createdAt: createdAt,
+      avatarColor: avatarColor,
+      avatarLetter: avatarLetter,
+      reactionEmoji: reactionEmoji,
+      reactionCount: reactionCount,
+      status: status ?? this.status,
+    );
+  }
 }
 
 class ChatEventModel {
@@ -87,22 +117,59 @@ class ChatTokenModel {
   }
 }
 
+class SendChatMessageModel {
+  final int id;
+  final int event;
+  final DateTime created;
+  final DateTime modified;
+  final String message;
+
+  SendChatMessageModel({
+    required this.id,
+    required this.event,
+    required this.created,
+    required this.modified,
+    required this.message,
+  });
+
+  factory SendChatMessageModel.fromJson(Map<String, dynamic> json) {
+    return SendChatMessageModel(
+      id: json['id'] ?? 0,
+      event: json['event'] ?? 0,
+      created: DateTime.tryParse(json['created'] ?? '') ?? DateTime.now(),
+      modified: DateTime.tryParse(json['modified'] ?? '') ?? DateTime.now(),
+      message: json['message'] ?? '',
+    );
+  }
+}
+
 @HiveType(typeId: 6)
 class EventChatCreatorModel {
   @HiveField(0)
   final int id;
+
   @HiveField(1)
   final String name;
+
   @HiveField(2)
   final String? avatar;
 
-  EventChatCreatorModel({required this.id, required this.name, this.avatar});
+  @HiveField(3)
+  final String role;
+
+  EventChatCreatorModel({
+    required this.id,
+    required this.name,
+    this.avatar,
+    required this.role,
+  });
 
   factory EventChatCreatorModel.fromJson(Map<String, dynamic> json) {
     return EventChatCreatorModel(
       id: json['id'] ?? 0,
       name: json['name'] ?? json['full_name'] ?? '',
       avatar: json['avatar'] ?? json['image'],
+      role: (json['role'] ?? '').toString(),
     );
   }
 }
@@ -143,11 +210,14 @@ class EventChatDetailModel extends HiveObject {
   }
 
   MemberRoleEnum get roleEnum {
-    switch (role.toLowerCase()) {
+    switch (creator.role.trim().toLowerCase()) {
       case 'admin':
         return MemberRoleEnum.admin;
+
+      case 'organization':
       case 'organizer':
         return MemberRoleEnum.organizer;
+
       default:
         return MemberRoleEnum.volunteer;
     }
@@ -157,17 +227,26 @@ class EventChatDetailModel extends HiveObject {
     final isMe = creator.id == currentUserId;
 
     return ChatModel(
+      id: id,
       senderName: isMe ? 'You' : creator.name,
       badge: roleEnum == MemberRoleEnum.admin
           ? 'Sanad Admin'
           : roleEnum == MemberRoleEnum.organizer
           ? 'Organizer'
           : null,
+
       badgeColor: roleEnum == MemberRoleEnum.admin
           ? AppColors.primary
           : roleEnum == MemberRoleEnum.organizer
-          ? AppColors.bronze
+          ? AppColors.secondary400.withValues(alpha: 0.1)
           : null,
+
+      badgeTextColor: roleEnum == MemberRoleEnum.admin
+          ? AppColors.white
+          : roleEnum == MemberRoleEnum.organizer
+          ? AppColors.secondary400
+          : null,
+
       badgeIcon: roleEnum == MemberRoleEnum.admin
           ? AppIcons.check
           : roleEnum == MemberRoleEnum.organizer
@@ -180,6 +259,7 @@ class EventChatDetailModel extends HiveObject {
       avatarLetter: creator.name.isNotEmpty
           ? creator.name[0].toUpperCase()
           : '?',
+      status: ChatMessageStatus.sent,
     );
   }
 

@@ -20,40 +20,73 @@ class HiveBoxes {
 
   static const String cacheInfo = 'cache_info_box';
 
-  static String eventChatBox(int eventId) => 'chat_messages_${eventId}_box';
+
+  // ================= EVENT CHAT =================
+
+  static String eventChatBox(int eventId) =>
+      'chat_messages_${eventId}_box';
+
+
+  // نخزن الـ IDs اللي اتفتح لها Chat Box
+  static final Set<int> openedChatEventIds = {};
+
 
   static Future<void> init() async {
-    await Hive.openBox<OrganizationEventDetailsModel>(organizationEvents);
+    await Hive.openBox<OrganizationEventDetailsModel>(
+      organizationEvents,
+    );
 
-    await Hive.openBox<VolunteerEventDetailsModel>(volunteerEvents);
+    await Hive.openBox<VolunteerEventDetailsModel>(
+      volunteerEvents,
+    );
 
-    await Hive.openBox<VolunteerCommunitiesCache>(volunteerCommunities);
+    await Hive.openBox<VolunteerCommunitiesCache>(
+      volunteerCommunities,
+    );
 
-    await Hive.openBox<VolunteerHomeModel>(volunteerHome);
+    await Hive.openBox<VolunteerHomeModel>(
+      volunteerHome,
+    );
 
-    await Hive.openBox<OrganizationHomeModel>(organizationHome);
+    await Hive.openBox<OrganizationHomeModel>(
+      organizationHome,
+    );
 
     await Hive.openBox(cacheInfo);
   }
 
+
   static Box<OrganizationEventDetailsModel> get organizationEventsBox =>
       Hive.box<OrganizationEventDetailsModel>(organizationEvents);
+
 
   static Box<VolunteerEventDetailsModel> get volunteerEventsBox =>
       Hive.box<VolunteerEventDetailsModel>(volunteerEvents);
 
+
   static Box<VolunteerCommunitiesCache> get volunteerCommunitiesBox =>
       Hive.box<VolunteerCommunitiesCache>(volunteerCommunities);
+
 
   static Box<VolunteerHomeModel> get volunteerHomeBox =>
       Hive.box<VolunteerHomeModel>(volunteerHome);
 
+
   static Box<OrganizationHomeModel> get organizationHomeBox =>
       Hive.box<OrganizationHomeModel>(organizationHome);
 
-  static Box get cacheInfoBox => Hive.box(cacheInfo);
 
-  static Future<Box<EventChatDetailModel>> openEventChatBox(int eventId) {
-    return Hive.openBox<EventChatDetailModel>(eventChatBox(eventId));
+  static Box get cacheInfoBox =>
+      Hive.box(cacheInfo);
+
+
+  static Future<Box<EventChatDetailModel>> openEventChatBox(
+      int eventId,
+      ) async {
+    openedChatEventIds.add(eventId);
+
+    return Hive.openBox<EventChatDetailModel>(
+      eventChatBox(eventId),
+    );
   }
 }

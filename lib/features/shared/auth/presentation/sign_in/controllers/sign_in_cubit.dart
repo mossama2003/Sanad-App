@@ -84,6 +84,10 @@ class SignInCubit extends Cubit<SignInState> {
           await CacheHelper.save(CacheKeys.profileId, user.profile!.id!);
         }
 
+        if (user.id != null) {
+          await CacheHelper.save(CacheKeys.userId, user.id!);
+        }
+
         emit(Success());
 
         AppToast.success('shared.sign_in.account_signed_in'.tr());

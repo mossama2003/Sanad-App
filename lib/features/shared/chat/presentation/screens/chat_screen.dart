@@ -34,35 +34,36 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _pinnedExpanded = false;
   bool _isFirstLoad = true;
   double? _prevMaxScrollExtent;
+  bool _showScrollToBottom = false;
+  bool _isLoadingMore = false;
 
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
   static final List<PinnedMessage> _pinned = [
     PinnedMessage(
-      title: 'Welcome to Beach Cleanup Drive 👋',
-      body:
-      "So glad you're here! This community brings together everyone joining Beach Cleanup Drive. Say hi, ask questions, and let's make this event amazing together.",
-      icon: AppIcons.donations,
+      title: "shared.chat.pinned.welcome_title".tr(),
+      body: "shared.chat.pinned.welcome_body".tr(),
+      icon: AppIcons.community,
       color: AppColors.primary,
     ),
+
     PinnedMessage(
-      title: 'Quick Guidance',
-      body:
-      'Arrive 15 minutes early • Bring your ID for QR check-in • Wear comfortable clothes • Coordinate carpooling here if you can.',
+      title: "shared.chat.pinned.guidelines_title".tr(),
+      body: "shared.chat.pinned.guidelines_body".tr(),
       icon: AppIcons.info,
       color: AppColors.laserBlue,
     ),
+
     PinnedMessage(
-      title: 'Community Notes',
-      body:
-      'Be kind & respectful • No spam or promotions • Use channels to coordinate not chat • Admins are always around if you need help.',
+      title: "shared.chat.pinned.help_title".tr(),
+      body: "shared.chat.pinned.help_body".tr(),
       icon: AppIcons.sparkle,
       color: AppColors.bronze,
     ),
   ];
 
-  final List<String> _reactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
+  // final List<String> _reactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
 
   late final ChatCubit _chatCubit;
 
@@ -74,8 +75,7 @@ class _ChatScreenState extends State<ChatScreen> {
       chatRepo: ChatRepoImpel(),
       eventId: widget.eventId,
       currentUserId: widget.currentUserId,
-    )
-      ..initChat();
+    )..initChat();
 
     _scrollController.addListener(_onScroll);
   }
@@ -91,124 +91,141 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _onScroll() {
     if (!_scrollController.hasClients) return;
-    if (_scrollController.position.pixels <=
-        _scrollController.position.minScrollExtent + 80) {
-      _prevMaxScrollExtent = _scrollController.position.maxScrollExtent;
-      _chatCubit.loadMoreHistory();
+
+    final position = _scrollController.position;
+
+    if (position.pixels <= position.minScrollExtent + 80) {
+      if (!_isLoadingMore) {
+        _isLoadingMore = true;
+
+        _prevMaxScrollExtent = position.maxScrollExtent;
+
+        _chatCubit.loadMoreHistory();
+      }
+    }
+
+    final shouldShow = position.maxScrollExtent - position.pixels > 300;
+
+    if (shouldShow != _showScrollToBottom) {
+      setState(() {
+        _showScrollToBottom = shouldShow;
+      });
     }
   }
 
-  void _showReactionPicker(BuildContext context,
-      Offset position,
-      ChatModel msg,) {
-    final overlay = Overlay.of(context);
-
-    late OverlayEntry entry;
-
-    entry = OverlayEntry(
-      builder: (_) {
-        return Positioned.fill(
-          child: Material(
-            color: Colors.transparent,
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () {
-                      if (entry.mounted) entry.remove();
-                    },
-                    child: Container(color: Colors.transparent),
-                  ),
-                ),
-                Positioned(
-                  left: position.dx - 100,
-                  top: position.dy - 65,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: TweenAnimationBuilder(
-                      duration: const Duration(milliseconds: 160),
-                      tween: Tween(begin: .9, end: 1.0),
-                      builder: (context, scale, child) {
-                        return Transform.scale(scale: scale, child: child);
-                      },
-                      child: Container(
-                        padding: AppSize.padding(horizontal: 6, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(32),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: .10),
-                              blurRadius: 18,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: _reactions.map((emoji) {
-                            final selected = msg.reactionEmoji == emoji;
-
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (selected) {
-                                    msg.reactionEmoji = null;
-                                    msg.reactionCount = 0;
-                                  } else {
-                                    msg.reactionEmoji = emoji;
-                                    msg.reactionCount = 1;
-                                  }
-                                });
-                                if (entry.mounted) entry.remove();
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 150),
-                                margin: AppSize.margin(horizontal: 1),
-                                padding: AppSize.padding(all: 5),
-                                decoration: BoxDecoration(
-                                  color: selected
-                                      ? Colors.grey.withValues(alpha: .16)
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                                child: AnimatedScale(
-                                  duration: const Duration(milliseconds: 150),
-                                  scale: selected ? 1.12 : 1,
-                                  child: Text(
-                                    emoji,
-                                    style: TextStyle(
-                                      fontSize: AppSize.font(22),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-
-    overlay.insert(entry);
-    Future.delayed(const Duration(seconds: 5), () {
-      if (entry.mounted) entry.remove();
-    });
-  }
+  // void _showReactionPicker(
+  //   BuildContext context,
+  //   Offset position,
+  //   ChatModel msg,
+  // ) {
+  //   final overlay = Overlay.of(context);
+  //
+  //   late OverlayEntry entry;
+  //
+  //   entry = OverlayEntry(
+  //     builder: (_) {
+  //       return Positioned.fill(
+  //         child: Material(
+  //           color: Colors.transparent,
+  //           child: Stack(
+  //             children: [
+  //               Positioned.fill(
+  //                 child: GestureDetector(
+  //                   behavior: HitTestBehavior.translucent,
+  //                   onTap: () {
+  //                     if (entry.mounted) entry.remove();
+  //                   },
+  //                   child: Container(color: Colors.transparent),
+  //                 ),
+  //               ),
+  //               Positioned(
+  //                 left: position.dx - 100,
+  //                 top: position.dy - 65,
+  //                 child: Material(
+  //                   color: Colors.transparent,
+  //                   child: TweenAnimationBuilder(
+  //                     duration: const Duration(milliseconds: 160),
+  //                     tween: Tween(begin: .9, end: 1.0),
+  //                     builder: (context, scale, child) {
+  //                       return Transform.scale(scale: scale, child: child);
+  //                     },
+  //                     child: Container(
+  //                       padding: AppSize.padding(horizontal: 6, vertical: 5),
+  //                       decoration: BoxDecoration(
+  //                         color: Colors.white,
+  //                         borderRadius: BorderRadius.circular(32),
+  //                         boxShadow: [
+  //                           BoxShadow(
+  //                             color: Colors.black.withValues(alpha: .10),
+  //                             blurRadius: 18,
+  //                             offset: const Offset(0, 3),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                       child: Row(
+  //                         mainAxisSize: MainAxisSize.min,
+  //                         children: _reactions.map((emoji) {
+  //                           final selected = msg.reactionEmoji == emoji;
+  //
+  //                           return GestureDetector(
+  //                             onTap: () {
+  //                               setState(() {
+  //                                 if (selected) {
+  //                                   msg.reactionEmoji = null;
+  //                                   msg.reactionCount = 0;
+  //                                 } else {
+  //                                   msg.reactionEmoji = emoji;
+  //                                   msg.reactionCount = 1;
+  //                                 }
+  //                               });
+  //                               if (entry.mounted) entry.remove();
+  //                             },
+  //                             child: AnimatedContainer(
+  //                               duration: const Duration(milliseconds: 150),
+  //                               margin: AppSize.margin(horizontal: 1),
+  //                               padding: AppSize.padding(all: 5),
+  //                               decoration: BoxDecoration(
+  //                                 color: selected
+  //                                     ? Colors.grey.withValues(alpha: .16)
+  //                                     : Colors.transparent,
+  //                                 borderRadius: BorderRadius.circular(100),
+  //                               ),
+  //                               child: AnimatedScale(
+  //                                 duration: const Duration(milliseconds: 150),
+  //                                 scale: selected ? 1.12 : 1,
+  //                                 child: Text(
+  //                                   emoji,
+  //                                   style: TextStyle(
+  //                                     fontSize: AppSize.font(22),
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                             ),
+  //                           );
+  //                         }).toList(),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  //
+  //   overlay.insert(entry);
+  //   Future.delayed(const Duration(seconds: 5), () {
+  //     if (entry.mounted) entry.remove();
+  //   });
+  // }
 
   void _jumpToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-      }
+      if (!_scrollController.hasClients) return;
+
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
   }
 
@@ -222,6 +239,37 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       }
     });
+  }
+
+  Widget _buildScrollToBottomButton() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: !_showScrollToBottom
+          ? const SizedBox.shrink()
+          : GestureDetector(
+              onTap: _jumpToBottom,
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: .15),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+            ),
+    );
   }
 
   void _onSendPressed() {
@@ -238,12 +286,10 @@ class _ChatScreenState extends State<ChatScreen> {
     final today = DateTime(now.year, now.month, now.day);
     final target = DateTime(date.year, date.month, date.day);
 
-    final diff = today
-        .difference(target)
-        .inDays;
+    final diff = today.difference(target).inDays;
 
-    if (diff == 0) return 'volunteer.chat.today'.tr();
-    if (diff == 1) return 'volunteer.chat.yesterday'.tr();
+    if (diff == 0) return 'shared.chat.today'.tr();
+    if (diff == 1) return 'shared.chat.yesterday'.tr();
 
     if (diff < 7) {
       return DateFormat('EEEE').format(date);
@@ -268,84 +314,120 @@ class _ChatScreenState extends State<ChatScreen> {
               _buildPinnedSection(),
 
               Expanded(
-                child: BlocConsumer<ChatCubit, ChatState>(
-                  listener: (context, state) {
-                    if (state is ChatError) {
-                      AppToast.error(state.message);
-                      return;
-                    }
+                child: Stack(
+                  children: [
+                    BlocConsumer<ChatCubit, ChatState>(
+                      listener: (context, state) {
+                        if (state is ChatError) {
+                          AppToast.error(state.message);
+                          return;
+                        }
 
-                    if (state is! ChatLoaded) return;
+                        if (state is! ChatLoaded) return;
 
-                    if (state.isLoadingMore) return;
+                        // ==========================
+                        // تحميل رسائل قديمة فوق
+                        // ==========================
+                        if (_prevMaxScrollExtent != null &&
+                            !state.isLoadingMore) {
+                          final oldExtent = _prevMaxScrollExtent!;
+                          _prevMaxScrollExtent = null;
+                          _isLoadingMore = false;
 
-                    if (_prevMaxScrollExtent != null) {
-                      final storedExtent = _prevMaxScrollExtent!;
-                      _prevMaxScrollExtent = null;
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (!_scrollController.hasClients) return;
 
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (!_scrollController.hasClients) return;
-                        final diff =
-                            _scrollController.position.maxScrollExtent -
-                                storedExtent;
-                        if (diff > 0) {
-                          _scrollController.jumpTo(
-                            _scrollController.offset + diff,
+                            final newExtent =
+                                _scrollController.position.maxScrollExtent;
+
+                            final diff = newExtent - oldExtent;
+
+                            if (diff > 0) {
+                              _scrollController.jumpTo(
+                                _scrollController.offset + diff,
+                              );
+                            }
+                          });
+
+                          return;
+                        }
+
+                        // ==========================
+                        // أول دخول للشات
+                        // ==========================
+                        if (_isFirstLoad &&
+                            state.messages.isNotEmpty &&
+                            !state.isSyncing) {
+                          _isFirstLoad = false;
+
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (!_scrollController.hasClients) return;
+
+                            _scrollController.jumpTo(
+                              _scrollController.position.maxScrollExtent,
+                            );
+                          });
+
+                          return;
+                        }
+
+                        // ==========================
+                        // رسالة جديدة فقط
+                        // ==========================
+                        if (!_showScrollToBottom) {
+                          _scrollToBottom();
+                        }
+                      },
+                      builder: (context, state) {
+                        if (state is ChatLoading || state is ChatInitial) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
                           );
                         }
-                      });
-                      return;
-                    }
 
-                    if (_isFirstLoad) {
-                      _jumpToBottom();
-                      if (!state.isSyncing) _isFirstLoad = false;
-                      return;
-                    }
+                        if (state is ChatError) {
+                          return _buildErrorState(state.message);
+                        }
 
-                    _scrollToBottom();
-                  },
-                  builder: (context, state) {
-                    if (state is ChatLoading || state is ChatInitial) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+                        final chatState = state as ChatLoaded;
 
-                    if (state is ChatError) {
-                      return _buildErrorState(state.message);
-                    }
+                        if (chatState.messages.isEmpty &&
+                            !chatState.isSyncing &&
+                            !chatState.isLoadingMore) {
+                          return _buildEmptyState();
+                        }
 
-                    final chatState = state as ChatLoaded;
-
-                    if (chatState.messages.isEmpty &&
-                        !chatState.isSyncing &&
-                        !chatState.isLoadingMore) {
-                      return _buildEmptyState();
-                    }
-
-                    return SingleChildScrollView(
-                      controller: _scrollController,
-                      child: Column(
-                        children: [
-                          if (chatState.isSyncing) _buildSyncingBanner(),
-                          if (chatState.isLoadingMore)
-                            Padding(
-                              padding: AppSize.padding(vertical: 10),
-                              child: const Center(
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                        return SingleChildScrollView(
+                          controller: _scrollController,
+                          child: Column(
+                            children: [
+                              if (chatState.isSyncing) _buildSyncingBanner(),
+                              if (chatState.isLoadingMore)
+                                Padding(
+                                  padding: AppSize.padding(vertical: 10),
+                                  child: const Center(
+                                    child: SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ..._buildMessagesWithDividers(chatState.messages),
-                          SizedBox(height: AppSize.getHeight(12)),
-                        ],
-                      ),
-                    );
-                  },
+                              ..._buildMessagesWithDividers(chatState.messages),
+                              SizedBox(height: AppSize.getHeight(12)),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    Positioned(
+                      right: 16,
+                      bottom: 20,
+                      child: _buildScrollToBottomButton(),
+                    ),
+                  ],
                 ),
               ),
               _buildMessageInput(),
@@ -379,9 +461,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             alignment: Alignment.center,
             child: Text(
-              widget.event.name
-                  .trim()
-                  .isNotEmpty
+              widget.event.name.trim().isNotEmpty
                   ? widget.event.name.trim()[0].toUpperCase()
                   : '',
               style: TextStyle(
@@ -494,7 +574,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      'volunteer.chat.view_event'.tr(),
+                      'shared.chat.view_event'.tr(),
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: AppSize.font(13),
@@ -546,7 +626,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  'volunteer.chat.retry'.tr(),
+                  'shared.chat.retry'.tr(),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -814,7 +894,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         msg.senderName,
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
-                          fontSize: AppSize.font(13),
+                          fontSize: AppSize.font(12),
                           color: AppColors.black,
                         ),
                       ),
@@ -838,9 +918,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 SizedBox(height: AppSize.getHeight(5)),
                 GestureDetector(
-                  onLongPressStart: (details) {
-                    _showReactionPicker(context, details.globalPosition, msg);
-                  },
+                  // onLongPressStart: (details) {
+                  //   _showReactionPicker(context, details.globalPosition, msg);
+                  // },
                   child: Column(
                     crossAxisAlignment: isMe
                         ? CrossAxisAlignment.end
@@ -850,11 +930,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         padding: AppSize.padding(horizontal: 14, vertical: 11),
                         decoration: BoxDecoration(
                           color: bubbleColor,
+                          border: Border.all(color: AppColors.grey300),
                           borderRadius: BorderRadius.only(
-                            topLeft: const Radius.circular(18),
-                            topRight: const Radius.circular(18),
-                            bottomLeft: Radius.circular(isMe ? 18 : 4),
-                            bottomRight: Radius.circular(isMe ? 4 : 18),
+                            topLeft: const Radius.circular(20),
+                            topRight: const Radius.circular(20),
+                            bottomLeft: Radius.circular(isMe ? 20 : 10),
+                            bottomRight: Radius.circular(isMe ? 10 : 20),
                           ),
                         ),
                         child: Text(
@@ -875,12 +956,58 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 SizedBox(height: AppSize.getHeight(4)),
-                Text(
-                  msg.time,
-                  style: TextStyle(
-                    fontSize: AppSize.font(11),
-                    color: AppColors.grey500,
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      msg.time,
+                      style: TextStyle(
+                        fontSize: AppSize.font(11),
+                        color: AppColors.grey500,
+                      ),
+                    ),
+                    if (msg.status == ChatMessageStatus.sending) ...[
+                      SizedBox(width: AppSize.getWidth(4)),
+                      SizedBox(
+                        width: 10,
+                        height: 10,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1.5,
+                          color: AppColors.grey500,
+                        ),
+                      ),
+                    ],
+                    if (msg.status == ChatMessageStatus.failed)
+                      GestureDetector(
+                        // 👈 جديد - ده اللي كان ناقص
+                        onTap: () => _chatCubit.retryMessage(msg.localId!),
+                        behavior: HitTestBehavior.opaque,
+                        // 👈 يخلي المساحة كلها قابلة للدوس مش بس الحروف
+                        child: Padding(
+                          padding: AppSize.padding(horizontal: 4, vertical: 2),
+                          // مساحة دوس أوسع
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CustomIcon(
+                                icon: AppIcons.info,
+                                color: AppColors.red,
+                                width: AppSize.getSize(12),
+                                height: AppSize.getSize(12),
+                              ),
+                              SizedBox(width: AppSize.getWidth(2)),
+                              Text(
+                                'shared.chat.tap_to_retry'.tr(),
+                                style: TextStyle(
+                                  fontSize: AppSize.font(10),
+                                  color: AppColors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
@@ -896,24 +1023,27 @@ class _ChatScreenState extends State<ChatScreen> {
     return Container(
       padding: AppSize.padding(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: msg.badgeColor!,
+        color: msg.badgeColor ?? Colors.transparent,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CustomIcon(
-            icon: msg.badgeIcon!,
-            color: AppColors.white,
-            width: AppSize.getSize(11),
-            height: AppSize.getSize(11),
-          ),
-          SizedBox(width: AppSize.getWidth(3)),
+          if (msg.badgeIcon != null)
+            CustomIcon(
+              icon: msg.badgeIcon!,
+              color: msg.badgeTextColor ?? AppColors.white,
+              width: AppSize.getSize(11),
+              height: AppSize.getSize(11),
+            ),
+
+          if (msg.badgeIcon != null) SizedBox(width: AppSize.getWidth(3)),
+
           Text(
-            msg.badge!,
+            msg.badge ?? '',
             style: TextStyle(
               fontSize: AppSize.font(11),
-              color: AppColors.white,
+              color: msg.badgeTextColor ?? AppColors.white,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1010,7 +1140,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             SizedBox(height: AppSize.getHeight(14)),
             Text(
-              'volunteer.chat.no_messages_title'.tr(),
+              'shared.chat.no_messages_title'.tr(),
               style: TextStyle(
                 fontSize: AppSize.font(15),
                 fontWeight: FontWeight.w600,
@@ -1019,7 +1149,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             SizedBox(height: AppSize.getHeight(6)),
             Text(
-              'volunteer.chat.no_messages_subtitle'.tr(),
+              'shared.chat.no_messages_subtitle'.tr(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: AppSize.font(13),
@@ -1048,7 +1178,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           SizedBox(width: AppSize.getWidth(6)),
           Text(
-            'volunteer.chat.syncing_messages'.tr(),
+            'shared.chat.syncing_messages'.tr(),
             style: TextStyle(
               fontSize: AppSize.font(11),
               color: AppColors.grey500,

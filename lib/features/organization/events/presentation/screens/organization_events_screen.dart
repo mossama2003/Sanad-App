@@ -330,7 +330,7 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
                               ChatScreen(
                                 eventId: event.id,
                                 currentUserId: CacheHelper.get(
-                                  CacheKeys.profileId,
+                                  CacheKeys.userId,
                                 ),
                                 event: event.toChatEvent(),
                               ),

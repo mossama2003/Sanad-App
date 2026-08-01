@@ -17,4 +17,6 @@ class CacheKeys {
   static const String firstUse = 'first_use';
 
   static const String profileId = 'profile_id';
+
+  static const String userId = 'user_id';
 }

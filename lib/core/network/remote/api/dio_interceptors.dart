@@ -20,7 +20,8 @@ class DioInterceptors extends Interceptor {
     final String? accessToken = CacheHelper.get(CacheKeys.accessToken);
 
     debugPrint("TOKEN FROM CACHE => $accessToken");
-    debugPrint("ID FROM CACHE => ${CacheHelper.get(CacheKeys.profileId)}");
+    debugPrint("PROFILE ID FROM CACHE => ${CacheHelper.get(CacheKeys.profileId)}");
+    debugPrint("USER ID FROM CACHE => ${CacheHelper.get(CacheKeys.userId)}");
 
     if (lang != null && lang.isNotEmpty) {
       options.headers['lang'] = lang;

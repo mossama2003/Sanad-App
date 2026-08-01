@@ -20,4 +20,9 @@ abstract class ChatRepo {
     required int eventId,
     required Map<String, dynamic> body,
   });
+
+  Future<Either<String, SendChatMessageModel>> sendMessage({
+    required int eventId,
+    required String message,
+  });
 }

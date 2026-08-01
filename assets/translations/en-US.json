@@ -128,6 +128,24 @@
       "account_signed_in": "Account Signed In",
       "user_role_not_found": "User role not found"
     },
+    "chat": {
+      "no_messages_title": "No messages yet",
+      "no_messages_subtitle": "Start the conversation and be the first to say hi",
+      "syncing_messages": "Syncing messages...",
+      "retry": "Retry",
+      "view_event": "View Event",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "tap_to_retry": "Tap to retry",
+      "pinned": {
+        "welcome_title": "Welcome to the Community 👋",
+        "welcome_body": "Welcome everyone! This space is for event members to communicate, share updates, and support each other.",
+        "guidelines_title": "Event Guidelines",
+        "guidelines_body": "Please be respectful, follow the event rules, and keep conversations related to the event.",
+        "help_title": "Need Help?",
+        "help_body": "If you have any questions or need assistance, feel free to ask. Our organizers are here to support you."
+      }
+    },
     "donations_removed": {
       "winter_clothing_drive": "Winter Clothing Drive",
       "help_provide_warm": "Help provide warm clothing for families in need this winter season.",
@@ -635,24 +653,18 @@
     "community": {
       "title": "Communities",
       "desc": "Connect with other volunteers",
-      "search": "Search communities",
-      "active": "Active",
+      "search": "Search for communities",
+      "expired": "Expired: Chat closes 3 days after the event",
       "ended": "Ended",
+      "active": "Active",
+      "2_min_ago": "2 minutes ago",
+      "2_days_ago": "2 days ago",
       "communities_are_automatically_created": "Communities are automatically created when you join an event.",
-      "chat_access_remains": "Chat access remains for 3 days after the event ends.",
+      "chat_access_remains": "Chat access remains available for 3 days after the event ends.",
       "no_communities": "No communities yet",
-      "join_event_to_access_chat": "Join volunteer events to access community chats and connect with other volunteers.",
+      "join_event_to_access_chat": "Join volunteer events to access chats and connect with other volunteers.",
       "browse_events": "Browse Events",
       "no_messages_yet": "No messages yet"
-    },
-    "chat": {
-      "no_messages_title": "No messages yet",
-      "no_messages_subtitle": "Start the conversation and be the first to say hi",
-      "syncing_messages": "Syncing messages...",
-      "retry": "Retry",
-      "view_event": "View Event",
-      "today": "Today",
-      "yesterday": "Yesterday"
     },
     "emergency": {
       "title": "Emergency Events",

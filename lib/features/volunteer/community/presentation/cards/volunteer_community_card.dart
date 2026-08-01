@@ -36,7 +36,7 @@ class VolunteerCommunityCard extends StatelessWidget {
       onTap: () => AppNavigator.push(
         ChatScreen(
           eventId: event.id,
-          currentUserId: CacheHelper.get(CacheKeys.profileId),
+          currentUserId: CacheHelper.get(CacheKeys.userId),
           event: event.toChatEvent(),
         ),
       ),

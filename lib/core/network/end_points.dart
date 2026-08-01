@@ -33,6 +33,8 @@ String GET_CHAT_TOKEN(int eventId) =>
 
 String GET_CHAT_HISTORY = 'v1/events/event_chat/';
 
+String SEND_CHAT_MESSAGE = 'v1/events/event_chat/';
+
 String EVENT_MEMBER_BATCH_UPDATE(int eventId) =>
     'v1/events/event_member_batch_update/$eventId/';
 

@@ -20,19 +20,22 @@ class EventChatCreatorModelAdapter extends TypeAdapter<EventChatCreatorModel> {
       id: fields[0] as int,
       name: fields[1] as String,
       avatar: fields[2] as String?,
+      role: fields[3] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, EventChatCreatorModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.avatar);
+      ..write(obj.avatar)
+      ..writeByte(3)
+      ..write(obj.role);
   }
 
   @override
