@@ -210,7 +210,7 @@ class VolunteerEventsCard extends StatelessWidget {
                     SizedBox(width: AppSize.getWidth(5)),
 
                     Text(
-                      DateFormat('dd MMM yyyy').format(date),
+                      DateFormat('dd MMM yyyy', 'en').format(date),
                       style: TextStyle(
                         color: secondaryColor,
                         fontSize: AppSize.font(14),
@@ -229,7 +229,7 @@ class VolunteerEventsCard extends StatelessWidget {
                     SizedBox(width: AppSize.getWidth(5)),
 
                     Text(
-                      DateFormat('hh:mm a').format(date),
+                      DateFormat('hh:mm a', 'en').format(date),
                       style: TextStyle(
                         color: secondaryColor,
                         fontSize: AppSize.font(14),

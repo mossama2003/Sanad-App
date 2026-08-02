@@ -433,52 +433,20 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       initialTime: TimeOfDay.now(),
     );
 
-    if (picked == null) return;
+    if (picked == null || !context.mounted) return;
 
     startTime = picked;
     startTimeController.text = picked.format(context);
 
-    if (endTime != null) {
-      final startMinutes = picked.hour * 60 + picked.minute;
+    if (endTime == null) return;
 
-      final endMinutes = endTime!.hour * 60 + endTime!.minute;
-
-      if (endMinutes <= startMinutes) {
-        endTime = null;
-        endTimeController.clear();
-      }
-    }
-  }
-
-  // ===================== Pick End Time =====================
-
-  Future<void> pickEndTime(BuildContext context) async {
-    if (startTime == null) {
-      emit(Error());
-
-      return;
-    }
-
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: startTime!,
-    );
-
-    if (picked == null) return;
-
-    final startMinutes = startTime!.hour * 60 + startTime!.minute;
-
-    final endMinutes = picked.hour * 60 + picked.minute;
+    final startMinutes = (picked.hour * 60) + picked.minute;
+    final endMinutes = (endTime!.hour * 60) + endTime!.minute;
 
     if (endMinutes <= startMinutes) {
-      emit(Error());
-
-      return;
+      endTime = null;
+      endTimeController.clear();
     }
-
-    endTime = picked;
-
-    endTimeController.text = picked.format(context);
   }
 
   // ===================== Create Event =====================

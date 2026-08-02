@@ -78,7 +78,9 @@ class _OrganizationQrCodeScreenState extends State<OrganizationQrCodeScreen> {
 
       await file.writeAsBytes(image);
 
-      await Share.shareXFiles([XFile(file.path)], text: widget.event.name);
+      await SharePlus.instance.share(
+        ShareParams(files: [XFile(file.path)], text: widget.event.name),
+      );
     } catch (_) {
       AppToast.error('organization.events.something_went_wrong'.tr());
     }
@@ -269,6 +271,7 @@ class _OrganizationQrCodeScreenState extends State<OrganizationQrCodeScreen> {
 
                       DateFormat(
                         'dd MMM yyyy • hh:mm a',
+                        'en',
                       ).format(widget.event.date),
                     ),
 
@@ -278,14 +281,11 @@ class _OrganizationQrCodeScreenState extends State<OrganizationQrCodeScreen> {
                       AppIcons.location,
 
                       [
-                        widget.event.location?['description'],
+                            widget.event.location?['description'],
 
-                        widget.event.location?['city'],
-                      ]
-                          .where((e) =>
-                      e != null && e
-                          .toString()
-                          .isNotEmpty)
+                            widget.event.location?['city'],
+                          ]
+                          .where((e) => e != null && e.toString().isNotEmpty)
                           .join(', '),
                     ),
                   ],
@@ -387,18 +387,18 @@ class _OrganizationQrCodeScreenState extends State<OrganizationQrCodeScreen> {
                   children: [
                     isDownloading && i == 0
                         ? SizedBox(
-                      width: AppSize.getSize(20),
-                      height: AppSize.getHeight(20),
-                      child: const CircularProgressIndicator(
-                        strokeWidth: 2,
-                      ),
-                    )
+                            width: AppSize.getSize(20),
+                            height: AppSize.getHeight(20),
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
                         : CustomIcon(
-                      icon: actions[i].$1,
-                      color: AppColors.primary,
-                      width: AppSize.getSize(20),
-                      height: AppSize.getHeight(20),
-                    ),
+                            icon: actions[i].$1,
+                            color: AppColors.primary,
+                            width: AppSize.getSize(20),
+                            height: AppSize.getHeight(20),
+                          ),
 
                     SizedBox(height: AppSize.getHeight(4)),
 

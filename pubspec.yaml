@@ -16,10 +16,10 @@ dependencies:
   # App Controller And Helpers
   flutter_bloc: ^9.1.1
   easy_localization: ^3.0.8
-  permission_handler: ^12.0.1
+  permission_handler: ^13.0.0
   flutter_intl_phone_field: ^0.0.7
   intl: ^0.20.2
-  open_file: ^3.5.11
+  open_file: ^4.0.0
   url_launcher: ^6.3.2
 
   # Network
@@ -56,11 +56,16 @@ dependencies:
   cookie_jar: ^4.0.9
   qr_flutter: ^4.1.0
   screenshot: ^3.0.0
-  image_gallery_saver_plus: ^4.0.1
+  image_gallery_saver_plus: ^5.1.1
   mobile_scanner: ^7.4.0
   geolocator: ^14.0.3
   ably_flutter: ^1.2.44
   timeago: ^3.7.1
+  collection: ^1.19.1
+  path_provider: ^2.1.6
+  emoji_picker_flutter: ^4.5.3
+  audioplayers: ^6.8.1
+  flutter_linkify: ^6.0.0
 
   #Caching
   hive: ^2.2.3
@@ -91,4 +96,6 @@ flutter:
     - assets/images/
     - assets/translations/
     - assets/lottie/coming_soon.json
+    - assets/sounds/message_received.mp3
+    - assets/sounds/message_send.mp3
 

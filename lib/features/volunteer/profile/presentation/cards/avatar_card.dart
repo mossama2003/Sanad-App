@@ -20,7 +20,7 @@ class AvatarCard extends StatelessWidget {
 
   final String name;
   final String location;
-  final String createdAt;
+  final String? createdAt;
   final String? image;
   final String? level;
 
@@ -141,7 +141,12 @@ class AvatarCard extends StatelessWidget {
         SizedBox(height: AppSize.getHeight(3)),
 
         Text(
-          createdAt,
+          createdAt != null && createdAt!.isNotEmpty
+              ? DateFormat(
+                  'dd MMM yyyy',
+                  'en_US',
+                ).format(DateTime.parse(createdAt!))
+              : '',
           style: TextStyle(
             fontSize: AppSize.font(15),
             color: Theme.of(context).textTheme.bodyMedium?.color,

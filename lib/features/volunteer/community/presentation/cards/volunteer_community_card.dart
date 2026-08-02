@@ -113,7 +113,9 @@ class VolunteerCommunityCard extends StatelessWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.transparent,
+                              color: isEnded
+                                  ? Colors.transparent
+                                  : AppColors.primary,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(color: AppColors.primary),
                             ),
@@ -124,7 +126,9 @@ class VolunteerCommunityCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: AppSize.font(12),
                                 fontWeight: FontWeight.w400,
-                                color: AppColors.primary,
+                                color: isEnded
+                                    ? AppColors.primary
+                                    : AppColors.white,
                               ),
                             ),
                           ),
@@ -199,7 +203,7 @@ class VolunteerCommunityCard extends StatelessWidget {
                           SizedBox(width: AppSize.getWidth(3)),
 
                           Text(
-                            DateFormat('dd MMM yyyy').format(date),
+                            DateFormat('dd MMM yyyy', 'en').format(date),
                             style: TextStyle(
                               fontSize: AppSize.font(13),
                               color: AppColors.black.withValues(alpha: .5),

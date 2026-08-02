@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:dartz/dartz.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,13 +25,14 @@ class ChatCubit extends Cubit<ChatState> {
   ably.RealtimeChannel? _channel;
   StreamSubscription<ably.Message>? _messageSubscription;
 
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
   ChatCubit({
     required this.chatRepo,
     required this.eventId,
     required this.currentUserId,
   }) : super(ChatInitial());
 
-  // ── Init: cache فورًا → history + token بالتوازي → Ably في الخلفية ─────
   Future<void> initChat() async {
     // 1) Load local cache first
     final cached = await ChatCacheService.getCachedMessages(eventId);
@@ -77,7 +79,6 @@ class ChatCubit extends Cubit<ChatState> {
       },
 
       (data) async {
-        // Update Hive
         await ChatCacheService.cacheMessages(eventId, data.results);
 
         final serverMessages = data.results
@@ -86,8 +87,6 @@ class ChatCubit extends Cubit<ChatState> {
 
         final current = state;
 
-        // لو عندنا cache ظاهر بالفعل
-        // نحدثه بدون ما نعمل jump
         if (current is ChatLoaded && hasCache) {
           emit(
             current.copyWith(
@@ -134,7 +133,6 @@ class ChatCubit extends Cubit<ChatState> {
 
     _channel = _realtime!.channels.get('events:$eventId');
 
-    // 👇 جديد - راقب حالة الاتصال والـ channel
     _realtime!.connection.on().listen((stateChange) {
       debugPrint('🔌 Ably connection state: ${stateChange.current}');
     });
@@ -150,8 +148,6 @@ class ChatCubit extends Cubit<ChatState> {
     });
   }
 
-  /// يحول صيغة Python dict repr (زي 'True', 'None', اقتباس مفرد،
-  /// أباستروف متعمول لها escape بـ \') إلى JSON صحيح.
   String _pythonReprToJson(String input) {
     final buffer = StringBuffer();
     bool inString = false;
@@ -163,7 +159,6 @@ class ChatCubit extends Cubit<ChatState> {
 
       if (!inString) {
         if (char == "'") {
-          // بداية سترينج - نبدله بـ اقتباس مزدوج (JSON)
           inString = true;
           buffer.write('"');
           i++;
@@ -187,28 +182,23 @@ class ChatCubit extends Cubit<ChatState> {
         buffer.write(char);
         i++;
       } else {
-        // جوه سترينج
         if (char == '\\' && i + 1 < length && input[i + 1] == "'") {
-          // أباستروف متعمول لها escape - نكتبها عادي، مفيهاش تعارض مع JSON
           buffer.write("'");
           i += 2;
           continue;
         }
         if (char == '\\' && i + 1 < length) {
-          // أي escape تانية (\\n, \\\\, إلخ) - سيبها زي ما هي
           buffer.write(char);
           buffer.write(input[i + 1]);
           i += 2;
           continue;
         }
         if (char == '"') {
-          // اقتباس مزدوج حرفي جوه القيمة - لازم نعمله escape عشان JSON
           buffer.write('\\"');
           i++;
           continue;
         }
         if (char == "'") {
-          // نهاية السترينج (مش مسبوقة بـ backslash، اتعالجت فوق)
           inString = false;
           buffer.write('"');
           i++;
@@ -226,13 +216,40 @@ class ChatCubit extends Cubit<ChatState> {
     if (index + keyword.length > input.length) return false;
     if (input.substring(index, index + keyword.length) != keyword) return false;
 
-    // تأكد إنها كلمة كاملة مش جزء من اسم أطول (مثلاً "Trueee")
     final nextIndex = index + keyword.length;
     if (nextIndex < input.length) {
       final nextChar = input[nextIndex];
       if (RegExp(r'[A-Za-z0-9_]').hasMatch(nextChar)) return false;
     }
     return true;
+  }
+
+  Map<String, dynamic> _deepConvertMap(dynamic input) {
+    if (input is Map) {
+      return input.map(
+        (key, value) => MapEntry(key.toString(), _deepConvertValue(value)),
+      );
+    }
+    return {};
+  }
+
+  dynamic _deepConvertValue(dynamic value) {
+    if (value is Map) {
+      return _deepConvertMap(value);
+    }
+    if (value is List) {
+      return value.map(_deepConvertValue).toList();
+    }
+    return value;
+  }
+
+  Future<void> _playSound(String assetPath) async {
+    try {
+      await _audioPlayer.play(AssetSource(assetPath));
+      debugPrint('🔊 sound played: $assetPath');
+    } catch (e) {
+      debugPrint('🔇 sound error: $e');
+    }
   }
 
   // ── Realtime incoming message (مع Dedupe + Optimistic Replace) ──────────────
@@ -244,14 +261,12 @@ class ChatCubit extends Cubit<ChatState> {
     final rawData = message.data;
 
     if (rawData is Map) {
-      data = Map<String, dynamic>.from(rawData);
+      data = _deepConvertMap(rawData);
     } else if (rawData is String) {
       try {
-        // JSON عادي
         data = Map<String, dynamic>.from(jsonDecode(rawData));
       } catch (_) {
         try {
-          // Python dict repr fallback
           final fixed = _pythonReprToJson(rawData);
           data = Map<String, dynamic>.from(jsonDecode(fixed));
         } catch (e) {
@@ -267,15 +282,12 @@ class ChatCubit extends Cubit<ChatState> {
 
     final incomingMessage = chatMsg.toUiModel(currentUserId: currentUserId);
 
-    // 1) منع التكرار بالـ server id
     final alreadyExists = current.messages.any((m) => m.id == chatMsg.id);
 
     if (alreadyExists) {
       return;
     }
 
-    // 2) لو دي رسالة أنا بعتها Optimistic
-    // استبدلها بدل ما تضيف واحدة جديدة
     final optimisticIndex = current.messages.indexWhere(
       (m) =>
           m.localId != null &&
@@ -295,7 +307,11 @@ class ChatCubit extends Cubit<ChatState> {
       return;
     }
 
-    // 3) رسالة جديدة من مستخدم آخر
+    final isFromOtherUser = chatMsg.creator.id != currentUserId;
+    if (isFromOtherUser) {
+      _playSound('sounds/message_received.mp3');
+    }
+
     await ChatCacheService.cacheMessage(eventId, chatMsg);
 
     emit(current.copyWith(messages: [...current.messages, incomingMessage]));
@@ -360,6 +376,8 @@ class ChatCubit extends Cubit<ChatState> {
 
     emit(current.copyWith(messages: [...current.messages, optimisticMsg]));
 
+    _playSound('sounds/message_send.mp3');
+
     final result = await chatRepo.sendMessage(eventId: eventId, message: text);
 
     result.fold((error) {
@@ -419,6 +437,7 @@ class ChatCubit extends Cubit<ChatState> {
     _messageSubscription?.cancel();
     _channel?.detach();
     _realtime?.close();
+    _audioPlayer.dispose();
     return super.close();
   }
 }

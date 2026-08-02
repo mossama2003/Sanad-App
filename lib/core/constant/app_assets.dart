@@ -117,4 +117,6 @@ class AppIcons {
   static String website = '$icons/website.svg';
   static String note = '$icons/note.svg';
   static String image = '$icons/image.svg';
+  static String keyboard = '$icons/keyboard.svg';
+  static String emoji = '$icons/emoji.svg';
 }

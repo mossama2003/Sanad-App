@@ -35,14 +35,6 @@ class VolunteerProfileScreen extends StatelessWidget {
         final cubit = AppCubit.get(context);
         final user = cubit.user;
 
-        String formatJoinedDate(String? date) {
-          if (date == null || date.isEmpty) return '';
-
-          final parsedDate = DateTime.parse(date);
-
-          return 'Joined ${DateFormat('MMMM yyyy').format(parsedDate)}';
-        }
-
         return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
@@ -67,7 +59,7 @@ class VolunteerProfileScreen extends StatelessWidget {
                               .where((e) => e != null && e.trim().isNotEmpty)
                               .join(', ')
                         : '',
-                    createdAt: formatJoinedDate(user?.profile?.created),
+                    createdAt: user?.profile?.created,
                     image: user?.avatar,
                     level: 'volunteer.profile.level'.tr(),
                   ),

@@ -150,7 +150,10 @@ class OrganizationRecentlyCompletedSection extends StatelessWidget {
                             SizedBox(height: AppSize.getHeight(3)),
 
                             Text(
-                              DateFormat('MMM dd, yyyy').format(event.date),
+                              DateFormat(
+                                'MMM dd, yyyy',
+                                'en',
+                              ).format(event.date),
 
                               style: TextStyle(
                                 fontSize: AppSize.font(12),

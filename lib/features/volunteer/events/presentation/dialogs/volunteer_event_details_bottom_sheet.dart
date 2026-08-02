@@ -1,11 +1,11 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:sanad_app/core/constant/app_size.dart';
-import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
+import 'package:sanad_app/core/helper/app_navigator.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:sanad_app/core/constant/app_size.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../../core/helper/app_number_formatter.dart';
 import '../../data/models/volunteer_event_details_model.dart';
@@ -50,7 +50,9 @@ class VolunteerEventDetailsBottomSheet extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         child: Container(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.sizeOf(context).height * .8,
+            maxHeight: MediaQuery
+                .sizeOf(context)
+                .height * .8,
           ),
           decoration: BoxDecoration(
             color: colors.surface,
@@ -164,7 +166,9 @@ class _EventDetailsCard extends StatelessWidget {
       padding: AppSize.padding(all: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: Theme.of(context).cardColor,
+        color: Theme
+            .of(context)
+            .cardColor,
       ),
       child: Column(
         children: [
@@ -173,7 +177,7 @@ class _EventDetailsCard extends StatelessWidget {
             title: 'volunteer.events.bottom_sheet.date_time'.tr(),
             value: DateFormat(
               'dd MMM yyyy - hh:mm a',
-              context.locale.languageCode,
+              'en',
             ).format(event.date),
             textColor: textColor,
             secondaryColor: secondaryColor,
@@ -188,7 +192,10 @@ class _EventDetailsCard extends StatelessWidget {
               event.location?['description'],
               event.location?['city'],
               event.location?['state'],
-            ].where((e) => e != null && e.toString().isNotEmpty).join(', '),
+            ].where((e) =>
+            e != null && e
+                .toString()
+                .isNotEmpty).join(', '),
             textColor: textColor,
             secondaryColor: secondaryColor,
           ),
@@ -274,10 +281,10 @@ class _EventImage extends StatelessWidget {
           width: double.infinity,
           child: imageUrl != null && imageUrl!.isNotEmpty
               ? Image.network(
-                  imageUrl!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => _buildPlaceholder(context),
-                )
+            imageUrl!,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => _buildPlaceholder(context),
+          )
               : _buildPlaceholder(context),
         ),
 

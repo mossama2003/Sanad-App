@@ -26,9 +26,6 @@ class AppHelper {
     return AppCubit.get(AppNavigator.context).user;
   }
 
-  static Future<void> getAuthUser() async {
-    // await AppCubit.get(AppNavigator.context).getAuth();
-  }
 
   static Future<void> share(String text) async {
     await SharePlus.instance.share(ShareParams(text: text));
@@ -88,46 +85,61 @@ class AppHelper {
   }
 
   static String timeAgoShort(DateTime date) {
-    final diff = DateTime.now().difference(date);
+    final now = DateTime.now();
+    final diff = now.difference(date);
 
-    // Future date
+    // Future
     if (diff.isNegative) {
-      final future = date.difference(DateTime.now());
+      final future = date.difference(now);
+
+      if (future.inMinutes < 1) {
+        return 'Just now';
+      }
 
       if (future.inMinutes < 60) {
-        return '${future.inMinutes} m';
+        return 'in ${future.inMinutes} min';
       }
 
       if (future.inHours < 24) {
-        return '${future.inHours} H';
+        return 'in ${future.inHours} hr';
+      }
+
+      if (future.inDays < 30) {
+        return 'in ${future.inDays} day${future.inDays == 1 ? '' : 's'}';
       }
 
       if (future.inDays < 365) {
-        return '${future.inDays} D';
+        final months = (future.inDays / 30).floor();
+        return 'in $months month${months == 1 ? '' : 's'}';
       }
 
       final years = (future.inDays / 365).floor();
-      return '$years year${years > 1 ? 's' : ''}';
+      return 'in $years year${years == 1 ? '' : 's'}';
     }
 
-    // Past date
+    // Past
     if (diff.inMinutes < 1) {
-      return 'now';
+      return 'Just now';
     }
 
     if (diff.inMinutes < 60) {
-      return '${diff.inMinutes} m';
+      return '${diff.inMinutes} min ago';
     }
 
     if (diff.inHours < 24) {
-      return '${diff.inHours} H';
+      return '${diff.inHours} hr ago';
+    }
+
+    if (diff.inDays < 30) {
+      return '${diff.inDays} day${diff.inDays == 1 ? '' : 's'} ago';
     }
 
     if (diff.inDays < 365) {
-      return '${diff.inDays} D';
+      final months = (diff.inDays / 30).floor();
+      return '$months month${months == 1 ? '' : 's'} ago';
     }
 
     final years = (diff.inDays / 365).floor();
-    return '$years year${years > 1 ? 's' : ''}';
+    return '$years year${years == 1 ? '' : 's'} ago';
   }
 }
