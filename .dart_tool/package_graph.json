@@ -24,6 +24,7 @@
         "easy_date_timeline",
         "easy_localization",
         "emoji_picker_flutter",
+        "equatable",
         "file_selector",
         "firebase_core",
         "firebase_messaging",
@@ -156,6 +157,14 @@
       "version": "2.2.3",
       "dependencies": [
         "crypto",
+        "meta"
+      ]
+    },
+    {
+      "name": "equatable",
+      "version": "2.1.0",
+      "dependencies": [
+        "collection",
         "meta"
       ]
     },

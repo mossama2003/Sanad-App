@@ -122,9 +122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   SettingsTile(
                     icon: AppIcons.lock,
-
                     title: 'shared.settings.privacy_settings'.tr(),
-
                     trailing: arrowIcon(),
                   ),
                   SizedBox(height: AppSize.getHeight(10)),

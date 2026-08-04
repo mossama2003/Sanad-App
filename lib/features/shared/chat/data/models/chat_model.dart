@@ -29,6 +29,7 @@ class ChatModel {
   String? reactionEmoji;
   int reactionCount;
   final ChatMessageStatus status;
+  final bool isEdited;
 
   ChatModel({
     this.id,
@@ -36,8 +37,8 @@ class ChatModel {
     required this.senderName,
     this.badge,
     this.badgeColor,
-    this.badgeTextColor,
     this.badgeIcon,
+    this.badgeTextColor,
     required this.text,
     required this.time,
     required this.createdAt,
@@ -46,18 +47,24 @@ class ChatModel {
     this.reactionEmoji,
     this.reactionCount = 0,
     this.status = ChatMessageStatus.sent,
+    this.isEdited = false,
   });
 
-  ChatModel copyWith({int? id, ChatMessageStatus? status}) {
+  ChatModel copyWith({
+    int? id,
+    ChatMessageStatus? status,
+    String? text,
+    bool? isEdited,
+  }) {
     return ChatModel(
       id: id ?? this.id,
       localId: localId,
       senderName: senderName,
       badge: badge,
       badgeColor: badgeColor,
-      badgeTextColor: badgeTextColor,
       badgeIcon: badgeIcon,
-      text: text,
+      badgeTextColor: badgeTextColor,
+      text: text ?? this.text,
       time: time,
       createdAt: createdAt,
       avatarColor: avatarColor,
@@ -65,6 +72,7 @@ class ChatModel {
       reactionEmoji: reactionEmoji,
       reactionCount: reactionCount,
       status: status ?? this.status,
+      isEdited: isEdited ?? this.isEdited,
     );
   }
 }
@@ -75,6 +83,9 @@ class ChatEventModel {
   final DateTime date;
   final String? cover;
   final String status;
+  final int organizerId;
+  final String organizerName;
+  final String? organizerAvatar;
 
   const ChatEventModel({
     required this.id,
@@ -82,6 +93,9 @@ class ChatEventModel {
     required this.date,
     this.cover,
     required this.status,
+    required this.organizerId,
+    required this.organizerName,
+    this.organizerAvatar,
   });
 }
 
@@ -188,6 +202,8 @@ class EventChatDetailModel extends HiveObject {
   final DateTime modified;
   @HiveField(5)
   final String message;
+  @HiveField(6)
+  final bool isEdited;
 
   EventChatDetailModel({
     required this.id,
@@ -196,6 +212,7 @@ class EventChatDetailModel extends HiveObject {
     required this.created,
     required this.modified,
     required this.message,
+    this.isEdited = false,
   });
 
   factory EventChatDetailModel.fromJson(Map<String, dynamic> json) {
@@ -206,6 +223,7 @@ class EventChatDetailModel extends HiveObject {
       created: DateTime.tryParse(json['created'] ?? '') ?? DateTime.now(),
       modified: DateTime.tryParse(json['modified'] ?? '') ?? DateTime.now(),
       message: json['message'] ?? '',
+      isEdited: false,
     );
   }
 
@@ -260,6 +278,7 @@ class EventChatDetailModel extends HiveObject {
           ? creator.name[0].toUpperCase()
           : '?',
       status: ChatMessageStatus.sent,
+      isEdited: isEdited,
     );
   }
 
@@ -312,24 +331,34 @@ class PinnedMessage {
 
 extension VolunteerEventChatMapper on VolunteerEventDetailsModel {
   ChatEventModel toChatEvent() {
+    final creatorMap = creator;
+
     return ChatEventModel(
       id: id,
       name: name,
       date: date,
       cover: cover,
       status: status,
+      organizerId: creatorMap?['id'] is int ? creatorMap!['id'] as int : 0,
+      organizerName: (creatorMap?['name'] ?? '').toString(),
+      organizerAvatar: creatorMap?['avatar']?.toString(),
     );
   }
 }
 
 extension OrganizationEventChatMapper on OrganizationEventDetailsModel {
   ChatEventModel toChatEvent() {
+    final creatorMap = creator;
+
     return ChatEventModel(
       id: id,
       name: name,
       date: date,
       cover: cover,
       status: status,
+      organizerId: creatorMap?['id'] is int ? creatorMap!['id'] as int : 0,
+      organizerName: (creatorMap?['name'] ?? '').toString(),
+      organizerAvatar: creatorMap?['avatar']?.toString(),
     );
   }
 }

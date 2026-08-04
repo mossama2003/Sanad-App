@@ -1,28 +1,45 @@
+import 'package:sanad_app/core/network/remote/api/dio_helper.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:sanad_app/core/network/remote/api/dio_helper.dart';
 
+import '../../../../../core/network/error/failures.dart';
 import '../../../../../core/network/end_points.dart';
+import '../models/members_model.dart';
 import '../models/chat_model.dart';
 
 part 'chat_repo_impel.dart';
 
 abstract class ChatRepo {
-  Future<Either<String, ChatTokenModel>> getChatToken(int eventId);
+  Future<Either<Failure, ChatTokenModel>> getChatToken(int eventId);
 
-  Future<Either<String, PaginatedEventChatModel>> getChatHistory({
+  Future<Either<Failure, PaginatedEventChatModel>> getChatHistory({
     required int eventId,
     int page = 1,
   });
 
-  Future<Either<String, bool>> updateMemberBatch({
+  Future<Either<Failure, bool>> updateMemberBatch({
     required int eventId,
     required Map<String, dynamic> body,
   });
 
-  Future<Either<String, SendChatMessageModel>> sendMessage({
+  Future<Either<Failure, SendChatMessageModel>> sendMessage({
     required int eventId,
     required String message,
+  });
+
+  Future<Either<Failure, SendChatMessageModel>> editMessage({
+    required int messageId,
+    required String message,
+  });
+
+  Future<Either<Failure, List<int>>> deleteMessages(List<int> ids);
+
+  Future<Either<Failure, PaginatedMembersModel>> getEventMembers({
+    required int eventId,
+    int page = 1,
+    int? size,
+    String? search,
+    String? ordering,
   });
 }

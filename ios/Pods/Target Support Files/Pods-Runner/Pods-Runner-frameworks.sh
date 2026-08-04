@@ -178,41 +178,20 @@ code_sign_if_enabled() {
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/Ably/Ably.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/AblyDeltaCodec/AblyDeltaCodec.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/Mantle/Mantle.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/SDWebImageWebPCoder/SDWebImageWebPCoder.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ably_flutter/ably_flutter.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/flutter_image_compress_common/flutter_image_compress_common.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/image_gallery_saver_plus/image_gallery_saver_plus.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/libwebp/libwebp.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/msgpack/msgpack.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/open_file_ios/open_file_ios.framework"
 fi
 if [[ "$CONFIGURATION" == "Profile" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/Ably/Ably.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/AblyDeltaCodec/AblyDeltaCodec.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/Mantle/Mantle.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/SDWebImageWebPCoder/SDWebImageWebPCoder.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ably_flutter/ably_flutter.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/flutter_image_compress_common/flutter_image_compress_common.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/image_gallery_saver_plus/image_gallery_saver_plus.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/libwebp/libwebp.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/msgpack/msgpack.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/open_file_ios/open_file_ios.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/Ably/Ably.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/AblyDeltaCodec/AblyDeltaCodec.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/Mantle/Mantle.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/SDWebImageWebPCoder/SDWebImageWebPCoder.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ably_flutter/ably_flutter.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/flutter_image_compress_common/flutter_image_compress_common.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/image_gallery_saver_plus/image_gallery_saver_plus.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/libwebp/libwebp.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/msgpack/msgpack.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/open_file_ios/open_file_ios.framework"
 fi
 if [ "${COCOAPODS_PARALLEL_CODE_SIGN}" == "true" ]; then
   wait

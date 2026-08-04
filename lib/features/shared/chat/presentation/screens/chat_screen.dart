@@ -1,15 +1,19 @@
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
+import 'dart:ui';
+
 import 'package:sanad_app/core/shared/widgets/custom_field_text.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/constant/app_size.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:flutter/material.dart';
 
+import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../dialogs/members_bottom_sheet.dart';
@@ -40,6 +44,8 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _showScrollToBottom = false;
   bool _isLoadingMore = false;
   bool _showEmojiPicker = false;
+  bool _isSendingLocation = false;
+  ChatModel? _editingMessage;
 
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _messageFocusNode = FocusNode();
@@ -271,6 +277,50 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Future<void> _sendCurrentLocation() async {
+    if (_isSendingLocation) return;
+
+    setState(() => _isSendingLocation = true);
+
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        AppToast.error('shared.chat.location_service_disabled'.tr());
+        return;
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          AppToast.error('shared.chat.location_permission_denied'.tr());
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        AppToast.error('shared.chat.location_permission_denied_forever'.tr());
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
+
+      final locationUrl =
+          'https://www.google.com/maps?q=${position.latitude},${position.longitude}';
+
+      _chatCubit.sendMessage(locationUrl);
+      _scrollToBottom();
+    } catch (_) {
+      AppToast.error('shared.chat.location_fetch_failed'.tr());
+    } finally {
+      if (mounted) setState(() => _isSendingLocation = false);
+    }
+  }
+
   void _onBackspacePressed() {
     _messageController.text = _messageController.text.characters
         .skipLast(1)
@@ -278,6 +328,149 @@ class _ChatScreenState extends State<ChatScreen> {
     _messageController.selection = TextSelection.fromPosition(
       TextPosition(offset: _messageController.text.length),
     );
+  }
+
+  void _showMessageActions(ChatModel msg) {
+    if (msg.senderName != 'You' || msg.status != ChatMessageStatus.sent) return;
+    if (msg.id == null) return;
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'dismiss',
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 280),
+      pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
+      transitionBuilder: (context, anim, secondaryAnim, child) {
+        return GestureDetector(
+          onTap: () => AppNavigator.pop(),
+          behavior: HitTestBehavior.opaque,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: 8 * anim.value,
+              sigmaY: 8 * anim.value,
+            ),
+            child: Container(
+              color: AppColors.black.withValues(alpha: 0.25 * anim.value),
+              child: Center(
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: ScaleTransition(
+                      scale: CurvedAnimation(
+                        parent: anim,
+                        curve: Curves.easeOutBack,
+                        reverseCurve: Curves.easeIn,
+                      ),
+                      child: FadeTransition(
+                        opacity: anim,
+                        child: _buildMessageActionsSheet(msg),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSelectionBar(ChatLoaded state) {
+    return Container(
+      color: AppColors.white,
+      padding: AppSize.padding(horizontal: 12, vertical: 10),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => _chatCubit.exitSelectionMode(),
+            child: Center(
+              child: CustomIcon(
+                icon: AppIcons.close,
+                color: AppColors.black,
+                width: AppSize.getSize(24),
+                height: AppSize.getSize(24),
+              ),
+            ),
+          ),
+          SizedBox(width: AppSize.getWidth(14)),
+          Expanded(
+            child: Text(
+              'shared.chat.selected_count'.tr(
+                namedArgs: {'count': '${state.selectedMessageIds.length}'},
+              ),
+              style: TextStyle(
+                fontSize: AppSize.font(15),
+                fontWeight: FontWeight.w600,
+                color: AppColors.black,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () =>
+                _confirmDeleteSelected(state.selectedMessageIds.length),
+            child: Center(
+              child: CustomIcon(
+                icon: AppIcons.delete,
+                color: AppColors.red,
+                width: AppSize.getSize(24),
+                height: AppSize.getSize(24),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteMessage(ChatModel msg) {
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmDialog(
+        title: 'shared.chat.delete_message'.tr(),
+        message: 'shared.chat.delete_confirm'.tr(),
+        confirmText: 'shared.chat.delete_message'.tr(),
+        cancelText: 'shared.chat.cancel'.tr(),
+        isDestructive: true,
+        onConfirm: () => _chatCubit.deleteSingleMessage(msg.id!),
+      ),
+    );
+  }
+
+  void _confirmDeleteSelected(int count) {
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmDialog(
+        title: 'shared.chat.delete_message'.tr(),
+        message: 'shared.chat.delete_selected_confirm'.tr(
+          namedArgs: {'count': '$count'},
+        ),
+        confirmText: 'shared.chat.delete_message'.tr(),
+        cancelText: 'shared.chat.cancel'.tr(),
+        isDestructive: true,
+        onConfirm: () => _chatCubit.deleteSelectedMessages(),
+      ),
+    );
+  }
+
+  void _startEditingMessage(ChatModel msg) {
+    setState(() {
+      _editingMessage = msg;
+      _messageController.text = msg.text;
+      _messageController.selection = TextSelection.collapsed(
+        offset: msg.text.length,
+      );
+    });
+    _messageFocusNode.requestFocus();
+  }
+
+  void _cancelEditing() {
+    setState(() {
+      _editingMessage = null;
+      _messageController.clear();
+    });
   }
 
   Future<void> _openLink(String url) async {
@@ -306,8 +499,7 @@ class _ChatScreenState extends State<ChatScreen> {
           : GestureDetector(
               onTap: _jumpToBottom,
               child: Container(
-                width: 44,
-                height: 44,
+                padding: AppSize.padding(all: 10),
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
@@ -319,10 +511,13 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ],
                 ),
-                child: const Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  color: Colors.white,
-                  size: 28,
+                child: Center(
+                  child: CustomIcon(
+                    icon: AppIcons.arrowDown,
+                    color: AppColors.white,
+                    width: AppSize.getSize(15),
+                    height: AppSize.getSize(15),
+                  ),
                 ),
               ),
             ),
@@ -332,6 +527,15 @@ class _ChatScreenState extends State<ChatScreen> {
   void _onSendPressed() {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
+
+    if (_editingMessage != null) {
+      final messageId = _editingMessage!.id!;
+      _chatCubit.editMessage(messageId: messageId, newText: text);
+
+      setState(() => _editingMessage = null);
+      _messageController.clear();
+      return;
+    }
 
     _chatCubit.sendMessage(text);
     _messageController.clear();
@@ -364,136 +568,282 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F5F7),
         body: SafeArea(
-          child: Column(
-            children: [
-              _buildAppBar(context),
-              _buildEventBanner(),
-              _buildPinnedSection(),
+          child: BlocBuilder<ChatCubit, ChatState>(
+            buildWhen: (previous, current) =>
+                current is ChatLoaded &&
+                (previous is! ChatLoaded ||
+                    previous.isSelectionMode != current.isSelectionMode ||
+                    previous.selectedMessageIds.length !=
+                        current.selectedMessageIds.length),
+            builder: (context, state) {
+              final isSelectionMode =
+                  state is ChatLoaded && state.isSelectionMode;
 
-              Expanded(
-                child: Stack(
-                  children: [
-                    BlocConsumer<ChatCubit, ChatState>(
-                      listener: (context, state) {
-                        if (state is ChatError) {
-                          AppToast.error(state.message);
-                          return;
-                        }
+              return Column(
+                children: [
+                  if (isSelectionMode)
+                    _buildSelectionBar(state)
+                  else ...[
+                    _buildAppBar(context),
+                    _buildEventBanner(),
+                    _buildPinnedSection(),
+                  ],
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        BlocConsumer<ChatCubit, ChatState>(
+                          listener: (context, state) {
+                            if (state is ChatError) {
+                              AppToast.error(state.message);
+                              return;
+                            }
 
-                        if (state is! ChatLoaded) return;
+                            if (state is! ChatLoaded) return;
 
-                        // ==========================
-                        // تحميل رسائل قديمة فوق
-                        // ==========================
-                        if (_prevMaxScrollExtent != null &&
-                            !state.isLoadingMore) {
-                          final oldExtent = _prevMaxScrollExtent!;
-                          _prevMaxScrollExtent = null;
-                          _isLoadingMore = false;
+                            if (_prevMaxScrollExtent != null &&
+                                !state.isLoadingMore) {
+                              final oldExtent = _prevMaxScrollExtent!;
+                              _prevMaxScrollExtent = null;
+                              _isLoadingMore = false;
 
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            if (!_scrollController.hasClients) return;
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (!_scrollController.hasClients) return;
 
-                            final newExtent =
-                                _scrollController.position.maxScrollExtent;
+                                final newExtent =
+                                    _scrollController.position.maxScrollExtent;
 
-                            final diff = newExtent - oldExtent;
+                                final diff = newExtent - oldExtent;
 
-                            if (diff > 0) {
-                              _scrollController.jumpTo(
-                                _scrollController.offset + diff,
+                                if (diff > 0) {
+                                  _scrollController.jumpTo(
+                                    _scrollController.offset + diff,
+                                  );
+                                }
+                              });
+
+                              return;
+                            }
+
+                            if (_isFirstLoad &&
+                                state.messages.isNotEmpty &&
+                                !state.isSyncing) {
+                              _isFirstLoad = false;
+
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (!_scrollController.hasClients) return;
+
+                                _scrollController.jumpTo(
+                                  _scrollController.position.maxScrollExtent,
+                                );
+                              });
+
+                              return;
+                            }
+
+                            if (!_showScrollToBottom) {
+                              _scrollToBottom();
+                            }
+                          },
+                          builder: (context, state) {
+                            if (state is ChatLoading || state is ChatInitial) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
                               );
                             }
-                          });
 
-                          return;
-                        }
+                            if (state is ChatError) {
+                              return _buildErrorState(state.message);
+                            }
 
-                        // ==========================
-                        // أول دخول للشات
-                        // ==========================
-                        if (_isFirstLoad &&
-                            state.messages.isNotEmpty &&
-                            !state.isSyncing) {
-                          _isFirstLoad = false;
+                            final chatState = state as ChatLoaded;
 
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            if (!_scrollController.hasClients) return;
+                            if (chatState.messages.isEmpty &&
+                                !chatState.isSyncing &&
+                                !chatState.isLoadingMore) {
+                              return _buildEmptyState();
+                            }
 
-                            _scrollController.jumpTo(
-                              _scrollController.position.maxScrollExtent,
-                            );
-                          });
-
-                          return;
-                        }
-
-                        // ==========================
-                        // رسالة جديدة فقط
-                        // ==========================
-                        if (!_showScrollToBottom) {
-                          _scrollToBottom();
-                        }
-                      },
-                      builder: (context, state) {
-                        if (state is ChatLoading || state is ChatInitial) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-
-                        if (state is ChatError) {
-                          return _buildErrorState(state.message);
-                        }
-
-                        final chatState = state as ChatLoaded;
-
-                        if (chatState.messages.isEmpty &&
-                            !chatState.isSyncing &&
-                            !chatState.isLoadingMore) {
-                          return _buildEmptyState();
-                        }
-
-                        return SingleChildScrollView(
-                          controller: _scrollController,
-                          child: Column(
-                            children: [
-                              if (chatState.isSyncing) _buildSyncingBanner(),
-                              if (chatState.isLoadingMore)
-                                Padding(
-                                  padding: AppSize.padding(vertical: 10),
-                                  child: const Center(
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
+                            return SingleChildScrollView(
+                              controller: _scrollController,
+                              child: Column(
+                                children: [
+                                  if (chatState.isSyncing)
+                                    _buildSyncingBanner(),
+                                  if (chatState.isLoadingMore)
+                                    Padding(
+                                      padding: AppSize.padding(vertical: 10),
+                                      child: const Center(
+                                        child: SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ..._buildMessagesWithDividers(chatState.messages),
-                              SizedBox(height: AppSize.getHeight(12)),
-                            ],
-                          ),
-                        );
-                      },
+                                  ..._buildMessagesWithDividers(chatState),
+                                  SizedBox(height: AppSize.getHeight(12)),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        Positioned(
+                          right: 16,
+                          bottom: 20,
+                          child: _buildScrollToBottomButton(),
+                        ),
+                      ],
                     ),
-                    Positioned(
-                      right: 16,
-                      bottom: 20,
-                      child: _buildScrollToBottomButton(),
-                    ),
-                  ],
-                ),
-              ),
-              _buildMessageInput(),
-            ],
+                  ),
+                  if (!isSelectionMode) _buildMessageInput(),
+                ],
+              );
+            },
           ),
         ),
       ),
     );
   }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return BlocProvider.value(
+  //     value: _chatCubit,
+  //     child: Scaffold(
+  //       backgroundColor: const Color(0xFFF5F5F7),
+  //       body: SafeArea(
+  //         child: Column(
+  //           children: [
+  //             _buildAppBar(context),
+  //             _buildEventBanner(),
+  //             _buildPinnedSection(),
+  //
+  //             Expanded(
+  //               child: Stack(
+  //                 children: [
+  //                   BlocConsumer<ChatCubit, ChatState>(
+  //                     listener: (context, state) {
+  //                       if (state is ChatError) {
+  //                         AppToast.error(state.message);
+  //                         return;
+  //                       }
+  //
+  //                       if (state is! ChatLoaded) return;
+  //
+  //                       // ==========================
+  //                       // تحميل رسائل قديمة فوق
+  //                       // ==========================
+  //                       if (_prevMaxScrollExtent != null &&
+  //                           !state.isLoadingMore) {
+  //                         final oldExtent = _prevMaxScrollExtent!;
+  //                         _prevMaxScrollExtent = null;
+  //                         _isLoadingMore = false;
+  //
+  //                         WidgetsBinding.instance.addPostFrameCallback((_) {
+  //                           if (!_scrollController.hasClients) return;
+  //
+  //                           final newExtent =
+  //                               _scrollController.position.maxScrollExtent;
+  //
+  //                           final diff = newExtent - oldExtent;
+  //
+  //                           if (diff > 0) {
+  //                             _scrollController.jumpTo(
+  //                               _scrollController.offset + diff,
+  //                             );
+  //                           }
+  //                         });
+  //
+  //                         return;
+  //                       }
+  //
+  //                       // ==========================
+  //                       // أول دخول للشات
+  //                       // ==========================
+  //                       if (_isFirstLoad &&
+  //                           state.messages.isNotEmpty &&
+  //                           !state.isSyncing) {
+  //                         _isFirstLoad = false;
+  //
+  //                         WidgetsBinding.instance.addPostFrameCallback((_) {
+  //                           if (!_scrollController.hasClients) return;
+  //
+  //                           _scrollController.jumpTo(
+  //                             _scrollController.position.maxScrollExtent,
+  //                           );
+  //                         });
+  //
+  //                         return;
+  //                       }
+  //
+  //                       // ==========================
+  //                       // رسالة جديدة فقط
+  //                       // ==========================
+  //                       if (!_showScrollToBottom) {
+  //                         _scrollToBottom();
+  //                       }
+  //                     },
+  //                     builder: (context, state) {
+  //                       if (state is ChatLoading || state is ChatInitial) {
+  //                         return const Center(
+  //                           child: CircularProgressIndicator(),
+  //                         );
+  //                       }
+  //
+  //                       if (state is ChatError) {
+  //                         return _buildErrorState(state.message);
+  //                       }
+  //
+  //                       final chatState = state as ChatLoaded;
+  //
+  //                       if (chatState.messages.isEmpty &&
+  //                           !chatState.isSyncing &&
+  //                           !chatState.isLoadingMore) {
+  //                         return _buildEmptyState();
+  //                       }
+  //
+  //                       return SingleChildScrollView(
+  //                         controller: _scrollController,
+  //                         child: Column(
+  //                           children: [
+  //                             if (chatState.isSyncing) _buildSyncingBanner(),
+  //                             if (chatState.isLoadingMore)
+  //                               Padding(
+  //                                 padding: AppSize.padding(vertical: 10),
+  //                                 child: const Center(
+  //                                   child: SizedBox(
+  //                                     width: 20,
+  //                                     height: 20,
+  //                                     child: CircularProgressIndicator(
+  //                                       strokeWidth: 2,
+  //                                     ),
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                             ..._buildMessagesWithDividers(chatState.messages),
+  //                             SizedBox(height: AppSize.getHeight(12)),
+  //                           ],
+  //                         ),
+  //                       );
+  //                     },
+  //                   ),
+  //                   Positioned(
+  //                     right: 16,
+  //                     bottom: 20,
+  //                     child: _buildScrollToBottomButton(),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //             _buildMessageInput(),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // ── AppBar ───────────────────────────────────────────────────────────────
 
@@ -542,13 +892,35 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 SizedBox(height: AppSize.getHeight(1)),
-                Text(
-                  // TODO: يتربط بـ Ably presence count (channel.presence.get())
-                  '6 online • 8 members',
-                  style: TextStyle(
-                    fontSize: AppSize.font(12),
-                    color: AppColors.grey500,
-                  ),
+                BlocBuilder<ChatCubit, ChatState>(
+                  buildWhen: (previous, current) =>
+                      current is ChatLoaded &&
+                      (previous is! ChatLoaded ||
+                          previous.onlineCount != current.onlineCount ||
+                          previous.totalMembersCount !=
+                              current.totalMembersCount),
+                  builder: (context, state) {
+                    final online = state is ChatLoaded ? state.onlineCount : 0;
+                    final total = state is ChatLoaded
+                        ? state.totalMembersCount
+                        : 0;
+
+                    if (state is ChatLoaded) {
+                      debugPrint(
+                        "UI -> online=${state.onlineCount}, total=${state.totalMembersCount}",
+                      );
+                    }
+
+                    return Text(
+                      'shared.chat.online_members_count'.tr(
+                        namedArgs: {'online': '$online', 'total': '$total'},
+                      ),
+                      style: TextStyle(
+                        fontSize: AppSize.font(12),
+                        color: AppColors.grey500,
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -556,7 +928,11 @@ class _ChatScreenState extends State<ChatScreen> {
           CustomIcon(
             icon: AppIcons.community,
             color: AppColors.grey600,
-            onTap: () => MembersBottomSheet.show(context),
+            onTap: () => MembersBottomSheet.show(
+              context,
+              eventId: widget.eventId,
+              organizerName: widget.event.organizerName,
+            ),
           ),
           SizedBox(width: AppSize.getWidth(10)),
           CustomIcon(
@@ -874,13 +1250,13 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  List<Widget> _buildMessagesWithDividers(List<ChatModel> messages) {
+  List<Widget> _buildMessagesWithDividers(ChatLoaded chatState) {
     final widgets = <Widget>[];
     DateTime? lastDate;
     String? lastSenderName;
 
-    for (int i = 0; i < messages.length; i++) {
-      final msg = messages[i];
+    for (int i = 0; i < chatState.messages.length; i++) {
+      final msg = chatState.messages[i];
       final msgDate = DateTime(
         msg.createdAt.year,
         msg.createdAt.month,
@@ -892,13 +1268,20 @@ class _ChatScreenState extends State<ChatScreen> {
       if (isNewDay) {
         widgets.add(_buildDateDivider(_dateDividerLabel(msg.createdAt)));
         lastDate = msgDate;
-        lastSenderName = null; // 👈 يوم جديد = مجموعة جديدة حتى لو نفس الشخص
+        lastSenderName = null;
       }
 
-      // أول رسالة في مجموعتها لو: يوم جديد، أو الراسل مختلف عن اللي قبله
       final isFirstInGroup = lastSenderName != msg.senderName;
 
-      widgets.add(_buildChatMessage(msg, isFirstInGroup: isFirstInGroup));
+      widgets.add(
+        _buildChatMessage(
+          msg,
+          isFirstInGroup: isFirstInGroup,
+          isSelectionMode: chatState.isSelectionMode,
+          isSelected:
+              msg.id != null && chatState.selectedMessageIds.contains(msg.id),
+        ),
+      );
 
       lastSenderName = msg.senderName;
     }
@@ -925,9 +1308,15 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildChatMessage(ChatModel msg, {required bool isFirstInGroup}) {
+  Widget _buildChatMessage(
+    ChatModel msg, {
+    required bool isFirstInGroup,
+    bool isSelectionMode = false,
+    bool isSelected = false,
+  }) {
     final bool isSanad = msg.badge == 'Sanad Admin';
     final bool isMe = msg.senderName == 'You';
+    final bool isSelectable = isSelectionMode && isMe && msg.id != null;
 
     final bubbleColor = isMe
         ? AppColors.primary
@@ -935,196 +1324,249 @@ class _ChatScreenState extends State<ChatScreen> {
 
     final textColor = isMe ? Colors.white : AppColors.black;
 
-    return Padding(
-      padding: AppSize.padding(
-        horizontal: 14,
-        top: isFirstInGroup ? 8 : 2,
-        bottom: isFirstInGroup ? 0 : 0,
-      ),
-      child: Row(
-        mainAxisAlignment: isMe
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (!isMe) ...[
-            isFirstInGroup
-                ? _buildAvatar(msg)
-                : SizedBox(width: AppSize.getSize(38)),
-            SizedBox(width: AppSize.getWidth(10)),
-          ],
-          Flexible(
-            child: Column(
-              crossAxisAlignment: isMe
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
-              children: [
-                if (isFirstInGroup) ...[
-                  Row(
-                    mainAxisAlignment: isMe
-                        ? MainAxisAlignment.end
-                        : MainAxisAlignment.start,
-                    children: [
-                      if (!isMe)
-                        Text(
-                          msg.senderName,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: AppSize.font(12),
-                            color: AppColors.black,
-                          ),
-                        ),
-                      if (!isMe && msg.badge != null) ...[
-                        SizedBox(width: AppSize.getWidth(6)),
-                        _buildBadge(msg),
-                      ],
-                      if (isMe) ...[
-                        if (msg.badge != null) _buildBadge(msg),
-                        SizedBox(width: AppSize.getWidth(6)),
-                        Text(
-                          msg.senderName,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: AppSize.font(13),
-                            color: AppColors.black,
-                          ),
-                        ),
-                      ],
-                    ],
+    return GestureDetector(
+      onTap: isSelectionMode
+          ? () {
+              if (!isSelectable) return;
+              _chatCubit.toggleMessageSelection(msg.id!, isOwnMessage: isMe);
+            }
+          : null,
+      child: Container(
+        color: isSelected
+            ? AppColors.primary.withValues(alpha: 0.06)
+            : Colors.transparent,
+        padding: AppSize.padding(
+          horizontal: 14,
+          top: isFirstInGroup ? 8 : 2,
+          bottom: isFirstInGroup ? 0 : 0,
+        ),
+        child: Row(
+          mainAxisAlignment: isMe
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
+          children: [
+            if (isSelectionMode && isMe) ...[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (isFirstInGroup) ...[
+                    Opacity(opacity: 0, child: _buildNameBadgeRow(msg, isMe)),
+                    SizedBox(height: AppSize.getHeight(5)),
+                  ],
+                  Padding(
+                    padding: AppSize.padding(top: 6),
+                    child: Icon(
+                      isSelected
+                          ? Icons.check_circle
+                          : Icons.radio_button_unchecked,
+                      size: 20,
+                      color: isSelected ? AppColors.primary : AppColors.grey500,
+                    ),
                   ),
-                  SizedBox(height: AppSize.getHeight(5)),
                 ],
-                GestureDetector(
-                  child: Column(
-                    crossAxisAlignment: isMe
-                        ? CrossAxisAlignment.end
-                        : CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: AppSize.padding(horizontal: 14, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: bubbleColor,
-                          border: Border.all(color: AppColors.grey300),
-                          borderRadius: BorderRadius.only(
-                            topLeft: const Radius.circular(20),
-                            topRight: const Radius.circular(20),
-                            bottomLeft: Radius.circular(isMe ? 20 : 10),
-                            bottomRight: Radius.circular(isMe ? 10 : 20),
+              ),
+              SizedBox(width: AppSize.getWidth(8)),
+            ],
+            if (!isMe) ...[
+              isFirstInGroup
+                  ? _buildAvatar(msg)
+                  : SizedBox(width: AppSize.getSize(38)),
+              SizedBox(width: AppSize.getWidth(10)),
+            ],
+            Flexible(
+              child: Column(
+                crossAxisAlignment: isMe
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
+                children: [
+                  if (isFirstInGroup) ...[
+                    _buildNameBadgeRow(msg, isMe),
+                    SizedBox(height: AppSize.getHeight(5)),
+                  ],
+                  GestureDetector(
+                    onLongPress: () => _showMessageActions(msg),
+                    child: Column(
+                      crossAxisAlignment: isMe
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: AppSize.padding(
+                            horizontal: 14,
+                            vertical: 10,
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Linkify(
-                              text: msg.text,
-                              onOpen: (link) => _openLink(link.url),
-                              softWrap: true,
-                              overflow: TextOverflow.visible,
-                              options: const LinkifyOptions(humanize: true),
-                              style: TextStyle(
-                                fontSize: AppSize.font(13),
-                                color: textColor,
-                                fontWeight: FontWeight.w600,
-                                height: 1.5,
-                              ),
-                              linkStyle: TextStyle(
-                                fontSize: AppSize.font(13),
-                                color: isMe
-                                    ? AppColors.white
-                                    : AppColors.laserBlue,
-                                height: 1.5,
-                                decoration: TextDecoration.underline,
-                                decorationColor: isMe
-                                    ? AppColors.white
-                                    : AppColors.laserBlue,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          decoration: BoxDecoration(
+                            color: bubbleColor,
+                            border: Border.all(color: AppColors.grey300),
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(20),
+                              topRight: const Radius.circular(20),
+                              bottomLeft: Radius.circular(isMe ? 20 : 10),
+                              bottomRight: Radius.circular(isMe ? 10 : 20),
                             ),
-                            SizedBox(height: AppSize.getHeight(4)),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  DateFormat(
-                                    'hh:mm a',
-                                    'en_US',
-                                  ).format(msg.createdAt),
-                                  style: TextStyle(
-                                    fontSize: AppSize.font(10),
-                                    color: isMe
-                                        ? Colors.white.withValues(alpha: 0.75)
-                                        : AppColors.grey500,
-                                  ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Linkify(
+                                text: msg.text,
+                                onOpen: (link) => _openLink(link.url),
+                                softWrap: true,
+                                overflow: TextOverflow.visible,
+                                options: const LinkifyOptions(humanize: true),
+                                style: TextStyle(
+                                  fontSize: AppSize.font(13),
+                                  color: textColor,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.5,
                                 ),
-                                if (msg.status ==
-                                    ChatMessageStatus.sending) ...[
-                                  SizedBox(width: AppSize.getWidth(4)),
-                                  SizedBox(
-                                    width: 9,
-                                    height: 9,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 1.3,
+                                linkStyle: TextStyle(
+                                  fontSize: AppSize.font(13),
+                                  color: isMe
+                                      ? AppColors.white
+                                      : AppColors.laserBlue,
+                                  height: 1.5,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: isMe
+                                      ? AppColors.white
+                                      : AppColors.laserBlue,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(height: AppSize.getHeight(4)),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    DateFormat(
+                                      'hh:mm a',
+                                      'en_US',
+                                    ).format(msg.createdAt),
+                                    style: TextStyle(
+                                      fontSize: AppSize.font(10),
                                       color: isMe
-                                          ? Colors.white70
+                                          ? Colors.white.withValues(alpha: 0.75)
                                           : AppColors.grey500,
                                     ),
                                   ),
+                                  if (msg.isEdited) ...[
+                                    SizedBox(width: AppSize.getWidth(4)),
+                                    Text(
+                                      'shared.chat.edited'.tr(),
+                                      style: TextStyle(
+                                        fontSize: AppSize.font(9),
+                                        fontStyle: FontStyle.italic,
+                                        color: isMe
+                                            ? Colors.white70
+                                            : AppColors.grey500,
+                                      ),
+                                    ),
+                                  ],
+                                  if (msg.status ==
+                                      ChatMessageStatus.sending) ...[
+                                    SizedBox(width: AppSize.getWidth(4)),
+                                    SizedBox(
+                                      width: 9,
+                                      height: 9,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 1.3,
+                                        color: isMe
+                                            ? Colors.white70
+                                            : AppColors.grey500,
+                                      ),
+                                    ),
+                                  ],
                                 ],
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      if (msg.reactionEmoji != null)
-                        Padding(
-                          padding: AppSize.padding(top: 6),
-                          child: _buildReaction(msg),
-                        ),
-
-                      if (msg.status == ChatMessageStatus.failed)
-                        Padding(
-                          padding: AppSize.padding(top: 4),
-                          child: GestureDetector(
-                            onTap: () => _chatCubit.retryMessage(msg.localId!),
-                            behavior: HitTestBehavior.opaque,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CustomIcon(
-                                  icon: AppIcons.info,
-                                  color: AppColors.red,
-                                  width: AppSize.getSize(12),
-                                  height: AppSize.getSize(12),
-                                ),
-                                SizedBox(width: AppSize.getWidth(2)),
-                                Text(
-                                  'shared.chat.tap_to_retry'.tr(),
-                                  style: TextStyle(
-                                    fontSize: AppSize.font(10),
-                                    color: AppColors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                    ],
+
+                        if (msg.reactionEmoji != null)
+                          Padding(
+                            padding: AppSize.padding(top: 6),
+                            child: _buildReaction(msg),
+                          ),
+
+                        if (msg.status == ChatMessageStatus.failed)
+                          Padding(
+                            padding: AppSize.padding(top: 4),
+                            child: GestureDetector(
+                              onTap: () =>
+                                  _chatCubit.retryMessage(msg.localId!),
+                              behavior: HitTestBehavior.opaque,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CustomIcon(
+                                    icon: AppIcons.info,
+                                    color: AppColors.red,
+                                    width: AppSize.getSize(12),
+                                    height: AppSize.getSize(12),
+                                  ),
+                                  SizedBox(width: AppSize.getWidth(2)),
+                                  Text(
+                                    'shared.chat.tap_to_retry'.tr(),
+                                    style: TextStyle(
+                                      fontSize: AppSize.font(10),
+                                      color: AppColors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: AppSize.getHeight(4)),
-              ],
+                  SizedBox(height: AppSize.getHeight(4)),
+                ],
+              ),
+            ),
+            if (isMe) ...[
+              SizedBox(width: AppSize.getWidth(10)),
+              isFirstInGroup
+                  ? _buildAvatar(msg)
+                  : SizedBox(width: AppSize.getSize(38)),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNameBadgeRow(ChatModel msg, bool isMe) {
+    return Row(
+      mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (!isMe)
+          Text(
+            msg.senderName,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: AppSize.font(12),
+              color: AppColors.black,
             ),
           ),
-          if (isMe) ...[
-            SizedBox(width: AppSize.getWidth(10)),
-            isFirstInGroup
-                ? _buildAvatar(msg)
-                : SizedBox(width: AppSize.getSize(38)),
-          ],
+        if (!isMe && msg.badge != null) ...[
+          SizedBox(width: AppSize.getWidth(6)),
+          _buildBadge(msg),
         ],
-      ),
+        if (isMe) ...[
+          if (msg.badge != null) _buildBadge(msg),
+          SizedBox(width: AppSize.getWidth(6)),
+          Text(
+            msg.senderName,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: AppSize.font(13),
+              color: AppColors.black,
+            ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -1198,6 +1640,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildMessageInput() {
     return Column(
       children: [
+        if (_editingMessage != null) _buildEditingBanner(),
         Container(
           padding: AppSize.padding(horizontal: 12, bottom: 12),
           child: Row(
@@ -1209,17 +1652,36 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: CustomIcon(
                     icon: _showEmojiPicker ? AppIcons.keyboard : AppIcons.emoji,
                     color: AppColors.grey600,
-                    width: AppSize.getSize(24),
-                    height: AppSize.getSize(24),
+                    width: AppSize.getSize(23),
+                    height: AppSize.getSize(23),
                   ),
                 ),
               ),
-              SizedBox(width: AppSize.getWidth(6)),
+              GestureDetector(
+                onTap: _sendCurrentLocation,
+                child: Padding(
+                  padding: AppSize.padding(all: 6),
+                  child: _isSendingLocation
+                      ? SizedBox(
+                          width: AppSize.getSize(24),
+                          height: AppSize.getSize(24),
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : CustomIcon(
+                          icon: AppIcons.location,
+                          color: AppColors.grey600,
+                          width: AppSize.getSize(24),
+                          height: AppSize.getSize(24),
+                        ),
+                ),
+              ),
               Expanded(
                 child: CustomFieldText(
                   controller: _messageController,
                   focusNode: _messageFocusNode,
-                  hintText: 'Write a message...',
+                  hintText: 'shared.chat.write_message'.tr(),
                   onTap: () {
                     if (_showEmojiPicker) {
                       setState(() => _showEmojiPicker = false);
@@ -1348,6 +1810,142 @@ class _ChatScreenState extends State<ChatScreen> {
             style: TextStyle(
               fontSize: AppSize.font(11),
               color: AppColors.grey500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessageActionsSheet(ChatModel msg) {
+    return Padding(
+      padding: AppSize.padding(horizontal: 40),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            constraints: BoxConstraints(maxWidth: AppSize.getWidth(280)),
+            padding: AppSize.padding(horizontal: 18, vertical: 14),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              msg.text,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: AppSize.font(16),
+                height: 1.5,
+              ),
+            ),
+          ),
+          SizedBox(height: AppSize.getHeight(14)),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildActionTile(
+                  icon: AppIcons.edit,
+                  label: 'shared.chat.edit_message'.tr(),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _startEditingMessage(msg);
+                  },
+                ),
+                Divider(height: 1, color: AppColors.grey300),
+                _buildActionTile(
+                  icon: AppIcons.check,
+                  label: 'shared.chat.select_messages'.tr(),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _chatCubit.enterSelectionMode(msg.id!);
+                  },
+                ),
+                Divider(height: 1, color: AppColors.grey300),
+                _buildActionTile(
+                  icon: AppIcons.delete,
+                  label: 'shared.chat.delete_message'.tr(),
+                  color: AppColors.red,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _confirmDeleteMessage(msg);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionTile({
+    required String icon,
+    required String label,
+    required VoidCallback onTap,
+    Color? color,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: AppSize.padding(horizontal: 18, vertical: 14),
+        child: Row(
+          children: [
+            CustomIcon(
+              icon: icon,
+              color: color ?? AppColors.black,
+              width: AppSize.getSize(20),
+              height: AppSize.getSize(20),
+            ),
+            SizedBox(width: AppSize.getWidth(12)),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: AppSize.font(14),
+                fontWeight: FontWeight.w500,
+                color: color ?? AppColors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEditingBanner() {
+    return Container(
+      padding: AppSize.padding(horizontal: 20, vertical: 12),
+      color: AppColors.primary.withValues(alpha: 0.08),
+      child: Row(
+        children: [
+          CustomIcon(
+            icon: AppIcons.edit,
+            width: AppSize.getSize(20),
+            height: AppSize.getSize(20),
+          ),
+          SizedBox(width: AppSize.getWidth(6)),
+          Expanded(
+            child: Text(
+              'shared.chat.editing_message'.tr(),
+              style: TextStyle(
+                fontSize: AppSize.font(12),
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: _cancelEditing,
+            child: CustomIcon(
+              icon: AppIcons.close,
+              color: AppColors.grey600,
+              width: AppSize.getSize(20),
+              height: AppSize.getSize(20),
             ),
           ),
         ],

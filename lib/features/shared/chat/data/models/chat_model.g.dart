@@ -66,13 +66,14 @@ class EventChatDetailModelAdapter extends TypeAdapter<EventChatDetailModel> {
       created: fields[3] as DateTime,
       modified: fields[4] as DateTime,
       message: fields[5] as String,
+      isEdited: fields[6] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, EventChatDetailModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -84,7 +85,9 @@ class EventChatDetailModelAdapter extends TypeAdapter<EventChatDetailModel> {
       ..writeByte(4)
       ..write(obj.modified)
       ..writeByte(5)
-      ..write(obj.message);
+      ..write(obj.message)
+      ..writeByte(6)
+      ..write(obj.isEdited);
   }
 
   @override

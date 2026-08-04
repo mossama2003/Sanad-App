@@ -1,23 +1,67 @@
-import 'dart:ui';
-
 import '../enums/member_role_enum.dart';
 
-class MembersModel {
-  final String name;
-  final String? subtitle;
-  final bool isOnline;
-  final Color avatarColor;
-  final MemberRoleEnum role;
+class MemberModel {
+  final int id;
+  final String volunteerName;
+  final String role;
 
-  const MembersModel({
-    required this.name,
-    this.subtitle,
-    this.isOnline = false,
-    required this.avatarColor,
+  const MemberModel({
+    required this.id,
+    required this.volunteerName,
     required this.role,
   });
 
-  String get avatarLetter => name[0].toUpperCase();
+  factory MemberModel.fromJson(Map<String, dynamic> json) {
+    return MemberModel(
+      id: json['id'] ?? 0,
+      volunteerName: json['volunteer'] ?? '',
+      role: (json['role'] ?? '').toString(),
+    );
+  }
 
-  String get statusText => subtitle ?? (isOnline ? 'Online now' : 'Offline');
+  MemberRoleEnum get roleEnum {
+    switch (role.trim().toLowerCase()) {
+      case 'admin':
+        return MemberRoleEnum.admin;
+      case 'organization':
+      case 'organizer':
+        return MemberRoleEnum.organizer;
+      default:
+        return MemberRoleEnum.volunteer;
+    }
+  }
+
+  String get avatarLetter => volunteerName.trim().isNotEmpty
+      ? volunteerName.trim()[0].toUpperCase()
+      : '?';
+}
+
+class PaginatedMembersModel {
+  final int count;
+  final int maxPages;
+  final String? next;
+  final String? previous;
+  final List<MemberModel> results;
+
+  const PaginatedMembersModel({
+    required this.count,
+    required this.maxPages,
+    this.next,
+    this.previous,
+    required this.results,
+  });
+
+  factory PaginatedMembersModel.fromJson(Map<String, dynamic> json) {
+    return PaginatedMembersModel(
+      count: json['count'] ?? 0,
+      maxPages: json['max_pages'] ?? 1,
+      next: json['next'],
+      previous: json['previous'],
+      results: (json['results'] as List<dynamic>? ?? [])
+          .map((e) => MemberModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  bool get hasMore => next != null;
 }

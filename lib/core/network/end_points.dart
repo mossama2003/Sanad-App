@@ -38,6 +38,12 @@ String SEND_CHAT_MESSAGE = 'v1/events/event_chat/';
 String EVENT_MEMBER_BATCH_UPDATE(int eventId) =>
     'v1/events/event_member_batch_update/$eventId/';
 
+String EDIT_MESSAGE(int messageId) => 'v1/events/event_chat/$messageId/';
+
+String DELETE_MESSAGE = 'v1/events/event_chat/batch_delete/';
+
+String EVENT_MEMBERS = 'v1/events/read_event_member/';
+
 /// Volunteering Endpoints
 String JOIN_EVENT = 'v1/events/join/';
 

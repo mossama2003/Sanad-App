@@ -4,13 +4,17 @@ import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dartz/dartz.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/helper/app_toast.dart';
+import '../../../../../core/network/error/failures.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../data/cache/chat_cache_service.dart';
+import '../../data/enums/member_role_enum.dart';
 import '../../data/models/chat_model.dart';
+import '../../data/models/members_model.dart';
 import '../../data/repos/chat_repo.dart';
 import 'package:ably_flutter/ably_flutter.dart' as ably;
 
@@ -24,6 +28,7 @@ class ChatCubit extends Cubit<ChatState> {
   ably.Realtime? _realtime;
   ably.RealtimeChannel? _channel;
   StreamSubscription<ably.Message>? _messageSubscription;
+  StreamSubscription<ably.PresenceMessage>? _presenceSubscription;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -34,9 +39,7 @@ class ChatCubit extends Cubit<ChatState> {
   }) : super(ChatInitial());
 
   Future<void> initChat() async {
-    // 1) Load local cache first
     final cached = await ChatCacheService.getCachedMessages(eventId);
-
     final hasCache = cached.isNotEmpty;
 
     if (hasCache) {
@@ -54,34 +57,75 @@ class ChatCubit extends Cubit<ChatState> {
       emit(ChatLoading());
     }
 
-    // 2) Get token + history parallel
     final results = await Future.wait([
       chatRepo.getChatToken(eventId),
       chatRepo.getChatHistory(eventId: eventId, page: 1),
+      chatRepo.getEventMembers(eventId: eventId, page: 1),
     ]);
 
-    final tokenResult = results[0] as Either<String, ChatTokenModel>;
+    final tokenResult = results[0] as Either<Failure, ChatTokenModel>;
+    final historyResult =
+        results[1] as Either<Failure, PaginatedEventChatModel>;
+    final membersResult = results[2] as Either<Failure, PaginatedMembersModel>;
 
-    final historyResult = results[1] as Either<String, PaginatedEventChatModel>;
+    // final totalMembersCount = membersResult.fold(
+    //   (_) => 0,
+    //   (data) => data.count,
+    // );
 
-    // 3) Update from server
+    final totalMembersCount = membersResult.fold(
+          (failure) {
+        debugPrint('⚠️ getEventMembers FAILED: ${failure.errMessage}'); // 👈 جديد
+        return 0;
+      },
+          (data) {
+        debugPrint('✅ getEventMembers SUCCESS: count = ${data.count}'); // 👈 جديد
+        return data.count;
+      },
+    );
+
     await historyResult.fold(
-      (error) async {
+      (failure) async {
         if (!hasCache) {
-          emit(ChatError(error));
+          emit(ChatError(failure.errMessage));
         } else {
           final current = state;
-
           if (current is ChatLoaded) {
-            emit(current.copyWith(isSyncing: false));
+            emit(
+              current.copyWith(
+                isSyncing: false,
+                totalMembersCount: totalMembersCount,
+              ),
+            );
           }
         }
       },
-
       (data) async {
-        await ChatCacheService.cacheMessages(eventId, data.results);
+        final existingCached = await ChatCacheService.getCachedMessages(
+          eventId,
+        );
+        final editedStatusMap = {
+          for (final m in existingCached) m.id: m.isEdited,
+        };
 
-        final serverMessages = data.results
+        final mergedResults = data.results.map((m) {
+          final wasEdited = editedStatusMap[m.id] ?? false;
+          if (!wasEdited) return m;
+
+          return EventChatDetailModel(
+            id: m.id,
+            creator: m.creator,
+            role: m.role,
+            created: m.created,
+            modified: m.modified,
+            message: m.message,
+            isEdited: true,
+          );
+        }).toList();
+
+        await ChatCacheService.cacheMessages(eventId, mergedResults);
+
+        final serverMessages = mergedResults
             .map((e) => e.toUiModel(currentUserId: currentUserId))
             .toList();
 
@@ -94,6 +138,7 @@ class ChatCubit extends Cubit<ChatState> {
               page: 1,
               hasMore: data.hasMore,
               isSyncing: false,
+              totalMembersCount: totalMembersCount,
             ),
           );
         } else {
@@ -103,6 +148,7 @@ class ChatCubit extends Cubit<ChatState> {
               page: 1,
               hasMore: data.hasMore,
               isSyncing: false,
+              totalMembersCount: totalMembersCount,
             ),
           );
         }
@@ -117,6 +163,7 @@ class ChatCubit extends Cubit<ChatState> {
   Future<void> _connectToAbly(ChatTokenModel token) async {
     _realtime = ably.Realtime(
       options: ably.ClientOptions(
+        clientId: token.clientId,
         authCallback: (params) async {
           return ably.TokenRequest(
             keyName: token.keyName,
@@ -142,10 +189,46 @@ class ChatCubit extends Cubit<ChatState> {
       '📡 Channel attached: events:$eventId | state: ${_channel!.state}',
     );
 
+    try {
+      await _channel!.presence.enter();
+      await _updateOnlineCount();
+    } catch (e) {
+      debugPrint('⚠️ Failed to enter presence: $e');
+    }
+
+    _presenceSubscription = _channel!.presence.subscribe().listen((_) {
+      _updateOnlineCount();
+    });
+
     _messageSubscription = _channel!.subscribe().listen((message) {
       debugPrint('📩 Realtime message received: ${message.data}');
       _onRealtimeMessage(message);
     });
+  }
+
+  Future<void> _updateOnlineCount() async {
+    if (_channel == null) return;
+
+    try {
+      final members = await _channel!.presence.get();
+
+      debugPrint("Presence members: ${members.length}");
+
+      final current = state;
+      if (current is ChatLoaded) {
+        final newState = current.copyWith(
+          onlineCount: members.length,
+        );
+
+        debugPrint(
+          "Emit -> online=${newState.onlineCount}, total=${newState.totalMembersCount}",
+        );
+
+        emit(newState);
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   String _pythonReprToJson(String input) {
@@ -246,9 +329,8 @@ class ChatCubit extends Cubit<ChatState> {
   Future<void> _playSound(String assetPath) async {
     try {
       await _audioPlayer.play(AssetSource(assetPath));
-      debugPrint('🔊 sound played: $assetPath');
-    } catch (e) {
-      debugPrint('🔇 sound error: $e');
+    } catch (_) {
+      // تجاهل أي خطأ تشغيل صوت
     }
   }
 
@@ -279,14 +361,10 @@ class ChatCubit extends Cubit<ChatState> {
     }
 
     final chatMsg = EventChatDetailModel.fromJson(data);
-
     final incomingMessage = chatMsg.toUiModel(currentUserId: currentUserId);
 
     final alreadyExists = current.messages.any((m) => m.id == chatMsg.id);
-
-    if (alreadyExists) {
-      return;
-    }
+    if (alreadyExists) return;
 
     final optimisticIndex = current.messages.indexWhere(
       (m) =>
@@ -297,13 +375,10 @@ class ChatCubit extends Cubit<ChatState> {
 
     if (optimisticIndex != -1) {
       final updatedMessages = [...current.messages];
-
       updatedMessages[optimisticIndex] = incomingMessage;
 
       await ChatCacheService.cacheMessage(eventId, chatMsg);
-
       emit(current.copyWith(messages: updatedMessages));
-
       return;
     }
 
@@ -313,7 +388,6 @@ class ChatCubit extends Cubit<ChatState> {
     }
 
     await ChatCacheService.cacheMessage(eventId, chatMsg);
-
     emit(current.copyWith(messages: [...current.messages, incomingMessage]));
   }
 
@@ -333,16 +407,40 @@ class ChatCubit extends Cubit<ChatState> {
     );
 
     result.fold(
-      (error) {
+      (failure) {
         emit(current.copyWith(isLoadingMore: false));
-        AppToast.error(error);
+        AppToast.error(failure.errMessage);
       },
       (data) async {
-        await ChatCacheService.cacheMessages(eventId, data.results);
+        // 👈 جديد - نفس منطق الـ merge
+        final existingCached = await ChatCacheService.getCachedMessages(
+          eventId,
+        );
+        final editedStatusMap = {
+          for (final m in existingCached) m.id: m.isEdited,
+        };
 
-        final olderMessages = data.results
-            .map((e) => e.toUiModel(currentUserId: currentUserId))
-            .toList();
+        final mergedResults = data.results.map((m) {
+          final wasEdited = editedStatusMap[m.id] ?? false;
+          if (!wasEdited) return m;
+
+          return EventChatDetailModel(
+            id: m.id,
+            creator: m.creator,
+            role: m.role,
+            created: m.created,
+            modified: m.modified,
+            message: m.message,
+            isEdited: true,
+          );
+        }).toList();
+
+        await ChatCacheService.cacheMessages(eventId, mergedResults); // ✅
+
+        final olderMessages =
+            mergedResults // ✅
+                .map((e) => e.toUiModel(currentUserId: currentUserId))
+                .toList();
 
         emit(
           current.copyWith(
@@ -380,9 +478,9 @@ class ChatCubit extends Cubit<ChatState> {
 
     final result = await chatRepo.sendMessage(eventId: eventId, message: text);
 
-    result.fold((error) {
+    result.fold((failure) {
       _updateMessageStatus(localId, ChatMessageStatus.failed);
-      AppToast.error(error);
+      AppToast.error(failure.errMessage);
     }, (sent) => _updateMessageId(localId, sent.id));
   }
 
@@ -400,9 +498,9 @@ class ChatCubit extends Cubit<ChatState> {
 
     final result = await chatRepo.sendMessage(eventId: eventId, message: text);
 
-    result.fold((error) {
+    result.fold((failure) {
       _updateMessageStatus(localId, ChatMessageStatus.failed);
-      AppToast.error(error);
+      AppToast.error(failure.errMessage);
     }, (sent) => _updateMessageId(localId, sent.id));
   }
 
@@ -432,9 +530,154 @@ class ChatCubit extends Cubit<ChatState> {
     emit(current.copyWith(messages: updated));
   }
 
+  // ── Edit message (optimistic + rollback on failure) ────────────────────
+  Future<void> editMessage({
+    required int messageId,
+    required String newText,
+  }) async {
+    final current = state;
+    if (current is! ChatLoaded) return;
+
+    final index = current.messages.indexWhere((m) => m.id == messageId);
+    if (index == -1) return;
+
+    final backup = current.messages;
+    final updatedMessages = [...current.messages];
+    updatedMessages[index] = updatedMessages[index].copyWith(
+      text: newText,
+      isEdited: true,
+    );
+
+    emit(current.copyWith(messages: updatedMessages));
+
+    final result = await chatRepo.editMessage(
+      messageId: messageId,
+      message: newText,
+    );
+
+    result.fold(
+      (failure) {
+        emit(current.copyWith(messages: backup));
+        AppToast.error(failure.errMessage);
+      },
+      (_) async {
+        await ChatCacheService.updateCachedMessageText(
+          eventId: eventId,
+          messageId: messageId,
+          newText: newText,
+          modified: DateTime.now(),
+        );
+      },
+    );
+  }
+
+  // ── Delete single message (from Action Sheet) ───────────────────────────
+  Future<void> deleteSingleMessage(int messageId) async {
+    final current = state;
+    if (current is! ChatLoaded) return;
+
+    final backup = current.messages;
+    final updatedMessages = current.messages
+        .where((m) => m.id != messageId)
+        .toList();
+
+    emit(current.copyWith(messages: updatedMessages));
+
+    final result = await chatRepo.deleteMessages([messageId]);
+
+    result.fold(
+      (failure) {
+        final rolledBack = state;
+        if (rolledBack is ChatLoaded) {
+          emit(rolledBack.copyWith(messages: backup));
+        }
+        AppToast.error(failure.errMessage);
+      },
+      (_) async {
+        // 👈 جديد
+        await ChatCacheService.deleteCachedMessages(eventId, [messageId]);
+      },
+    );
+  }
+
+  // ── Selection mode ───────────────────────────────────────────────────
+  void enterSelectionMode(int messageId) {
+    final current = state;
+    if (current is! ChatLoaded) return;
+
+    emit(
+      current.copyWith(isSelectionMode: true, selectedMessageIds: {messageId}),
+    );
+  }
+
+  void toggleMessageSelection(int messageId, {required bool isOwnMessage}) {
+    if (!isOwnMessage) return;
+
+    final current = state;
+    if (current is! ChatLoaded) return;
+
+    final updated = Set<int>.from(current.selectedMessageIds);
+    if (updated.contains(messageId)) {
+      updated.remove(messageId);
+    } else {
+      updated.add(messageId);
+    }
+
+    if (updated.isEmpty) {
+      emit(current.copyWith(isSelectionMode: false, selectedMessageIds: {}));
+      return;
+    }
+
+    emit(current.copyWith(selectedMessageIds: updated));
+  }
+
+  void exitSelectionMode() {
+    final current = state;
+    if (current is! ChatLoaded) return;
+
+    emit(current.copyWith(isSelectionMode: false, selectedMessageIds: {}));
+  }
+
+  Future<void> deleteSelectedMessages() async {
+    final current = state;
+    if (current is! ChatLoaded || current.selectedMessageIds.isEmpty) return;
+
+    final ids = current.selectedMessageIds.toList();
+    final backup = current.messages;
+
+    final updatedMessages = current.messages
+        .where((m) => m.id == null || !ids.contains(m.id))
+        .toList();
+
+    emit(
+      current.copyWith(
+        messages: updatedMessages,
+        isSelectionMode: false,
+        selectedMessageIds: {},
+      ),
+    );
+
+    final result = await chatRepo.deleteMessages(ids);
+
+    result.fold(
+      (failure) {
+        final rolledBack = state;
+        if (rolledBack is ChatLoaded) {
+          emit(rolledBack.copyWith(messages: backup));
+        }
+        AppToast.error(failure.errMessage);
+      },
+      (deletedIds) async {
+        await ChatCacheService.deleteCachedMessages(eventId, deletedIds);
+      },
+    );
+  }
+
   @override
   Future<void> close() {
     _messageSubscription?.cancel();
+    _presenceSubscription?.cancel();
+    _channel?.presence.leave();
     _channel?.detach();
     _realtime?.close();
     _audioPlayer.dispose();
