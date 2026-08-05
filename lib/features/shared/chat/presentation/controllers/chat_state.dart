@@ -57,12 +57,29 @@ class ChatLoaded extends ChatState {
       totalMembersCount: totalMembersCount ?? this.totalMembersCount,
     );
   }
+
+  // 👈 السطر المطلوب إضافته
+  @override
+  List<Object?> get props => [
+    messages,
+    page,
+    hasMore,
+    isSyncing,
+    isLoadingMore,
+    isSelectionMode,
+    selectedMessageIds,
+    onlineCount,
+    totalMembersCount,
+  ];
 }
 
 class ChatError extends ChatState {
   final String message;
 
-  ChatError(this.message);
+  const ChatError(this.message); // 👈 لاحظ: خليها const برضه، ناقصة const حاليًا
+
+  @override
+  List<Object?> get props => [message]; // 👈 السطر المطلوب إضافته
 }
 
 abstract class MembersState extends Equatable {
