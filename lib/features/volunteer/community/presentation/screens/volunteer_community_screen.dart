@@ -68,176 +68,223 @@ class _VolunteerCommunityScreenState extends State<VolunteerCommunityScreen> {
               forceRefresh: true,
             );
           },
+
           child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+
             child: Padding(
-              padding: AppSize.padding(horizontal: 12, vertical: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'volunteer.community.title'.tr(),
-                    style: TextStyle(
-                      fontSize: AppSize.font(22),
-                      fontWeight: FontWeight.w700,
-                      color: textColor,
-                    ),
-                  ),
-                  SizedBox(height: AppSize.getHeight(3)),
-                  Text(
-                    'volunteer.community.desc'.tr(),
-                    style: TextStyle(
-                      fontSize: AppSize.font(15),
-                      color: textColor.withValues(alpha: .5),
-                    ),
-                  ),
-                  SizedBox(height: AppSize.getHeight(20)),
-                  CustomSearchField(
-                    controller: searchController,
-                    hint: 'volunteer.community.search'.tr(),
-                    borderColor: AppColors.grey300,
-                    borderRadius: 20,
-                    borderWidth: 1,
-                    onChanged: (value) {
-                      context.read<VolunteerCommunityCubit>().search(
-                        volunteerId: CacheHelper.get(CacheKeys.profileId),
-                        query: value,
-                      );
-                    },
-                  ),
-                  SizedBox(height: AppSize.getHeight(15)),
+              padding: EdgeInsets.only(
+                left: 12,
+                right: 12,
+                top: 15,
+                bottom: MediaQuery.of(context).padding.bottom + 30,
+              ),
 
-                  if (cubit.communities.isEmpty)
-                    Container(
-                      width: double.infinity,
-                      padding: AppSize.padding(all: 20),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight:
+                      MediaQuery.of(context).size.height -
+                      MediaQuery.of(context).padding.top -
+                      kToolbarHeight,
+                ),
 
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: textColor.withValues(alpha: .12),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(
-                              alpha: theme.brightness == Brightness.dark
-                                  ? .35
-                                  : .12,
-                            ),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                  children: [
+                    Text(
+                      'volunteer.community.title'.tr(),
+                      style: TextStyle(
+                        fontSize: AppSize.font(22),
+                        fontWeight: FontWeight.w700,
+                        color: textColor,
                       ),
+                    ),
 
-                      child: Column(
-                        children: [
-                          Container(
-                            height: AppSize.getHeight(40),
-                            width: AppSize.getWidth(40),
+                    SizedBox(height: AppSize.getHeight(3)),
 
-                            decoration: BoxDecoration(
-                              color: textColor.withValues(alpha: .1),
-                              shape: BoxShape.circle,
-                            ),
-
-                            child: Center(
-                              child: CustomIcon(
-                                icon: AppIcons.community,
-                                color: textColor.withValues(alpha: .5),
-                                width: AppSize.getSize(20),
-                                height: AppSize.getSize(20),
-                              ),
-                            ),
-                          ),
-
-                          SizedBox(height: AppSize.getHeight(15)),
-
-                          Text(
-                            'volunteer.community.no_communities'.tr(),
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: AppSize.font(16),
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-
-                          SizedBox(height: AppSize.getHeight(10)),
-
-                          Text(
-                            'volunteer.community.join_event_to_access_chat'
-                                .tr(),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: secondaryColor,
-                              fontSize: AppSize.font(14),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-
-                          SizedBox(height: AppSize.getHeight(15)),
-
-                          CustomButton(
-                            width: AppSize.getWidth(150),
-                            height: AppSize.getHeight(40),
-                            title: 'volunteer.community.browse_events'.tr(),
-
-                            onTap: () {
-                              cubit.updateSelectedNavbarItem(
-                                VolunteerHomeNavbarItem.events,
-                              );
-                            },
-                          ),
-                        ],
+                    Text(
+                      'volunteer.community.desc'.tr(),
+                      style: TextStyle(
+                        fontSize: AppSize.font(15),
+                        color: textColor.withValues(alpha: .5),
                       ),
-                    )
-                  else
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: cubit.communities.length,
-                      separatorBuilder: (_, _) =>
-                          SizedBox(height: AppSize.getHeight(10)),
-                      itemBuilder: (_, index) {
-                        return VolunteerCommunityCard(
-                          event: cubit.communities[index],
+                    ),
+
+                    SizedBox(height: AppSize.getHeight(20)),
+
+                    CustomSearchField(
+                      controller: searchController,
+                      hint: 'volunteer.community.search'.tr(),
+                      borderColor: AppColors.grey300,
+                      borderRadius: 20,
+                      borderWidth: 1,
+
+                      onChanged: (value) {
+                        context.read<VolunteerCommunityCubit>().search(
+                          volunteerId: CacheHelper.get(CacheKeys.profileId),
+                          query: value,
                         );
                       },
                     ),
 
-                  SizedBox(height: AppSize.getHeight(20)),
+                    SizedBox(height: AppSize.getHeight(15)),
 
-                  Divider(
-                    thickness: AppSize.font(1),
-                    color: AppColors.black.withValues(alpha: 0.1),
-                  ),
+                    if (cubit.communities.isEmpty)
+                      Container(
+                        width: double.infinity,
 
-                  SizedBox(height: AppSize.getHeight(10)),
+                        padding: AppSize.padding(all: 20),
 
-                  Center(
-                    child: Text(
-                      'volunteer.community.communities_are_automatically_created'
-                          .tr(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: AppSize.font(13),
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.black.withValues(alpha: 0.7),
+                        decoration: BoxDecoration(
+                          color: cardColor,
+
+                          borderRadius: BorderRadius.circular(15),
+
+                          border: Border.all(
+                            color: textColor.withValues(alpha: .12),
+                          ),
+
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(
+                                alpha: theme.brightness == Brightness.dark
+                                    ? .35
+                                    : .12,
+                              ),
+
+                              blurRadius: 8,
+
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+
+                        child: Column(
+                          children: [
+                            Container(
+                              height: AppSize.getHeight(40),
+                              width: AppSize.getWidth(40),
+
+                              decoration: BoxDecoration(
+                                color: textColor.withValues(alpha: .1),
+                                shape: BoxShape.circle,
+                              ),
+
+                              child: Center(
+                                child: CustomIcon(
+                                  icon: AppIcons.community,
+                                  color: textColor.withValues(alpha: .5),
+                                  width: AppSize.getSize(20),
+                                  height: AppSize.getSize(20),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: AppSize.getHeight(15)),
+
+                            Text(
+                              'volunteer.community.no_communities'.tr(),
+
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: AppSize.font(16),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+
+                            SizedBox(height: AppSize.getHeight(10)),
+
+                            Text(
+                              'volunteer.community.join_event_to_access_chat'
+                                  .tr(),
+
+                              textAlign: TextAlign.center,
+
+                              style: TextStyle(
+                                color: secondaryColor,
+                                fontSize: AppSize.font(14),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+
+                            SizedBox(height: AppSize.getHeight(15)),
+
+                            CustomButton(
+                              width: AppSize.getWidth(150),
+                              height: AppSize.getHeight(40),
+
+                              title: 'volunteer.community.browse_events'.tr(),
+
+                              onTap: () {
+                                cubit.updateSelectedNavbarItem(
+                                  VolunteerHomeNavbarItem.events,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      ListView.separated(
+                        shrinkWrap: true,
+
+                        physics: const NeverScrollableScrollPhysics(),
+
+                        itemCount: cubit.communities.length,
+
+                        separatorBuilder: (_, _) =>
+                            SizedBox(height: AppSize.getHeight(10)),
+
+                        itemBuilder: (_, index) {
+                          return VolunteerCommunityCard(
+                            event: cubit.communities[index],
+                          );
+                        },
+                      ),
+
+                    SizedBox(height: AppSize.getHeight(20)),
+
+                    Divider(
+                      thickness: AppSize.font(1),
+
+                      color: AppColors.black.withValues(alpha: 0.1),
+                    ),
+
+                    SizedBox(height: AppSize.getHeight(10)),
+
+                    Center(
+                      child: Text(
+                        'volunteer.community.communities_are_automatically_created'
+                            .tr(),
+
+                        textAlign: TextAlign.center,
+
+                        style: TextStyle(
+                          fontSize: AppSize.font(13),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.black.withValues(alpha: 0.7),
+                        ),
                       ),
                     ),
-                  ),
-                  Center(
-                    child: Text(
-                      'volunteer.community.chat_access_remains'.tr(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: AppSize.font(13),
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.black.withValues(alpha: 0.7),
+
+                    Center(
+                      child: Text(
+                        'volunteer.community.chat_access_remains'.tr(),
+
+                        textAlign: TextAlign.center,
+
+                        style: TextStyle(
+                          fontSize: AppSize.font(13),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.black.withValues(alpha: 0.7),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

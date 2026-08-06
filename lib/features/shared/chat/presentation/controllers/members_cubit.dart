@@ -1,11 +1,12 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../../../core/helper/app_toast.dart';
 import '../../data/enums/member_role_enum.dart';
-import '../../data/models/members_model.dart';
+import '../../data/models/member_model.dart';
 import '../../data/repos/chat_repo.dart';
 
 part 'members_state.dart';
@@ -62,6 +63,43 @@ class MembersCubit extends Cubit<MembersState> {
           isLoadingMore: false,
         ),
       ),
+    );
+  }
+
+  Future<void> updateMemberRole({
+    required int memberId,
+    required String newRole,
+  }) async {
+    final current = state;
+    if (current is! MembersLoaded) return;
+
+    final index = current.members.indexWhere((m) => m.id == memberId);
+    if (index == -1) return;
+
+    final backup = current.members;
+
+    // Optimistic update
+    final updatedMembers = [...current.members];
+    updatedMembers[index] = updatedMembers[index].copyWith(role: newRole);
+    emit(current.copyWith(members: updatedMembers));
+
+    final result = await chatRepo.updateVolunteerRole(
+      memberId: memberId,
+      role: newRole,
+    );
+
+    result.fold(
+          (failure) {
+        // Rollback
+        final latest = state;
+        if (latest is MembersLoaded) {
+          emit(latest.copyWith(members: backup));
+        }
+        AppToast.error(failure.errMessage);
+      },
+          (savedRole) {
+        AppToast.success('shared.chat.role_updated'.tr());
+      },
     );
   }
 

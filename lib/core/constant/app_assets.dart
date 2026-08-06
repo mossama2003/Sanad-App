@@ -119,4 +119,7 @@ class AppIcons {
   static String image = '$icons/image.svg';
   static String keyboard = '$icons/keyboard.svg';
   static String emoji = '$icons/emoji.svg';
+  static String tag = '$icons/tag.svg';
+  static String muteNotification = '$icons/mute-notification.svg';
+  static String flag = '$icons/flag.svg';
 }

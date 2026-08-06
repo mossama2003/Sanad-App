@@ -19,6 +19,15 @@ class MemberModel {
     );
   }
 
+  MemberModel copyWith({String? role}) {
+    // 👈 جديد
+    return MemberModel(
+      id: id,
+      volunteerName: volunteerName,
+      role: role ?? this.role,
+    );
+  }
+
   MemberRoleEnum get roleEnum {
     switch (role.trim().toLowerCase()) {
       case 'admin':
@@ -36,14 +45,14 @@ class MemberModel {
       : '?';
 }
 
-class PaginatedMembersModel {
+class PaginatedMemberModel {
   final int count;
   final int maxPages;
   final String? next;
   final String? previous;
   final List<MemberModel> results;
 
-  const PaginatedMembersModel({
+  const PaginatedMemberModel({
     required this.count,
     required this.maxPages,
     this.next,
@@ -51,8 +60,8 @@ class PaginatedMembersModel {
     required this.results,
   });
 
-  factory PaginatedMembersModel.fromJson(Map<String, dynamic> json) {
-    return PaginatedMembersModel(
+  factory PaginatedMemberModel.fromJson(Map<String, dynamic> json) {
+    return PaginatedMemberModel(
       count: json['count'] ?? 0,
       maxPages: json['max_pages'] ?? 1,
       next: json['next'],

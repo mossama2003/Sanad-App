@@ -89,6 +89,19 @@ class VolunteerCommunityCubit extends Cubit<VolunteerCommunityState> {
     emit(BottomNavChange());
   }
 
+  Future<void> removeCommunity(int eventId) async {
+    communities.removeWhere((community) => community.id == eventId);
+
+    await _box.put(
+      _cacheKey,
+      VolunteerCommunitiesCache(
+        communities: List<VolunteerEventDetailsModel>.from(communities),
+      ),
+    );
+
+    emit(Success());
+  }
+
   @override
   Future<void> close() {
     _searchDebounce?.cancel();

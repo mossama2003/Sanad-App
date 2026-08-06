@@ -5,7 +5,8 @@ import 'package:dio/dio.dart';
 
 import '../../../../../core/network/error/failures.dart';
 import '../../../../../core/network/end_points.dart';
-import '../models/members_model.dart';
+import '../models/event_report_model.dart';
+import '../models/member_model.dart';
 import '../models/chat_model.dart';
 
 part 'chat_repo_impel.dart';
@@ -35,11 +36,23 @@ abstract class ChatRepo {
 
   Future<Either<Failure, List<int>>> deleteMessages(List<int> ids);
 
-  Future<Either<Failure, PaginatedMembersModel>> getEventMembers({
+  Future<Either<Failure, PaginatedMemberModel>> getEventMembers({
     required int eventId,
     int page = 1,
     int? size,
     String? search,
     String? ordering,
+  });
+
+  Future<Either<Failure, String>> updateVolunteerRole({
+    required int memberId,
+    required String role,
+  });
+
+  Future<Either<Failure, bool>> leaveEvent(int eventId);
+
+  Future<Either<Failure, EventReportModel>> reportEvent({
+    required int eventId,
+    String? reason,
   });
 }

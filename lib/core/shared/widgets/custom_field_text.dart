@@ -13,7 +13,7 @@ class CustomFieldText extends StatelessWidget {
     this.helperText,
     this.labelText,
     required this.controller,
-    this.focusNode, // 👈 جديد
+    this.focusNode,
     this.onSubmit,
     this.padding,
     this.onTap,

@@ -5,7 +5,7 @@ import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/constant/app_size.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 import 'package:sanad_app/features/shared/chat/data/enums/member_role_enum.dart';
-import 'package:sanad_app/features/shared/chat/data/models/members_model.dart';
+import 'package:sanad_app/features/shared/chat/data/models/member_model.dart';
 
 import '../../../../../core/style/app_colors.dart';
 import '../../data/repos/chat_repo.dart';
@@ -16,6 +16,7 @@ class MembersBottomSheet extends StatefulWidget {
   final String? organizerName;
   final String? organizerSubtitle;
   final Set<int> onlineUserIds;
+  final bool isOrganizer;
 
   const MembersBottomSheet({
     super.key,
@@ -23,6 +24,7 @@ class MembersBottomSheet extends StatefulWidget {
     this.organizerName,
     this.organizerSubtitle,
     this.onlineUserIds = const {},
+    this.isOrganizer = false,
   });
 
   static Future<void> show(
@@ -31,6 +33,7 @@ class MembersBottomSheet extends StatefulWidget {
     String? organizerName,
     String? organizerSubtitle,
     Set<int> onlineUserIds = const {},
+    bool isOrganizer = false,
   }) {
     return showModalBottomSheet(
       context: context,
@@ -41,6 +44,7 @@ class MembersBottomSheet extends StatefulWidget {
         organizerName: organizerName,
         organizerSubtitle: organizerSubtitle,
         onlineUserIds: onlineUserIds,
+        isOrganizer: isOrganizer,
       ),
     );
   }
@@ -52,6 +56,9 @@ class MembersBottomSheet extends StatefulWidget {
 class _MembersBottomSheetState extends State<MembersBottomSheet> {
   late final MembersCubit _membersCubit;
   final ScrollController _scrollController = ScrollController();
+
+  int? _editingMemberId;
+  final TextEditingController _roleController = TextEditingController();
 
   @override
   void initState() {
@@ -68,6 +75,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _roleController.dispose();
     _membersCubit.close();
     super.dispose();
   }
@@ -78,6 +86,25 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
     if (position.pixels >= position.maxScrollExtent - 100) {
       _membersCubit.loadMoreMembers();
     }
+  }
+
+  void _startEditingRole(MemberModel member) {
+    setState(() {
+      _editingMemberId = member.id;
+      _roleController.text = member.role;
+    });
+  }
+
+  void _confirmEditingRole(MemberModel member) {
+    final newRole = _roleController.text.trim();
+
+    setState(() {
+      _editingMemberId = null;
+    });
+
+    if (newRole.isEmpty || newRole == member.role) return;
+
+    _membersCubit.updateMemberRole(memberId: member.id, newRole: newRole);
   }
 
   // ── Build ─────────────────────────────────────────────────────────────────
@@ -301,14 +328,48 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
 
   Widget _buildMemberTile(MemberModel m) {
     final isOnline = widget.onlineUserIds.contains(m.id);
+    final isEditing = _editingMemberId == m.id;
 
     return _buildTile(
       name: m.volunteerName,
-      statusText: isOnline ? 'Online now' : 'Volunteer',
+      statusText: m.role.trim(),
       isOnline: isOnline,
       avatarColor: AppColors.grey500,
       role: m.roleEnum,
       avatarLetter: m.avatarLetter,
+      isEditing: isEditing,
+      showRoleAsBadge: true,
+      trailing: widget.isOrganizer
+          ? GestureDetector(
+              onTap: () =>
+                  isEditing ? _confirmEditingRole(m) : _startEditingRole(m),
+              child: Padding(
+                padding: AppSize.padding(all: 4),
+                child: isEditing
+                    ? Container(
+                        width: AppSize.getSize(26),
+                        height: AppSize.getSize(26),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: CustomIcon(
+                          icon: AppIcons.check,
+                          color: AppColors.white,
+                          width: AppSize.getSize(18),
+                          height: AppSize.getSize(18),
+                        ),
+                      )
+                    : CustomIcon(
+                        icon: AppIcons.edit,
+                        color: AppColors.grey600,
+                        width: AppSize.getSize(18),
+                        height: AppSize.getSize(18),
+                      ),
+              ),
+            )
+          : null,
     );
   }
 
@@ -321,10 +382,16 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
     required Color avatarColor,
     required MemberRoleEnum role,
     required String avatarLetter,
+    bool isEditing = false,
+    bool showRoleAsBadge = false,
+    Widget? trailing,
   }) {
+    final hasStatusText = statusText.trim().isNotEmpty;
+
     return Padding(
       padding: AppSize.padding(vertical: 7),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Avatar with online dot
           Stack(
@@ -381,37 +448,90 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                     color: AppColors.black,
                   ),
                 ),
-                SizedBox(width: AppSize.getWidth(2)),
-                Text(
-                  statusText,
-                  style: TextStyle(
-                    fontSize: AppSize.font(12.5),
-                    color: AppColors.grey500,
+                if (isEditing) ...[
+                  SizedBox(height: AppSize.getHeight(6)),
+                  TextField(
+                    controller: _roleController,
+                    autofocus: true,
+                    style: TextStyle(
+                      fontSize: AppSize.font(13),
+                      color: AppColors.black,
+                    ),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      hintText: 'shared.chat.role_hint'.tr(),
+                      hintStyle: TextStyle(
+                        fontSize: AppSize.font(13),
+                        color: AppColors.grey500,
+                      ),
+                      contentPadding: AppSize.padding(
+                        horizontal: 14,
+                        vertical: 9,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide(
+                          color: AppColors.primary,
+                          width: 1.2,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide(
+                          color: AppColors.primary,
+                          width: 1.2,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide(
+                          color: AppColors.primary,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                ] else if (hasStatusText) ...[
+                  SizedBox(height: AppSize.getHeight(6)),
+                  showRoleAsBadge
+                      ? _buildBadge(
+                          label: statusText,
+                          icon: AppIcons.tag,
+                          color: AppColors.bronze,
+                          bg: AppColors.bronze.withValues(alpha: 0.2),
+                        )
+                      : Text(
+                          statusText,
+                          style: TextStyle(
+                            fontSize: AppSize.font(12.5),
+                            color: AppColors.grey500,
+                          ),
+                        ),
+                ],
               ],
             ),
           ),
-          if (role == MemberRoleEnum.admin)
+          if (!isEditing && role == MemberRoleEnum.admin)
             _buildBadge(
               label: 'Admin',
               icon: AppIcons.check,
               color: AppColors.white,
               bg: AppColors.primary,
             ),
-          if (role == MemberRoleEnum.organizer)
+          if (!isEditing && role == MemberRoleEnum.organizer)
             _buildBadge(
               label: 'Organizer',
               icon: AppIcons.crown,
               color: AppColors.white,
               bg: AppColors.bronze,
             ),
+          if (trailing != null) trailing,
         ],
       ),
     );
   }
 
-  // ── Badge ─────────────────────────────────────────────────────────────────
+  // ── Badge (Admin / Organizer) ───────────────────────────────────────────
 
   Widget _buildBadge({
     required String label,

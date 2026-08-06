@@ -5,16 +5,22 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:dartz/dartz.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/helper/app_toast.dart';
+import '../../../../../core/network/end_points.dart';
 import '../../../../../core/network/error/failures.dart';
+import '../../../../../core/network/remote/api/dio_helper.dart';
+import '../../../../../core/storage/hive/hive_boxes.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../../volunteer/community/data/cache/community_cache_service.dart';
+import '../../../../volunteer/events/data/models/volunteer_event_details_model.dart';
+import '../../../../volunteer/events/presentation/dialogs/volunteer_event_details_bottom_sheet.dart';
 import '../../data/cache/chat_cache_service.dart';
 import '../../data/enums/member_role_enum.dart';
 import '../../data/models/chat_model.dart';
-import '../../data/models/members_model.dart';
+import '../../data/models/member_model.dart';
 import '../../data/repos/chat_repo.dart';
 import 'package:ably_flutter/ably_flutter.dart' as ably;
 
@@ -76,7 +82,7 @@ class ChatCubit extends Cubit<ChatState> {
     final tokenResult = results[0] as Either<Failure, ChatTokenModel>;
     final historyResult =
         results[1] as Either<Failure, PaginatedEventChatModel>;
-    final membersResult = results[2] as Either<Failure, PaginatedMembersModel>;
+    final membersResult = results[2] as Either<Failure, PaginatedMemberModel>;
 
     final totalMembersCount = membersResult.fold(
       (failure) {
@@ -198,15 +204,19 @@ class ChatCubit extends Cubit<ChatState> {
       _updateOnlineCount();
     });
 
-    // 👈 جديد - subscribe منفصل بس لـ typing events
-    _channel!.subscribe(name: 'typing').listen(_onTypingEvent);
-
+    // 👈 subscription واحد بس، بيفرّق بالـ switch
     _messageSubscription = _channel!.subscribe().listen((message) {
-      // 👈 جديد - تجاهل أي event اسمه typing جوه الـ listener العام
-      if (message.name == 'typing') return;
+      debugPrint(
+        '📩 Realtime event received: name=${message.name}, data=${message.data}',
+      );
 
-      debugPrint('📩 Realtime message received: ${message.data}');
-      _onRealtimeMessage(message);
+      switch (message.name) {
+        case 'typing':
+          _onTypingEvent(message);
+          return;
+        default:
+          _onRealtimeMessage(message);
+      }
     });
 
     unawaited(
@@ -431,6 +441,17 @@ class ChatCubit extends Cubit<ChatState> {
         }
       }
     } else {
+      return;
+    }
+
+    // 👈 جديد - حماية إضافية: تجاهل أي payload مش شكل رسالة شات حقيقية
+    // (زي typing events لو وصلت غلط، أو أي event تاني غير متوقع)
+    final rawMessage = data['message'];
+    final rawCreator = data['creator'];
+    if (rawMessage == null ||
+        (rawMessage is String && rawMessage.trim().isEmpty) ||
+        rawCreator == null) {
+      debugPrint('⚠️ Ignored non-chat realtime payload: $data');
       return;
     }
 
@@ -744,6 +765,84 @@ class ChatCubit extends Cubit<ChatState> {
       (deletedIds) async {
         await ChatCacheService.deleteCachedMessages(eventId, deletedIds);
       },
+    );
+  }
+
+  Future<void> showEventDetails(BuildContext context, int eventId) async {
+    final cachedEvent = _getEventFromCache(eventId);
+
+    if (cachedEvent != null) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => VolunteerEventDetailsBottomSheet(
+          event: cachedEvent,
+          showJoinButton: false,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final response = await DioHelper.get(url: EVENT_QR(eventId));
+      final eventDetails = VolunteerEventDetailsModel.fromJson(response.data);
+
+      if (!context.mounted) return;
+      Navigator.pop(context);
+
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => VolunteerEventDetailsBottomSheet(event: eventDetails),
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      Navigator.pop(context);
+      AppToast.error('shared.chat.event_details_failed'.tr());
+    }
+  }
+
+  VolunteerEventDetailsModel? _getEventFromCache(int eventId) {
+    final box = HiveBoxes.volunteerEventsBox;
+    try {
+      return box.values.firstWhere((e) => e.id == eventId);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<bool> leaveEvent() async {
+    final result = await chatRepo.leaveEvent(eventId);
+
+    return await result.fold(
+      (failure) async {
+        AppToast.error(failure.errMessage);
+        return false;
+      },
+      (_) async {
+        await CommunityCacheService.removeCommunity(eventId);
+
+        AppToast.success('shared.chat.left_event_success'.tr());
+
+        return true;
+      },
+    );
+  }
+
+  Future<void> reportEvent(String? reason) async {
+    final result = await chatRepo.reportEvent(eventId: eventId, reason: reason);
+
+    result.fold(
+      (failure) => AppToast.error(failure.errMessage),
+      (_) => AppToast.success('shared.chat.report_submitted'.tr()),
     );
   }
 

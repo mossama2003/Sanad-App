@@ -138,7 +138,7 @@ class ChatRepoImpel implements ChatRepo {
   }
 
   @override
-  Future<Either<Failure, PaginatedMembersModel>> getEventMembers({
+  Future<Either<Failure, PaginatedMemberModel>> getEventMembers({
     required int eventId,
     int page = 1,
     int? size,
@@ -170,7 +170,73 @@ class ChatRepoImpel implements ChatRepo {
       );
 
       if (response.statusCode == 200) {
-        return right(PaginatedMembersModel.fromJson(response.data));
+        return right(PaginatedMemberModel.fromJson(response.data));
+      }
+
+      return left(ServerFailure.fromResponse(response));
+    } catch (e) {
+      return left(ServerFailure.fromCatchError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> updateVolunteerRole({
+    required int memberId,
+    required String role,
+  }) async {
+    try {
+      final formData = FormData.fromMap({'role': role});
+
+      final response = await DioHelper.patch(
+        url: MANAGE_EVENT_MEMBER(memberId),
+        data: formData,
+      );
+
+      if (response.statusCode == 200) {
+        return right((response.data['role'] ?? role).toString());
+      }
+
+      return left(ServerFailure.fromResponse(response));
+    } catch (e) {
+      return left(ServerFailure.fromCatchError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> leaveEvent(int eventId) async {
+    try {
+      final response = await DioHelper.post(
+        url: LEAVE_EVENT_CHAT,
+        data: {'event': eventId},
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return right(true);
+      }
+
+      return left(ServerFailure.fromResponse(response));
+    } catch (e) {
+      return left(ServerFailure.fromCatchError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, EventReportModel>> reportEvent({
+    required int eventId,
+    String? reason,
+  }) async {
+    try {
+      final response = await DioHelper.post(
+        url: REPORT_EVENT_CHAT,
+        data: {
+          'event': eventId,
+          if (reason != null && reason.trim().isNotEmpty)
+            'reason': reason.trim(),
+        },
+      );
+
+      if (response.statusCode == 201) {
+        return right(EventReportModel.fromJson(response.data));
       }
 
       return left(ServerFailure.fromResponse(response));

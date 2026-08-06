@@ -44,6 +44,12 @@ String DELETE_MESSAGE = 'v1/events/event_chat/batch_delete/';
 
 String EVENT_MEMBERS = 'v1/events/read_event_member/';
 
+String MANAGE_EVENT_MEMBER(int id) => 'v1/events/manage_event_member/$id/';
+
+String LEAVE_EVENT_CHAT = 'v1/events/leave/';
+
+String REPORT_EVENT_CHAT = 'v1/events/event_report/';
+
 /// Volunteering Endpoints
 String JOIN_EVENT = 'v1/events/join/';
 

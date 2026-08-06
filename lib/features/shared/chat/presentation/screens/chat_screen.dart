@@ -13,10 +13,12 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../volunteer/community/presentation/controllers/volunteer_community_cubit.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../dialogs/report_chat_bottom_sheet.dart';
 import '../dialogs/members_bottom_sheet.dart';
 import '../../data/models/chat_model.dart';
 import '../../data/repos/chat_repo.dart';
@@ -48,6 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isSendingLocation = false;
   ChatModel? _editingMessage;
 
+  final GlobalKey _moreButtonKey = GlobalKey();
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _messageFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
@@ -105,7 +108,6 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
-  // 👈 دالة جديدة
   Future<void> _loadCurrentUserName() async {
     final appCubit = AppCubit.get(context);
 
@@ -578,6 +580,170 @@ class _ChatScreenState extends State<ChatScreen> {
     return DateFormat('d MMM yyyy').format(date);
   }
 
+  void _showChatOptionsMenu(BuildContext context) {
+    final RenderBox button =
+        _moreButtonKey.currentContext!.findRenderObject() as RenderBox;
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    final position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        button.localToGlobal(
+          Offset(0, button.size.height + 6),
+          ancestor: overlay,
+        ),
+        button.localToGlobal(
+          button.size.bottomRight(Offset.zero) + const Offset(0, 6),
+          ancestor: overlay,
+        ),
+      ),
+      Offset.zero & overlay.size,
+    );
+
+    final userRole = AppCubit.get(context).user?.role;
+    final isVolunteer = userRole == 'volunteer';
+
+    showMenu<String>(
+      context: context,
+      position: position,
+      color: AppColors.white,
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      constraints: BoxConstraints(minWidth: AppSize.getWidth(220)),
+      items: [
+        _buildMenuItem(
+          value: 'mute_notifications',
+          icon: AppIcons.muteNotification,
+          label: 'shared.chat.mute_notifications'.tr(),
+        ),
+        _buildMenuItem(
+          value: 'search_messages',
+          icon: AppIcons.search,
+          label: 'shared.chat.search_messages'.tr(),
+        ),
+        _buildMenuItem(
+          value: 'share_invite',
+          icon: AppIcons.share,
+          label: 'shared.chat.share_invite'.tr(),
+        ),
+        const PopupMenuDivider(
+          height: 12,
+          thickness: 0.2,
+          endIndent: 15,
+          indent: 15,
+        ),
+        _buildMenuItem(
+          value: 'report_chat',
+          icon: AppIcons.flag,
+          label: 'shared.chat.report_chat'.tr(),
+          color: AppColors.red,
+        ),
+        if (isVolunteer)
+          _buildMenuItem(
+            value: 'leave_chat',
+            icon: AppIcons.signOut,
+            label: 'shared.chat.leave_chat'.tr(),
+            color: AppColors.red,
+          ),
+      ],
+    ).then((selected) {
+      if (selected == null) return;
+      _handleChatOption(selected);
+    });
+  }
+
+  PopupMenuItem<String> _buildMenuItem({
+    required String value,
+    required String icon,
+    required String label,
+    Color? color,
+  }) {
+    return PopupMenuItem<String>(
+      value: value,
+      height: 44,
+      child: Row(
+        children: [
+          CustomIcon(
+            icon: icon,
+            color: color ?? AppColors.grey700,
+            width: AppSize.getSize(18),
+            height: AppSize.getSize(18),
+          ),
+          SizedBox(width: AppSize.getWidth(12)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: AppSize.font(13.5),
+              fontWeight: FontWeight.w500,
+              color: color ?? AppColors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleChatOption(String option) {
+    switch (option) {
+      case 'mute_notifications':
+        AppToast.success('shared.chat.muted_success'.tr());
+        break;
+
+      case 'search_messages':
+        break;
+
+      case 'share_invite':
+
+        /// TODO Share APP LINK
+        // Share.share(
+        //   'shared.chat.invite_message'.tr(
+        //     namedArgs: {'eventName': widget.event.name},
+        //   ),
+        // );
+        break;
+
+      case 'report_chat':
+        AppNavigator.sheet(
+          ReportChatBottomSheet(
+            onReport: (reason) {
+              _chatCubit.reportEvent(reason);
+            },
+          ),
+        );
+        break;
+
+      case 'leave_chat':
+        _confirmLeaveChat();
+        break;
+    }
+  }
+
+  void _confirmLeaveChat() {
+    final communityCubit = context.read<VolunteerCommunityCubit>();
+
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmDialog(
+        title: 'shared.chat.leave_chat'.tr(),
+        message: 'shared.chat.leave_confirm'.tr(),
+        confirmText: 'shared.chat.leave_chat'.tr(),
+        cancelText: 'shared.chat.cancel'.tr(),
+        isDestructive: true,
+        onConfirm: () async {
+          final success = await _chatCubit.leaveEvent();
+
+          if (!success) return;
+
+          await communityCubit.removeCommunity(_chatCubit.eventId);
+
+          if (!mounted) return;
+
+          AppNavigator.pop();
+        },
+      ),
+    );
+  }
+
   // ── Build ────────────────────────────────────────────────────────────────
 
   @override
@@ -913,7 +1079,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 SizedBox(height: AppSize.getHeight(1)),
                 BlocBuilder<ChatCubit, ChatState>(
                   buildWhen: (previous, current) =>
-                  current is ChatLoaded &&
+                      current is ChatLoaded &&
                       (previous is! ChatLoaded ||
                           previous.onlineCount != current.onlineCount ||
                           previous.totalMembersCount !=
@@ -922,7 +1088,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   builder: (context, state) {
                     final online = state is ChatLoaded ? state.onlineCount : 0;
                     final total = state is ChatLoaded
-                        ? state.totalMembersCount + 2 // 👈 إضافة الـ 2 هنا
+                        ? state.totalMembersCount +
+                              2 // 👈 إضافة الـ 2 هنا
                         : 0;
                     final isReady =
                         state is ChatLoaded && state.isPresenceReady;
@@ -930,14 +1097,14 @@ class _ChatScreenState extends State<ChatScreen> {
                     return Text(
                       isReady
                           ? 'shared.chat.online_members_count'.tr(
-                        namedArgs: {
-                          'online': '$online',
-                          'total': '$total',
-                        },
-                      )
+                              namedArgs: {
+                                'online': '$online',
+                                'total': '$total',
+                              },
+                            )
                           : 'shared.chat.members_count_only'.tr(
-                        namedArgs: {'total': '$total'},
-                      ),
+                              namedArgs: {'total': '$total'},
+                            ),
                       style: TextStyle(
                         fontSize: AppSize.font(12),
                         color: AppColors.grey500,
@@ -957,19 +1124,25 @@ class _ChatScreenState extends State<ChatScreen> {
                   ? currentState.onlineUserIds
                   : <int>{};
 
+              final userRole = AppCubit.get(context).user?.role;
+              final isOrganizer =
+                  userRole == 'organization' || userRole == 'admin';
+
               MembersBottomSheet.show(
                 context,
                 eventId: widget.eventId,
                 organizerName: widget.event.organizerName,
                 onlineUserIds: onlineIds,
+                isOrganizer: isOrganizer,
               );
             },
           ),
           SizedBox(width: AppSize.getWidth(10)),
           CustomIcon(
+            key: _moreButtonKey,
             icon: AppIcons.more,
             color: AppColors.grey600,
-            onTap: () {},
+            onTap: () => _showChatOptionsMenu(context),
           ),
         ],
       ),
@@ -1028,9 +1201,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () {
-                    // TODO: Navigate لصفحة تفاصيل الإيفينت (widget.eventId)
-                  },
+                  onTap: () =>
+                      _chatCubit.showEventDetails(context, widget.eventId),
                   child: Container(
                     padding: AppSize.padding(horizontal: 14, vertical: 7),
                     decoration: BoxDecoration(
@@ -1779,7 +1951,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildTypingIndicator() {
     return BlocBuilder<ChatCubit, ChatState>(
       buildWhen: (previous, current) =>
-      current is ChatLoaded &&
+          current is ChatLoaded &&
           (previous is! ChatLoaded ||
               previous.typingUsers != current.typingUsers),
       builder: (context, state) {

@@ -18,10 +18,12 @@ class VolunteerEventDetailsBottomSheet extends StatelessWidget {
     super.key,
     required this.event,
     this.onJoinTap,
+    this.showJoinButton = true,
   });
 
   final VolunteerEventDetailsModel event;
   final VoidCallback? onJoinTap;
+  final bool showJoinButton;
 
   Future<void> _makePhoneCall(String? phone) async {
     if (phone == null || phone.isEmpty) return;
@@ -50,9 +52,7 @@ class VolunteerEventDetailsBottomSheet extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         child: Container(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery
-                .sizeOf(context)
-                .height * .8,
+            maxHeight: MediaQuery.sizeOf(context).height * .8,
           ),
           decoration: BoxDecoration(
             color: colors.surface,
@@ -102,20 +102,21 @@ class VolunteerEventDetailsBottomSheet extends StatelessWidget {
                         },
                       ),
 
-                      SizedBox(height: AppSize.getHeight(20)),
-
-                      CustomButton(
-                        title: event.joined
-                            ? 'volunteer.events.bottom_sheet.joined'.tr()
-                            : 'volunteer.events.bottom_sheet.join_event'.tr(),
-                        icon: event.joined ? AppIcons.check : null,
-                        height: AppSize.getHeight(50),
-                        bgColor: event.joined
-                            ? AppColors.primary.withValues(alpha: .1)
-                            : AppColors.primary,
-                        textColor: event.joined ? Colors.green : Colors.white,
-                        onTap: onJoinTap,
-                      ),
+                      if (showJoinButton) ...[
+                        SizedBox(height: AppSize.getHeight(20)),
+                        CustomButton(
+                          title: event.joined
+                              ? 'volunteer.events.bottom_sheet.joined'.tr()
+                              : 'volunteer.events.bottom_sheet.join_event'.tr(),
+                          icon: event.joined ? AppIcons.check : null,
+                          height: AppSize.getHeight(50),
+                          bgColor: event.joined
+                              ? AppColors.primary.withValues(alpha: .1)
+                              : AppColors.primary,
+                          textColor: event.joined ? Colors.green : Colors.white,
+                          onTap: onJoinTap,
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -166,19 +167,14 @@ class _EventDetailsCard extends StatelessWidget {
       padding: AppSize.padding(all: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: Theme
-            .of(context)
-            .cardColor,
+        color: Theme.of(context).cardColor,
       ),
       child: Column(
         children: [
           _EventDetailItem(
             icon: AppIcons.events,
             title: 'volunteer.events.bottom_sheet.date_time'.tr(),
-            value: DateFormat(
-              'dd MMM yyyy - hh:mm a',
-              'en',
-            ).format(event.date),
+            value: DateFormat('dd MMM yyyy - hh:mm a', 'en').format(event.date),
             textColor: textColor,
             secondaryColor: secondaryColor,
           ),
@@ -192,10 +188,7 @@ class _EventDetailsCard extends StatelessWidget {
               event.location?['description'],
               event.location?['city'],
               event.location?['state'],
-            ].where((e) =>
-            e != null && e
-                .toString()
-                .isNotEmpty).join(', '),
+            ].where((e) => e != null && e.toString().isNotEmpty).join(', '),
             textColor: textColor,
             secondaryColor: secondaryColor,
           ),
@@ -281,10 +274,10 @@ class _EventImage extends StatelessWidget {
           width: double.infinity,
           child: imageUrl != null && imageUrl!.isNotEmpty
               ? Image.network(
-            imageUrl!,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => _buildPlaceholder(context),
-          )
+                  imageUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => _buildPlaceholder(context),
+                )
               : _buildPlaceholder(context),
         ),
 
