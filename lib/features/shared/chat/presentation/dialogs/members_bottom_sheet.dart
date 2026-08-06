@@ -15,12 +15,14 @@ class MembersBottomSheet extends StatefulWidget {
   final int eventId;
   final String? organizerName;
   final String? organizerSubtitle;
+  final Set<int> onlineUserIds;
 
   const MembersBottomSheet({
     super.key,
     required this.eventId,
     this.organizerName,
     this.organizerSubtitle,
+    this.onlineUserIds = const {},
   });
 
   static Future<void> show(
@@ -28,6 +30,7 @@ class MembersBottomSheet extends StatefulWidget {
     required int eventId,
     String? organizerName,
     String? organizerSubtitle,
+    Set<int> onlineUserIds = const {},
   }) {
     return showModalBottomSheet(
       context: context,
@@ -37,6 +40,7 @@ class MembersBottomSheet extends StatefulWidget {
         eventId: eventId,
         organizerName: organizerName,
         organizerSubtitle: organizerSubtitle,
+        onlineUserIds: onlineUserIds,
       ),
     );
   }
@@ -296,10 +300,12 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
   // ── Member tile (from API) ──────────────────────────────────────────────
 
   Widget _buildMemberTile(MemberModel m) {
+    final isOnline = widget.onlineUserIds.contains(m.id);
+
     return _buildTile(
       name: m.volunteerName,
-      statusText: 'Volunteer',
-      isOnline: false,
+      statusText: isOnline ? 'Online now' : 'Volunteer',
+      isOnline: isOnline,
       avatarColor: AppColors.grey500,
       role: m.roleEnum,
       avatarLetter: m.avatarLetter,

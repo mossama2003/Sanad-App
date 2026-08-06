@@ -24,6 +24,7 @@ class ChatCubit extends Cubit<ChatState> {
   final ChatRepo chatRepo;
   final int eventId;
   final int currentUserId;
+  String currentUserName;
 
   ably.Realtime? _realtime;
   ably.RealtimeChannel? _channel;
@@ -32,11 +33,20 @@ class ChatCubit extends Cubit<ChatState> {
 
   final AudioPlayer _audioPlayer = AudioPlayer();
 
+  Timer? _typingSendThrottle;
+  final Map<int, Timer> _typingClearTimers = {};
+
   ChatCubit({
     required this.chatRepo,
     required this.eventId,
     required this.currentUserId,
+    this.currentUserName = 'You',
   }) : super(ChatInitial());
+
+  void updateCurrentUserName(String name) {
+    if (name.trim().isEmpty) return;
+    currentUserName = name;
+  }
 
   Future<void> initChat() async {
     final cached = await ChatCacheService.getCachedMessages(eventId);
@@ -68,18 +78,13 @@ class ChatCubit extends Cubit<ChatState> {
         results[1] as Either<Failure, PaginatedEventChatModel>;
     final membersResult = results[2] as Either<Failure, PaginatedMembersModel>;
 
-    // final totalMembersCount = membersResult.fold(
-    //   (_) => 0,
-    //   (data) => data.count,
-    // );
-
     final totalMembersCount = membersResult.fold(
-          (failure) {
-        debugPrint('⚠️ getEventMembers FAILED: ${failure.errMessage}'); // 👈 جديد
+      (failure) {
+        debugPrint('⚠️ getEventMembers FAILED: ${failure.errMessage}');
         return 0;
       },
-          (data) {
-        debugPrint('✅ getEventMembers SUCCESS: count = ${data.count}'); // 👈 جديد
+      (data) {
+        debugPrint('✅ getEventMembers SUCCESS: count = ${data.count}');
         return data.count;
       },
     );
@@ -189,21 +194,31 @@ class ChatCubit extends Cubit<ChatState> {
       '📡 Channel attached: events:$eventId | state: ${_channel!.state}',
     );
 
-    try {
-      await _channel!.presence.enter();
-      await _updateOnlineCount();
-    } catch (e) {
-      debugPrint('⚠️ Failed to enter presence: $e');
-    }
-
     _presenceSubscription = _channel!.presence.subscribe().listen((_) {
       _updateOnlineCount();
     });
 
+    // 👈 جديد - subscribe منفصل بس لـ typing events
+    _channel!.subscribe(name: 'typing').listen(_onTypingEvent);
+
     _messageSubscription = _channel!.subscribe().listen((message) {
+      // 👈 جديد - تجاهل أي event اسمه typing جوه الـ listener العام
+      if (message.name == 'typing') return;
+
       debugPrint('📩 Realtime message received: ${message.data}');
       _onRealtimeMessage(message);
     });
+
+    unawaited(
+      _channel!.presence
+          .enter()
+          .then((_) {
+            return _updateOnlineCount();
+          })
+          .catchError((e) {
+            debugPrint('⚠️ Failed to enter presence: $e');
+          }),
+    );
   }
 
   Future<void> _updateOnlineCount() async {
@@ -212,16 +227,27 @@ class ChatCubit extends Cubit<ChatState> {
     try {
       final members = await _channel!.presence.get();
 
-      debugPrint("Presence members: ${members.length}");
+      final ids = members
+          .map((m) => m.clientId)
+          .whereType<String>()
+          .map((clientId) {
+            final parts = clientId.split(':');
+            if (parts.length == 2) {
+              return int.tryParse(parts[1]);
+            }
+            return null;
+          })
+          .whereType<int>()
+          .toSet();
+
+      debugPrint("Presence members: ${members.length}, ids: $ids");
 
       final current = state;
       if (current is ChatLoaded) {
         final newState = current.copyWith(
           onlineCount: members.length,
-        );
-
-        debugPrint(
-          "Emit -> online=${newState.onlineCount}, total=${newState.totalMembersCount}",
+          isPresenceReady: true,
+          onlineUserIds: ids,
         );
 
         emit(newState);
@@ -229,6 +255,54 @@ class ChatCubit extends Cubit<ChatState> {
     } catch (e) {
       debugPrint(e.toString());
     }
+  }
+
+  // ── Typing indicator: sending ──────────────────────────────────────────
+  void notifyTyping() {
+    if (_channel == null) return;
+
+    // throttle: نبعت event واحد كل ثانية ونص بحد أقصى، مش مع كل حرف
+    if (_typingSendThrottle?.isActive ?? false) return;
+
+    _typingSendThrottle = Timer(const Duration(milliseconds: 1500), () {});
+
+    _channel!
+        .publish(
+          name: 'typing',
+          data: {'userId': currentUserId, 'name': currentUserName},
+        )
+        .catchError((e) {
+          debugPrint('⚠️ Failed to publish typing event: $e');
+        });
+  }
+
+  // ── Typing indicator: receiving ──────────────────────────────────────────
+  void _onTypingEvent(ably.Message message) {
+    final data = message.data;
+    if (data is! Map) return;
+
+    final converted = _deepConvertMap(data);
+    final userId = converted['userId'];
+    final name = converted['name'];
+
+    if (userId is! int || name is! String) return;
+    if (userId == currentUserId) return;
+
+    final current = state;
+    if (current is! ChatLoaded) return;
+
+    final updatedTyping = Map<int, String>.from(current.typingUsers);
+    updatedTyping[userId] = name;
+    emit(current.copyWith(typingUsers: updatedTyping));
+
+    _typingClearTimers[userId]?.cancel();
+    _typingClearTimers[userId] = Timer(const Duration(seconds: 3), () {
+      final latest = state;
+      if (latest is! ChatLoaded) return;
+
+      final cleared = Map<int, String>.from(latest.typingUsers)..remove(userId);
+      emit(latest.copyWith(typingUsers: cleared));
+    });
   }
 
   String _pythonReprToJson(String input) {
@@ -677,6 +751,10 @@ class ChatCubit extends Cubit<ChatState> {
   Future<void> close() {
     _messageSubscription?.cancel();
     _presenceSubscription?.cancel();
+    _typingSendThrottle?.cancel();
+    for (final t in _typingClearTimers.values) {
+      t.cancel();
+    }
     _channel?.presence.leave();
     _channel?.detach();
     _realtime?.close();

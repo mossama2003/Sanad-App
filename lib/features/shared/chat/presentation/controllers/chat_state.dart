@@ -21,6 +21,9 @@ class ChatLoaded extends ChatState {
   final Set<int> selectedMessageIds;
   final int onlineCount;
   final int totalMembersCount;
+  final bool isPresenceReady;
+  final Set<int> onlineUserIds;
+  final Map<int, String> typingUsers;
 
   const ChatLoaded({
     required this.messages,
@@ -32,6 +35,9 @@ class ChatLoaded extends ChatState {
     this.selectedMessageIds = const {},
     this.onlineCount = 0,
     this.totalMembersCount = 0,
+    this.isPresenceReady = false,
+    this.onlineUserIds = const {},
+    this.typingUsers = const {},
   });
 
   ChatLoaded copyWith({
@@ -44,6 +50,9 @@ class ChatLoaded extends ChatState {
     Set<int>? selectedMessageIds,
     int? onlineCount,
     int? totalMembersCount,
+    bool? isPresenceReady,
+    Set<int>? onlineUserIds,
+    Map<int, String>? typingUsers,
   }) {
     return ChatLoaded(
       messages: messages ?? this.messages,
@@ -55,31 +64,27 @@ class ChatLoaded extends ChatState {
       selectedMessageIds: selectedMessageIds ?? this.selectedMessageIds,
       onlineCount: onlineCount ?? this.onlineCount,
       totalMembersCount: totalMembersCount ?? this.totalMembersCount,
+      isPresenceReady: isPresenceReady ?? this.isPresenceReady,
+      onlineUserIds: onlineUserIds ?? this.onlineUserIds,
+      typingUsers: typingUsers ?? this.typingUsers,
     );
   }
 
-  // 👈 السطر المطلوب إضافته
   @override
   List<Object?> get props => [
-    messages,
-    page,
-    hasMore,
-    isSyncing,
-    isLoadingMore,
-    isSelectionMode,
-    selectedMessageIds,
-    onlineCount,
-    totalMembersCount,
+    messages, page, hasMore, isSyncing, isLoadingMore, isSelectionMode,
+    selectedMessageIds, onlineCount, totalMembersCount, isPresenceReady,
+    onlineUserIds, typingUsers,
   ];
 }
 
 class ChatError extends ChatState {
   final String message;
 
-  const ChatError(this.message); // 👈 لاحظ: خليها const برضه، ناقصة const حاليًا
+  const ChatError(this.message);
 
   @override
-  List<Object?> get props => [message]; // 👈 السطر المطلوب إضافته
+  List<Object?> get props => [message];
 }
 
 abstract class MembersState extends Equatable {

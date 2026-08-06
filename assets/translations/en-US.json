@@ -155,6 +155,9 @@
       "location_fetch_failed": "Failed to get your location. Please try again",
       "send_location": "Send current location",
       "sending_location": "Sending location...",
+      "members_count_only": "{total} members",
+      "one_typing": "{name} is typing...",
+      "multiple_typing": "Several people are typing...",
       "pinned": {
         "welcome_title": "Welcome to the Community 👋",
         "welcome_body": "Welcome everyone! This space is for event members to communicate, share updates, and support each other.",

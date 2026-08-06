@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/style/app_colors.dart';
@@ -86,7 +87,10 @@ class _ChatScreenState extends State<ChatScreen> {
       chatRepo: ChatRepoImpel(),
       eventId: widget.eventId,
       currentUserId: widget.currentUserId,
+      // currentUserName هتاخد القيمة الافتراضية 'You' مؤقتًا
     )..initChat();
+
+    _loadCurrentUserName(); // 👈 جديد
 
     _scrollController.addListener(_onScroll);
   }
@@ -99,6 +103,21 @@ class _ChatScreenState extends State<ChatScreen> {
     _messageFocusNode.dispose();
     _chatCubit.close();
     super.dispose();
+  }
+
+  // 👈 دالة جديدة
+  Future<void> _loadCurrentUserName() async {
+    final appCubit = AppCubit.get(context);
+
+    var user = appCubit.user;
+    user ??= await appCubit.getUser();
+
+    if (!mounted) return;
+
+    final name = user?.name;
+    if (name != null && name.trim().isNotEmpty) {
+      _chatCubit.updateCurrentUserName(name);
+    }
   }
 
   void _onScroll() {
@@ -584,7 +603,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   if (isSelectionMode)
                     _buildSelectionBar(state)
                   else ...[
-                    _buildAppBar(context),
+                    _buildAppBar(context, state),
                     _buildEventBanner(),
                     _buildPinnedSection(),
                   ],
@@ -847,7 +866,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // ── AppBar ───────────────────────────────────────────────────────────────
 
-  Widget _buildAppBar(BuildContext context) {
+  Widget _buildAppBar(BuildContext context, ChatState outerState) {
     return Container(
       color: AppColors.white,
       padding: AppSize.padding(horizontal: 12, vertical: 10),
@@ -894,26 +913,30 @@ class _ChatScreenState extends State<ChatScreen> {
                 SizedBox(height: AppSize.getHeight(1)),
                 BlocBuilder<ChatCubit, ChatState>(
                   buildWhen: (previous, current) =>
-                      current is ChatLoaded &&
+                  current is ChatLoaded &&
                       (previous is! ChatLoaded ||
                           previous.onlineCount != current.onlineCount ||
                           previous.totalMembersCount !=
-                              current.totalMembersCount),
+                              current.totalMembersCount ||
+                          previous.isPresenceReady != current.isPresenceReady),
                   builder: (context, state) {
                     final online = state is ChatLoaded ? state.onlineCount : 0;
                     final total = state is ChatLoaded
-                        ? state.totalMembersCount
+                        ? state.totalMembersCount + 2 // 👈 إضافة الـ 2 هنا
                         : 0;
-
-                    if (state is ChatLoaded) {
-                      debugPrint(
-                        "UI -> online=${state.onlineCount}, total=${state.totalMembersCount}",
-                      );
-                    }
+                    final isReady =
+                        state is ChatLoaded && state.isPresenceReady;
 
                     return Text(
-                      'shared.chat.online_members_count'.tr(
-                        namedArgs: {'online': '$online', 'total': '$total'},
+                      isReady
+                          ? 'shared.chat.online_members_count'.tr(
+                        namedArgs: {
+                          'online': '$online',
+                          'total': '$total',
+                        },
+                      )
+                          : 'shared.chat.members_count_only'.tr(
+                        namedArgs: {'total': '$total'},
                       ),
                       style: TextStyle(
                         fontSize: AppSize.font(12),
@@ -928,11 +951,19 @@ class _ChatScreenState extends State<ChatScreen> {
           CustomIcon(
             icon: AppIcons.community,
             color: AppColors.grey600,
-            onTap: () => MembersBottomSheet.show(
-              context,
-              eventId: widget.eventId,
-              organizerName: widget.event.organizerName,
-            ),
+            onTap: () {
+              final currentState = _chatCubit.state;
+              final onlineIds = currentState is ChatLoaded
+                  ? currentState.onlineUserIds
+                  : <int>{};
+
+              MembersBottomSheet.show(
+                context,
+                eventId: widget.eventId,
+                organizerName: widget.event.organizerName,
+                onlineUserIds: onlineIds,
+              );
+            },
           ),
           SizedBox(width: AppSize.getWidth(10)),
           CustomIcon(
@@ -1641,6 +1672,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Column(
       children: [
         if (_editingMessage != null) _buildEditingBanner(),
+        _buildTypingIndicator(),
         Container(
           padding: AppSize.padding(horizontal: 12, bottom: 12),
           child: Row(
@@ -1682,6 +1714,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   controller: _messageController,
                   focusNode: _messageFocusNode,
                   hintText: 'shared.chat.write_message'.tr(),
+                  onChanged: (_) => _chatCubit.notifyTyping(),
                   onTap: () {
                     if (_showEmojiPicker) {
                       setState(() => _showEmojiPicker = false);
@@ -1740,6 +1773,50 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildTypingIndicator() {
+    return BlocBuilder<ChatCubit, ChatState>(
+      buildWhen: (previous, current) =>
+      current is ChatLoaded &&
+          (previous is! ChatLoaded ||
+              previous.typingUsers != current.typingUsers),
+      builder: (context, state) {
+        if (state is! ChatLoaded || state.typingUsers.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        final names = state.typingUsers.values.toList();
+        final text = names.length == 1
+            ? 'shared.chat.one_typing'.tr(namedArgs: {'name': names.first})
+            : 'shared.chat.multiple_typing'.tr();
+
+        return Padding(
+          padding: AppSize.padding(horizontal: 16, bottom: 4),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 12,
+                height: 12,
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  color: AppColors.grey500,
+                ),
+              ),
+              SizedBox(width: AppSize.getWidth(6)),
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: AppSize.font(11),
+                  fontStyle: FontStyle.italic,
+                  color: AppColors.grey500,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

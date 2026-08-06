@@ -155,6 +155,9 @@
       "location_fetch_failed": "فشل تحديد موقعك، حاول مرة أخرى",
       "send_location": "إرسال الموقع الحالي",
       "sending_location": "جاري إرسال الموقع...",
+      "members_count_only": "{total} عضو",
+      "one_typing": "{name} بيكتب...",
+      "multiple_typing": "أكتر من شخص بيكتب...",
       "pinned": {
         "welcome_title": "أهلاً بكم في المجتمع 👋",
         "welcome_body": "مرحباً بالجميع! هذه المساحة مخصصة لأعضاء الفعالية للتواصل ومشاركة التحديثات ودعم بعضكم البعض.",
