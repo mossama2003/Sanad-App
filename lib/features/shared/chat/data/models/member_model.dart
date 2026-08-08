@@ -2,11 +2,13 @@ import '../enums/member_role_enum.dart';
 
 class MemberModel {
   final int id;
+  final int userId;
   final String volunteerName;
   final String role;
 
   const MemberModel({
     required this.id,
+    required this.userId,
     required this.volunteerName,
     required this.role,
   });
@@ -14,15 +16,16 @@ class MemberModel {
   factory MemberModel.fromJson(Map<String, dynamic> json) {
     return MemberModel(
       id: json['id'] ?? 0,
+      userId: json['user_id'] ?? 0,
       volunteerName: json['volunteer'] ?? '',
       role: (json['role'] ?? '').toString(),
     );
   }
 
   MemberModel copyWith({String? role}) {
-    // 👈 جديد
     return MemberModel(
       id: id,
+      userId: userId,
       volunteerName: volunteerName,
       role: role ?? this.role,
     );

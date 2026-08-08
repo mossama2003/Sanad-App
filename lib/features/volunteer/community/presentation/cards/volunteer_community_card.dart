@@ -21,15 +21,14 @@ class VolunteerCommunityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final latestMessage = event.latestMessage?['message']?.toString() ?? '';
+    final latestMessageDate = DateTime.tryParse(
+      event.latestMessage?['created']?.toString() ?? '',
+    );
 
     final unread = event.unreadChatMessages;
-
     final joiners = event.joiners;
-
     final date = event.date;
-
     final status = event.status.toLowerCase();
-
     final isEnded = status == 'completed';
 
     return GestureDetector(
@@ -98,7 +97,7 @@ class VolunteerCommunityCard extends StatelessWidget {
                           SizedBox(width: AppSize.getWidth(10)),
 
                           Text(
-                            AppHelper.timeAgoShort(date),
+                            AppHelper.timeAgoShort(latestMessageDate ?? date),
                             style: TextStyle(
                               fontSize: AppSize.font(11),
                               color: AppColors.black.withValues(alpha: .55),

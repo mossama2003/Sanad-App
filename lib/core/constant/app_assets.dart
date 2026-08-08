@@ -122,4 +122,8 @@ class AppIcons {
   static String tag = '$icons/tag.svg';
   static String muteNotification = '$icons/mute-notification.svg';
   static String flag = '$icons/flag.svg';
+  static String googleDrive = '$icons/google-drive.svg';
+  static String googleMaps = '$icons/google-maps.svg';
+  static String usaFlag = '$icons/USA-flag.svg';
+  static String egyptFlag = '$icons/EGY-flag.svg';
 }

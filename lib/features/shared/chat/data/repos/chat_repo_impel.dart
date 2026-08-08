@@ -244,4 +244,47 @@ class ChatRepoImpel implements ChatRepo {
       return left(ServerFailure.fromCatchError(e));
     }
   }
+
+  @override
+  Future<Either<Failure, PaginatedSearchResultModel>> searchMessages({
+    required int eventId,
+    required String query,
+    int page = 1,
+  }) async {
+    try {
+      final response = await DioHelper.get(
+        url: SEARCH_CHAT_MESSAGES,
+        query: {'event': eventId, 'q': query, 'page': page},
+      );
+
+      if (response.statusCode == 200) {
+        return right(PaginatedSearchResultModel.fromJson(response.data));
+      }
+
+      return left(ServerFailure.fromResponse(response));
+    } catch (e) {
+      return left(ServerFailure.fromCatchError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, EventChatContextModel>> getMessageContext({
+    required int eventId,
+    required int messageId,
+  }) async {
+    try {
+      final response = await DioHelper.get(
+        url: SEARCH_CHAT_CONTEXT,
+        query: {'event': eventId, 'message_id': messageId},
+      );
+
+      if (response.statusCode == 200) {
+        return right(EventChatContextModel.fromJson(response.data));
+      }
+
+      return left(ServerFailure.fromResponse(response));
+    } catch (e) {
+      return left(ServerFailure.fromCatchError(e));
+    }
+  }
 }

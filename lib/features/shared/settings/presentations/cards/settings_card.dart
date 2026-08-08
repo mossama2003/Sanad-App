@@ -101,6 +101,7 @@ class SettingsTile extends StatelessWidget {
   final String title;
   final Widget trailing;
   final VoidCallback? onTap;
+  final bool withColor;
 
   const SettingsTile({
     super.key,
@@ -108,6 +109,7 @@ class SettingsTile extends StatelessWidget {
     required this.title,
     required this.trailing,
     this.onTap,
+    this.withColor = false,
   });
 
   @override
@@ -129,6 +131,7 @@ class SettingsTile extends StatelessWidget {
               ),
               child: CustomIcon(
                 icon: icon,
+                withColor: withColor,
                 color: AppColors.primary,
                 width: AppSize.getSize(20),
                 height: AppSize.getSize(20),

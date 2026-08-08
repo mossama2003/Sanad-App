@@ -37,10 +37,9 @@ void main() async {
   /// LANGUAGE INIT
   await EasyLocalization.ensureInitialized();
 
-  /// LANGUAGE INIT
-  await EasyLocalization.ensureInitialized();
   await initializeDateFormatting('ar');
   await initializeDateFormatting('en');
+
   await AppLocales.init();
 
   /// DIO INITIALIZATION
@@ -103,10 +102,10 @@ class MyApp extends StatelessWidget {
               themeMode: currentTheme.mode,
               home: SplashScreen(),
               locale: context.locale,
-              navigatorKey: AppNavigator.key,
-              debugShowCheckedModeBanner: false,
               supportedLocales: context.supportedLocales,
               localizationsDelegates: context.localizationDelegates,
+              navigatorKey: AppNavigator.key,
+              debugShowCheckedModeBanner: false,
               builder: (context, child) {
                 return ScrollConfiguration(
                   behavior: AppBehavior(),

@@ -50,6 +50,10 @@ String LEAVE_EVENT_CHAT = 'v1/events/leave/';
 
 String REPORT_EVENT_CHAT = 'v1/events/event_report/';
 
+String SEARCH_CHAT_MESSAGES = 'v1/events/event_chat/search/';
+
+String SEARCH_CHAT_CONTEXT = 'v1/events/event_chat/search_context/';
+
 /// Volunteering Endpoints
 String JOIN_EVENT = 'v1/events/join/';
 

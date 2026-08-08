@@ -177,6 +177,13 @@
       "left_event_success": "You left the event",
       "report_subtitle": "Tell us what's wrong with this chat",
       "report_reason_hint": "Describe the issue (optional)",
+      "search_hint": "Search messages...",
+      "no_search_results": "No messages found",
+      "search_prompt": "Type to search messages",
+      "shared_location": "Location",
+      "tap_open_maps": "Tap to open in Google Maps",
+      "shared_file": "Google Drive file",
+      "tap_open_drive": "Tap to open in Drive",
       "pinned": {
         "welcome_title": "Welcome to the Community 👋",
         "welcome_body": "Welcome everyone! This space is for event members to communicate, share updates, and support each other.",

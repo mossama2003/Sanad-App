@@ -8,6 +8,7 @@ import '../../../../../core/network/end_points.dart';
 import '../models/event_report_model.dart';
 import '../models/member_model.dart';
 import '../models/chat_model.dart';
+import '../models/search_messages.dart';
 
 part 'chat_repo_impel.dart';
 
@@ -54,5 +55,16 @@ abstract class ChatRepo {
   Future<Either<Failure, EventReportModel>> reportEvent({
     required int eventId,
     String? reason,
+  });
+
+  Future<Either<Failure, PaginatedSearchResultModel>> searchMessages({
+    required int eventId,
+    required String query,
+    int page = 1,
+  });
+
+  Future<Either<Failure, EventChatContextModel>> getMessageContext({
+    required int eventId,
+    required int messageId,
   });
 }

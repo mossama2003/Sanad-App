@@ -13,6 +13,7 @@ import '../controllers/members_cubit.dart';
 
 class MembersBottomSheet extends StatefulWidget {
   final int eventId;
+  final int? organizerId; // 👈 جديد
   final String? organizerName;
   final String? organizerSubtitle;
   final Set<int> onlineUserIds;
@@ -21,6 +22,7 @@ class MembersBottomSheet extends StatefulWidget {
   const MembersBottomSheet({
     super.key,
     required this.eventId,
+    this.organizerId, // 👈 جديد
     this.organizerName,
     this.organizerSubtitle,
     this.onlineUserIds = const {},
@@ -30,6 +32,7 @@ class MembersBottomSheet extends StatefulWidget {
   static Future<void> show(
     BuildContext context, {
     required int eventId,
+    int? organizerId, // 👈 جديد
     String? organizerName,
     String? organizerSubtitle,
     Set<int> onlineUserIds = const {},
@@ -41,6 +44,8 @@ class MembersBottomSheet extends StatefulWidget {
       backgroundColor: Colors.transparent,
       builder: (_) => MembersBottomSheet(
         eventId: eventId,
+        organizerId: organizerId,
+        // 👈 جديد
         organizerName: organizerName,
         organizerSubtitle: organizerSubtitle,
         onlineUserIds: onlineUserIds,
@@ -113,6 +118,10 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
   Widget build(BuildContext context) {
     final hasOrganizer =
         widget.organizerName != null && widget.organizerName!.trim().isNotEmpty;
+
+    final isOrganizerOnline =
+        widget.organizerId != null &&
+        widget.onlineUserIds.contains(widget.organizerId);
 
     return BlocProvider.value(
       value: _membersCubit,
@@ -250,7 +259,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                             _buildStaticTile(
                               name: widget.organizerName!,
                               subtitle: widget.organizerSubtitle,
-                              isOnline: false,
+                              isOnline: isOrganizerOnline,
                               avatarColor: AppColors.bronze,
                               role: MemberRoleEnum.organizer,
                             ),
@@ -327,7 +336,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
   // ── Member tile (from API) ──────────────────────────────────────────────
 
   Widget _buildMemberTile(MemberModel m) {
-    final isOnline = widget.onlineUserIds.contains(m.id);
+    final isOnline = widget.onlineUserIds.contains(m.userId);
     final isEditing = _editingMemberId == m.id;
 
     return _buildTile(
@@ -420,11 +429,11 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
               ),
               if (isOnline)
                 Positioned(
-                  bottom: 1,
-                  right: 1,
+                  bottom: 2,
+                  right: -1,
                   child: Container(
-                    width: AppSize.getSize(11),
-                    height: AppSize.getSize(11),
+                    width: AppSize.getSize(15),
+                    height: AppSize.getSize(15),
                     decoration: BoxDecoration(
                       color: AppColors.green,
                       shape: BoxShape.circle,

@@ -21,6 +21,7 @@ import '../../data/cache/chat_cache_service.dart';
 import '../../data/enums/member_role_enum.dart';
 import '../../data/models/chat_model.dart';
 import '../../data/models/member_model.dart';
+import '../../data/models/search_messages.dart';
 import '../../data/repos/chat_repo.dart';
 import 'package:ably_flutter/ably_flutter.dart' as ably;
 
@@ -31,6 +32,14 @@ class ChatCubit extends Cubit<ChatState> {
   final int eventId;
   final int currentUserId;
   String currentUserName;
+  List<SearchResultMessageModel> searchResults = [];
+  bool isSearching = false;
+  bool searchHasMore = false;
+  int _searchPage = 1;
+  String _lastSearchQuery = '';
+  int _pendingOnlineCount = 0;
+  Set<int> _pendingOnlineUserIds = {};
+  bool _pendingPresenceReady = false;
 
   ably.Realtime? _realtime;
   ably.RealtimeChannel? _channel;
@@ -38,9 +47,9 @@ class ChatCubit extends Cubit<ChatState> {
   StreamSubscription<ably.PresenceMessage>? _presenceSubscription;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
-
-  Timer? _typingSendThrottle;
+  final ValueNotifier<int> searchResultsNotifier = ValueNotifier(0);
   final Map<int, Timer> _typingClearTimers = {};
+  Timer? _typingSendThrottle;
 
   ChatCubit({
     required this.chatRepo,
@@ -52,6 +61,55 @@ class ChatCubit extends Cubit<ChatState> {
   void updateCurrentUserName(String name) {
     if (name.trim().isEmpty) return;
     currentUserName = name;
+  }
+
+  int? _extractUserIdFromClientId(String? clientId) {
+    if (clientId == null) return null;
+    final parts = clientId.split(':');
+    if (parts.length != 2) return null;
+    return int.tryParse(parts[1]);
+  }
+
+  void _handlePresenceMessage(ably.PresenceMessage msg) {
+    final userId = _extractUserIdFromClientId(msg.clientId);
+    if (userId == null) return;
+
+    final updated = Set<int>.from(_pendingOnlineUserIds);
+
+    switch (msg.action) {
+      case ably.PresenceAction.enter:
+      case ably.PresenceAction.update:
+      case ably.PresenceAction.present:
+        updated.add(userId);
+        break;
+      case ably.PresenceAction.leave:
+      case ably.PresenceAction.absent:
+        updated.remove(userId);
+        break;
+      default:
+        break;
+    }
+
+    _pendingOnlineUserIds = updated;
+    _pendingOnlineCount = updated.length;
+    _pendingPresenceReady = true;
+
+    debugPrint("Presence event: ${msg.action} → ids: $updated");
+
+    _emitPendingPresenceIfLoaded();
+  }
+
+  void _emitPendingPresenceIfLoaded() {
+    final current = state;
+    if (current is! ChatLoaded) return;
+
+    emit(
+      current.copyWith(
+        onlineCount: _pendingOnlineCount,
+        isPresenceReady: true,
+        onlineUserIds: _pendingOnlineUserIds,
+      ),
+    );
   }
 
   Future<void> initChat() async {
@@ -84,6 +142,11 @@ class ChatCubit extends Cubit<ChatState> {
         results[1] as Either<Failure, PaginatedEventChatModel>;
     final membersResult = results[2] as Either<Failure, PaginatedMemberModel>;
 
+    // 👈 التعديل الأساسي: نبدأ الاتصال بـ Ably فورًا، من غير ما نستنى معالجة الهيستوري
+    tokenResult.fold((_) {}, (token) {
+      _connectToAbly(token);
+    });
+
     final totalMembersCount = membersResult.fold(
       (failure) {
         debugPrint('⚠️ getEventMembers FAILED: ${failure.errMessage}');
@@ -106,6 +169,15 @@ class ChatCubit extends Cubit<ChatState> {
               current.copyWith(
                 isSyncing: false,
                 totalMembersCount: totalMembersCount,
+                onlineCount: _pendingPresenceReady
+                    ? _pendingOnlineCount
+                    : current.onlineCount,
+                isPresenceReady: _pendingPresenceReady
+                    ? true
+                    : current.isPresenceReady,
+                onlineUserIds: _pendingPresenceReady
+                    ? _pendingOnlineUserIds
+                    : current.onlineUserIds,
               ),
             );
           }
@@ -150,6 +222,15 @@ class ChatCubit extends Cubit<ChatState> {
               hasMore: data.hasMore,
               isSyncing: false,
               totalMembersCount: totalMembersCount,
+              onlineCount: _pendingPresenceReady
+                  ? _pendingOnlineCount
+                  : current.onlineCount,
+              isPresenceReady: _pendingPresenceReady
+                  ? true
+                  : current.isPresenceReady,
+              onlineUserIds: _pendingPresenceReady
+                  ? _pendingOnlineUserIds
+                  : current.onlineUserIds,
             ),
           );
         } else {
@@ -160,15 +241,14 @@ class ChatCubit extends Cubit<ChatState> {
               hasMore: data.hasMore,
               isSyncing: false,
               totalMembersCount: totalMembersCount,
+              onlineCount: _pendingOnlineCount,
+              isPresenceReady: _pendingPresenceReady,
+              onlineUserIds: _pendingOnlineUserIds,
             ),
           );
         }
       },
     );
-
-    tokenResult.fold((_) {}, (token) {
-      _connectToAbly(token);
-    });
   }
 
   Future<void> _connectToAbly(ChatTokenModel token) async {
@@ -200,11 +280,28 @@ class ChatCubit extends Cubit<ChatState> {
       '📡 Channel attached: events:$eventId | state: ${_channel!.state}',
     );
 
-    _presenceSubscription = _channel!.presence.subscribe().listen((_) {
-      _updateOnlineCount();
+    // 👈 التعديل: نبني الـ set بشكل تراكمي من كل presence message بدل ما نعمل get() كل مرة
+    _presenceSubscription = _channel!.presence.subscribe().listen((msg) {
+      _handlePresenceMessage(msg);
     });
 
-    // 👈 subscription واحد بس، بيفرّق بالـ switch
+    // 👈 نضيف نفسنا فورًا (optimistic) من غير ما نستنى تأكيد enter()
+    _pendingOnlineUserIds = {..._pendingOnlineUserIds, currentUserId};
+    _pendingOnlineCount = _pendingOnlineUserIds.length;
+    _pendingPresenceReady = true;
+    _emitPendingPresenceIfLoaded();
+
+    unawaited(
+      _channel!.presence
+          .enter()
+          .then((_) {
+            return _updateOnlineCount();
+          })
+          .catchError((e) {
+            debugPrint('⚠️ Failed to enter presence: $e');
+          }),
+    );
+
     _messageSubscription = _channel!.subscribe().listen((message) {
       debugPrint(
         '📩 Realtime event received: name=${message.name}, data=${message.data}',
@@ -218,17 +315,6 @@ class ChatCubit extends Cubit<ChatState> {
           _onRealtimeMessage(message);
       }
     });
-
-    unawaited(
-      _channel!.presence
-          .enter()
-          .then((_) {
-            return _updateOnlineCount();
-          })
-          .catchError((e) {
-            debugPrint('⚠️ Failed to enter presence: $e');
-          }),
-    );
   }
 
   Future<void> _updateOnlineCount() async {
@@ -239,29 +325,17 @@ class ChatCubit extends Cubit<ChatState> {
 
       final ids = members
           .map((m) => m.clientId)
-          .whereType<String>()
-          .map((clientId) {
-            final parts = clientId.split(':');
-            if (parts.length == 2) {
-              return int.tryParse(parts[1]);
-            }
-            return null;
-          })
+          .map(_extractUserIdFromClientId)
           .whereType<int>()
           .toSet();
 
-      debugPrint("Presence members: ${members.length}, ids: $ids");
+      debugPrint("Presence get(): ${members.length}, ids: $ids");
 
-      final current = state;
-      if (current is ChatLoaded) {
-        final newState = current.copyWith(
-          onlineCount: members.length,
-          isPresenceReady: true,
-          onlineUserIds: ids,
-        );
+      _pendingOnlineUserIds = ids;
+      _pendingOnlineCount = ids.length;
+      _pendingPresenceReady = true;
 
-        emit(newState);
-      }
+      _emitPendingPresenceIfLoaded();
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -495,7 +569,81 @@ class ChatCubit extends Cubit<ChatState> {
 
     emit(current.copyWith(isLoadingMore: true));
 
+    // 👇 لو المستخدم فاتح الشات عن طريق Search Jump
+    if (current.highlightedMessageId != null) {
+      final oldestId = current.messages.firstOrNull?.id;
+
+      if (oldestId == null) {
+        emit(current.copyWith(isLoadingMore: false));
+        return;
+      }
+
+      final result = await chatRepo.getMessageContext(
+        eventId: eventId,
+        messageId: oldestId,
+      );
+
+      result.fold(
+        (failure) {
+          emit(current.copyWith(isLoadingMore: false));
+          AppToast.error(failure.errMessage);
+        },
+        (context) async {
+          final existingCached = await ChatCacheService.getCachedMessages(
+            eventId,
+          );
+
+          final editedStatusMap = {
+            for (final m in existingCached) m.id: m.isEdited,
+          };
+
+          final mergedOlder = context.older.map((m) {
+            final wasEdited = editedStatusMap[m.id] ?? false;
+
+            if (!wasEdited) return m;
+
+            return EventChatDetailModel(
+              id: m.id,
+              creator: m.creator,
+              role: m.role,
+              created: m.created,
+              modified: m.modified,
+              message: m.message,
+              isEdited: true,
+            );
+          }).toList();
+
+          await ChatCacheService.cacheMessages(eventId, mergedOlder);
+
+          final existingIds = current.messages
+              .map((e) => e.id)
+              .whereType<int>()
+              .toSet();
+
+          final olderMessages = mergedOlder
+              .map((e) => e.toUiModel(currentUserId: currentUserId))
+              .where((e) => e.id == null || !existingIds.contains(e.id))
+              .toList();
+
+          emit(
+            current.copyWith(
+              messages: [...olderMessages, ...current.messages],
+              hasMore: context.hasMoreBefore,
+              isLoadingMore: false,
+            ),
+          );
+        },
+      );
+
+      return;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // العادي (Page Pagination)
+    // ─────────────────────────────────────────────────────────────
+
     final nextPage = current.page + 1;
+
     final result = await chatRepo.getChatHistory(
       eventId: eventId,
       page: nextPage,
@@ -507,16 +655,17 @@ class ChatCubit extends Cubit<ChatState> {
         AppToast.error(failure.errMessage);
       },
       (data) async {
-        // 👈 جديد - نفس منطق الـ merge
         final existingCached = await ChatCacheService.getCachedMessages(
           eventId,
         );
+
         final editedStatusMap = {
           for (final m in existingCached) m.id: m.isEdited,
         };
 
         final mergedResults = data.results.map((m) {
           final wasEdited = editedStatusMap[m.id] ?? false;
+
           if (!wasEdited) return m;
 
           return EventChatDetailModel(
@@ -530,12 +679,11 @@ class ChatCubit extends Cubit<ChatState> {
           );
         }).toList();
 
-        await ChatCacheService.cacheMessages(eventId, mergedResults); // ✅
+        await ChatCacheService.cacheMessages(eventId, mergedResults);
 
-        final olderMessages =
-            mergedResults // ✅
-                .map((e) => e.toUiModel(currentUserId: currentUserId))
-                .toList();
+        final olderMessages = mergedResults
+            .map((e) => e.toUiModel(currentUserId: currentUserId))
+            .toList();
 
         emit(
           current.copyWith(
@@ -768,7 +916,7 @@ class ChatCubit extends Cubit<ChatState> {
     );
   }
 
-  Future<void> showEventDetails(BuildContext context, int eventId) async {
+  Future showEventDetails(BuildContext context, int eventId) async {
     final cachedEvent = _getEventFromCache(eventId);
 
     if (cachedEvent != null) {
@@ -792,20 +940,27 @@ class ChatCubit extends Cubit<ChatState> {
 
     try {
       final response = await DioHelper.get(url: EVENT_QR(eventId));
+
       final eventDetails = VolunteerEventDetailsModel.fromJson(response.data);
 
       if (!context.mounted) return;
+
       Navigator.pop(context);
 
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (_) => VolunteerEventDetailsBottomSheet(event: eventDetails),
+        builder: (_) => VolunteerEventDetailsBottomSheet(
+          event: eventDetails,
+          showJoinButton: false, // ✅ فتح من الشات
+        ),
       );
     } catch (_) {
       if (!context.mounted) return;
+
       Navigator.pop(context);
+
       AppToast.error('shared.chat.event_details_failed'.tr());
     }
   }
@@ -844,6 +999,110 @@ class ChatCubit extends Cubit<ChatState> {
       (failure) => AppToast.error(failure.errMessage),
       (_) => AppToast.success('shared.chat.report_submitted'.tr()),
     );
+  }
+
+  // ── Search ────────────────────────────────────────────────────────────
+  Future<void> searchMessages(String query) async {
+    if (query.trim().isEmpty) {
+      searchResults = [];
+      _searchPage = 1;
+      searchHasMore = false;
+      searchResultsNotifier.value++;
+      return;
+    }
+
+    _lastSearchQuery = query.trim();
+    isSearching = true;
+    _searchPage = 1;
+    searchResultsNotifier.value++;
+
+    final result = await chatRepo.searchMessages(
+      eventId: eventId,
+      query: _lastSearchQuery,
+      page: 1,
+    );
+
+    isSearching = false;
+
+    result.fold(
+      (failure) {
+        searchResults = [];
+        searchHasMore = false;
+        AppToast.error(failure.errMessage);
+        searchResultsNotifier.value++;
+      },
+      (data) {
+        searchResults = data.results;
+        searchHasMore = data.hasMore;
+        searchResultsNotifier.value++;
+      },
+    );
+  }
+
+  Future<void> loadMoreSearchResults() async {
+    if (!searchHasMore || isSearching || _lastSearchQuery.isEmpty) return;
+
+    isSearching = true;
+    final nextPage = _searchPage + 1;
+
+    final result = await chatRepo.searchMessages(
+      eventId: eventId,
+      query: _lastSearchQuery,
+      page: nextPage,
+    );
+
+    isSearching = false;
+
+    result.fold((failure) => AppToast.error(failure.errMessage), (data) {
+      _searchPage = nextPage;
+      searchResults = [...searchResults, ...data.results];
+      searchHasMore = data.hasMore;
+      searchResultsNotifier.value++;
+    });
+  }
+
+  // ── Jump to a specific message from search ─────────────────────────────
+  Future<void> jumpToMessage(int messageId) async {
+    final current = state;
+    if (current is! ChatLoaded) return;
+
+    emit(current.copyWith(isLoadingMore: true));
+
+    final result = await chatRepo.getMessageContext(
+      eventId: eventId,
+      messageId: messageId,
+    );
+
+    await result.fold(
+      // 👈 ضيف await هنا
+      (failure) async {
+        emit(current.copyWith(isLoadingMore: false));
+        AppToast.error(failure.errMessage);
+      },
+      (context) async {
+        final contextMessages = context.allMessages
+            .map((e) => e.toUiModel(currentUserId: currentUserId))
+            .toList();
+
+        await ChatCacheService.cacheMessages(eventId, context.allMessages);
+
+        emit(
+          ChatLoaded(
+            messages: contextMessages,
+            page: 1,
+            hasMore: context.hasMoreBefore || context.hasMoreAfter,
+            isSyncing: false,
+            highlightedMessageId: messageId,
+          ),
+        );
+      },
+    );
+  }
+
+  void clearHighlight() {
+    final current = state;
+    if (current is! ChatLoaded) return;
+    emit(current.copyWith(clearHighlight: true));
   }
 
   @override

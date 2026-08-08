@@ -24,6 +24,7 @@ class ChatLoaded extends ChatState {
   final bool isPresenceReady;
   final Set<int> onlineUserIds;
   final Map<int, String> typingUsers;
+  final int? highlightedMessageId;
 
   const ChatLoaded({
     required this.messages,
@@ -38,6 +39,7 @@ class ChatLoaded extends ChatState {
     this.isPresenceReady = false,
     this.onlineUserIds = const {},
     this.typingUsers = const {},
+    this.highlightedMessageId,
   });
 
   ChatLoaded copyWith({
@@ -53,6 +55,8 @@ class ChatLoaded extends ChatState {
     bool? isPresenceReady,
     Set<int>? onlineUserIds,
     Map<int, String>? typingUsers,
+    int? highlightedMessageId,
+    bool clearHighlight = false,
   }) {
     return ChatLoaded(
       messages: messages ?? this.messages,
@@ -67,14 +71,26 @@ class ChatLoaded extends ChatState {
       isPresenceReady: isPresenceReady ?? this.isPresenceReady,
       onlineUserIds: onlineUserIds ?? this.onlineUserIds,
       typingUsers: typingUsers ?? this.typingUsers,
+      highlightedMessageId: clearHighlight
+          ? null
+          : (highlightedMessageId ?? this.highlightedMessageId),
     );
   }
 
   @override
   List<Object?> get props => [
-    messages, page, hasMore, isSyncing, isLoadingMore, isSelectionMode,
-    selectedMessageIds, onlineCount, totalMembersCount, isPresenceReady,
-    onlineUserIds, typingUsers,
+    messages,
+    page,
+    hasMore,
+    isSyncing,
+    isLoadingMore,
+    isSelectionMode,
+    selectedMessageIds,
+    onlineCount,
+    totalMembersCount,
+    isPresenceReady,
+    onlineUserIds,
+    typingUsers,
   ];
 }
 
