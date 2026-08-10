@@ -682,25 +682,26 @@ class _ChatScreenState extends State<ChatScreen> {
           icon: AppIcons.share,
           label: 'shared.chat.share_invite'.tr(),
         ),
-        const PopupMenuDivider(
-          height: 12,
-          thickness: 0.2,
-          endIndent: 15,
-          indent: 15,
-        ),
-        _buildMenuItem(
-          value: 'report_chat',
-          icon: AppIcons.flag,
-          label: 'shared.chat.report_chat'.tr(),
-          color: AppColors.red,
-        ),
-        if (isVolunteer)
+        if (isVolunteer) ...[
+          const PopupMenuDivider(
+            height: 12,
+            thickness: 0.2,
+            endIndent: 15,
+            indent: 15,
+          ),
+          _buildMenuItem(
+            value: 'report_chat',
+            icon: AppIcons.flag,
+            label: 'shared.chat.report_chat'.tr(),
+            color: AppColors.red,
+          ),
           _buildMenuItem(
             value: 'leave_chat',
             icon: AppIcons.signOut,
             label: 'shared.chat.leave_chat'.tr(),
             color: AppColors.red,
           ),
+        ],
       ],
     ).then((selected) {
       if (selected == null) return;
