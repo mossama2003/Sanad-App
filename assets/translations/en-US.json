@@ -184,6 +184,11 @@
       "tap_open_maps": "Tap to open in Google Maps",
       "shared_file": "Google Drive file",
       "tap_open_drive": "Tap to open in Drive",
+      "replying_to": "Replying to {name}",
+      "replying_to_yourself": "Replying to yourself",
+      "you": "You",
+      "original_message": "Original message",
+      "message_unavailable": "Message unavailable",
       "pinned": {
         "welcome_title": "Welcome to the Community 👋",
         "welcome_body": "Welcome everyone! This space is for event members to communicate, share updates, and support each other.",

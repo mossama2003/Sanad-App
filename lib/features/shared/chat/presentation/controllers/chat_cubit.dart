@@ -698,7 +698,7 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   // ── Send message (REST API + optimistic UI) ────────────────────────────
-  Future<void> sendMessage(String text) async {
+  Future<void> sendMessage(String text, {int? parentId}) async {
     final current = state;
     if (text.trim().isEmpty || current is! ChatLoaded) return;
 
@@ -713,13 +713,18 @@ class ChatCubit extends Cubit<ChatState> {
       avatarColor: AppColors.primary,
       avatarLetter: 'Y',
       status: ChatMessageStatus.sending,
+      parentId: parentId,
     );
 
     emit(current.copyWith(messages: [...current.messages, optimisticMsg]));
 
     _playSound('sounds/message_send.mp3');
 
-    final result = await chatRepo.sendMessage(eventId: eventId, message: text);
+    final result = await chatRepo.sendMessage(
+      eventId: eventId,
+      message: text,
+      parentId: parentId,
+    );
 
     result.fold((failure) {
       _updateMessageStatus(localId, ChatMessageStatus.failed);
@@ -735,11 +740,16 @@ class ChatCubit extends Cubit<ChatState> {
     final index = current.messages.indexWhere((m) => m.localId == localId);
     if (index == -1) return;
 
-    final text = current.messages[index].text;
+    final msg = current.messages[index];
 
     _updateMessageStatus(localId, ChatMessageStatus.sending);
 
-    final result = await chatRepo.sendMessage(eventId: eventId, message: text);
+    final result = await chatRepo.sendMessage(
+      eventId: eventId,
+      message: msg.text,
+      parentId:
+          msg.parentId, // 👈 جديد: يحافظ على الريبلاي حتى بعد الفشل والإعادة
+    );
 
     result.fold((failure) {
       _updateMessageStatus(localId, ChatMessageStatus.failed);

@@ -41,9 +41,14 @@ class ChatRepoImpel implements ChatRepo {
   Future<Either<Failure, SendChatMessageModel>> sendMessage({
     required int eventId,
     required String message,
+    int? parentId,
   }) async {
     try {
-      final formData = FormData.fromMap({'event': eventId, 'message': message});
+      final formData = FormData.fromMap({
+        'event': eventId,
+        'message': message,
+        if (parentId != null) 'parent': parentId,
+      });
 
       final response = await DioHelper.post(
         url: SEND_CHAT_MESSAGE,

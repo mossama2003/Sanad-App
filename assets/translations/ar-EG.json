@@ -184,6 +184,11 @@
       "tap_open_maps": "اضغط للفتح في جوجل ماب",
       "shared_file": "ملف جوجل درايف",
       "tap_open_drive": "اضغط للفتح في درايف",
+      "replying_to": "بترد على {name}",
+      "replying_to_yourself": "بترد على نفسك",
+      "you": "انت",
+      "original_message": "الرسالة الأصلية",
+      "message_unavailable": "الرسالة مش متاحة",
       "pinned": {
         "welcome_title": "أهلاً بكم في المجتمع 👋",
         "welcome_body": "مرحباً بالجميع! هذه المساحة مخصصة لأعضاء الفعالية للتواصل ومشاركة التحديثات ودعم بعضكم البعض.",

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:flutter/services.dart';
 import 'package:sanad_app/core/shared/widgets/custom_field_text.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
@@ -53,12 +54,15 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _showEmojiPicker = false;
   bool _isSendingLocation = false;
   ChatModel? _editingMessage;
+  ChatModel? _replyingToMessage;
   bool _isSearchMode = false;
   String _searchQuery = '';
   int? _lastHighlightedId;
+  int? _flashHighlightId;
+  Timer? _flashHighlightTimer;
 
   final GlobalKey _moreButtonKey = GlobalKey();
-  final GlobalKey _highlightedMessageKey = GlobalKey();
+  final Map<int, GlobalKey> _messageKeys = {};
   final FocusNode _searchFocusNode = FocusNode();
   final FocusNode _messageFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
@@ -94,6 +98,37 @@ class _ChatScreenState extends State<ChatScreen> {
 
   late final ChatCubit _chatCubit;
 
+  // ── Theme helpers ────────────────────────────────────────────────────────
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _surfaceColor =>
+      _isDark ? const Color(0xFF1C1C1E) : const Color(0xFFFFFFFF);
+
+  Color get _primaryTextColor =>
+      _isDark ? const Color(0xFFF5F5F7) : const Color(0xFF1C1C1E);
+
+  Color get _secondaryTextColor =>
+      _isDark ? const Color(0xFFAEAEB2) : const Color(0xFF6B6B70);
+
+  Color get _iconColor =>
+      _isDark ? const Color(0xFFB8B8BD) : const Color(0xFF6B6B70);
+
+  Color get _dividerColor =>
+      _isDark ? const Color(0xFF38383A) : const Color(0xFFD8D8DC);
+
+  Color get _bubbleOtherColor =>
+      _isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF8F8FA);
+
+  Color get _bubbleSanadColor =>
+      _isDark ? const Color(0xFF16332C) : const Color(0xFFD6F5EC);
+
+  Color get _softBackground =>
+      _isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF5F5F7);
+
+  Color get _scaffoldBackground =>
+      _isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF0F0F2);
+
   @override
   void initState() {
     super.initState();
@@ -118,6 +153,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _searchController.dispose();
     _searchFocusNode.dispose();
     _searchDebounce?.cancel();
+    _flashHighlightTimer?.cancel();
     _chatCubit.close();
     super.dispose();
   }
@@ -159,114 +195,6 @@ class _ChatScreenState extends State<ChatScreen> {
       });
     }
   }
-
-  // void _showReactionPicker(
-  //   BuildContext context,
-  //   Offset position,
-  //   ChatModel msg,
-  // ) {
-  //   final overlay = Overlay.of(context);
-  //
-  //   late OverlayEntry entry;
-  //
-  //   entry = OverlayEntry(
-  //     builder: (_) {
-  //       return Positioned.fill(
-  //         child: Material(
-  //           color: Colors.transparent,
-  //           child: Stack(
-  //             children: [
-  //               Positioned.fill(
-  //                 child: GestureDetector(
-  //                   behavior: HitTestBehavior.translucent,
-  //                   onTap: () {
-  //                     if (entry.mounted) entry.remove();
-  //                   },
-  //                   child: Container(color: Colors.transparent),
-  //                 ),
-  //               ),
-  //               Positioned(
-  //                 left: position.dx - 100,
-  //                 top: position.dy - 65,
-  //                 child: Material(
-  //                   color: Colors.transparent,
-  //                   child: TweenAnimationBuilder(
-  //                     duration: const Duration(milliseconds: 160),
-  //                     tween: Tween(begin: .9, end: 1.0),
-  //                     builder: (context, scale, child) {
-  //                       return Transform.scale(scale: scale, child: child);
-  //                     },
-  //                     child: Container(
-  //                       padding: AppSize.padding(horizontal: 6, vertical: 5),
-  //                       decoration: BoxDecoration(
-  //                         color: Colors.white,
-  //                         borderRadius: BorderRadius.circular(32),
-  //                         boxShadow: [
-  //                           BoxShadow(
-  //                             color: Colors.black.withValues(alpha: .10),
-  //                             blurRadius: 18,
-  //                             offset: const Offset(0, 3),
-  //                           ),
-  //                         ],
-  //                       ),
-  //                       child: Row(
-  //                         mainAxisSize: MainAxisSize.min,
-  //                         children: _reactions.map((emoji) {
-  //                           final selected = msg.reactionEmoji == emoji;
-  //
-  //                           return GestureDetector(
-  //                             onTap: () {
-  //                               setState(() {
-  //                                 if (selected) {
-  //                                   msg.reactionEmoji = null;
-  //                                   msg.reactionCount = 0;
-  //                                 } else {
-  //                                   msg.reactionEmoji = emoji;
-  //                                   msg.reactionCount = 1;
-  //                                 }
-  //                               });
-  //                               if (entry.mounted) entry.remove();
-  //                             },
-  //                             child: AnimatedContainer(
-  //                               duration: const Duration(milliseconds: 150),
-  //                               margin: AppSize.margin(horizontal: 1),
-  //                               padding: AppSize.padding(all: 5),
-  //                               decoration: BoxDecoration(
-  //                                 color: selected
-  //                                     ? Colors.grey.withValues(alpha: .16)
-  //                                     : Colors.transparent,
-  //                                 borderRadius: BorderRadius.circular(100),
-  //                               ),
-  //                               child: AnimatedScale(
-  //                                 duration: const Duration(milliseconds: 150),
-  //                                 scale: selected ? 1.12 : 1,
-  //                                 child: Text(
-  //                                   emoji,
-  //                                   style: TextStyle(
-  //                                     fontSize: AppSize.font(22),
-  //                                   ),
-  //                                 ),
-  //                               ),
-  //                             ),
-  //                           );
-  //                         }).toList(),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  //
-  //   overlay.insert(entry);
-  //   Future.delayed(const Duration(seconds: 5), () {
-  //     if (entry.mounted) entry.remove();
-  //   });
-  // }
 
   void _jumpToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -313,10 +241,12 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void _scrollToHighlightedMessage() {
+  void _scrollToHighlightedMessage(int? messageId) {
+    if (messageId == null) return;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final ctx = _highlightedMessageKey.currentContext;
+        final ctx = _messageKeys[messageId]?.currentContext;
         if (ctx == null) return;
 
         Scrollable.ensureVisible(
@@ -331,6 +261,34 @@ class _ChatScreenState extends State<ChatScreen> {
         });
       });
     });
+  }
+
+  void _onTapReplyQuote(int parentId) {
+    final ctx = _messageKeys[parentId]?.currentContext;
+
+    if (ctx != null) {
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 400),
+        alignment: 0.5,
+        curve: Curves.easeOut,
+      );
+
+      setState(() => _flashHighlightId = parentId);
+      _flashHighlightTimer?.cancel();
+      _flashHighlightTimer = Timer(const Duration(seconds: 2), () {
+        if (mounted) setState(() => _flashHighlightId = null);
+      });
+    } else {
+      _chatCubit.jumpToMessage(parentId);
+    }
+  }
+
+  ChatModel? _findMessageById(ChatLoaded state, int id) {
+    for (final m in state.messages) {
+      if (m.id == id) return m;
+    }
+    return null;
   }
 
   void _toggleEmojiPicker() {
@@ -460,7 +418,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildSelectionBar(ChatLoaded state) {
     return Container(
-      color: AppColors.white,
+      color: _surfaceColor,
       padding: AppSize.padding(horizontal: 12, vertical: 10),
       child: Row(
         children: [
@@ -469,7 +427,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Center(
               child: CustomIcon(
                 icon: AppIcons.close,
-                color: AppColors.black,
+                color: _primaryTextColor,
                 width: AppSize.getSize(24),
                 height: AppSize.getSize(24),
               ),
@@ -484,7 +442,7 @@ class _ChatScreenState extends State<ChatScreen> {
               style: TextStyle(
                 fontSize: AppSize.font(15),
                 fontWeight: FontWeight.w600,
-                color: AppColors.black,
+                color: _primaryTextColor,
               ),
             ),
           ),
@@ -537,6 +495,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _startEditingMessage(ChatModel msg) {
     setState(() {
+      _replyingToMessage = null; // 👈 يلغي أي ريبلاي شغال
       _editingMessage = msg;
       _messageController.text = msg.text;
       _messageController.selection = TextSelection.collapsed(
@@ -551,6 +510,20 @@ class _ChatScreenState extends State<ChatScreen> {
       _editingMessage = null;
       _messageController.clear();
     });
+  }
+
+  void _startReplyingTo(ChatModel msg) {
+    if (msg.id == null) return;
+    setState(() {
+      _editingMessage = null;
+      _replyingToMessage = msg;
+    });
+    _messageFocusNode.requestFocus();
+  }
+
+  // 👈 جديد
+  void _cancelReplying() {
+    setState(() => _replyingToMessage = null);
   }
 
   Future<void> _openLink(String url) async {
@@ -639,8 +612,10 @@ class _ChatScreenState extends State<ChatScreen> {
       return;
     }
 
-    _chatCubit.sendMessage(text);
+    final parentId = _replyingToMessage?.id;
+    _chatCubit.sendMessage(text, parentId: parentId);
     _messageController.clear();
+    setState(() => _replyingToMessage = null);
     _scrollToBottom();
   }
 
@@ -687,7 +662,7 @@ class _ChatScreenState extends State<ChatScreen> {
     showMenu<String>(
       context: context,
       position: position,
-      color: AppColors.white,
+      color: _surfaceColor,
       elevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       constraints: BoxConstraints(minWidth: AppSize.getWidth(220)),
@@ -746,7 +721,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           CustomIcon(
             icon: icon,
-            color: color ?? AppColors.grey700,
+            color: color ?? _iconColor,
             width: AppSize.getSize(18),
             height: AppSize.getSize(18),
           ),
@@ -756,7 +731,7 @@ class _ChatScreenState extends State<ChatScreen> {
             style: TextStyle(
               fontSize: AppSize.font(13.5),
               fontWeight: FontWeight.w500,
-              color: color ?? AppColors.black,
+              color: color ?? _primaryTextColor,
             ),
           ),
         ],
@@ -833,7 +808,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return BlocProvider.value(
       value: _chatCubit,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F5F7),
+        backgroundColor: _scaffoldBackground,
         body: SafeArea(
           child: BlocBuilder<ChatCubit, ChatState>(
             buildWhen: (previous, current) =>
@@ -875,7 +850,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                           _lastHighlightedId) {
                                     _lastHighlightedId =
                                         state.highlightedMessageId;
-                                    _scrollToHighlightedMessage();
+                                    _scrollToHighlightedMessage(
+                                      state.highlightedMessageId,
+                                    );
                                     return;
                                   }
 
@@ -999,155 +976,17 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return BlocProvider.value(
-  //     value: _chatCubit,
-  //     child: Scaffold(
-  //       backgroundColor: const Color(0xFFF5F5F7),
-  //       body: SafeArea(
-  //         child: Column(
-  //           children: [
-  //             _buildAppBar(context),
-  //             _buildEventBanner(),
-  //             _buildPinnedSection(),
-  //
-  //             Expanded(
-  //               child: Stack(
-  //                 children: [
-  //                   BlocConsumer<ChatCubit, ChatState>(
-  //                     listener: (context, state) {
-  //                       if (state is ChatError) {
-  //                         AppToast.error(state.message);
-  //                         return;
-  //                       }
-  //
-  //                       if (state is! ChatLoaded) return;
-  //
-  //                       // ==========================
-  //                       // تحميل رسائل قديمة فوق
-  //                       // ==========================
-  //                       if (_prevMaxScrollExtent != null &&
-  //                           !state.isLoadingMore) {
-  //                         final oldExtent = _prevMaxScrollExtent!;
-  //                         _prevMaxScrollExtent = null;
-  //                         _isLoadingMore = false;
-  //
-  //                         WidgetsBinding.instance.addPostFrameCallback((_) {
-  //                           if (!_scrollController.hasClients) return;
-  //
-  //                           final newExtent =
-  //                               _scrollController.position.maxScrollExtent;
-  //
-  //                           final diff = newExtent - oldExtent;
-  //
-  //                           if (diff > 0) {
-  //                             _scrollController.jumpTo(
-  //                               _scrollController.offset + diff,
-  //                             );
-  //                           }
-  //                         });
-  //
-  //                         return;
-  //                       }
-  //
-  //                       // ==========================
-  //                       // أول دخول للشات
-  //                       // ==========================
-  //                       if (_isFirstLoad &&
-  //                           state.messages.isNotEmpty &&
-  //                           !state.isSyncing) {
-  //                         _isFirstLoad = false;
-  //
-  //                         WidgetsBinding.instance.addPostFrameCallback((_) {
-  //                           if (!_scrollController.hasClients) return;
-  //
-  //                           _scrollController.jumpTo(
-  //                             _scrollController.position.maxScrollExtent,
-  //                           );
-  //                         });
-  //
-  //                         return;
-  //                       }
-  //
-  //                       // ==========================
-  //                       // رسالة جديدة فقط
-  //                       // ==========================
-  //                       if (!_showScrollToBottom) {
-  //                         _scrollToBottom();
-  //                       }
-  //                     },
-  //                     builder: (context, state) {
-  //                       if (state is ChatLoading || state is ChatInitial) {
-  //                         return const Center(
-  //                           child: CircularProgressIndicator(),
-  //                         );
-  //                       }
-  //
-  //                       if (state is ChatError) {
-  //                         return _buildErrorState(state.message);
-  //                       }
-  //
-  //                       final chatState = state as ChatLoaded;
-  //
-  //                       if (chatState.messages.isEmpty &&
-  //                           !chatState.isSyncing &&
-  //                           !chatState.isLoadingMore) {
-  //                         return _buildEmptyState();
-  //                       }
-  //
-  //                       return SingleChildScrollView(
-  //                         controller: _scrollController,
-  //                         child: Column(
-  //                           children: [
-  //                             if (chatState.isSyncing) _buildSyncingBanner(),
-  //                             if (chatState.isLoadingMore)
-  //                               Padding(
-  //                                 padding: AppSize.padding(vertical: 10),
-  //                                 child: const Center(
-  //                                   child: SizedBox(
-  //                                     width: 20,
-  //                                     height: 20,
-  //                                     child: CircularProgressIndicator(
-  //                                       strokeWidth: 2,
-  //                                     ),
-  //                                   ),
-  //                                 ),
-  //                               ),
-  //                             ..._buildMessagesWithDividers(chatState.messages),
-  //                             SizedBox(height: AppSize.getHeight(12)),
-  //                           ],
-  //                         ),
-  //                       );
-  //                     },
-  //                   ),
-  //                   Positioned(
-  //                     right: 16,
-  //                     bottom: 20,
-  //                     child: _buildScrollToBottomButton(),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //             _buildMessageInput(),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   // ── AppBar ───────────────────────────────────────────────────────────────
 
   Widget _buildAppBar(BuildContext context, ChatState outerState) {
     return Container(
-      color: AppColors.white,
+      color: _surfaceColor,
       padding: AppSize.padding(horizontal: 12, vertical: 10),
       child: Row(
         children: [
           CustomIcon(
             icon: AppIcons.arrowBack,
-            color: AppColors.black,
+            color: _primaryTextColor,
             onTap: () => AppNavigator.pop(),
           ),
           SizedBox(width: AppSize.getWidth(10)),
@@ -1180,7 +1019,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   style: TextStyle(
                     fontSize: AppSize.font(16),
                     fontWeight: FontWeight.w600,
-                    color: AppColors.black,
+                    color: _primaryTextColor,
                   ),
                 ),
                 SizedBox(height: AppSize.getHeight(1)),
@@ -1213,7 +1052,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                       style: TextStyle(
                         fontSize: AppSize.font(12),
-                        color: AppColors.grey500,
+                        color: _secondaryTextColor,
                       ),
                     );
                   },
@@ -1223,7 +1062,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           CustomIcon(
             icon: AppIcons.community,
-            color: AppColors.grey600,
+            color: _iconColor,
             onTap: () {
               final currentState = _chatCubit.state;
               final onlineIds = currentState is ChatLoaded
@@ -1248,7 +1087,7 @@ class _ChatScreenState extends State<ChatScreen> {
           CustomIcon(
             key: _moreButtonKey,
             icon: AppIcons.more,
-            color: AppColors.grey600,
+            color: _iconColor,
             onTap: () => _showChatOptionsMenu(context),
           ),
         ],
@@ -1260,7 +1099,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildEventBanner() {
     return Container(
-      color: AppColors.white,
+      color: _surfaceColor,
       child: Column(
         children: [
           Padding(
@@ -1290,7 +1129,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         style: TextStyle(
                           fontSize: AppSize.font(13),
                           fontWeight: FontWeight.w600,
-                          color: AppColors.black,
+                          color: _primaryTextColor,
                         ),
                       ),
                       SizedBox(height: AppSize.getHeight(2)),
@@ -1301,7 +1140,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         ).format(widget.event.date),
                         style: TextStyle(
                           fontSize: AppSize.font(11),
-                          color: AppColors.grey500,
+                          color: _secondaryTextColor,
                         ),
                       ),
                     ],
@@ -1329,7 +1168,6 @@ class _ChatScreenState extends State<ChatScreen> {
               ],
             ),
           ),
-          // _buildPinnedSection(),
         ],
       ),
     );
@@ -1339,7 +1177,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildSearchAppBar() {
     return Container(
-      color: AppColors.white,
+      color: _surfaceColor,
       padding: AppSize.padding(horizontal: 12, vertical: 10),
       child: Row(
         children: [
@@ -1347,7 +1185,7 @@ class _ChatScreenState extends State<ChatScreen> {
             icon: AppIcons.arrowBack,
             width: AppSize.getSize(24),
             height: AppSize.getSize(24),
-            color: AppColors.black,
+            color: _primaryTextColor,
             onTap: _exitSearchMode,
           ),
           SizedBox(width: AppSize.getWidth(10)),
@@ -1372,7 +1210,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Icon(
                   Icons.close,
                   size: AppSize.getSize(20),
-                  color: AppColors.grey600,
+                  color: _iconColor,
                 ),
               ),
             ),
@@ -1391,7 +1229,7 @@ class _ChatScreenState extends State<ChatScreen> {
               'shared.chat.search_prompt'.tr(),
               style: TextStyle(
                 fontSize: AppSize.font(13),
-                color: AppColors.grey500,
+                color: _secondaryTextColor,
               ),
             ),
           );
@@ -1410,8 +1248,7 @@ class _ChatScreenState extends State<ChatScreen> {
           itemCount:
               _chatCubit.searchResults.length +
               (_chatCubit.searchHasMore ? 1 : 0),
-          separatorBuilder: (_, __) =>
-              Divider(height: 1, color: AppColors.grey300),
+          separatorBuilder: (_, __) => Divider(height: 1, color: _dividerColor),
           itemBuilder: (context, index) {
             if (index >= _chatCubit.searchResults.length) {
               _chatCubit.loadMoreSearchResults();
@@ -1440,7 +1277,7 @@ class _ChatScreenState extends State<ChatScreen> {
       onTap: () async {
         _exitSearchMode();
         await _chatCubit.jumpToMessage(result.id);
-        _scrollToHighlightedMessage();
+        _scrollToHighlightedMessage(result.id);
       },
       child: Padding(
         padding: AppSize.padding(horizontal: 16, vertical: 12),
@@ -1455,7 +1292,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     style: TextStyle(
                       fontSize: AppSize.font(13.5),
                       fontWeight: FontWeight.w600,
-                      color: AppColors.black,
+                      color: _primaryTextColor,
                     ),
                   ),
                 ),
@@ -1466,7 +1303,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ).format(result.created.toLocal()),
                   style: TextStyle(
                     fontSize: AppSize.font(11),
-                    color: AppColors.grey500,
+                    color: _secondaryTextColor,
                   ),
                 ),
               ],
@@ -1478,7 +1315,7 @@ class _ChatScreenState extends State<ChatScreen> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: AppSize.font(13),
-                color: AppColors.black.withValues(alpha: 0.75),
+                color: _primaryTextColor.withValues(alpha: 0.75),
               ),
             ),
           ],
@@ -1494,13 +1331,13 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off, size: 48, color: AppColors.grey500),
+            Icon(Icons.search_off, size: 48, color: _secondaryTextColor),
             SizedBox(height: AppSize.getHeight(12)),
             Text(
               'shared.chat.no_search_results'.tr(),
               style: TextStyle(
                 fontSize: AppSize.font(14),
-                color: AppColors.grey500,
+                color: _secondaryTextColor,
               ),
             ),
           ],
@@ -1520,7 +1357,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             CustomIcon(
               icon: AppIcons.info,
-              color: AppColors.grey500,
+              color: _secondaryTextColor,
               width: AppSize.getSize(40),
               height: AppSize.getSize(40),
             ),
@@ -1530,7 +1367,7 @@ class _ChatScreenState extends State<ChatScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: AppSize.font(13),
-                color: AppColors.grey500,
+                color: _secondaryTextColor,
               ),
             ),
             SizedBox(height: AppSize.getHeight(14)),
@@ -1569,11 +1406,11 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Container(
         margin: AppSize.margin(all: 12),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: _surfaceColor,
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withValues(alpha: _isDark ? 0.2 : 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -1597,7 +1434,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: AppSize.getSize(15),
-                      color: AppColors.black,
+                      color: _primaryTextColor,
                     ),
                   ),
                   SizedBox(width: AppSize.getWidth(8)),
@@ -1623,7 +1460,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     curve: Curves.easeInOut,
                     child: CustomIcon(
                       icon: AppIcons.arrowDown,
-                      color: AppColors.grey500,
+                      color: _secondaryTextColor,
                       width: AppSize.getSize(12),
                       height: AppSize.getSize(12),
                     ),
@@ -1658,7 +1495,7 @@ class _ChatScreenState extends State<ChatScreen> {
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
       padding: AppSize.padding(all: 14),
       decoration: BoxDecoration(
-        color: p.color.withValues(alpha: 0.1),
+        color: p.color.withValues(alpha: _isDark ? 0.18 : 0.1),
         border: Border.all(color: p.color.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(25),
       ),
@@ -1695,7 +1532,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   p.body,
                   style: TextStyle(
                     fontSize: AppSize.font(11),
-                    color: AppColors.black,
+                    color: _primaryTextColor,
                     height: 1.45,
                   ),
                 ),
@@ -1715,19 +1552,19 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Row(
         children: [
           SizedBox(width: AppSize.getWidth(16)),
-          Expanded(child: Divider(color: AppColors.grey500, thickness: 1)),
+          Expanded(child: Divider(color: _dividerColor, thickness: 1)),
           Padding(
             padding: AppSize.padding(horizontal: 12),
             child: Text(
               label,
               style: TextStyle(
                 fontSize: AppSize.font(12),
-                color: AppColors.grey500,
+                color: _secondaryTextColor,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          Expanded(child: Divider(color: AppColors.grey500, thickness: 1)),
+          Expanded(child: Divider(color: _dividerColor, thickness: 1)),
           SizedBox(width: AppSize.getWidth(16)),
         ],
       ),
@@ -1766,7 +1603,12 @@ class _ChatScreenState extends State<ChatScreen> {
               msg.id != null && chatState.selectedMessageIds.contains(msg.id),
           isHighlighted:
               msg.id != null &&
-              msg.id == chatState.highlightedMessageId, // 👈 جديد
+              (msg.id == chatState.highlightedMessageId ||
+                  msg.id == _flashHighlightId),
+          // 👈 جديد: fallback للفلاش
+          parentMessage: msg.parentId != null
+              ? _findMessageById(chatState, msg.parentId!) // 👈 جديد
+              : null,
         ),
       );
 
@@ -1801,6 +1643,7 @@ class _ChatScreenState extends State<ChatScreen> {
     bool isSelectionMode = false,
     bool isSelected = false,
     bool isHighlighted = false,
+    ChatModel? parentMessage, // 👈 جديد
   }) {
     final bool isSanad = msg.badge == 'Sanad Admin';
     final bool isMe = msg.senderName == 'You';
@@ -1808,14 +1651,153 @@ class _ChatScreenState extends State<ChatScreen> {
 
     final bubbleColor = isMe
         ? AppColors.primary
-        : (isSanad ? const Color(0xFFD6F5EC) : Colors.white);
+        : (isSanad ? _bubbleSanadColor : _bubbleOtherColor);
 
-    final textColor = isMe ? Colors.white : AppColors.black;
+    final textColor = isMe ? Colors.white : _primaryTextColor;
 
     final linkType = _detectLinkType(msg.text);
 
+    // 👈 جديد: key ثابت لكل رسالة عندها id (عشان الـ scroll والهايلايت)
+    final messageKey = msg.id != null
+        ? (_messageKeys[msg.id!] ??= GlobalKey())
+        : null;
+
+    final bubbleContent = GestureDetector(
+      onLongPress: () => _showMessageActions(msg),
+      child: Column(
+        crossAxisAlignment: isMe
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: AppSize.padding(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: bubbleColor,
+              border: Border.all(color: _dividerColor),
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(20),
+                topRight: const Radius.circular(20),
+                bottomLeft: Radius.circular(isMe ? 20 : 10),
+                bottomRight: Radius.circular(isMe ? 10 : 20),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (msg.parentId != null) // 👈 جديد
+                  _buildReplyQuote(msg, parentMessage, isMe, textColor),
+                linkType != _ChatLinkType.none
+                    ? _buildLinkPreviewCard(msg, linkType, isMe, textColor)
+                    : Linkify(
+                        text: msg.text,
+                        onOpen: (link) => _openLink(link.url),
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                        options: const LinkifyOptions(humanize: true),
+                        style: TextStyle(
+                          fontSize: AppSize.font(13),
+                          color: textColor,
+                          fontWeight: FontWeight.w600,
+                          height: 1.5,
+                        ),
+                        linkStyle: TextStyle(
+                          fontSize: AppSize.font(13),
+                          color: isMe ? AppColors.white : AppColors.laserBlue,
+                          height: 1.5,
+                          decoration: TextDecoration.underline,
+                          decorationColor: isMe
+                              ? AppColors.white
+                              : AppColors.laserBlue,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                SizedBox(height: AppSize.getHeight(4)),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      DateFormat('hh:mm a', 'en_US').format(msg.createdAt),
+                      style: TextStyle(
+                        fontSize: AppSize.font(10),
+                        color: isMe
+                            ? Colors.white.withValues(alpha: 0.75)
+                            : _secondaryTextColor,
+                      ),
+                    ),
+                    if (msg.isEdited) ...[
+                      SizedBox(width: AppSize.getWidth(4)),
+                      Text(
+                        'shared.chat.edited'.tr(),
+                        style: TextStyle(
+                          fontSize: AppSize.font(9),
+                          fontStyle: FontStyle.italic,
+                          color: isMe ? Colors.white70 : _secondaryTextColor,
+                        ),
+                      ),
+                    ],
+                    if (msg.status == ChatMessageStatus.sending) ...[
+                      SizedBox(width: AppSize.getWidth(4)),
+                      SizedBox(
+                        width: 9,
+                        height: 9,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1.3,
+                          color: isMe ? Colors.white70 : _secondaryTextColor,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (msg.reactionEmoji != null)
+            Padding(
+              padding: AppSize.padding(top: 6),
+              child: _buildReaction(msg),
+            ),
+          if (msg.status == ChatMessageStatus.failed)
+            Padding(
+              padding: AppSize.padding(top: 4),
+              child: GestureDetector(
+                onTap: () => _chatCubit.retryMessage(msg.localId!),
+                behavior: HitTestBehavior.opaque,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CustomIcon(
+                      icon: AppIcons.info,
+                      color: AppColors.red,
+                      width: AppSize.getSize(12),
+                      height: AppSize.getSize(12),
+                    ),
+                    SizedBox(width: AppSize.getWidth(2)),
+                    Text(
+                      'shared.chat.tap_to_retry'.tr(),
+                      style: TextStyle(
+                        fontSize: AppSize.font(10),
+                        color: AppColors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+
+    final swipeableContent = (!isSelectionMode && msg.id != null)
+        ? _SwipeToReplyWrapper(
+            onReply: () => _startReplyingTo(msg),
+            isMe: isMe,
+            child: bubbleContent,
+          )
+        : bubbleContent;
+
     return GestureDetector(
-      key: isHighlighted ? _highlightedMessageKey : null,
+      key: messageKey,
       onTap: isSelectionMode
           ? () {
               if (!isSelectable) return;
@@ -1836,7 +1818,7 @@ class _ChatScreenState extends State<ChatScreen> {
           padding: AppSize.padding(
             horizontal: 14,
             top: isFirstInGroup ? 8 : 2,
-            bottom: isFirstInGroup ? 0 : 0,
+            bottom: 0,
           ),
           child: Row(
             mainAxisAlignment: isMe
@@ -1860,7 +1842,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         size: 20,
                         color: isSelected
                             ? AppColors.primary
-                            : AppColors.grey500,
+                            : _secondaryTextColor,
                       ),
                     ),
                   ],
@@ -1883,154 +1865,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       _buildNameBadgeRow(msg, isMe),
                       SizedBox(height: AppSize.getHeight(5)),
                     ],
-                    GestureDetector(
-                      onLongPress: () => _showMessageActions(msg),
-                      child: Column(
-                        crossAxisAlignment: isMe
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: AppSize.padding(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: bubbleColor,
-                              border: Border.all(color: AppColors.grey300),
-                              borderRadius: BorderRadius.only(
-                                topLeft: const Radius.circular(20),
-                                topRight: const Radius.circular(20),
-                                bottomLeft: Radius.circular(isMe ? 20 : 10),
-                                bottomRight: Radius.circular(isMe ? 10 : 20),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                linkType != _ChatLinkType.none
-                                    ? _buildLinkPreviewCard(
-                                        msg,
-                                        linkType,
-                                        isMe,
-                                        textColor,
-                                      )
-                                    : Linkify(
-                                        text: msg.text,
-                                        onOpen: (link) => _openLink(link.url),
-                                        softWrap: true,
-                                        overflow: TextOverflow.visible,
-                                        options: const LinkifyOptions(
-                                          humanize: true,
-                                        ),
-                                        style: TextStyle(
-                                          fontSize: AppSize.font(13),
-                                          color: textColor,
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.5,
-                                        ),
-                                        linkStyle: TextStyle(
-                                          fontSize: AppSize.font(13),
-                                          color: isMe
-                                              ? AppColors.white
-                                              : AppColors.laserBlue,
-                                          height: 1.5,
-                                          decoration: TextDecoration.underline,
-                                          decorationColor: isMe
-                                              ? AppColors.white
-                                              : AppColors.laserBlue,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                SizedBox(height: AppSize.getHeight(4)),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      DateFormat(
-                                        'hh:mm a',
-                                        'en_US',
-                                      ).format(msg.createdAt),
-                                      style: TextStyle(
-                                        fontSize: AppSize.font(10),
-                                        color: isMe
-                                            ? Colors.white.withValues(
-                                                alpha: 0.75,
-                                              )
-                                            : AppColors.grey500,
-                                      ),
-                                    ),
-                                    if (msg.isEdited) ...[
-                                      SizedBox(width: AppSize.getWidth(4)),
-                                      Text(
-                                        'shared.chat.edited'.tr(),
-                                        style: TextStyle(
-                                          fontSize: AppSize.font(9),
-                                          fontStyle: FontStyle.italic,
-                                          color: isMe
-                                              ? Colors.white70
-                                              : AppColors.grey500,
-                                        ),
-                                      ),
-                                    ],
-                                    if (msg.status ==
-                                        ChatMessageStatus.sending) ...[
-                                      SizedBox(width: AppSize.getWidth(4)),
-                                      SizedBox(
-                                        width: 9,
-                                        height: 9,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 1.3,
-                                          color: isMe
-                                              ? Colors.white70
-                                              : AppColors.grey500,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          if (msg.reactionEmoji != null)
-                            Padding(
-                              padding: AppSize.padding(top: 6),
-                              child: _buildReaction(msg),
-                            ),
-
-                          if (msg.status == ChatMessageStatus.failed)
-                            Padding(
-                              padding: AppSize.padding(top: 4),
-                              child: GestureDetector(
-                                onTap: () =>
-                                    _chatCubit.retryMessage(msg.localId!),
-                                behavior: HitTestBehavior.opaque,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    CustomIcon(
-                                      icon: AppIcons.info,
-                                      color: AppColors.red,
-                                      width: AppSize.getSize(12),
-                                      height: AppSize.getSize(12),
-                                    ),
-                                    SizedBox(width: AppSize.getWidth(2)),
-                                    Text(
-                                      'shared.chat.tap_to_retry'.tr(),
-                                      style: TextStyle(
-                                        fontSize: AppSize.font(10),
-                                        color: AppColors.red,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+                    swipeableContent,
                     SizedBox(height: AppSize.getHeight(4)),
                   ],
                 ),
@@ -2048,6 +1883,133 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Widget _buildReplyQuote(
+    ChatModel msg,
+    ChatModel? parentMessage,
+    bool isMe,
+    Color textColor,
+  ) {
+    final displayName = parentMessage != null
+        ? (parentMessage.senderName == 'You'
+              ? 'shared.chat.you'.tr()
+              : parentMessage.senderName)
+        : 'shared.chat.original_message'.tr();
+
+    final displayText =
+        parentMessage?.text ?? 'shared.chat.message_unavailable'.tr();
+
+    return GestureDetector(
+      onTap: () => _onTapReplyQuote(msg.parentId!),
+      child: Container(
+        width: double.infinity,
+        margin: EdgeInsets.only(bottom: AppSize.getHeight(6)),
+        padding: AppSize.padding(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          color: isMe
+              ? Colors.white.withValues(alpha: 0.15)
+              : AppColors.primary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(10),
+          border: Border(
+            left: BorderSide(
+              color: isMe ? Colors.white : AppColors.primary,
+              width: 3,
+            ),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              displayName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: AppSize.font(11.5),
+                fontWeight: FontWeight.w700,
+                color: isMe ? Colors.white : AppColors.primary,
+              ),
+            ),
+            SizedBox(height: AppSize.getHeight(2)),
+            Text(
+              displayText,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: AppSize.font(11.5),
+                color: isMe
+                    ? Colors.white.withValues(alpha: 0.85)
+                    : textColor.withValues(alpha: 0.7),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReplyingBanner() {
+    final msg = _replyingToMessage;
+    if (msg == null) return const SizedBox.shrink();
+
+    return Container(
+      padding: AppSize.padding(horizontal: 14, vertical: 10),
+      color: AppColors.primary.withValues(alpha: 0.08),
+      child: Row(
+        children: [
+          Container(
+            width: 3,
+            height: AppSize.getHeight(34),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          SizedBox(width: AppSize.getWidth(10)),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  msg.senderName == 'You'
+                      ? 'shared.chat.replying_to_yourself'.tr()
+                      : 'shared.chat.replying_to'.tr(
+                          namedArgs: {'name': msg.senderName},
+                        ),
+                  style: TextStyle(
+                    fontSize: AppSize.font(12.5),
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                ),
+                SizedBox(height: AppSize.getHeight(2)),
+                Text(
+                  msg.text,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: AppSize.font(12),
+                    color: _secondaryTextColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: _cancelReplying,
+            child: CustomIcon(
+              icon: AppIcons.close,
+              color: _iconColor,
+              width: AppSize.getSize(18),
+              height: AppSize.getSize(18),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildNameBadgeRow(ChatModel msg, bool isMe) {
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -2059,7 +2021,7 @@ class _ChatScreenState extends State<ChatScreen> {
             style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: AppSize.font(12),
-              color: AppColors.black,
+              color: _primaryTextColor,
             ),
           ),
         if (!isMe && msg.badge != null) ...[
@@ -2074,7 +2036,7 @@ class _ChatScreenState extends State<ChatScreen> {
             style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: AppSize.font(13),
-              color: AppColors.black,
+              color: _primaryTextColor,
             ),
           ),
         ],
@@ -2119,11 +2081,16 @@ class _ChatScreenState extends State<ChatScreen> {
     return Container(
       padding: AppSize.padding(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _bubbleOtherColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(
+          color: _isDark ? const Color(0xFF48484A) : const Color(0xFFE2E8F0),
+        ),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: .05), blurRadius: 6),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: _isDark ? 0.15 : .05),
+            blurRadius: 6,
+          ),
         ],
       ),
       child: Row(
@@ -2141,6 +2108,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: AppSize.font(12),
+                  color: _primaryTextColor,
                 ),
               ),
             ),
@@ -2153,9 +2121,11 @@ class _ChatScreenState extends State<ChatScreen> {
     return Column(
       children: [
         if (_editingMessage != null) _buildEditingBanner(),
+        if (_replyingToMessage != null) _buildReplyingBanner(),
         _buildTypingIndicator(),
         Container(
-          padding: AppSize.padding(horizontal: 12, bottom: 12),
+          color: _surfaceColor,
+          padding: AppSize.padding(horizontal: 12, bottom: 12, top: 8),
           child: Row(
             children: [
               GestureDetector(
@@ -2164,7 +2134,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   padding: AppSize.padding(all: 6),
                   child: CustomIcon(
                     icon: _showEmojiPicker ? AppIcons.keyboard : AppIcons.emoji,
-                    color: AppColors.grey600,
+                    color: _iconColor,
                     width: AppSize.getSize(23),
                     height: AppSize.getSize(23),
                   ),
@@ -2184,7 +2154,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         )
                       : CustomIcon(
                           icon: AppIcons.location,
-                          color: AppColors.grey600,
+                          color: _iconColor,
                           width: AppSize.getSize(24),
                           height: AppSize.getSize(24),
                         ),
@@ -2239,12 +2209,12 @@ class _ChatScreenState extends State<ChatScreen> {
                 emojiViewConfig: EmojiViewConfig(
                   columns: 8,
                   emojiSizeMax: 28,
-                  backgroundColor: AppColors.white,
+                  backgroundColor: _surfaceColor,
                 ),
                 categoryViewConfig: CategoryViewConfig(
                   indicatorColor: AppColors.primary,
                   iconColorSelected: AppColors.primary,
-                  backgroundColor: AppColors.white,
+                  backgroundColor: _surfaceColor,
                 ),
                 bottomActionBarConfig: const BottomActionBarConfig(
                   enabled: false,
@@ -2282,7 +2252,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 height: 12,
                 child: CircularProgressIndicator(
                   strokeWidth: 1.5,
-                  color: AppColors.grey500,
+                  color: _secondaryTextColor,
                 ),
               ),
               SizedBox(width: AppSize.getWidth(6)),
@@ -2291,7 +2261,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 style: TextStyle(
                   fontSize: AppSize.font(11),
                   fontStyle: FontStyle.italic,
-                  color: AppColors.grey500,
+                  color: _secondaryTextColor,
                 ),
               ),
             ],
@@ -2330,7 +2300,7 @@ class _ChatScreenState extends State<ChatScreen> {
               style: TextStyle(
                 fontSize: AppSize.font(15),
                 fontWeight: FontWeight.w600,
-                color: AppColors.black,
+                color: _primaryTextColor,
               ),
             ),
             SizedBox(height: AppSize.getHeight(6)),
@@ -2339,7 +2309,7 @@ class _ChatScreenState extends State<ChatScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: AppSize.font(13),
-                color: AppColors.grey500,
+                color: _secondaryTextColor,
               ),
             ),
           ],
@@ -2359,7 +2329,7 @@ class _ChatScreenState extends State<ChatScreen> {
             height: 12,
             child: CircularProgressIndicator(
               strokeWidth: 1.5,
-              color: AppColors.grey500,
+              color: _secondaryTextColor,
             ),
           ),
           SizedBox(width: AppSize.getWidth(6)),
@@ -2367,7 +2337,7 @@ class _ChatScreenState extends State<ChatScreen> {
             'shared.chat.syncing_messages'.tr(),
             style: TextStyle(
               fontSize: AppSize.font(11),
-              color: AppColors.grey500,
+              color: _secondaryTextColor,
             ),
           ),
         ],
@@ -2400,7 +2370,7 @@ class _ChatScreenState extends State<ChatScreen> {
           SizedBox(height: AppSize.getHeight(14)),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: _surfaceColor,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -2414,7 +2384,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     _startEditingMessage(msg);
                   },
                 ),
-                Divider(height: 1, color: AppColors.grey300),
+                Divider(height: 1, color: _dividerColor),
                 _buildActionTile(
                   icon: AppIcons.check,
                   label: 'shared.chat.select_messages'.tr(),
@@ -2423,7 +2393,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     _chatCubit.enterSelectionMode(msg.id!);
                   },
                 ),
-                Divider(height: 1, color: AppColors.grey300),
+                Divider(height: 1, color: _dividerColor),
                 _buildActionTile(
                   icon: AppIcons.delete,
                   label: 'shared.chat.delete_message'.tr(),
@@ -2456,7 +2426,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             CustomIcon(
               icon: icon,
-              color: color ?? AppColors.black,
+              color: color ?? _primaryTextColor,
               width: AppSize.getSize(20),
               height: AppSize.getSize(20),
             ),
@@ -2466,7 +2436,7 @@ class _ChatScreenState extends State<ChatScreen> {
               style: TextStyle(
                 fontSize: AppSize.font(14),
                 fontWeight: FontWeight.w500,
-                color: color ?? AppColors.black,
+                color: color ?? _primaryTextColor,
               ),
             ),
           ],
@@ -2483,6 +2453,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           CustomIcon(
             icon: AppIcons.edit,
+            color: AppColors.primary,
             width: AppSize.getSize(20),
             height: AppSize.getSize(20),
           ),
@@ -2501,7 +2472,7 @@ class _ChatScreenState extends State<ChatScreen> {
             onTap: _cancelEditing,
             child: CustomIcon(
               icon: AppIcons.close,
-              color: AppColors.grey600,
+              color: _iconColor,
               width: AppSize.getSize(20),
               height: AppSize.getSize(20),
             ),
@@ -2524,9 +2495,7 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Container(
         padding: AppSize.padding(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
-          color: isMe
-              ? Colors.white.withValues(alpha: 0.15)
-              : const Color(0xFFF5F5F7),
+          color: isMe ? Colors.white.withValues(alpha: 0.15) : _softBackground,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
@@ -2535,9 +2504,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Container(
               width: AppSize.getSize(38),
               height: AppSize.getSize(38),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(shape: BoxShape.circle),
               alignment: Alignment.center,
               child: CustomIcon(
                 icon: isMaps ? AppIcons.googleMaps : AppIcons.googleDrive,
@@ -2577,6 +2544,95 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SwipeToReplyWrapper extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onReply;
+  final bool isMe; // 👈 جديد
+
+  const _SwipeToReplyWrapper({
+    required this.child,
+    required this.onReply,
+    required this.isMe, // 👈 جديد
+  });
+
+  @override
+  State<_SwipeToReplyWrapper> createState() => _SwipeToReplyWrapperState();
+}
+
+class _SwipeToReplyWrapperState extends State<_SwipeToReplyWrapper> {
+  static const double _maxDrag = 64;
+  static const double _triggerDrag = 50;
+
+  double _dragExtent = 0;
+  bool _triggered = false;
+
+  void _onDragUpdate(DragUpdateDetails details) {
+    setState(() {
+      final next = _dragExtent + details.delta.dx;
+
+      // 👈 جديد: رسايل الآخرين تتسحب يمين بس (شمال → يمين)
+      // ورسايلي أنا تتسحب شمال بس (يمين → شمال)
+      _dragExtent = widget.isMe
+          ? next.clamp(-_maxDrag, 0.0)
+          : next.clamp(0.0, _maxDrag);
+
+      final crossedThreshold = _dragExtent.abs() >= _triggerDrag;
+
+      if (!_triggered && crossedThreshold) {
+        _triggered = true;
+        HapticFeedback.mediumImpact();
+      } else if (_triggered && !crossedThreshold) {
+        _triggered = false;
+      }
+    });
+  }
+
+  void _onDragEnd(DragEndDetails details) {
+    if (_triggered) {
+      widget.onReply();
+    }
+    setState(() {
+      _dragExtent = 0;
+      _triggered = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = (_dragExtent.abs() / _triggerDrag).clamp(0.0, 1.0);
+
+    return GestureDetector(
+      onHorizontalDragUpdate: _onDragUpdate,
+      onHorizontalDragEnd: _onDragEnd,
+      child: Stack(
+        alignment: _dragExtent >= 0
+            ? Alignment.centerLeft
+            : Alignment.centerRight,
+        children: [
+          if (_dragExtent != 0)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Opacity(
+                opacity: progress,
+                child: Icon(
+                  Icons.reply,
+                  size: 20,
+                  color: AppColors.primary.withValues(
+                    alpha: 0.5 + (0.5 * progress),
+                  ),
+                ),
+              ),
+            ),
+          Transform.translate(
+            offset: Offset(_dragExtent, 0),
+            child: widget.child,
+          ),
+        ],
       ),
     );
   }

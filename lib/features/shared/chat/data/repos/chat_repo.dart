@@ -28,6 +28,7 @@ abstract class ChatRepo {
   Future<Either<Failure, SendChatMessageModel>> sendMessage({
     required int eventId,
     required String message,
+    int? parentId,
   });
 
   Future<Either<Failure, SendChatMessageModel>> editMessage({

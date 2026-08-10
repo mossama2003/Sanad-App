@@ -30,6 +30,7 @@ class ChatModel {
   int reactionCount;
   final ChatMessageStatus status;
   final bool isEdited;
+  final int? parentId;
 
   ChatModel({
     this.id,
@@ -48,6 +49,7 @@ class ChatModel {
     this.reactionCount = 0,
     this.status = ChatMessageStatus.sent,
     this.isEdited = false,
+    this.parentId,
   });
 
   ChatModel copyWith({
@@ -73,6 +75,7 @@ class ChatModel {
       reactionCount: reactionCount,
       status: status ?? this.status,
       isEdited: isEdited ?? this.isEdited,
+      parentId: parentId,
     );
   }
 }
@@ -204,6 +207,8 @@ class EventChatDetailModel extends HiveObject {
   final String message;
   @HiveField(6)
   final bool isEdited;
+  @HiveField(7)
+  final int? parent;
 
   EventChatDetailModel({
     required this.id,
@@ -213,6 +218,7 @@ class EventChatDetailModel extends HiveObject {
     required this.modified,
     required this.message,
     this.isEdited = false,
+    this.parent,
   });
 
   factory EventChatDetailModel.fromJson(Map<String, dynamic> json) {
@@ -224,6 +230,7 @@ class EventChatDetailModel extends HiveObject {
       modified: DateTime.tryParse(json['modified'] ?? '') ?? DateTime.now(),
       message: json['message'] ?? '',
       isEdited: false,
+      parent: json['parent'] is int ? json['parent'] as int : null,
     );
   }
 
@@ -231,11 +238,9 @@ class EventChatDetailModel extends HiveObject {
     switch (creator.role.trim().toLowerCase()) {
       case 'admin':
         return MemberRoleEnum.admin;
-
       case 'organization':
       case 'organizer':
         return MemberRoleEnum.organizer;
-
       default:
         return MemberRoleEnum.volunteer;
     }
@@ -252,19 +257,16 @@ class EventChatDetailModel extends HiveObject {
           : roleEnum == MemberRoleEnum.organizer
           ? 'Organizer'
           : null,
-
       badgeColor: roleEnum == MemberRoleEnum.admin
           ? AppColors.primary
           : roleEnum == MemberRoleEnum.organizer
           ? AppColors.secondary400.withValues(alpha: 0.1)
           : null,
-
       badgeTextColor: roleEnum == MemberRoleEnum.admin
           ? AppColors.white
           : roleEnum == MemberRoleEnum.organizer
           ? AppColors.secondary400
           : null,
-
       badgeIcon: roleEnum == MemberRoleEnum.admin
           ? AppIcons.check
           : roleEnum == MemberRoleEnum.organizer
@@ -279,6 +281,7 @@ class EventChatDetailModel extends HiveObject {
           : '?',
       status: ChatMessageStatus.sent,
       isEdited: isEdited,
+      parentId: parent, // 👈 جديد
     );
   }
 

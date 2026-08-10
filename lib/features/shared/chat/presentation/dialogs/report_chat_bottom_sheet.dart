@@ -17,14 +17,19 @@ class ReportChatBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final reasonController = TextEditingController();
 
+    final theme = Theme.of(context);
+    final primaryTextColor = theme.textTheme.bodyLarge?.color ?? AppColors.black;
+    final secondaryTextColor = theme.textTheme.bodySmall?.color ?? AppColors.grey500;
+    final handleColor = theme.dividerColor;
+
     return Padding(
       padding: AppSize.padding(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: AppSize.padding(all: 20),
         child: Column(
@@ -37,7 +42,7 @@ class ReportChatBottomSheet extends StatelessWidget {
                 height: AppSize.getHeight(4),
                 margin: AppSize.margin(bottom: 16),
                 decoration: BoxDecoration(
-                  color: AppColors.grey500,
+                  color: handleColor,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -48,7 +53,7 @@ class ReportChatBottomSheet extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppSize.font(18),
                 fontWeight: FontWeight.w700,
-                color: AppColors.black,
+                color: primaryTextColor,
               ),
             ),
 
@@ -58,7 +63,7 @@ class ReportChatBottomSheet extends StatelessWidget {
               'shared.chat.report_subtitle'.tr(),
               style: TextStyle(
                 fontSize: AppSize.font(13),
-                color: AppColors.grey500,
+                color: secondaryTextColor,
               ),
             ),
 

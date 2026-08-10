@@ -30,14 +30,14 @@ class MembersBottomSheet extends StatefulWidget {
   });
 
   static Future<void> show(
-    BuildContext context, {
-    required int eventId,
-    int? organizerId, // 👈 جديد
-    String? organizerName,
-    String? organizerSubtitle,
-    Set<int> onlineUserIds = const {},
-    bool isOrganizer = false,
-  }) {
+      BuildContext context, {
+        required int eventId,
+        int? organizerId, // 👈 جديد
+        String? organizerName,
+        String? organizerSubtitle,
+        Set<int> onlineUserIds = const {},
+        bool isOrganizer = false,
+      }) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -64,6 +64,27 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
 
   int? _editingMemberId;
   final TextEditingController _roleController = TextEditingController();
+
+  // ── Dark mode helpers ───────────────────────────────────────────────────
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  // خلفية الشيت (بديل AppColors.white)
+  Color get _surfaceColor => Theme.of(context).cardColor;
+
+  // نص أساسي (بديل AppColors.black)
+  Color get _primaryTextColor =>
+      Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.black;
+
+  // نص ثانوي (بديل AppColors.grey500)
+  Color get _secondaryTextColor =>
+      Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500;
+
+  // فواصل / بوردرات (بديل AppColors.grey500 / grey)
+  Color get _dividerColor => Theme.of(context).dividerColor;
+
+  // خلفية أفاتار الفوليونتير الفاتحة (كانت 0xFFF5F5F7)
+  Color get _volunteerAvatarBg =>
+      _isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF5F5F7);
 
   @override
   void initState() {
@@ -121,7 +142,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
 
     final isOrganizerOnline =
         widget.organizerId != null &&
-        widget.onlineUserIds.contains(widget.organizerId);
+            widget.onlineUserIds.contains(widget.organizerId);
 
     return BlocProvider.value(
       value: _membersCubit,
@@ -129,9 +150,9 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
         initialChildSize: 0.60,
         builder: (context, scrollController) {
           return Container(
-            decoration: const BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            decoration: BoxDecoration(
+              color: _surfaceColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -141,7 +162,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                   width: AppSize.getWidth(40),
                   height: AppSize.getHeight(4),
                   decoration: BoxDecoration(
-                    color: AppColors.grey500,
+                    color: _dividerColor,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -164,7 +185,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                             style: TextStyle(
                               fontSize: AppSize.font(18),
                               fontWeight: FontWeight.w700,
-                              color: AppColors.black,
+                              color: _primaryTextColor,
                             ),
                           ),
                           const Spacer(),
@@ -176,14 +197,14 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: AppColors.grey500,
+                                  color: _dividerColor,
                                   width: 1.5,
                                 ),
                               ),
                               alignment: Alignment.center,
                               child: CustomIcon(
                                 icon: AppIcons.close,
-                                color: AppColors.grey500,
+                                color: _secondaryTextColor,
                                 width: AppSize.getSize(16),
                                 height: AppSize.getSize(16),
                               ),
@@ -197,7 +218,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
 
                 SizedBox(height: AppSize.getHeight(6)),
                 Divider(
-                  color: AppColors.grey.withValues(alpha: 0.2),
+                  color: _dividerColor,
                   thickness: 1,
                 ),
 
@@ -219,7 +240,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                                 Text(
                                   state.message,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: AppColors.grey500),
+                                  style: TextStyle(color: _secondaryTextColor),
                                 ),
                                 SizedBox(height: AppSize.getHeight(10)),
                                 GestureDetector(
@@ -307,7 +328,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
         style: TextStyle(
           fontSize: AppSize.font(11),
           fontWeight: FontWeight.w600,
-          color: AppColors.grey500,
+          color: _secondaryTextColor,
           letterSpacing: 0.6,
         ),
       ),
@@ -350,34 +371,34 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
       showRoleAsBadge: true,
       trailing: widget.isOrganizer
           ? GestureDetector(
-              onTap: () =>
-                  isEditing ? _confirmEditingRole(m) : _startEditingRole(m),
-              child: Padding(
-                padding: AppSize.padding(all: 4),
-                child: isEditing
-                    ? Container(
-                        width: AppSize.getSize(26),
-                        height: AppSize.getSize(26),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        alignment: Alignment.center,
-                        child: CustomIcon(
-                          icon: AppIcons.check,
-                          color: AppColors.white,
-                          width: AppSize.getSize(18),
-                          height: AppSize.getSize(18),
-                        ),
-                      )
-                    : CustomIcon(
-                        icon: AppIcons.edit,
-                        color: AppColors.grey600,
-                        width: AppSize.getSize(18),
-                        height: AppSize.getSize(18),
-                      ),
-              ),
-            )
+        onTap: () =>
+        isEditing ? _confirmEditingRole(m) : _startEditingRole(m),
+        child: Padding(
+          padding: AppSize.padding(all: 4),
+          child: isEditing
+              ? Container(
+            width: AppSize.getSize(26),
+            height: AppSize.getSize(26),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: CustomIcon(
+              icon: AppIcons.check,
+              color: AppColors.white,
+              width: AppSize.getSize(18),
+              height: AppSize.getSize(18),
+            ),
+          )
+              : CustomIcon(
+            icon: AppIcons.edit,
+            color: _secondaryTextColor,
+            width: AppSize.getSize(18),
+            height: AppSize.getSize(18),
+          ),
+        ),
+      )
           : null,
     );
   }
@@ -411,7 +432,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                 height: AppSize.getSize(44),
                 decoration: BoxDecoration(
                   color: role == MemberRoleEnum.volunteer
-                      ? const Color(0xFFF5F5F7)
+                      ? _volunteerAvatarBg
                       : avatarColor,
                   shape: BoxShape.circle,
                 ),
@@ -420,7 +441,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                   avatarLetter,
                   style: TextStyle(
                     color: role == MemberRoleEnum.volunteer
-                        ? AppColors.black
+                        ? _primaryTextColor
                         : AppColors.white,
                     fontWeight: FontWeight.w700,
                     fontSize: AppSize.font(17),
@@ -437,7 +458,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                     decoration: BoxDecoration(
                       color: AppColors.green,
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.white, width: 2),
+                      border: Border.all(color: _surfaceColor, width: 2),
                     ),
                   ),
                 ),
@@ -454,7 +475,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                   style: TextStyle(
                     fontSize: AppSize.font(14.5),
                     fontWeight: FontWeight.w600,
-                    color: AppColors.black,
+                    color: _primaryTextColor,
                   ),
                 ),
                 if (isEditing) ...[
@@ -464,14 +485,14 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                     autofocus: true,
                     style: TextStyle(
                       fontSize: AppSize.font(13),
-                      color: AppColors.black,
+                      color: _primaryTextColor,
                     ),
                     decoration: InputDecoration(
                       isDense: true,
                       hintText: 'shared.chat.role_hint'.tr(),
                       hintStyle: TextStyle(
                         fontSize: AppSize.font(13),
-                        color: AppColors.grey500,
+                        color: _secondaryTextColor,
                       ),
                       contentPadding: AppSize.padding(
                         horizontal: 14,
@@ -504,18 +525,20 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                   SizedBox(height: AppSize.getHeight(6)),
                   showRoleAsBadge
                       ? _buildBadge(
-                          label: statusText,
-                          icon: AppIcons.tag,
-                          color: AppColors.bronze,
-                          bg: AppColors.bronze.withValues(alpha: 0.2),
-                        )
+                    label: statusText,
+                    icon: AppIcons.tag,
+                    color: AppColors.bronze,
+                    bg: AppColors.bronze.withValues(
+                      alpha: _isDark ? 0.28 : 0.2,
+                    ),
+                  )
                       : Text(
-                          statusText,
-                          style: TextStyle(
-                            fontSize: AppSize.font(12.5),
-                            color: AppColors.grey500,
-                          ),
-                        ),
+                    statusText,
+                    style: TextStyle(
+                      fontSize: AppSize.font(12.5),
+                      color: _secondaryTextColor,
+                    ),
+                  ),
                 ],
               ],
             ),
