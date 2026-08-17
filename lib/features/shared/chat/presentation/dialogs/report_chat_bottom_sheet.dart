@@ -22,74 +22,76 @@ class ReportChatBottomSheet extends StatelessWidget {
     final secondaryTextColor = theme.textTheme.bodySmall?.color ?? AppColors.grey500;
     final handleColor = theme.dividerColor;
 
-    return Padding(
-      padding: AppSize.padding(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+    return SafeArea(
+      child: Padding(
+        padding: AppSize.padding(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        padding: AppSize.padding(all: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: AppSize.getWidth(40),
-                height: AppSize.getHeight(4),
-                margin: AppSize.margin(bottom: 16),
-                decoration: BoxDecoration(
-                  color: handleColor,
-                  borderRadius: BorderRadius.circular(2),
+        child: Container(
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: AppSize.padding(all: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: AppSize.getWidth(40),
+                  height: AppSize.getHeight(4),
+                  margin: AppSize.margin(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: handleColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-
-            Text(
-              'shared.chat.report_chat'.tr(),
-              style: TextStyle(
-                fontSize: AppSize.font(18),
-                fontWeight: FontWeight.w700,
-                color: primaryTextColor,
+      
+              Text(
+                'shared.chat.report_chat'.tr(),
+                style: TextStyle(
+                  fontSize: AppSize.font(18),
+                  fontWeight: FontWeight.w700,
+                  color: primaryTextColor,
+                ),
               ),
-            ),
-
-            SizedBox(height: AppSize.getHeight(6)),
-
-            Text(
-              'shared.chat.report_subtitle'.tr(),
-              style: TextStyle(
-                fontSize: AppSize.font(13),
-                color: secondaryTextColor,
+      
+              SizedBox(height: AppSize.getHeight(6)),
+      
+              Text(
+                'shared.chat.report_subtitle'.tr(),
+                style: TextStyle(
+                  fontSize: AppSize.font(13),
+                  color: secondaryTextColor,
+                ),
               ),
-            ),
-
-            SizedBox(height: AppSize.getHeight(16)),
-
-            CustomFieldText(
-              controller: reasonController,
-              hintText: 'shared.chat.report_reason_hint'.tr(),
-              minLines: 3,
-              maxLines: 5,
-            ),
-
-            SizedBox(height: AppSize.getHeight(20)),
-
-            CustomButton(
-              title: 'shared.chat.report_chat'.tr(),
-              bgColor: AppColors.red,
-              onTap: () {
-                AppNavigator.pop();
-
-                final reason = reasonController.text.trim();
-
-                onReport(reason.isEmpty ? null : reason);
-              },
-            ),
-          ],
+      
+              SizedBox(height: AppSize.getHeight(16)),
+      
+              CustomFieldText(
+                controller: reasonController,
+                hintText: 'shared.chat.report_reason_hint'.tr(),
+                minLines: 3,
+                maxLines: 5,
+              ),
+      
+              SizedBox(height: AppSize.getHeight(20)),
+      
+              CustomButton(
+                title: 'shared.chat.report_chat'.tr(),
+                bgColor: AppColors.red,
+                onTap: () {
+                  AppNavigator.pop();
+      
+                  final reason = reasonController.text.trim();
+      
+                  onReport(reason.isEmpty ? null : reason);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

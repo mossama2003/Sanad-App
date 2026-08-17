@@ -11,6 +11,7 @@ import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/constant/app_size.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
@@ -751,13 +752,14 @@ class _ChatScreenState extends State<ChatScreen> {
         break;
 
       case 'share_invite':
-
-        /// TODO Share APP LINK
-        // Share.share(
-        //   'shared.chat.invite_message'.tr(
-        //     namedArgs: {'eventName': widget.event.name},
-        //   ),
-        // );
+        Share.share(
+          'shared.chat.invite_message'.tr(
+            namedArgs: {
+              'eventName': widget.event.name,
+              'link': _buildEventInviteLink(),
+            },
+          ),
+        );
         break;
 
       case 'report_chat':
@@ -774,6 +776,10 @@ class _ChatScreenState extends State<ChatScreen> {
         _confirmLeaveChat();
         break;
     }
+  }
+
+  String _buildEventInviteLink() {
+    return 'https://joinsanad.org/events/${widget.eventId}';
   }
 
   void _confirmLeaveChat() {
@@ -1037,24 +1043,39 @@ class _ChatScreenState extends State<ChatScreen> {
                     final total = state is ChatLoaded
                         ? state.totalMembersCount + 2
                         : 0;
-                    final isReady =
+                    final isPresenceReady =
                         state is ChatLoaded && state.isPresenceReady;
 
-                    return Text(
-                      isReady
-                          ? 'shared.chat.online_members_count'.tr(
-                              namedArgs: {
-                                'online': '$online',
-                                'total': '$total',
-                              },
-                            )
-                          : 'shared.chat.members_count_only'.tr(
-                              namedArgs: {'total': '$total'},
-                            ),
-                      style: TextStyle(
-                        fontSize: AppSize.font(12),
-                        color: _secondaryTextColor,
-                      ),
+                    return ValueListenableBuilder<bool>(
+                      valueListenable: _chatCubit.membersReadyNotifier,
+                      builder: (context, membersReady, _) {
+                        if (!membersReady) {
+                          return _PulsingSkeleton(
+                            width: AppSize.getWidth(60),
+                            height: AppSize.getHeight(10),
+                            color: _isDark
+                                ? const Color(0xFF3A3A3C)
+                                : const Color(0xFFE2E2E5),
+                          );
+                        }
+
+                        return Text(
+                          isPresenceReady
+                              ? 'shared.chat.online_members_count'.tr(
+                                  namedArgs: {
+                                    'online': '$online',
+                                    'total': '$total',
+                                  },
+                                )
+                              : 'shared.chat.members_count_only'.tr(
+                                  namedArgs: {'total': '$total'},
+                                ),
+                          style: TextStyle(
+                            fontSize: AppSize.font(12),
+                            color: _secondaryTextColor,
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -1577,6 +1598,14 @@ class _ChatScreenState extends State<ChatScreen> {
     DateTime? lastDate;
     String? lastSenderName;
 
+    final currentIds = chatState.messages
+        .map((m) => m.id)
+        .whereType<int>()
+        .toSet();
+    _messageKeys.removeWhere((id, _) => !currentIds.contains(id));
+
+    final seenIds = <int>{};
+
     for (int i = 0; i < chatState.messages.length; i++) {
       final msg = chatState.messages[i];
       final msgDate = DateTime(
@@ -1595,6 +1624,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
       final isFirstInGroup = lastSenderName != msg.senderName;
 
+      // 👈 جديد: لو الـ id ده اتكرر في نفس اللفة، تجاهل النسخة المكررة تمامًا
+      if (msg.id != null && !seenIds.add(msg.id!)) {
+        lastSenderName = msg.senderName;
+        continue;
+      }
+
       widgets.add(
         _buildChatMessage(
           msg,
@@ -1606,9 +1641,8 @@ class _ChatScreenState extends State<ChatScreen> {
               msg.id != null &&
               (msg.id == chatState.highlightedMessageId ||
                   msg.id == _flashHighlightId),
-          // 👈 جديد: fallback للفلاش
           parentMessage: msg.parentId != null
-              ? _findMessageById(chatState, msg.parentId!) // 👈 جديد
+              ? _findMessageById(chatState, msg.parentId!)
               : null,
         ),
       );
@@ -1644,7 +1678,7 @@ class _ChatScreenState extends State<ChatScreen> {
     bool isSelectionMode = false,
     bool isSelected = false,
     bool isHighlighted = false,
-    ChatModel? parentMessage, // 👈 جديد
+    ChatModel? parentMessage,
   }) {
     final bool isSanad = msg.badge == 'Sanad Admin';
     final bool isMe = msg.senderName == 'You';
@@ -1658,7 +1692,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
     final linkType = _detectLinkType(msg.text);
 
-    // 👈 جديد: key ثابت لكل رسالة عندها id (عشان الـ scroll والهايلايت)
     final messageKey = msg.id != null
         ? (_messageKeys[msg.id!] ??= GlobalKey())
         : null;
@@ -1792,7 +1825,6 @@ class _ChatScreenState extends State<ChatScreen> {
     final swipeableContent = (!isSelectionMode && msg.id != null)
         ? _SwipeToReplyWrapper(
             onReply: () => _startReplyingTo(msg),
-            isMe: isMe,
             child: bubbleContent,
           )
         : bubbleContent;
@@ -2553,13 +2585,8 @@ class _ChatScreenState extends State<ChatScreen> {
 class _SwipeToReplyWrapper extends StatefulWidget {
   final Widget child;
   final VoidCallback onReply;
-  final bool isMe; // 👈 جديد
 
-  const _SwipeToReplyWrapper({
-    required this.child,
-    required this.onReply,
-    required this.isMe, // 👈 جديد
-  });
+  const _SwipeToReplyWrapper({required this.child, required this.onReply});
 
   @override
   State<_SwipeToReplyWrapper> createState() => _SwipeToReplyWrapperState();
@@ -2576,13 +2603,9 @@ class _SwipeToReplyWrapperState extends State<_SwipeToReplyWrapper> {
     setState(() {
       final next = _dragExtent + details.delta.dx;
 
-      // 👈 جديد: رسايل الآخرين تتسحب يمين بس (شمال → يمين)
-      // ورسايلي أنا تتسحب شمال بس (يمين → شمال)
-      _dragExtent = widget.isMe
-          ? next.clamp(-_maxDrag, 0.0)
-          : next.clamp(0.0, _maxDrag);
+      _dragExtent = next.clamp(0.0, _maxDrag);
 
-      final crossedThreshold = _dragExtent.abs() >= _triggerDrag;
+      final crossedThreshold = _dragExtent >= _triggerDrag;
 
       if (!_triggered && crossedThreshold) {
         _triggered = true;
@@ -2605,15 +2628,13 @@ class _SwipeToReplyWrapperState extends State<_SwipeToReplyWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    final progress = (_dragExtent.abs() / _triggerDrag).clamp(0.0, 1.0);
+    final progress = (_dragExtent / _triggerDrag).clamp(0.0, 1.0);
 
     return GestureDetector(
       onHorizontalDragUpdate: _onDragUpdate,
       onHorizontalDragEnd: _onDragEnd,
       child: Stack(
-        alignment: _dragExtent >= 0
-            ? Alignment.centerLeft
-            : Alignment.centerRight,
+        alignment: Alignment.centerLeft,
         children: [
           if (_dragExtent != 0)
             Padding(
@@ -2634,6 +2655,62 @@ class _SwipeToReplyWrapperState extends State<_SwipeToReplyWrapper> {
             child: widget.child,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PulsingSkeleton extends StatefulWidget {
+  final double width;
+  final double height;
+  final Color color;
+
+  const _PulsingSkeleton({
+    required this.width,
+    required this.height,
+    required this.color,
+  });
+
+  @override
+  State<_PulsingSkeleton> createState() => _PulsingSkeletonState();
+}
+
+class _PulsingSkeletonState extends State<_PulsingSkeleton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..repeat(reverse: true);
+
+    _opacity = Tween<double>(
+      begin: 0.35,
+      end: 0.9,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _opacity,
+      child: Container(
+        width: widget.width,
+        height: widget.height,
+        decoration: BoxDecoration(
+          color: widget.color,
+          borderRadius: BorderRadius.circular(6),
+        ),
       ),
     );
   }

@@ -13,7 +13,7 @@ import '../controllers/members_cubit.dart';
 
 class MembersBottomSheet extends StatefulWidget {
   final int eventId;
-  final int? organizerId; // 👈 جديد
+  final int? organizerId;
   final String? organizerName;
   final String? organizerSubtitle;
   final Set<int> onlineUserIds;
@@ -22,7 +22,7 @@ class MembersBottomSheet extends StatefulWidget {
   const MembersBottomSheet({
     super.key,
     required this.eventId,
-    this.organizerId, // 👈 جديد
+    this.organizerId,
     this.organizerName,
     this.organizerSubtitle,
     this.onlineUserIds = const {},
@@ -30,14 +30,14 @@ class MembersBottomSheet extends StatefulWidget {
   });
 
   static Future<void> show(
-      BuildContext context, {
-        required int eventId,
-        int? organizerId, // 👈 جديد
-        String? organizerName,
-        String? organizerSubtitle,
-        Set<int> onlineUserIds = const {},
-        bool isOrganizer = false,
-      }) {
+    BuildContext context, {
+    required int eventId,
+    int? organizerId,
+    String? organizerName,
+    String? organizerSubtitle,
+    Set<int> onlineUserIds = const {},
+    bool isOrganizer = false,
+  }) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -45,7 +45,6 @@ class MembersBottomSheet extends StatefulWidget {
       builder: (_) => MembersBottomSheet(
         eventId: eventId,
         organizerId: organizerId,
-        // 👈 جديد
         organizerName: organizerName,
         organizerSubtitle: organizerSubtitle,
         onlineUserIds: onlineUserIds,
@@ -142,7 +141,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
 
     final isOrganizerOnline =
         widget.organizerId != null &&
-            widget.onlineUserIds.contains(widget.organizerId);
+        widget.onlineUserIds.contains(widget.organizerId);
 
     return BlocProvider.value(
       value: _membersCubit,
@@ -152,7 +151,9 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
           return Container(
             decoration: BoxDecoration(
               color: _surfaceColor,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -217,10 +218,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                 ),
 
                 SizedBox(height: AppSize.getHeight(6)),
-                Divider(
-                  color: _dividerColor,
-                  thickness: 1,
-                ),
+                Divider(color: _dividerColor, thickness: 1),
 
                 // List
                 Expanded(
@@ -371,34 +369,34 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
       showRoleAsBadge: true,
       trailing: widget.isOrganizer
           ? GestureDetector(
-        onTap: () =>
-        isEditing ? _confirmEditingRole(m) : _startEditingRole(m),
-        child: Padding(
-          padding: AppSize.padding(all: 4),
-          child: isEditing
-              ? Container(
-            width: AppSize.getSize(26),
-            height: AppSize.getSize(26),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: CustomIcon(
-              icon: AppIcons.check,
-              color: AppColors.white,
-              width: AppSize.getSize(18),
-              height: AppSize.getSize(18),
-            ),
-          )
-              : CustomIcon(
-            icon: AppIcons.edit,
-            color: _secondaryTextColor,
-            width: AppSize.getSize(18),
-            height: AppSize.getSize(18),
-          ),
-        ),
-      )
+              onTap: () =>
+                  isEditing ? _confirmEditingRole(m) : _startEditingRole(m),
+              child: Padding(
+                padding: AppSize.padding(all: 4),
+                child: isEditing
+                    ? Container(
+                        width: AppSize.getSize(26),
+                        height: AppSize.getSize(26),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: CustomIcon(
+                          icon: AppIcons.check,
+                          color: AppColors.white,
+                          width: AppSize.getSize(18),
+                          height: AppSize.getSize(18),
+                        ),
+                      )
+                    : CustomIcon(
+                        icon: AppIcons.edit,
+                        color: _secondaryTextColor,
+                        width: AppSize.getSize(18),
+                        height: AppSize.getSize(18),
+                      ),
+              ),
+            )
           : null,
     );
   }
@@ -525,20 +523,20 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
                   SizedBox(height: AppSize.getHeight(6)),
                   showRoleAsBadge
                       ? _buildBadge(
-                    label: statusText,
-                    icon: AppIcons.tag,
-                    color: AppColors.bronze,
-                    bg: AppColors.bronze.withValues(
-                      alpha: _isDark ? 0.28 : 0.2,
-                    ),
-                  )
+                          label: statusText,
+                          icon: AppIcons.tag,
+                          color: AppColors.bronze,
+                          bg: AppColors.bronze.withValues(
+                            alpha: _isDark ? 0.28 : 0.2,
+                          ),
+                        )
                       : Text(
-                    statusText,
-                    style: TextStyle(
-                      fontSize: AppSize.font(12.5),
-                      color: _secondaryTextColor,
-                    ),
-                  ),
+                          statusText,
+                          style: TextStyle(
+                            fontSize: AppSize.font(12.5),
+                            color: _secondaryTextColor,
+                          ),
+                        ),
                 ],
               ],
             ),

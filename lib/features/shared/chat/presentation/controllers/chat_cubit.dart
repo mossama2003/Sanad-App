@@ -48,6 +48,8 @@ class ChatCubit extends Cubit<ChatState> {
 
   final AudioPlayer _audioPlayer = AudioPlayer();
   final ValueNotifier<int> searchResultsNotifier = ValueNotifier(0);
+
+  final ValueNotifier<bool> membersReadyNotifier = ValueNotifier(false);
   final Map<int, Timer> _typingClearTimers = {};
   Timer? _typingSendThrottle;
 
@@ -142,7 +144,6 @@ class ChatCubit extends Cubit<ChatState> {
         results[1] as Either<Failure, PaginatedEventChatModel>;
     final membersResult = results[2] as Either<Failure, PaginatedMemberModel>;
 
-    // 👈 التعديل الأساسي: نبدأ الاتصال بـ Ably فورًا، من غير ما نستنى معالجة الهيستوري
     tokenResult.fold((_) {}, (token) {
       _connectToAbly(token);
     });
@@ -157,6 +158,8 @@ class ChatCubit extends Cubit<ChatState> {
         return data.count;
       },
     );
+    
+    membersReadyNotifier.value = true;
 
     await historyResult.fold(
       (failure) async {
@@ -280,26 +283,25 @@ class ChatCubit extends Cubit<ChatState> {
       '📡 Channel attached: events:$eventId | state: ${_channel!.state}',
     );
 
-    // 👈 التعديل: نبني الـ set بشكل تراكمي من كل presence message بدل ما نعمل get() كل مرة
+    // نبني الـ set بشكل تراكمي من كل presence message بدل ما نعمل get() كل مرة
     _presenceSubscription = _channel!.presence.subscribe().listen((msg) {
       _handlePresenceMessage(msg);
     });
 
-    // 👈 نضيف نفسنا فورًا (optimistic) من غير ما نستنى تأكيد enter()
+    // نضيف نفسنا فورًا (optimistic) من غير ما نستنى تأكيد enter()
     _pendingOnlineUserIds = {..._pendingOnlineUserIds, currentUserId};
     _pendingOnlineCount = _pendingOnlineUserIds.length;
     _pendingPresenceReady = true;
     _emitPendingPresenceIfLoaded();
 
+    // 👈 التعديل الأهم: نجيب لستة الأونلاين الحالية فورًا وبالتوازي مع enter()
+    // بدل ما نستنى enter() يخلص الأول وبعدين نجيب اللستة - ده كان سبب التأخير
+    unawaited(_updateOnlineCount());
+
     unawaited(
-      _channel!.presence
-          .enter()
-          .then((_) {
-            return _updateOnlineCount();
-          })
-          .catchError((e) {
-            debugPrint('⚠️ Failed to enter presence: $e');
-          }),
+      _channel!.presence.enter().catchError((e) {
+        debugPrint('⚠️ Failed to enter presence: $e');
+      }),
     );
 
     _messageSubscription = _channel!.subscribe().listen((message) {
@@ -345,7 +347,6 @@ class ChatCubit extends Cubit<ChatState> {
   void notifyTyping() {
     if (_channel == null) return;
 
-    // throttle: نبعت event واحد كل ثانية ونص بحد أقصى، مش مع كل حرف
     if (_typingSendThrottle?.isActive ?? false) return;
 
     _typingSendThrottle = Timer(const Duration(milliseconds: 1500), () {});
@@ -518,8 +519,6 @@ class ChatCubit extends Cubit<ChatState> {
       return;
     }
 
-    // 👈 جديد - حماية إضافية: تجاهل أي payload مش شكل رسالة شات حقيقية
-    // (زي typing events لو وصلت غلط، أو أي event تاني غير متوقع)
     final rawMessage = data['message'];
     final rawCreator = data['creator'];
     if (rawMessage == null ||
@@ -569,7 +568,6 @@ class ChatCubit extends Cubit<ChatState> {
 
     emit(current.copyWith(isLoadingMore: true));
 
-    // 👇 لو المستخدم فاتح الشات عن طريق Search Jump
     if (current.highlightedMessageId != null) {
       final oldestId = current.messages.firstOrNull?.id;
 
@@ -637,10 +635,6 @@ class ChatCubit extends Cubit<ChatState> {
 
       return;
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // العادي (Page Pagination)
-    // ─────────────────────────────────────────────────────────────
 
     final nextPage = current.page + 1;
 
@@ -747,8 +741,7 @@ class ChatCubit extends Cubit<ChatState> {
     final result = await chatRepo.sendMessage(
       eventId: eventId,
       message: msg.text,
-      parentId:
-          msg.parentId, // 👈 جديد: يحافظ على الريبلاي حتى بعد الفشل والإعادة
+      parentId: msg.parentId,
     );
 
     result.fold((failure) {
@@ -847,7 +840,6 @@ class ChatCubit extends Cubit<ChatState> {
         AppToast.error(failure.errMessage);
       },
       (_) async {
-        // 👈 جديد
         await ChatCacheService.deleteCachedMessages(eventId, [messageId]);
       },
     );
@@ -963,7 +955,7 @@ class ChatCubit extends Cubit<ChatState> {
         backgroundColor: Colors.transparent,
         builder: (_) => VolunteerEventDetailsBottomSheet(
           event: eventDetails,
-          showJoinButton: false, // ✅ فتح من الشات
+          showJoinButton: false,
         ),
       );
     } catch (_) {
@@ -1084,7 +1076,6 @@ class ChatCubit extends Cubit<ChatState> {
     );
 
     await result.fold(
-      // 👈 ضيف await هنا
       (failure) async {
         emit(current.copyWith(isLoadingMore: false));
         AppToast.error(failure.errMessage);
@@ -1123,6 +1114,7 @@ class ChatCubit extends Cubit<ChatState> {
     for (final t in _typingClearTimers.values) {
       t.cancel();
     }
+    membersReadyNotifier.dispose(); // 👈 جديد
     _channel?.presence.leave();
     _channel?.detach();
     _realtime?.close();

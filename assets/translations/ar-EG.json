@@ -173,7 +173,7 @@
       "leave_confirm": "متأكد إنك عايز تسيب الشات ده؟",
       "report_submitted": "تم إرسال البلاغ",
       "muted_success": "تم كتم الإشعارات",
-      "invite_message": "انضم لـ {eventName} على سند!",
+      "invite_message": "انضم لـ {eventName} معايا! 🎉\n{link}",
       "left_event_success": "سبت الإيفينت",
       "report_subtitle": "قولنا إيه المشكلة في الشات ده",
       "report_reason_hint": "اوصف المشكلة (اختياري)",

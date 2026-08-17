@@ -123,7 +123,7 @@ class _OrganizationEventFormScreenState
 
                       image: _cubit.eventCover,
 
-                      networkImage: widget.event?.cover,
+                      networkImage: _cubit.displayNetworkCover,
 
                       validator: (file) {
                         if (!widget.isEdit && file == null) {

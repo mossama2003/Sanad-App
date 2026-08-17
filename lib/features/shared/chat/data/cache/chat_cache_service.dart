@@ -4,6 +4,7 @@ import '../../../../../core/storage/hive/hive_boxes.dart';
 import '../models/chat_model.dart';
 
 class ChatCacheService {
+
   static Future<Box<EventChatDetailModel>> _openBox(int eventId) {
     return HiveBoxes.openEventChatBox(eventId);
   }

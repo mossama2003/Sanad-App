@@ -58,70 +58,97 @@ class VolunteerEventDetailsBottomSheet extends StatelessWidget {
             color: colors.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
           ),
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _EventImage(
-                  imageUrl: event.cover,
-                  onClose: () => AppNavigator.pop(),
+          child: Stack(
+            // 👈 جديد - الـ Stack بقى على مستوى الـ Container كله
+            children: [
+              SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _EventImage(
+                      imageUrl: event.cover, // 👈 شلنا onClose من هنا
+                    ),
+
+                    Padding(
+                      padding: AppSize.padding(all: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(event.name, style: _titleStyle(textColor)),
+
+                          SizedBox(height: AppSize.getHeight(10)),
+
+                          Text(
+                            event.description,
+                            style: _descriptionStyle(textColor),
+                          ),
+
+                          _EventDetailsCard(
+                            event: event,
+                            textColor: textColor,
+                            secondaryColor: secondaryColor,
+
+                            onPhoneTap: () {
+                              _makePhoneCall(event.creator?['phone']);
+                            },
+
+                            onPhoneLongPress: () {
+                              Clipboard.setData(
+                                ClipboardData(
+                                  text: event.creator?['phone'] ?? '',
+                                ),
+                              );
+
+                              AppToast.success(
+                                'volunteer.events.bottom_sheet.phone_copied'
+                                    .tr(),
+                              );
+                            },
+                          ),
+
+                          if (showJoinButton) ...[
+                            SizedBox(height: AppSize.getHeight(20)),
+                            CustomButton(
+                              title: event.joined
+                                  ? 'volunteer.events.bottom_sheet.joined'.tr()
+                                  : 'volunteer.events.bottom_sheet.join_event'
+                                        .tr(),
+                              icon: event.joined ? AppIcons.check : null,
+                              height: AppSize.getHeight(50),
+                              bgColor: event.joined
+                                  ? AppColors.primary.withValues(alpha: .1)
+                                  : AppColors.primary,
+                              textColor: event.joined
+                                  ? Colors.green
+                                  : Colors.white,
+                              onTap: onJoinTap,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
+              ),
 
-                Padding(
-                  padding: AppSize.padding(all: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(event.name, style: _titleStyle(textColor)),
-
-                      SizedBox(height: AppSize.getHeight(10)),
-
-                      Text(
-                        event.description,
-                        style: _descriptionStyle(textColor),
-                      ),
-
-                      _EventDetailsCard(
-                        event: event,
-                        textColor: textColor,
-                        secondaryColor: secondaryColor,
-
-                        onPhoneTap: () {
-                          _makePhoneCall(event.creator?['phone']);
-                        },
-
-                        onPhoneLongPress: () {
-                          Clipboard.setData(
-                            ClipboardData(text: event.creator?['phone'] ?? ''),
-                          );
-
-                          AppToast.success(
-                            'volunteer.events.bottom_sheet.phone_copied'.tr(),
-                          );
-                        },
-                      ),
-
-                      if (showJoinButton) ...[
-                        SizedBox(height: AppSize.getHeight(20)),
-                        CustomButton(
-                          title: event.joined
-                              ? 'volunteer.events.bottom_sheet.joined'.tr()
-                              : 'volunteer.events.bottom_sheet.join_event'.tr(),
-                          icon: event.joined ? AppIcons.check : null,
-                          height: AppSize.getHeight(50),
-                          bgColor: event.joined
-                              ? AppColors.primary.withValues(alpha: .1)
-                              : AppColors.primary,
-                          textColor: event.joined ? Colors.green : Colors.white,
-                          onTap: onJoinTap,
-                        ),
-                      ],
-                    ],
+              // 👈 جديد - زرار الإغلاق ثابت فوق كل حاجة، برا الـ SingleChildScrollView
+              Positioned(
+                top: AppSize.getHeight(16),
+                left: AppSize.getWidth(16),
+                child: GestureDetector(
+                  onTap: () => AppNavigator.pop(),
+                  child: Container(
+                    padding: AppSize.padding(all: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: .4),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.close, color: Colors.white),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -260,43 +287,25 @@ class _EventDetailsCard extends StatelessWidget {
 }
 
 class _EventImage extends StatelessWidget {
-  const _EventImage({required this.imageUrl, required this.onClose});
+  const _EventImage({
+    required this.imageUrl,
+  }); // 👈 شلنا onClose من الـ constructor
 
   final String? imageUrl;
-  final VoidCallback onClose;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        SizedBox(
-          height: AppSize.getHeight(250),
-          width: double.infinity,
-          child: imageUrl != null && imageUrl!.isNotEmpty
-              ? Image.network(
-                  imageUrl!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => _buildPlaceholder(context),
-                )
-              : _buildPlaceholder(context),
-        ),
-
-        Positioned(
-          top: AppSize.getHeight(16),
-          left: AppSize.getWidth(16),
-          child: GestureDetector(
-            onTap: onClose,
-            child: Container(
-              padding: AppSize.padding(all: 8),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: .4),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.close, color: Colors.white),
-            ),
-          ),
-        ),
-      ],
+    return SizedBox(
+      // 👈 مبقاش محتاج Stack هنا خالص، الـ close button طلع برا
+      height: AppSize.getHeight(250),
+      width: double.infinity,
+      child: imageUrl != null && imageUrl!.isNotEmpty
+          ? Image.network(
+              imageUrl!,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => _buildPlaceholder(context),
+            )
+          : _buildPlaceholder(context),
     );
   }
 

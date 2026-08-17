@@ -94,6 +94,14 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
   bool removeOldCover = false;
 
+  // 👈 جديد - المصدر الوحيد اللي المفروض الشاشة تعتمد عليه لعرض صورة الشبكة
+  // بيرجع null لو المستخدم دوس على X ومسح الصورة القديمة، عشان الـ CustomUploadFile
+  // ميعرضش صورة الشبكة تاني حتى لو widget.event?.cover لسه موجودة
+  String? get displayNetworkCover {
+    if (removeOldCover) return null;
+    return editingEvent?.cover;
+  }
+
   List<String>? selectedStatuses;
 
   // ===================== Time =====================
@@ -648,7 +656,10 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
               'city': selectedCity.value?.nameEn,
               'state': selectedGov.value?.nameEn,
             },
-            cover: eventCover != null ? eventCover!.path : baseEvent.cover,
+            // 👈 عدّلت: لو المستخدم مسح الصورة ومختارش وحدة جديدة، نمسح الكوفر بدل ما نسيب القديم
+            cover: eventCover != null
+                ? eventCover!.path
+                : (removeOldCover ? null : baseEvent.cover),
           );
 
           // تحديث الليست المحلي بتاع شاشة الـ Events (لو الـ event موجود فيها أصلاً)
