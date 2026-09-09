@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.sanad_app"
+    namespace = "com.example.sanad"
     compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.sanad_app"
+        applicationId = "com.example.sanad"
         minSdk = flutter.minSdkVersion
         targetSdk = 37
         versionCode = flutter.versionCode

@@ -555,7 +555,7 @@ class _MembersBottomSheetState extends State<MembersBottomSheet> {
               color: AppColors.white,
               bg: AppColors.bronze,
             ),
-          if (trailing != null) trailing,
+          ?trailing,
         ],
       ),
     );

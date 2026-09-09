@@ -41,7 +41,6 @@ class ConfirmDialog extends StatelessWidget {
       children: [
         Text(
           title,
-
           textAlign: TextAlign.center,
 
           style: TextStyle(
@@ -97,7 +96,7 @@ class ConfirmDialog extends StatelessWidget {
               child: CustomButton(
                 title: confirmText ?? 'core.yes'.tr(),
 
-                bgColor: isDestructive ? AppColors.red500 : AppColors.green500,
+                bgColor: isDestructive ? AppColors.red500 : AppColors.primary,
 
                 textColor: Colors.white,
 

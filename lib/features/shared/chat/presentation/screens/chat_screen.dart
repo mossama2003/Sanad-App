@@ -1,29 +1,29 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/services.dart';
 import 'package:sanad_app/core/shared/widgets/custom_field_text.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/constant/app_size.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../volunteer/community/presentation/controllers/volunteer_community_cubit.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
-import '../../../../../core/helper/app_toast.dart';
-import '../../../../../core/style/app_colors.dart';
 import '../dialogs/report_chat_bottom_sheet.dart';
 import '../../data/models/search_messages.dart';
 import '../dialogs/members_bottom_sheet.dart';
+import '../../../../../core/helper/app_toast.dart';
+import '../../../../../core/style/app_colors.dart';
 import '../../data/models/chat_model.dart';
 import '../../data/repos/chat_repo.dart';
 import '../controllers/chat_cubit.dart';
@@ -324,7 +324,7 @@ class _ChatScreenState extends State<ChatScreen> {
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        AppToast.error('shared.chat.location_service_disabled'.tr());
+        if (mounted) _showEnableLocationDialog();
         return;
       }
 
@@ -343,9 +343,7 @@ class _ChatScreenState extends State<ChatScreen> {
       }
 
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       );
 
       final locationUrl =
@@ -358,6 +356,21 @@ class _ChatScreenState extends State<ChatScreen> {
     } finally {
       if (mounted) setState(() => _isSendingLocation = false);
     }
+  }
+
+  void _showEnableLocationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmDialog(
+        title: 'shared.chat.location_service_disabled_title'.tr(),
+        message: 'shared.chat.location_service_disabled_body'.tr(),
+        confirmText: 'shared.chat.enable_location'.tr(),
+        cancelText: 'shared.chat.cancel'.tr(),
+        onConfirm: () async {
+          await Geolocator.openLocationSettings();
+        },
+      ),
+    );
   }
 
   void _onBackspacePressed() {
@@ -496,7 +509,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _startEditingMessage(ChatModel msg) {
     setState(() {
-      _replyingToMessage = null; // 👈 يلغي أي ريبلاي شغال
+      _replyingToMessage = null;
       _editingMessage = msg;
       _messageController.text = msg.text;
       _messageController.selection = TextSelection.collapsed(
@@ -522,7 +535,6 @@ class _ChatScreenState extends State<ChatScreen> {
     _messageFocusNode.requestFocus();
   }
 
-  // 👈 جديد
   void _cancelReplying() {
     setState(() => _replyingToMessage = null);
   }
@@ -752,12 +764,14 @@ class _ChatScreenState extends State<ChatScreen> {
         break;
 
       case 'share_invite':
-        Share.share(
-          'shared.chat.invite_message'.tr(
-            namedArgs: {
-              'eventName': widget.event.name,
-              'link': _buildEventInviteLink(),
-            },
+        SharePlus.instance.share(
+          ShareParams(
+            text: 'shared.chat.invite_message'.tr(
+              namedArgs: {
+                'eventName': widget.event.name,
+                'link': _buildEventInviteLink(),
+              },
+            ),
           ),
         );
         break;
@@ -871,8 +885,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
                                     WidgetsBinding.instance
                                         .addPostFrameCallback((_) {
-                                          if (!_scrollController.hasClients)
+                                          if (!_scrollController.hasClients) {
                                             return;
+                                          }
 
                                           final newExtent = _scrollController
                                               .position
@@ -897,8 +912,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
                                     WidgetsBinding.instance
                                         .addPostFrameCallback((_) {
-                                          if (!_scrollController.hasClients)
+                                          if (!_scrollController.hasClients) {
                                             return;
+                                          }
 
                                           _scrollController.jumpTo(
                                             _scrollController
@@ -1244,7 +1260,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildSearchResultsList() {
     return ValueListenableBuilder<int>(
       valueListenable: _chatCubit.searchResultsNotifier,
-      builder: (context, _, __) {
+      builder: (context, _, _) {
         if (_searchQuery.isEmpty) {
           return Center(
             child: Text(
@@ -1270,7 +1286,7 @@ class _ChatScreenState extends State<ChatScreen> {
           itemCount:
               _chatCubit.searchResults.length +
               (_chatCubit.searchHasMore ? 1 : 0),
-          separatorBuilder: (_, __) => Divider(height: 1, color: _dividerColor),
+          separatorBuilder: (_, _) => Divider(height: 1, color: _dividerColor),
           itemBuilder: (context, index) {
             if (index >= _chatCubit.searchResults.length) {
               _chatCubit.loadMoreSearchResults();

@@ -189,6 +189,9 @@
       "you": "You",
       "original_message": "Original message",
       "message_unavailable": "Message unavailable",
+      "location_service_disabled_title": "Location is off",
+      "location_service_disabled_body": "Turn on location services to share your current location in this chat.",
+      "enable_location": "Enable Location",
       "pinned": {
         "welcome_title": "Welcome to the Community 👋",
         "welcome_body": "Welcome everyone! This space is for event members to communicate, share updates, and support each other.",

@@ -189,6 +189,9 @@
       "you": "انت",
       "original_message": "الرسالة الأصلية",
       "message_unavailable": "الرسالة مش متاحة",
+      "location_service_disabled_title": "الموقع متوقف",
+      "location_service_disabled_body": "فعّل خدمات الموقع لمشاركة موقعك الحالي في هذه المحادثة.",
+      "enable_location": "تفعيل الموقع",
       "pinned": {
         "welcome_title": "أهلاً بكم في المجتمع 👋",
         "welcome_body": "مرحباً بالجميع! هذه المساحة مخصصة لأعضاء الفعالية للتواصل ومشاركة التحديثات ودعم بعضكم البعض.",

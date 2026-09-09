@@ -47,7 +47,7 @@ class ChatRepoImpel implements ChatRepo {
       final formData = FormData.fromMap({
         'event': eventId,
         'message': message,
-        if (parentId != null) 'parent': parentId,
+        'parent': ?parentId,
       });
 
       final response = await DioHelper.post(
