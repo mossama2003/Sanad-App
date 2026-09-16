@@ -5,11 +5,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
-import '../../data/models/cases_model.dart';
-import '../../data/params/case_model.dart';
 import '../../data/params/create_case_param.dart';
+import '../../../../../core/helper/app_toast.dart';
+import '../../data/models/cases_model.dart';
 import '../../data/repos/cases_repo.dart';
 
 part 'case_state.dart';
@@ -21,9 +20,11 @@ class CasesCubit extends Cubit<CasesState> {
 
   static CasesCubit get(BuildContext context) => BlocProvider.of(context);
 
-  final List<CaseModel> cases = [];
-
   final List<CaseCommentModel> comments = [];
+
+  final Set<int> _likingCases = {};
+
+  bool isUpdatingCase = false;
 
   final List<CaseListItemModel> casesList = [];
   int currentPage = 1;
@@ -41,22 +42,32 @@ class CasesCubit extends Cubit<CasesState> {
   StreamSubscription<ably.Message>? _commentsSubscription;
   String? _currentClientId;
 
+  bool isLikingCase(int caseId) {
+    return _likingCases.contains(caseId);
+  }
+
+  // ===================== Create Case =====================
   // ===================== Create Case =====================
   Future<void> createCase(CreateCaseParam param) async {
+    if (isUpdatingCase) return;
+
+    isUpdatingCase = true;
     emit(Loading());
 
     final result = await repo.createCase(param);
 
-    result.fold(
-      (l) {
+    await result.fold(
+      (l) async {
+        isUpdatingCase = false;
+
         emit(Error());
 
         AppToast.error(l.errMessage);
       },
-      (r) {
-        cases.insert(0, r);
+      (r) async {
+        isUpdatingCase = false;
 
-        emit(Success());
+        await getCases(me: isMySelected);
 
         AppToast.success('shared.cases.case_created_successfully'.tr());
       },
@@ -304,7 +315,7 @@ class CasesCubit extends Cubit<CasesState> {
       (l) {
         AppToast.error(l.errMessage);
       },
-      (_) {
+      (r) {
         casesList.removeWhere((c) => c.id == id);
 
         if (isMySelected) myCasesCount = (myCasesCount - 1).clamp(0, 999999);
@@ -312,6 +323,138 @@ class CasesCubit extends Cubit<CasesState> {
         emit(Success());
 
         AppToast.success('shared.cases.card.case_deleted_successfully'.tr());
+      },
+    );
+  }
+
+  Future<void> editComment({
+    required int commentId,
+    required String newComment,
+  }) async {
+    final result = await repo.editComment(id: commentId, comment: newComment);
+
+    result.fold(
+      (l) {
+        AppToast.error(l.errMessage);
+      },
+      (r) {
+        final index = comments.indexWhere((c) => c.id == commentId);
+
+        if (index != -1) {
+          comments[index] = comments[index].copyWith(comment: r);
+
+          emit(Success());
+        }
+
+        AppToast.success('shared.cases.comments.comment_updated'.tr());
+      },
+    );
+  }
+
+  Future<void> deleteComment({
+    required int commentId,
+    required int caseId,
+  }) async {
+    final result = await repo.deleteComment(commentId);
+
+    result.fold(
+      (l) {
+        AppToast.error(l.errMessage);
+      },
+      (r) {
+        comments.removeWhere((c) => c.id == commentId);
+        emit(Success());
+
+        final caseIndex = casesList.indexWhere((c) => c.id == caseId);
+        if (caseIndex != -1) {
+          casesList[caseIndex] = casesList[caseIndex]
+              .copyWithCommentsDecremented();
+        }
+
+        AppToast.success('shared.cases.comments.comment_deleted'.tr());
+      },
+    );
+  }
+
+  Future<void> likeCase(int caseId) async {
+    if (_likingCases.contains(caseId)) return;
+
+    _likingCases.add(caseId);
+    emit(Success());
+
+    final result = await repo.likeCase(caseId);
+
+    result.fold(
+      (l) {
+        _likingCases.remove(caseId);
+        emit(Success());
+
+        AppToast.error(l.errMessage);
+      },
+      (r) {
+        final index = casesList.indexWhere((c) => c.id == caseId);
+
+        if (index != -1) {
+          casesList[index] = casesList[index].copyWithLike(
+            likers: r.likers,
+            isLiked: r.isLiked,
+          );
+        }
+
+        _likingCases.remove(caseId);
+        emit(Success());
+      },
+    );
+  }
+
+  Future<void> updateCase({
+    required int id,
+    required CreateCaseParam param,
+  }) async {
+    if (isUpdatingCase) return;
+
+    isUpdatingCase = true;
+    emit(Loading());
+
+    final result = await repo.updateCase(id: id, param: param);
+
+    result.fold(
+      (l) {
+        isUpdatingCase = false;
+
+        AppToast.error(l.errMessage);
+
+        emit(Error());
+      },
+      (data) {
+        final index = casesList.indexWhere((caseItem) => caseItem.id == id);
+
+        if (index != -1) {
+          final oldCase = casesList[index];
+
+          casesList[index] = oldCase.copyWith(
+            paymentDetails: CasePaymentDetails.fromJson(
+              data['payment_details'],
+            ),
+            created: DateTime.parse(data['created']),
+            modified: DateTime.parse(data['modified']),
+            name: data['name'],
+            description: data['description'],
+            category: data['category'],
+            urgency: data['urgency'],
+            contactName: data['contact_name'],
+            contactPhone: data['contact_phone'],
+            info: data['info'],
+            note: data['note'],
+            active: data['active'],
+          );
+        }
+
+        isUpdatingCase = false;
+
+        emit(Success());
+
+        AppToast.success('Case updated successfully');
       },
     );
   }

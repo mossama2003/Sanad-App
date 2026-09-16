@@ -10,7 +10,6 @@ import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../data/models/cases_model.dart';
 import '../controllers/case_cubit.dart';
-import 'case_comments_bottom_sheet.dart';
 
 class CasesPopUp extends StatelessWidget {
   final CaseListItemModel caseItem;
@@ -22,28 +21,87 @@ class CasesPopUp extends StatelessWidget {
     required this.casesCubit,
   });
 
+  // ---------------------------------------------------------------------------
+  // Phone
+  // ---------------------------------------------------------------------------
+
   Future<void> _callPhone(String phone) async {
-    final uri = Uri(scheme: 'tel', path: phone);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
+    final uri = Uri(scheme: 'tel', path: phone.trim());
+
+    try {
+      final opened = await launchUrl(uri);
+
+      if (!opened) {
+        AppToast.error('shared.cases.pop_up.cant_call'.tr());
+      }
+    } catch (e) {
+      debugPrint('Failed to call phone: $e');
+
       AppToast.error('shared.cases.pop_up.cant_call'.tr());
     }
   }
 
-  Future<void> _openLink(String url) async {
-    final uri = Uri.tryParse(url);
-    if (uri != null && await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
+  // ---------------------------------------------------------------------------
+  // InstaPay
+  // ---------------------------------------------------------------------------
+
+  Future<void> _openInstaPayLink(String url) async {
+    final value = url.trim();
+
+    final uri = Uri.tryParse(value);
+
+    if (uri == null) {
+      AppToast.error('shared.cases.pop_up.cant_open_link'.tr());
+      return;
+    }
+
+    // Make sure this is an HTTPS InstaPay link.
+    if (uri.scheme.toLowerCase() != 'https' ||
+        uri.host.toLowerCase() != 'ipn.eg') {
+      AppToast.error('shared.cases.pop_up.cant_open_link'.tr());
+      return;
+    }
+
+    try {
+      final opened = await launchUrl(
+        uri,
+        mode: LaunchMode.externalNonBrowserApplication,
+      );
+
+      if (!opened) {
+        // Fallback:
+        //
+        // If the device does not expose InstaPay as an external
+        // application handler, open the official URL normally.
+        final fallbackOpened = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+
+        if (!fallbackOpened) {
+          AppToast.error('shared.cases.pop_up.cant_open_link'.tr());
+        }
+      }
+    } catch (e) {
+      debugPrint('Failed to open InstaPay link: $e');
+
       AppToast.error('shared.cases.pop_up.cant_open_link'.tr());
     }
   }
 
-  void _copyToClipboard(String value) {
-    Clipboard.setData(ClipboardData(text: value));
+  // ---------------------------------------------------------------------------
+  // Clipboard
+  // ---------------------------------------------------------------------------
+
+  Future<void> _copyToClipboard(String value) async {
+    await Clipboard.setData(ClipboardData(text: value));
+
     AppToast.success('shared.cases.pop_up.copied'.tr());
   }
+
+  // ---------------------------------------------------------------------------
+  // Egyptian phone formatting
+  // ---------------------------------------------------------------------------
 
   String _formatEgyptianPhone(String phone) {
     final value = phone.trim();
@@ -61,15 +119,30 @@ class CasesPopUp extends StatelessWidget {
     return value;
   }
 
-  bool get _isValidLink {
-    final value = caseItem.paymentDetails.description;
+  // ---------------------------------------------------------------------------
+  // InstaPay validation
+  // ---------------------------------------------------------------------------
 
-    if (value == null) return false;
+  bool get _isValidInstaPayLink {
+    final description = caseItem.paymentDetails.description;
 
-    final uri = Uri.tryParse(value.trim());
+    if (description == null || description.trim().isEmpty) {
+      return false;
+    }
 
-    return uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
+    final uri = Uri.tryParse(description.trim());
+
+    if (uri == null) {
+      return false;
+    }
+
+    return uri.scheme.toLowerCase() == 'https' &&
+        uri.host.toLowerCase() == 'ipn.eg';
   }
+
+  // ---------------------------------------------------------------------------
+  // Payment label
+  // ---------------------------------------------------------------------------
 
   String get _paymentLabel {
     switch (caseItem.paymentDetails.paymentType) {
@@ -87,44 +160,41 @@ class CasesPopUp extends StatelessWidget {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Payment value
+  // ---------------------------------------------------------------------------
+
   Widget _paymentValueWidget() {
-    final rawValue = caseItem.paymentDetails.description!;
-    final type = caseItem.paymentDetails.paymentType;
+    final rawValue = caseItem.paymentDetails.description!.trim();
 
-    // Wallet numbers are displayed without the country code.
-    final value = type == 'wallet' ? _formatEgyptianPhone(rawValue) : rawValue;
+    final paymentType = caseItem.paymentDetails.paymentType;
 
-    VoidCallback? onTapAction;
-    Color textColor = AppColors.black;
-    bool underline = false;
+    // Wallet numbers are displayed in Egyptian local format.
+    final value = paymentType == 'wallet'
+        ? _formatEgyptianPhone(rawValue)
+        : rawValue;
 
-    // InstaPay link
-    if (type == 'instapay' && _isValidLink) {
-      onTapAction = () => _openLink(rawValue);
-      textColor = AppColors.laserBlue;
-      underline = true;
-    }
+    final isInstaPay = paymentType == 'instapay' && _isValidInstaPayLink;
 
-    // Wallet:
-    // No onTap action intentionally.
-    // The user can only copy the number.
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: GestureDetector(
-            onTap: onTapAction,
+            onTap: isInstaPay ? () => _openInstaPayLink(rawValue) : null,
             onLongPress: () => _copyToClipboard(value),
             child: Text(
               value,
               style: TextStyle(
                 fontSize: AppSize.font(14),
-                color: textColor,
+                color: isInstaPay ? AppColors.laserBlue : AppColors.black,
                 fontWeight: FontWeight.w400,
-                decoration: underline
+                decoration: isInstaPay
                     ? TextDecoration.underline
                     : TextDecoration.none,
-                decorationColor: textColor,
+                decorationColor: isInstaPay
+                    ? AppColors.laserBlue
+                    : AppColors.black,
               ),
             ),
           ),
@@ -144,8 +214,14 @@ class CasesPopUp extends StatelessWidget {
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // Build
+  // ---------------------------------------------------------------------------
+
   @override
   Widget build(BuildContext context) {
+    final paymentDescription = caseItem.paymentDetails.description;
+
     return Dialog(
       backgroundColor: const Color(0xFFF5F5F7),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -156,6 +232,10 @@ class CasesPopUp extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ----------------------------------------------------------------
+              // Case name
+              // ----------------------------------------------------------------
+
               Text(
                 caseItem.name,
                 style: TextStyle(
@@ -167,6 +247,9 @@ class CasesPopUp extends StatelessWidget {
 
               SizedBox(height: AppSize.getHeight(10)),
 
+              // ----------------------------------------------------------------
+              // Case description
+              // ----------------------------------------------------------------
               if (caseItem.description.isNotEmpty) ...[
                 Text(
                   caseItem.description,
@@ -180,6 +263,9 @@ class CasesPopUp extends StatelessWidget {
                 SizedBox(height: AppSize.getHeight(15)),
               ],
 
+              // ----------------------------------------------------------------
+              // Contact + Payment
+              // ----------------------------------------------------------------
               Container(
                 width: double.infinity,
                 padding: AppSize.padding(all: 12),
@@ -190,7 +276,10 @@ class CasesPopUp extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // ==========================================================
                     // Contact Person
+                    // ==========================================================
+
                     Text(
                       'shared.cases.pop_up.contact_person'.tr(),
                       style: TextStyle(
@@ -212,7 +301,9 @@ class CasesPopUp extends StatelessWidget {
 
                     SizedBox(height: AppSize.getHeight(10)),
 
+                    // ==========================================================
                     // Phone
+                    // ==========================================================
                     Text(
                       'shared.cases.pop_up.phone'.tr(),
                       style: TextStyle(
@@ -258,7 +349,11 @@ class CasesPopUp extends StatelessWidget {
                       ],
                     ),
 
-                    if (caseItem.paymentDetails.description != null) ...[
+                    // ==========================================================
+                    // Payment
+                    // ==========================================================
+                    if (paymentDescription != null &&
+                        paymentDescription.trim().isNotEmpty) ...[
                       SizedBox(height: AppSize.getHeight(10)),
 
                       Text(
@@ -279,7 +374,9 @@ class CasesPopUp extends StatelessWidget {
 
               SizedBox(height: AppSize.getHeight(15)),
 
+              // ----------------------------------------------------------------
               // Required / Raised
+              // ----------------------------------------------------------------
               Container(
                 width: double.infinity,
                 padding: AppSize.padding(all: 12),
@@ -289,6 +386,10 @@ class CasesPopUp extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
+                    // ==========================================================
+                    // Required
+                    // ==========================================================
+
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,6 +416,9 @@ class CasesPopUp extends StatelessWidget {
                       ),
                     ),
 
+                    // ==========================================================
+                    // Raised
+                    // ==========================================================
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -342,90 +446,6 @@ class CasesPopUp extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-
-              SizedBox(height: AppSize.getHeight(15)),
-
-              Divider(thickness: 0.3, height: 1, color: AppColors.grey300),
-              SizedBox(height: AppSize.getHeight(15)),
-              Row(
-                children: [
-                  SizedBox(width: AppSize.getWidth(20)),
-                  CustomIcon(
-                    icon: AppIcons.donations,
-                    color: AppColors.grey600,
-                    width: AppSize.getWidth(18),
-                    height: AppSize.getHeight(18),
-                  ),
-                  SizedBox(width: AppSize.getWidth(3)),
-                  Text(
-                    '${caseItem.likers}',
-                    style: TextStyle(
-                      fontSize: AppSize.font(15),
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                  SizedBox(width: AppSize.getWidth(25)),
-                  GestureDetector(
-                    onTap: () => CaseCommentsBottomSheet.show(
-                      context,
-                      caseItem.id,
-                      casesCubit,
-                    ),
-                    child: Row(
-                      children: [
-                        CustomIcon(
-                          icon: AppIcons.comment,
-                          color: AppColors.grey600,
-                          width: AppSize.getWidth(18),
-                          height: AppSize.getHeight(18),
-                        ),
-                        SizedBox(width: AppSize.getWidth(3)),
-                        Text(
-                          '${caseItem.comments}',
-                          style: TextStyle(
-                            fontSize: AppSize.font(15),
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Spacer(),
-                  InkWell(
-                    onTap: () {
-                      ///TODO
-                      //Create share link here
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                      ),
-                      padding: AppSize.padding(vertical: 5, horizontal: 10),
-                      child: Row(
-                        children: [
-                          CustomIcon(
-                            icon: AppIcons.share,
-                            color: AppColors.black,
-                            width: AppSize.getWidth(15),
-                            height: AppSize.getHeight(15),
-                          ),
-                          SizedBox(width: AppSize.getWidth(5)),
-                          Text(
-                            'shared.cases.card.share'.tr(),
-                            style: TextStyle(
-                              fontSize: AppSize.font(15),
-                              color: AppColors.black,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: AppSize.getWidth(20)),
-                ],
               ),
             ],
           ),

@@ -8,6 +8,7 @@
     "yes": "Yes",
     "cancel": "Cancel",
     "delete": "Delete",
+    "save": "Save",
     "time_ago": {
       "seconds": "{value} seconds ago",
       "minutes": "{value} minutes ago",
@@ -317,21 +318,22 @@
         "raised_amount": "Amount Already Raised (Optional)",
         "hint_raised_amount": "Leave empty if none"
       },
+      "edit": {
+        "title": "Edit Case",
+        "desc": "Update your case information and keep the details up to date.",
+        "button": "Update Case"
+      },
       "comments": {
         "title": "Comments",
         "hint": "Write a comment...",
-        "no_comments": "No comments yet.\nBe the first to comment!"
+        "no_comments": "No comments yet.\nBe the first to comment!",
+        "edit": "Edit Comment",
+        "delete": "Delete",
+        "comment_updated": "Comment updated",
+        "comment_deleted": "Comment deleted",
+        "confirm_delete_title": "Delete Comment?",
+        "confirm_delete_desc": "This action cannot be undone."
       }
-    },
-    "cases_removed": {
-      "days_Ago": "2 days ago",
-      "family_displaced_by_fire": "Family Displaced by Fire",
-      "a_family_of_6_lost": "A family of 6 lost their home in a residential fire. They urgently need shelter, clothing, and basic necessities. The fire destroyed all their belongings and they are currently staying with relatives.",
-      "contact": "Contact: Mohamed Ahmed",
-      "national_bank": "0123456789 - National Bank of Egypt",
-      "mohamed": "Mohamed Ahmed",
-      "EGP_75000": "EGP 75,000",
-      "EGP_45000": "EGP 45,000"
     },
     "notifications": {
       "title": "Notifications",
@@ -564,7 +566,11 @@
     },
     "profile": {
       "verified_organization": "Verified Organization",
-      "social_media": "Social Media"
+      "social_media": "Social Media",
+      "events_created": "Events Created",
+      "volunteers_engaged": "Volunteers Engaged",
+      "donations_raised": "Donations Raised",
+      "cases_completed": "Cases Completed"
     }
   },
   "volunteer": {
@@ -798,7 +804,7 @@
       "posted": "Posted 2h ago by Egyptian Red Crescent"
     },
     "profile": {
-      "level": "Level 12",
+      "level": "Level ",
       "xp": "XP Points",
       "streak": "Day Streak",
       "attended": "Events Attended",
@@ -807,10 +813,10 @@
       "badges": "Badges",
       "view_all": "View All",
       "contact_information": "Contact Information",
-      "attendance_rate": "Attendance rate: 85%",
-      "completion_rate": "Completion rate: 90%",
-      "emergency_response": "Emergency response: 95%",
-      "org_ratings": "Org ratings: 4.5/5",
+      "attendance_rate": "Attendance rate: ",
+      "completion_rate": "Completion rate: ",
+      "emergency_response": "Emergency response: ",
+      "org_ratings": "Org ratings: ",
       "priority_access": "Priority access to critical emergencies for top-rated volunteers.",
       "volunteer_profile": "Volunteer Profile",
       "blood_type": "Blood Type",
@@ -822,18 +828,15 @@
       "edit_volunteer_profile": "Edit Volunteer Profile",
       "past_roles": "Past Roles",
       "past_roles_desc": "Roles you were assigned in event chats are saved here.",
-      "settings": "Settings"
-    },
-    "profile_removed": {
-      "nurse": "nurse",
+      "settings": "Settings",
+      "no_badges": "No badges yet",
+      "no_roles": "No past roles yet",
+      "cases_engagement": "Cases Engagement",
+      "donations_engagement": "Donations Engagement",
+      "available": "Available",
+      "not_available": "Not Available",
       "yes": "Yes",
-      "years": "3 years",
-      "team_lead": "Team Lead",
-      "beach_cleanup": "Beach Cleanup Drive",
-      "event_date1": "Nov 2025",
-      "first_aid": "First Aid",
-      "blood_donation": "Blood Donation Campaign",
-      "event_date2": "Oct 2025"
+      "no": "No"
     },
     "edit_profile": {
       "appbar": "Edit Profile",

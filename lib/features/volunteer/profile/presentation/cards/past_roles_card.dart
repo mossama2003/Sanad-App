@@ -5,15 +5,29 @@ import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../../shared/auth/data/models/user_profile_model.dart';
 
-class PastRolesCard extends StatefulWidget {
-  const PastRolesCard({super.key});
+class PastRolesCard extends StatelessWidget {
+  final List<VolunteerRoleModel> roles;
 
-  @override
-  State<PastRolesCard> createState() => _PastRolesCardState();
-}
+  const PastRolesCard({super.key, required this.roles});
 
-class _PastRolesCardState extends State<PastRolesCard> {
+  String _formatDate(String? date) {
+    if (date == null || date.isEmpty) {
+      return '-';
+    }
+
+    final parsed = DateTime.tryParse(date);
+
+    if (parsed == null) {
+      return date;
+    }
+
+    return '${parsed.day.toString().padLeft(2, '0')}/'
+        '${parsed.month.toString().padLeft(2, '0')}/'
+        '${parsed.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -33,11 +47,8 @@ class _PastRolesCardState extends State<PastRolesCard> {
     return Container(
       decoration: BoxDecoration(
         color: cardColor,
-
         borderRadius: BorderRadius.circular(24),
-
         border: Border.all(color: textColor.withValues(alpha: .15), width: .7),
-
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? .3 : .05),
@@ -46,9 +57,7 @@ class _PastRolesCardState extends State<PastRolesCard> {
           ),
         ],
       ),
-
       padding: AppSize.padding(all: 15),
-
       child: Column(
         children: [
           Row(
@@ -64,7 +73,6 @@ class _PastRolesCardState extends State<PastRolesCard> {
 
               Text(
                 'volunteer.profile.past_roles'.tr(),
-
                 style: TextStyle(
                   color: textColor,
                   fontSize: AppSize.font(15),
@@ -78,7 +86,6 @@ class _PastRolesCardState extends State<PastRolesCard> {
 
           Text(
             'volunteer.profile.past_roles_desc'.tr(),
-
             style: TextStyle(
               color: secondaryTextColor,
               fontSize: AppSize.font(12),
@@ -88,25 +95,31 @@ class _PastRolesCardState extends State<PastRolesCard> {
 
           SizedBox(height: AppSize.getHeight(16)),
 
-          _RoleItem(
-            background: itemBackground,
-            tag: 'volunteer.profile_removed.team_lead'.tr(),
-            title: 'volunteer.profile_removed.beach_cleanup'.tr(),
-            date: 'volunteer.profile_removed.event_date1'.tr(),
-            textColor: textColor,
-            lightTextColor: lightTextColor,
-          ),
-
-          SizedBox(height: AppSize.getHeight(10)),
-
-          _RoleItem(
-            background: itemBackground,
-            tag: 'volunteer.profile_removed.first_aid'.tr(),
-            title: 'volunteer.profile_removed.blood_donation'.tr(),
-            date: 'volunteer.profile_removed.event_date2'.tr(),
-            textColor: textColor,
-            lightTextColor: lightTextColor,
-          ),
+          if (roles.isEmpty)
+            Padding(
+              padding: AppSize.padding(vertical: 10),
+              child: Text(
+                'volunteer.profile.no_roles'.tr(),
+                style: TextStyle(
+                  color: textColor.withValues(alpha: .5),
+                  fontSize: AppSize.font(13),
+                ),
+              ),
+            )
+          else
+            ...roles.map(
+              (role) => Padding(
+                padding: AppSize.padding(bottom: AppSize.getHeight(10)),
+                child: _RoleItem(
+                  background: itemBackground,
+                  tag: role.role ?? '-',
+                  title: role.volunteer ?? '-',
+                  date: _formatDate(role.created),
+                  textColor: textColor,
+                  lightTextColor: lightTextColor,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -149,6 +162,8 @@ class _RoleItem extends StatelessWidget {
             padding: AppSize.padding(vertical: 5, horizontal: 13),
             child: Text(
               tag,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: AppColors.primary,
                 fontSize: AppSize.font(12),
@@ -165,6 +180,8 @@ class _RoleItem extends StatelessWidget {
               children: [
                 Text(
                   title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: textColor,
                     fontSize: AppSize.font(14),

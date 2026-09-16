@@ -1,29 +1,31 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:flutter/material.dart';
 
-import '../../../../../core/constant/app_assets.dart';
-import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/shared/widgets/custom_button.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
+import '../dialogs/case_comments_bottom_sheet.dart';
+import '../../../../../core/constant/app_assets.dart';
+import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../data/models/cases_model.dart';
 import '../controllers/case_cubit.dart';
-import '../dialogs/case_comments_bottom_sheet.dart';
 import '../dialogs/cases_pop_up.dart';
 
 class CasesCard extends StatelessWidget {
   final CaseListItemModel caseItem;
   final bool isOwner;
   final VoidCallback? onDelete;
+  final VoidCallback? onEdit;
 
   const CasesCard({
     super.key,
     required this.caseItem,
     this.isOwner = false,
     this.onDelete,
+    this.onEdit,
   });
 
   double get _progressValue {
@@ -44,6 +46,20 @@ class CasesCard extends StatelessWidget {
       : '';
 
   bool get _hasPayment => caseItem.paymentDetails.estimatedAmount > 0;
+
+  String _formatEgyptianPhone(String phone) {
+    final value = phone.trim();
+
+    if (value.startsWith('+20')) {
+      return '0${value.substring(3)}';
+    }
+
+    if (value.startsWith('20') && value.length == 12) {
+      return '0${value.substring(2)}';
+    }
+
+    return value;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -337,7 +353,7 @@ class CasesCard extends StatelessWidget {
                     ),
                     SizedBox(width: AppSize.getWidth(10)),
                     Text(
-                      caseItem.contactPhone,
+                      _formatEgyptianPhone(caseItem.contactPhone),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
                         color: AppColors.grey700,
@@ -360,7 +376,11 @@ class CasesCard extends StatelessWidget {
                       SizedBox(width: AppSize.getWidth(10)),
                       Expanded(
                         child: Text(
-                          caseItem.paymentDetails.description!,
+                          caseItem.paymentDetails.paymentType == 'wallet'
+                              ? _formatEgyptianPhone(
+                                  caseItem.paymentDetails.description!,
+                                )
+                              : caseItem.paymentDetails.description!,
                           style: TextStyle(
                             fontSize: AppSize.font(13),
                             color: AppColors.grey700,
@@ -376,22 +396,58 @@ class CasesCard extends StatelessWidget {
                 SizedBox(height: AppSize.getHeight(15)),
                 Row(
                   children: [
-                    SizedBox(width: AppSize.getWidth(20)),
-                    CustomIcon(
-                      icon: AppIcons.donations,
-                      color: AppColors.grey600,
-                      width: AppSize.getWidth(18),
-                      height: AppSize.getHeight(18),
-                    ),
-                    SizedBox(width: AppSize.getWidth(3)),
-                    Text(
-                      '${caseItem.likers}',
-                      style: TextStyle(
-                        fontSize: AppSize.font(15),
-                        fontWeight: FontWeight.w300,
+                    SizedBox(width: AppSize.getWidth(10)),
+
+                    // ================= LIKE =================
+                    InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {
+                        final cubit = CasesCubit.get(context);
+
+                        if (!cubit.isLikingCase(caseItem.id)) {
+                          cubit.likeCase(caseItem.id);
+                        }
+                      },
+                      child: Padding(
+                        padding: AppSize.padding(vertical: 5, horizontal: 3),
+                        child: Row(
+                          children: [
+                            CasesCubit.get(context).isLikingCase(caseItem.id)
+                                ? SizedBox(
+                                    width: AppSize.getWidth(18),
+                                    height: AppSize.getHeight(18),
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: AppColors.primary,
+                                    ),
+                                  )
+                                : CustomIcon(
+                                    icon: AppIcons.donations,
+                                    color: caseItem.isLiked
+                                        ? AppColors.red
+                                        : AppColors.grey600,
+                                    width: AppSize.getWidth(18),
+                                    height: AppSize.getHeight(18),
+                                  ),
+                            SizedBox(width: AppSize.getWidth(3)),
+                            Text(
+                              '${caseItem.likers}',
+                              style: TextStyle(
+                                fontSize: AppSize.font(15),
+                                fontWeight: FontWeight.w300,
+                                color: caseItem.isLiked
+                                    ? AppColors.red
+                                    : AppColors.black,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    SizedBox(width: AppSize.getWidth(25)),
+
+                    SizedBox(width: AppSize.getWidth(10)),
+
+                    // ================= COMMENTS =================
                     GestureDetector(
                       onTap: () => CaseCommentsBottomSheet.show(
                         context,
@@ -417,16 +473,21 @@ class CasesCard extends StatelessWidget {
                         ],
                       ),
                     ),
+
                     Spacer(),
+
+                    // ================= SHARE =================
                     InkWell(
                       onTap: () {
-                        ///TODO
-                        //Create share link here
+                        /// TODO
+                        // Create share link here
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          color: AppColors.primary.withValues(alpha: 0.12),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(30),
+                          ),
                         ),
                         padding: AppSize.padding(vertical: 5, horizontal: 10),
                         child: Row(
@@ -450,9 +511,38 @@ class CasesCard extends StatelessWidget {
                         ),
                       ),
                     ),
+
                     SizedBox(width: AppSize.getWidth(5)),
 
+                    // ================= EDIT & DELETE =================
                     if (isOwner) ...[
+                      // EDIT
+                      InkWell(
+                        onTap: onEdit,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.12),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(30),
+                            ),
+                          ),
+                          padding: AppSize.padding(vertical: 5, horizontal: 10),
+                          child: Row(
+                            children: [
+                              CustomIcon(
+                                icon: AppIcons.edit,
+                                color: AppColors.primary,
+                                width: AppSize.getSize(18),
+                                height: AppSize.getSize(18),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(width: AppSize.getWidth(5)),
+
+                      // DELETE
                       InkWell(
                         onTap: onDelete,
                         child: Container(
@@ -475,22 +565,25 @@ class CasesCard extends StatelessWidget {
                           ),
                         ),
                       ),
+
                       SizedBox(width: AppSize.getWidth(10)),
                     ],
                   ],
                 ),
-                SizedBox(height: AppSize.getHeight(20)),
-                CustomButton(
-                  title: 'shared.cases.card.button'.tr(),
-                  height: AppSize.getHeight(40),
-                  onTap: () => AppNavigator.dialog(
-                    CasesPopUp(
-                      caseItem: caseItem,
-                      casesCubit: CasesCubit.get(context),
+                if (!isOwner) ...[
+                  SizedBox(height: AppSize.getHeight(20)),
+                  CustomButton(
+                    title: 'shared.cases.card.button'.tr(),
+                    height: AppSize.getHeight(40),
+                    onTap: () => AppNavigator.dialog(
+                      CasesPopUp(
+                        caseItem: caseItem,
+                        casesCubit: CasesCubit.get(context),
+                      ),
                     ),
+                    bgColor: AppColors.laserBlue,
                   ),
-                  bgColor: AppColors.laserBlue,
-                ),
+                ],
               ],
             ),
           ),

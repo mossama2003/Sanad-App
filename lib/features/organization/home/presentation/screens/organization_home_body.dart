@@ -3,8 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/helper/app_navigator.dart';
+import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../../shared/cases/data/repos/cases_repo.dart';
+import '../../../../shared/cases/presentation/controllers/case_cubit.dart';
 import '../../../../shared/cases/presentation/screens/submit_case_screen.dart';
 import '../../data/enums/organization_home_navbar_enum.dart';
 import '../controllers/organization_home_cubit.dart';
@@ -12,8 +15,33 @@ import '../controllers/organization_home_cubit.dart';
 import '../widgets/organization_home_appbar_widget.dart';
 import '../widgets/organization_home_navbar_widget.dart';
 
-class OrganizationHomeBody extends StatelessWidget {
+class OrganizationHomeBody extends StatefulWidget {
   const OrganizationHomeBody({super.key});
+
+  @override
+  State<OrganizationHomeBody> createState() => _OrganizationHomeBodyState();
+}
+
+class _OrganizationHomeBodyState extends State<OrganizationHomeBody> {
+  late final CasesCubit casesCubit;
+
+  @override
+  void initState() {
+    super.initState();
+
+    casesCubit = CasesCubit(CasesRepoImpel());
+
+    final user = AppCubit.get(context).user;
+    final isOrg = user?.role == 'organization';
+
+    casesCubit.initCasesScreen(isOrg: isOrg);
+  }
+
+  @override
+  void dispose() {
+    casesCubit.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +53,14 @@ class OrganizationHomeBody extends StatelessWidget {
           body: SafeArea(
             child: Column(
               children: [
-                /// Fixed AppBar
                 const OrganizationHomeAppbarWidget(),
 
-                /// Screen Content
-                Expanded(child: cubit.currentScreen),
+                Expanded(
+                  child: BlocProvider.value(
+                    value: casesCubit,
+                    child: cubit.currentScreen,
+                  ),
+                ),
               ],
             ),
           ),
@@ -55,7 +86,7 @@ class OrganizationHomeBody extends StatelessWidget {
               ? FloatingActionButton(
                   heroTag: 'organization_cases_fab',
                   onPressed: () {
-                    AppNavigator.push(SubmitCaseScreen());
+                    AppNavigator.push(SubmitCaseScreen(casesCubit: casesCubit));
                   },
                   backgroundColor: AppColors.laserBlue,
                   elevation: 5,

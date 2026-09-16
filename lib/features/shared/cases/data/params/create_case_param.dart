@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:path/path.dart' as p;
 
@@ -19,13 +20,18 @@ class CreateCaseParam {
     this.note,
     this.active = true,
     this.attachments = const [],
+    this.existingAttachmentIds = const [],
   });
 
   final String? paymentType;
   final String? paymentDescription;
   final double? paymentEstimatedAmount;
   final double? paymentRaisedAmount;
+
   final List<File> attachments;
+
+  final List<int> existingAttachmentIds;
+
   final String name;
   final String description;
   final String category;
@@ -40,30 +46,43 @@ class CreateCaseParam {
   Future<FormData> toFormData() async {
     final formData = FormData.fromMap({
       if (paymentType != null) 'payment_type': paymentType,
+
       if (paymentDescription != null) 'payment_description': paymentDescription,
+
       if (paymentEstimatedAmount != null)
         'payment_estimated_amount': paymentEstimatedAmount,
+
       if (paymentRaisedAmount != null)
         'payment_raised_amount': paymentRaisedAmount,
+
       'name': name,
       'description': description,
       'category': category,
       'urgency': urgency,
       'contact_name': contactName,
       'contact_phone': contactPhone,
+
       if (info != null) 'info': info,
+
       if (paymentDetails != null) 'payment_details': paymentDetails,
+
       if (note != null) 'note': note,
+
       'active': active,
     });
 
+    for (final id in existingAttachmentIds) {
+      formData.fields.add(MapEntry('existing_attachments', id.toString()));
+    }
     for (var i = 0; i < attachments.length; i++) {
+      final file = attachments[i];
+
       formData.files.add(
         MapEntry(
           'attachments[$i]',
           await MultipartFile.fromFile(
-            attachments[i].path,
-            filename: p.basename(attachments[i].path),
+            file.path,
+            filename: p.basename(file.path),
           ),
         ),
       );

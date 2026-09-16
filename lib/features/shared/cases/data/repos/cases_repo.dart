@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 
 import '../../../../../core/network/end_points.dart';
 import '../../../../../core/network/error/failures.dart';
@@ -23,5 +24,19 @@ abstract class CasesRepo {
   Future<Either<Failure, CaseCommentModel>> addCaseComment({
     required int caseId,
     required String comment,
+  });
+
+  Future<Either<Failure, String>> editComment({
+    required int id,
+    required String comment,
+  });
+
+  Future<Either<Failure, void>> deleteComment(int id);
+
+  Future<Either<Failure, CaseListItemModel>> likeCase(int id);
+
+  Future<Either<Failure, Map<String, dynamic>>> updateCase({
+    required int id,
+    required CreateCaseParam param,
   });
 }

@@ -23,11 +23,16 @@ String DELETE_ACCOUNT = 'v1/users/profile/delete/';
 String GET_SKILLS = 'v1/categories/select_category/';
 
 /// Both Volunteering and Organization
+///
+//EVENTS
 String GET_EVENTS = 'v1/events/read_event/';
 
 String EVENT_QR(int ID) => 'v1/events/read_event/$ID/';
 
+//CASES
 String CREATE_CASE = 'v1/cases/manage_case/';
+
+String UPDATE_CASE(int id) => 'v1/cases/manage_case/$id/';
 
 String GET_CASES(bool me) => 'v1/cases/read_case/?me=$me';
 
@@ -38,7 +43,13 @@ String ADD_CASE_COMMENT = 'v1/cases/case_comments/';
 String GET_CASE_CHAT_TOKEN(int caseId) =>
     'v1/cases/read_case/$caseId/chat_token/';
 
+String EDIT_CASE_COMMENT(int id) => 'v1/cases/case_comments/$id/';
+
+String DELETE_CASE_COMMENT(int id) => 'v1/cases/case_comments/$id/';
+
 String DELETE_CASE(int id) => 'v1/cases/manage_case/$id/';
+
+String LIKE_CASE(int id) => 'v1/cases/like/$id/';
 
 /// Chat
 String GET_CHAT_TOKEN(int eventId) =>

@@ -1,12 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:sanad_app/features/shared/cases/presentation/screens/submit_case_screen.dart';
 
 import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../data/models/cases_model.dart';
 import '../../data/repos/cases_repo.dart';
 import '../cards/verified_info_card.dart';
 import '../controllers/case_cubit.dart';
@@ -50,6 +52,15 @@ class _CasesScreenState extends State<CasesScreen> {
         confirmText: 'shared.cases.card.delete'.tr(),
         isDestructive: true,
         onConfirm: () => casesCubit.deleteCase(id),
+      ),
+    );
+  }
+
+  void _editCase(CaseListItemModel caseItem) {
+    AppNavigator.push(
+      SubmitCaseScreen(
+        caseItem: caseItem,
+        casesCubit: casesCubit,
       ),
     );
   }
@@ -122,6 +133,7 @@ class _CasesScreenState extends State<CasesScreen> {
                                   currentUserId,
                           onDelete: () =>
                               _confirmDelete(casesCubit.casesList[i].id),
+                          onEdit: () => _editCase(casesCubit.casesList[i]),
                         ),
                         if (i < casesCubit.casesList.length - 1)
                           SizedBox(height: AppSize.getHeight(15)),

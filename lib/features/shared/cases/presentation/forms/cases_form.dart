@@ -18,11 +18,16 @@ import '../../../../../core/validator/app_validators.dart';
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../data/models/cases_model.dart';
 import '../../data/params/create_case_param.dart';
 import '../controllers/case_cubit.dart';
 
 class CasesForm extends StatefulWidget {
-  const CasesForm({super.key});
+  final CaseListItemModel? caseItem;
+
+  const CasesForm({super.key, this.caseItem});
+
+  bool get isEdit => caseItem != null;
 
   @override
   State<CasesForm> createState() => _CasesFormState();
@@ -48,10 +53,19 @@ class _CasesFormState extends State<CasesForm> {
 
   final ValueNotifier<String?> selectedCategory = ValueNotifier(null);
   final ValueNotifier<String?> selectedPaymentType = ValueNotifier(null);
+
   int selectedUrgency = 0;
 
+  // New files selected by the user
   File? casePhoto;
   File? supportingDocument;
+
+  // Existing files from API
+  String? existingCasePhotoUrl;
+  String? existingSupportingDocumentUrl;
+
+  String? existingCasePhotoName;
+  String? existingSupportingDocumentName;
 
   final List<DropdownItem<String>> categories = [
     DropdownItem(value: 'Medical', child: Text('Medical')),
@@ -62,6 +76,93 @@ class _CasesFormState extends State<CasesForm> {
   ];
 
   static const _urgencyValues = ['low', 'medium', 'high'];
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.caseItem != null) {
+      _fillForm(widget.caseItem!);
+    }
+  }
+
+  void _fillForm(CaseListItemModel caseItem) {
+    titleController.text = caseItem.name;
+    descriptionController.text = caseItem.description;
+
+    contactNameController.text = caseItem.contactName;
+
+    contactPhoneController.text = _normalizeEgyptianPhone(
+      caseItem.contactPhone,
+    );
+
+    estimatedAmountController.text = caseItem.paymentDetails.estimatedAmount
+        .toStringAsFixed(0);
+
+    raisedAmountController.text = caseItem.paymentDetails.raisedAmount
+        .toStringAsFixed(0);
+
+    additionalNotesController.text = caseItem.note ?? '';
+
+    selectedCategory.value = caseItem.category;
+
+    selectedPaymentType.value = caseItem.paymentDetails.paymentType;
+
+    selectedUrgency = _urgencyValues.indexOf(caseItem.urgency);
+
+    if (selectedUrgency == -1) {
+      selectedUrgency = 0;
+    }
+
+    final paymentType = caseItem.paymentDetails.paymentType;
+
+    final paymentDescription = caseItem.paymentDetails.description ?? '';
+
+    switch (paymentType) {
+      case 'instapay':
+        instapayLinkController.text = paymentDescription;
+        break;
+
+      case 'wallet':
+        walletPhoneController.text = _normalizeEgyptianPhone(
+          paymentDescription,
+        );
+        break;
+
+      case 'bank_account':
+        ibanController.text = paymentDescription;
+        break;
+    }
+
+    // Existing attachments from API
+    if (caseItem.attachments.isNotEmpty) {
+      final attachment = caseItem.attachments.first.attachment;
+
+      existingCasePhotoUrl = attachment.url;
+      existingCasePhotoName = attachment.name;
+    }
+
+    if (caseItem.attachments.length > 1) {
+      final attachment = caseItem.attachments[1].attachment;
+
+      existingSupportingDocumentUrl = attachment.url;
+      existingSupportingDocumentName = attachment.name;
+    }
+  }
+
+  String _normalizeEgyptianPhone(String phone) {
+    final value = phone.trim();
+
+    if (value.startsWith('+20')) {
+      return '0${value.substring(3)}';
+    }
+
+    if (value.startsWith('20') && value.length == 12) {
+      return '0${value.substring(2)}';
+    }
+
+    return value;
+  }
 
   @override
   void dispose() {
@@ -75,15 +176,23 @@ class _CasesFormState extends State<CasesForm> {
     instapayLinkController.dispose();
     walletPhoneController.dispose();
     ibanController.dispose();
+
     selectedCategory.dispose();
     selectedPaymentType.dispose();
+
     super.dispose();
   }
 
   Future<void> _pickCasePhoto() async {
     final file = await FilePicker.pickFile(type: FileType.image);
+
     if (file != null && file.path != null) {
-      setState(() => casePhoto = File(file.path!));
+      setState(() {
+        casePhoto = File(file.path!);
+
+        existingCasePhotoUrl = null;
+        existingCasePhotoName = null;
+      });
     }
   }
 
@@ -92,8 +201,14 @@ class _CasesFormState extends State<CasesForm> {
       type: FileType.custom,
       allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
     );
+
     if (file != null && file.path != null) {
-      setState(() => supportingDocument = File(file.path!));
+      setState(() {
+        supportingDocument = File(file.path!);
+
+        existingSupportingDocumentUrl = null;
+        existingSupportingDocumentName = null;
+      });
     }
   }
 
@@ -101,17 +216,22 @@ class _CasesFormState extends State<CasesForm> {
     switch (type) {
       case 'instapay':
         return instapayLinkController.text.trim();
+
       case 'wallet':
         return walletPhoneController.text.trim();
+
       case 'bank_account':
         return ibanController.text.trim().toUpperCase().replaceAll(' ', '');
+
       default:
         return null;
     }
   }
 
   void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
     final param = CreateCaseParam(
       name: titleController.text.trim(),
@@ -127,13 +247,18 @@ class _CasesFormState extends State<CasesForm> {
       ),
       paymentRaisedAmount: double.tryParse(raisedAmountController.text.trim()),
       note: additionalNotesController.text.trim(),
+
       attachments: [
-        ?casePhoto,
-        ?supportingDocument,
+        if (casePhoto != null) casePhoto!,
+        if (supportingDocument != null) supportingDocument!,
       ],
     );
 
-    CasesCubit.get(context).createCase(param);
+    if (widget.isEdit) {
+      CasesCubit.get(context).updateCase(id: widget.caseItem!.id, param: param);
+    } else {
+      CasesCubit.get(context).createCase(param);
+    }
   }
 
   @override
@@ -150,6 +275,7 @@ class _CasesFormState extends State<CasesForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _VerificationBanner(),
+
             SizedBox(height: AppSize.getHeight(20)),
 
             CustomFieldText(
@@ -159,6 +285,7 @@ class _CasesFormState extends State<CasesForm> {
               isRequired: true,
               validator: AppValidators.required,
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
 
             CustomFieldDropdown<String>(
@@ -170,14 +297,20 @@ class _CasesFormState extends State<CasesForm> {
               items: categories,
               onChanged: (_) {},
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
 
             _UrgencySelector(
               title: 'shared.cases.submit.urgency_level'.tr(),
               selected: selectedUrgency,
-              onTap: (i) => setState(() => selectedUrgency = i),
+              onTap: (i) {
+                setState(() {
+                  selectedUrgency = i;
+                });
+              },
               isRequired: true,
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
 
             CustomFieldText(
@@ -189,40 +322,64 @@ class _CasesFormState extends State<CasesForm> {
               maxLines: 4,
               validator: AppValidators.required,
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
 
+            // CASE PHOTO
             CustomUploadFile(
+              image: casePhoto,
+              networkImage: existingCasePhotoUrl,
               onTap: _pickCasePhoto,
-              onRemove: () => setState(() => casePhoto = null),
+              onRemove: () {
+                setState(() {
+                  casePhoto = null;
+                  existingCasePhotoUrl = null;
+                  existingCasePhotoName = null;
+                });
+              },
               title: 'shared.cases.submit.case_photos'.tr(),
               hint:
                   casePhoto?.path.split('/').last ??
+                  existingCasePhotoName ??
                   'shared.cases.submit.hint_case_photos'.tr(),
               icon: AppIcons.addPhoto,
               minLines: 4,
               maxLines: 4,
-              isRequired: true,
+              isRequired: !widget.isEdit,
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
 
+            // SUPPORTING DOCUMENT
             CustomUploadFile(
+              image: supportingDocument,
+              networkImage: existingSupportingDocumentUrl,
               onTap: _pickSupportingDocument,
-              onRemove: () => setState(() => supportingDocument = null),
+              onRemove: () {
+                setState(() {
+                  supportingDocument = null;
+                  existingSupportingDocumentUrl = null;
+                  existingSupportingDocumentName = null;
+                });
+              },
               title: 'shared.cases.submit.supporting_documents'.tr(),
               hint:
                   supportingDocument?.path.split('/').last ??
+                  existingSupportingDocumentName ??
                   'shared.cases.submit.hint_supporting_documents'.tr(),
               icon: AppIcons.uploadFile,
               minLines: 4,
               maxLines: 4,
               isRequired: false,
             ),
+
             SizedBox(height: AppSize.getHeight(20)),
 
             _ContactInfoSection(
               nameController: contactNameController,
               phoneController: contactPhoneController,
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
 
             _PaymentMethodSection(
@@ -233,6 +390,7 @@ class _CasesFormState extends State<CasesForm> {
               estimatedAmountController: estimatedAmountController,
               raisedAmountController: raisedAmountController,
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
 
             CustomFieldText(
@@ -242,9 +400,11 @@ class _CasesFormState extends State<CasesForm> {
               minLines: 4,
               maxLines: 4,
             ),
+
             SizedBox(height: AppSize.getHeight(15)),
 
             _WarningNoteBanner(),
+
             SizedBox(height: AppSize.getHeight(20)),
 
             Row(
@@ -257,7 +417,9 @@ class _CasesFormState extends State<CasesForm> {
                     textColor: const Color(0xFF1A1A2E),
                   ),
                 ),
+
                 SizedBox(width: AppSize.getWidth(12)),
+
                 Expanded(
                   flex: 2,
                   child: BlocBuilder<CasesCubit, CasesState>(
@@ -265,7 +427,9 @@ class _CasesFormState extends State<CasesForm> {
                       return CustomButton(
                         loading: state is Loading,
                         onTap: state is Loading ? null : _submit,
-                        title: 'shared.cases.submit.submit_button'.tr(),
+                        title: widget.isEdit
+                            ? 'shared.cases.edit.button'.tr()
+                            : 'shared.cases.submit.submit_button'.tr(),
                         bgColor: AppColors.primary,
                       );
                     },
@@ -273,6 +437,7 @@ class _CasesFormState extends State<CasesForm> {
                 ),
               ],
             ),
+
             SizedBox(height: AppSize.getHeight(16)),
           ],
         ),

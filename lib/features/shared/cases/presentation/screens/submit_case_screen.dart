@@ -7,12 +7,17 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../data/repos/cases_repo.dart';
+import '../../data/models/cases_model.dart';
 import '../controllers/case_cubit.dart';
 import '../forms/cases_form.dart';
 
 class SubmitCaseScreen extends StatefulWidget {
-  const SubmitCaseScreen({super.key});
+  final CaseListItemModel? caseItem;
+  final CasesCubit casesCubit;
+
+  const SubmitCaseScreen({super.key, this.caseItem, required this.casesCubit});
+
+  bool get isEdit => caseItem != null;
 
   @override
   State<SubmitCaseScreen> createState() => _SubmitCaseScreenState();
@@ -20,27 +25,27 @@ class SubmitCaseScreen extends StatefulWidget {
 
 class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
   bool showForm = false;
-  late final CasesCubit casesCubit;
 
   @override
   void initState() {
     super.initState();
-    casesCubit = CasesCubit(CasesRepoImpel());
+
     Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted) setState(() => showForm = true);
+      if (mounted) {
+        setState(() => showForm = true);
+      }
     });
   }
 
   @override
   void dispose() {
-    casesCubit.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: casesCubit,
+      value: widget.casesCubit,
       child: Scaffold(
         backgroundColor: AppColors.white,
         body: SafeArea(
@@ -57,7 +62,9 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'shared.cases.submit.title'.tr(),
+                            widget.isEdit
+                                ? 'shared.cases.edit.title'.tr()
+                                : 'shared.cases.submit.title'.tr(),
                             style: TextStyle(
                               fontSize: AppSize.font(20),
                               fontWeight: FontWeight.w800,
@@ -66,7 +73,9 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
                           ),
                           SizedBox(height: AppSize.getHeight(4)),
                           Text(
-                            'shared.cases.submit.desc'.tr(),
+                            widget.isEdit
+                                ? 'shared.cases.edit.desc'.tr()
+                                : 'shared.cases.submit.desc'.tr(),
                             style: TextStyle(
                               fontSize: AppSize.font(13),
                               color: AppColors.grey,
@@ -109,7 +118,7 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
                     duration: const Duration(milliseconds: 400),
                     child: SingleChildScrollView(
                       padding: AppSize.padding(horizontal: 16, bottom: 24),
-                      child: const CasesForm(),
+                      child: CasesForm(caseItem: widget.caseItem),
                     ),
                   ),
                 ),

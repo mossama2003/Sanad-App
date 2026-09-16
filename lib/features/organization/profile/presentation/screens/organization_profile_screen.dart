@@ -61,27 +61,28 @@ class OrganizationProfileScreen extends StatelessWidget {
 
                   SizedBox(height: AppSize.getHeight(20)),
 
-                  _buildStatsGrid(context),
+                  _buildStatsGrid(context, profile),
 
                   SizedBox(height: AppSize.getHeight(16)),
 
                   ContactInfoCard(
                     email: user?.email ?? '',
-                    phone: user?.phone ?? '',
-
-                    website: 'test',
-                    location: 'test',
-
-                    // location: [
-                    //   user?.profile?.state,
-                    //   user?.profile?.headquarters,
-                    // ]
-                    //     .where((e) => e != null && e!.trim().isNotEmpty)
-                    //     .join(', '),
+                    phone: user?.phone?.replaceFirst('+20', '0') ?? '',
+                    website: profile?.website ?? '',
+                    location: [
+                      profile?.state,
+                      profile?.headquarters,
+                    ].where((e) => e != null && e.trim().isNotEmpty).join(', '),
                   ),
 
                   SizedBox(height: AppSize.getHeight(16)),
+
                   SocialMediaCard(),
+
+                  if (profile?.branches?.isNotEmpty == true) ...[
+                    SizedBox(height: AppSize.getHeight(16)),
+                    _buildBranchesCard(context, profile!.branches!),
+                  ],
 
                   SizedBox(height: AppSize.getHeight(16)),
 
@@ -110,21 +111,19 @@ class OrganizationProfileScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     final organizationName = user?.name ?? '';
+    final avatar = user?.avatar;
 
     return Stack(
       clipBehavior: Clip.none,
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
-
           child: Stack(
             children: [
               Container(
                 width: double.infinity,
                 height: 170,
-
                 color: theme.colorScheme.surfaceContainerHighest,
-
                 child: Center(
                   child: CustomIcon(
                     icon: AppIcons.uploadFile,
@@ -138,16 +137,12 @@ class OrganizationProfileScreen extends StatelessWidget {
               Positioned(
                 top: 12,
                 right: 12,
-
                 child: Container(
                   width: AppSize.getSize(36),
                   height: AppSize.getSize(36),
-
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-
                     color: theme.cardColor,
-
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(
@@ -158,7 +153,6 @@ class OrganizationProfileScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   child: Center(
                     child: CustomIcon(
                       icon: AppIcons.edit,
@@ -176,38 +170,47 @@ class OrganizationProfileScreen extends StatelessWidget {
         Positioned(
           bottom: -30,
           left: 16,
-
           child: Container(
             width: 64,
             height: 64,
-
             decoration: BoxDecoration(
               color: AppColors.primary,
-
               borderRadius: BorderRadius.circular(16),
-
               border: Border.all(
                 color: theme.scaffoldBackgroundColor,
                 width: 3,
               ),
             ),
-
-            alignment: Alignment.center,
-
-            child: Text(
-              organizationName.isNotEmpty
-                  ? organizationName[0].toUpperCase()
-                  : 'O',
-
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(13),
+              child: avatar != null && avatar.isNotEmpty
+                  ? Image.network(
+                      avatar,
+                      width: 64,
+                      height: 64,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) {
+                        return _buildAvatarInitial(organizationName);
+                      },
+                    )
+                  : _buildAvatarInitial(organizationName),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildAvatarInitial(String organizationName) {
+    return Center(
+      child: Text(
+        organizationName.isNotEmpty ? organizationName[0].toUpperCase() : 'O',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 26,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 
@@ -229,7 +232,6 @@ class OrganizationProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             CustomIcon(
               icon: AppIcons.verified,
               color: AppColors.primary,
@@ -243,15 +245,12 @@ class OrganizationProfileScreen extends StatelessWidget {
 
         Container(
           padding: AppSize.padding(horizontal: 12, vertical: 6),
-
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: .15),
             borderRadius: BorderRadius.circular(20),
           ),
-
           child: Text(
             'organization.profile.verified_organization'.tr(),
-
             style: TextStyle(
               color: AppColors.primary,
               fontSize: AppSize.font(12),
@@ -269,11 +268,12 @@ class OrganizationProfileScreen extends StatelessWidget {
   ) {
     final theme = Theme.of(context);
 
-    return Text(
-      profile?.headquarters?.isNotEmpty == true
-          ? profile!.headquarters!
-          : 'No organization description available',
+    final headquarters = profile?.headquarters?.trim() ?? '';
 
+    return Text(
+      headquarters.isNotEmpty
+          ? headquarters
+          : 'No organization information available',
       style: TextStyle(
         color: theme.colorScheme.onSurface.withValues(alpha: .6),
         fontSize: 14,
@@ -282,7 +282,10 @@ class OrganizationProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsGrid(BuildContext context) {
+  Widget _buildStatsGrid(
+    BuildContext context,
+    OrganizationProfileModel? profile,
+  ) {
     final theme = Theme.of(context);
 
     final stats = [
@@ -292,38 +295,35 @@ class OrganizationProfileScreen extends StatelessWidget {
             ? AppColors.primary.withValues(alpha: .15)
             : const Color(0xFFEAF6F1),
         AppColors.primary,
-        '60',
-        'Events Created',
+        '${profile?.eventsCreated ?? 0}',
+        'organization.profile.events_created'.tr(),
       ),
-
       (
         AppIcons.community,
         theme.brightness == Brightness.dark
             ? Colors.blue.withValues(alpha: .15)
             : const Color(0xFFEAF1FB),
         const Color(0xFF3B82F6),
-        '1.2K',
-        'Volunteers Engaged',
+        '${profile?.attendeesCount ?? 0}',
+        'organization.profile.volunteers_engaged'.tr(),
       ),
-
       (
         AppIcons.pound,
         theme.brightness == Brightness.dark
             ? Colors.orange.withValues(alpha: .15)
             : const Color(0xFFFDF1E4),
         const Color(0xFFE8A13D),
-        'EGP 340K',
-        'Donations Raised',
+        'EGP ${profile?.donationsRaised ?? 0}',
+        'organization.profile.donations_raised'.tr(),
       ),
-
       (
         AppIcons.fileDone,
         theme.brightness == Brightness.dark
             ? AppColors.primary.withValues(alpha: .15)
             : const Color(0xFFEAF6F1),
         AppColors.primary,
-        '34',
-        'Cases Completed',
+        '${profile?.casesCompleted ?? 0}',
+        'organization.profile.cases_completed'.tr(),
       ),
     ];
 
@@ -337,6 +337,86 @@ class OrganizationProfileScreen extends StatelessWidget {
       children: stats
           .map((s) => _statCard(context, s.$1, s.$2, s.$3, s.$4, s.$5))
           .toList(),
+    );
+  }
+
+  Widget _buildBranchesCard(BuildContext context, List<String> branches) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      width: double.infinity,
+      padding: AppSize.padding(all: 16),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: theme.colorScheme.onSurface.withValues(
+            alpha: isDark ? .12 : .10,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: isDark ? .35 : .15),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Branches',
+            style: TextStyle(
+              color: theme.colorScheme.onSurface,
+              fontSize: AppSize.font(16),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          SizedBox(height: AppSize.getHeight(12)),
+
+          ...branches.asMap().entries.map((entry) {
+            final index = entry.key;
+            final branch = entry.value;
+
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: index == branches.length - 1
+                    ? 0
+                    : AppSize.getHeight(10),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${index + 1}.',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: AppSize.font(13),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(width: AppSize.getWidth(8)),
+                  Expanded(
+                    child: Text(
+                      branch,
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: .65,
+                        ),
+                        fontSize: AppSize.font(13),
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 
@@ -354,38 +434,28 @@ class OrganizationProfileScreen extends StatelessWidget {
 
     return Container(
       padding: AppSize.padding(all: 16),
-
       decoration: BoxDecoration(
         color: theme.cardColor,
-
         borderRadius: BorderRadius.circular(30),
-
         border: Border.all(
           color: theme.colorScheme.onSurface.withValues(
             alpha: isDark ? .12 : .10,
           ),
         ),
-
         boxShadow: [
           BoxShadow(
             offset: const Offset(0, 2),
-
             color: Colors.black.withValues(alpha: isDark ? .35 : .15),
-
             blurRadius: 8,
           ),
         ],
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
           Container(
             padding: AppSize.padding(all: 8),
-
             decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-
             child: CustomIcon(
               icon: icon,
               width: AppSize.getSize(18),

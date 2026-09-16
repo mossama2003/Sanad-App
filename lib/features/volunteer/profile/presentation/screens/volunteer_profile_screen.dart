@@ -23,6 +23,20 @@ import '../cards/avatar_card.dart';
 class VolunteerProfileScreen extends StatelessWidget {
   const VolunteerProfileScreen({super.key});
 
+  String formatEgyptianPhone(String? phone) {
+    if (phone == null || phone.isEmpty) return '';
+
+    if (phone.startsWith('+20')) {
+      return '0${phone.substring(3)}';
+    }
+
+    if (phone.startsWith('20')) {
+      return '0${phone.substring(2)}';
+    }
+
+    return phone;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AppCubit, AppStates>(
@@ -34,6 +48,16 @@ class VolunteerProfileScreen extends StatelessWidget {
       builder: (context, state) {
         final cubit = AppCubit.get(context);
         final user = cubit.user;
+
+        final profile = user?.profile is VolunteerProfileModel
+            ? user!.profile as VolunteerProfileModel
+            : null;
+
+        final location = [
+          profile?.city,
+          profile?.state,
+          profile?.country,
+        ].where((e) => e != null && e.trim().isNotEmpty).join(', ');
 
         return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -50,16 +74,8 @@ class VolunteerProfileScreen extends StatelessWidget {
                 children: [
                   AvatarCard(
                     name: '${user?.name ?? ''} ${user?.lastName ?? ''}',
-                    location: user?.profile is VolunteerProfileModel
-                        ? [
-                                (user!.profile as VolunteerProfileModel).city,
-                                (user.profile as VolunteerProfileModel).state,
-                                (user.profile as VolunteerProfileModel).country,
-                              ]
-                              .where((e) => e != null && e.trim().isNotEmpty)
-                              .join(', ')
-                        : '',
-                    createdAt: user?.profile?.created,
+                    location: location,
+                    createdAt: profile?.created,
                     image: user?.avatar,
                     level: 'volunteer.profile.level'.tr(),
                   ),
@@ -80,25 +96,28 @@ class VolunteerProfileScreen extends StatelessWidget {
                         StatCard(
                           icon: AppIcons.voltage,
                           iconColor: const Color(0xFF7B5EA7),
-                          value: '2,450',
+                          value: '${profile?.xp ?? 0}',
                           label: 'volunteer.profile.xp'.tr(),
                         ),
+
                         StatCard(
                           icon: AppIcons.fire,
                           iconColor: const Color(0xFFFF6B35),
-                          value: '7',
+                          value: '${profile?.streak ?? 0}',
                           label: 'volunteer.profile.streak'.tr(),
                         ),
+
                         StatCard(
                           icon: AppIcons.calendar,
                           iconColor: const Color(0xFF2ECFA0),
-                          value: '24',
+                          value: '0',
                           label: 'volunteer.profile.attended'.tr(),
                         ),
+
                         StatCard(
                           icon: AppIcons.donations,
                           iconColor: const Color(0xFFE05C5C),
-                          value: 'EGP 12.5K',
+                          value: 'EGP 0',
                           label: 'volunteer.profile.donations'.tr(),
                           smallValue: true,
                         ),
@@ -108,25 +127,27 @@ class VolunteerProfileScreen extends StatelessWidget {
 
                   SizedBox(height: AppSize.getHeight(16)),
 
-                  const BadgesCard(),
+                  BadgesCard(badges: profile?.badges ?? []),
 
                   SizedBox(height: AppSize.getHeight(16)),
 
-                  const ReliabilityScoreCard(),
+                  ReliabilityScoreCard(
+                    reliabilityScore: profile?.reliabilityScore,
+                  ),
 
                   SizedBox(height: AppSize.getHeight(16)),
 
-                  const VolunteerProfileCard(),
+                  VolunteerProfileCard(profile: profile),
 
                   SizedBox(height: AppSize.getHeight(16)),
 
-                  const PastRolesCard(),
+                  PastRolesCard(roles: profile?.roles ?? []),
 
                   SizedBox(height: AppSize.getHeight(16)),
 
                   ContactInfoCard(
                     email: user?.email ?? '',
-                    phone: user?.phone ?? '',
+                    phone: formatEgyptianPhone(user?.phone),
                   ),
 
                   SizedBox(height: AppSize.getHeight(16)),

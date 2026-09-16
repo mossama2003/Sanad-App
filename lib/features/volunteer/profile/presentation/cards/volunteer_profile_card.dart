@@ -7,38 +7,13 @@ import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../../shared/auth/data/models/user_profile_model.dart';
 import '../../../edit_profile/presentations/screens/edit_volunteer_profile_screen.dart';
 
-class VolunteerProfileCard extends StatefulWidget {
-  const VolunteerProfileCard({super.key});
+class VolunteerProfileCard extends StatelessWidget {
+  final VolunteerProfileModel? profile;
 
-  @override
-  State<VolunteerProfileCard> createState() => _VolunteerProfileCardState();
-}
-
-class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
-  final items = [
-    {
-      'title': 'volunteer.profile.blood_type'.tr(),
-      'value': 'O-',
-      'icon': AppIcons.blood,
-    },
-    {
-      'title': 'volunteer.profile.profession'.tr(),
-      'value': 'volunteer.profile_removed.nurse'.tr(),
-      'icon': AppIcons.business,
-    },
-    {
-      'title': 'volunteer.profile.own_vehicle'.tr(),
-      'value': 'volunteer.profile_removed.yes'.tr(),
-      'icon': AppIcons.car,
-    },
-    {
-      'title': 'volunteer.profile.exp'.tr(),
-      'value': 'volunteer.profile_removed.years'.tr(),
-      'icon': AppIcons.experience,
-    },
-  ];
+  const VolunteerProfileCard({super.key, required this.profile});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +29,40 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
         ? AppColors.grey900.withValues(alpha: .25)
         : AppColors.grey300.withValues(alpha: .2);
 
+    final languages = profile?.languages ?? [];
+    final skills = profile?.skills ?? [];
+
+    final items = [
+      {
+        'title': 'volunteer.profile.blood_type'.tr(),
+        'value': profile?.bloodGroup?.trim().isNotEmpty == true
+            ? profile!.bloodGroup!
+            : '-',
+        'icon': AppIcons.blood,
+      },
+      {
+        'title': 'volunteer.profile.profession'.tr(),
+        'value': profile?.profession?.trim().isNotEmpty == true
+            ? profile!.profession!
+            : '-',
+        'icon': AppIcons.business,
+      },
+      {
+        'title': 'volunteer.profile.own_vehicle'.tr(),
+        'value': profile?.ownVehicle == true
+            ? 'volunteer.profile.yes'.tr()
+            : 'volunteer.profile.no'.tr(),
+        'icon': AppIcons.car,
+      },
+      {
+        'title': 'volunteer.profile.exp'.tr(),
+        'value': '${profile?.emergencyExperience ?? 0}',
+        'icon': AppIcons.experience,
+      },
+    ];
+
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(24),
@@ -81,6 +89,8 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
           ),
 
           SizedBox(height: AppSize.getHeight(16)),
+
+          // Profile basic information
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -89,17 +99,20 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
               crossAxisCount: 2,
               crossAxisSpacing: AppSize.getWidth(10),
               mainAxisSpacing: AppSize.getHeight(10),
-              childAspectRatio: 2.8,
+              mainAxisExtent: AppSize.getHeight(62),
             ),
             itemBuilder: (context, index) {
               final item = items[index];
+
               return Container(
+                width: double.infinity,
                 decoration: BoxDecoration(
                   color: itemBackground,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                padding: AppSize.padding(vertical: 10, horizontal: 15),
+                padding: AppSize.padding(vertical: 8, horizontal: 12),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
                       width: AppSize.getWidth(30),
@@ -116,29 +129,38 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
                         ),
                       ),
                     ),
-                    SizedBox(width: AppSize.getWidth(10)),
+
+                    SizedBox(width: AppSize.getWidth(8)),
+
                     Expanded(
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Text(
-                              item['title'] as String,
-                              style: TextStyle(
-                                color: secondaryTextColor,
-                                fontWeight: FontWeight.w300,
-                                fontSize: AppSize.font(11),
-                              ),
+                          Text(
+                            item['title'] as String,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: secondaryTextColor,
+                              fontWeight: FontWeight.w300,
+                              fontSize: AppSize.font(11),
+                              height: 1.1,
                             ),
                           ),
 
+                          SizedBox(height: AppSize.getHeight(3)),
+
                           Text(
                             item['value'] as String,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: textColor,
                               fontSize: AppSize.font(14),
                               fontWeight: FontWeight.w600,
+                              height: 1.1,
                             ),
                           ),
                         ],
@@ -150,115 +172,99 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
             },
           ),
 
-          SizedBox(height: AppSize.getHeight(16)),
-          Row(
-            children: [
-              CustomIcon(
-                icon: AppIcons.language,
-                color: secondaryTextColor,
-                width: AppSize.getSize(18),
-                height: AppSize.getSize(18),
-              ),
+          // Languages
+          if (languages.isNotEmpty) ...[
+            SizedBox(height: AppSize.getHeight(16)),
 
-              SizedBox(width: AppSize.getWidth(5)),
-
-              Text(
-                'volunteer.profile.language'.tr(),
-
-                style: TextStyle(
+            Row(
+              children: [
+                CustomIcon(
+                  icon: AppIcons.language,
                   color: secondaryTextColor,
-                  fontSize: AppSize.font(13),
-                  fontWeight: FontWeight.w500,
+                  width: AppSize.getSize(18),
+                  height: AppSize.getSize(18),
                 ),
-              ),
-            ],
-          ),
 
-          SizedBox(height: AppSize.getHeight(10)),
+                SizedBox(width: AppSize.getWidth(5)),
 
-          Row(
-            children: [
-              ...List.generate(
-                3,
-                (index) => Padding(
-                  padding: AppSize.padding(end: AppSize.getWidth(5)),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(
-                        alpha: isDark ? .2 : .1,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: AppSize.padding(vertical: 5, horizontal: 13),
-                    child: Text(
-                      'English',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: AppSize.font(12),
-                        fontWeight: FontWeight.w500,
-                      ),
+                Expanded(
+                  child: Text(
+                    'volunteer.profile.language'.tr(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: secondaryTextColor,
+                      fontSize: AppSize.font(13),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
 
-          SizedBox(height: AppSize.getHeight(16)),
+            SizedBox(height: AppSize.getHeight(10)),
 
-          Row(
-            children: [
-              CustomIcon(
-                icon: AppIcons.skills,
-                color: secondaryTextColor,
-                width: AppSize.getSize(14),
-                height: AppSize.getSize(14),
-              ),
+            Wrap(
+              spacing: AppSize.getWidth(5),
+              runSpacing: AppSize.getHeight(5),
+              children: languages.map((language) {
+                return _Tag(
+                  text: language,
+                  color: AppColors.primary,
+                  isDark: isDark,
+                );
+              }).toList(),
+            ),
+          ],
 
-              SizedBox(width: AppSize.getWidth(5)),
+          // Skills
+          if (skills.isNotEmpty) ...[
+            SizedBox(height: AppSize.getHeight(16)),
 
-              Text(
-                'volunteer.profile.skills_certifications'.tr(),
-                style: TextStyle(
+            Row(
+              children: [
+                CustomIcon(
+                  icon: AppIcons.skills,
                   color: secondaryTextColor,
-                  fontSize: AppSize.font(13),
-                  fontWeight: FontWeight.w500,
+                  width: AppSize.getSize(14),
+                  height: AppSize.getSize(14),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: AppSize.getHeight(10)),
 
-          Row(
-            children: [
-              ...List.generate(
-                3,
-                (index) => Padding(
-                  padding: AppSize.padding(end: AppSize.getWidth(5)),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.laserBlue.withValues(
-                        alpha: isDark ? .2 : .1,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: AppSize.padding(vertical: 5, horizontal: 13),
-                    child: Text(
-                      'English',
-                      style: TextStyle(
-                        color: AppColors.laserBlue,
-                        fontSize: AppSize.font(12),
-                        fontWeight: FontWeight.w500,
-                      ),
+                SizedBox(width: AppSize.getWidth(5)),
+
+                Expanded(
+                  child: Text(
+                    'volunteer.profile.skills_certifications'.tr(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: secondaryTextColor,
+                      fontSize: AppSize.font(13),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+
+            SizedBox(height: AppSize.getHeight(10)),
+
+            Wrap(
+              spacing: AppSize.getWidth(5),
+              runSpacing: AppSize.getHeight(5),
+              children: skills.map((skill) {
+                return _Tag(
+                  text: skill,
+                  color: AppColors.laserBlue,
+                  isDark: isDark,
+                );
+              }).toList(),
+            ),
+          ],
 
           SizedBox(height: AppSize.getHeight(16)),
 
+          // Edit button
           CustomButton(
             onTap: () {
               AppNavigator.push(EditVolunteerProfileScreen());
@@ -270,6 +276,35 @@ class _VolunteerProfileCardState extends State<VolunteerProfileCard> {
             textSize: AppSize.font(13),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _Tag extends StatelessWidget {
+  final String text;
+  final Color color;
+  final bool isDark;
+
+  const _Tag({required this.text, required this.color, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: isDark ? .2 : .1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: AppSize.padding(vertical: 5, horizontal: 13),
+      child: Text(
+        text,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: color,
+          fontSize: AppSize.font(12),
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }

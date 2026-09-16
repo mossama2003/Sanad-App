@@ -132,6 +132,49 @@ class CaseListItemModel {
   final String? note;
   final bool active;
 
+  CaseListItemModel copyWith({
+    Creator? creator,
+    CasePaymentDetails? paymentDetails,
+    int? comments,
+    int? likers,
+    bool? isLiked,
+    List<CaseAttachment>? attachments,
+    DateTime? created,
+    DateTime? modified,
+    String? name,
+    String? description,
+    String? category,
+    String? urgency,
+    String? contactName,
+    String? contactPhone,
+    dynamic info,
+    bool? verified,
+    String? note,
+    bool? active,
+  }) {
+    return CaseListItemModel(
+      id: id,
+      creator: creator ?? this.creator,
+      paymentDetails: paymentDetails ?? this.paymentDetails,
+      comments: comments ?? this.comments,
+      likers: likers ?? this.likers,
+      isLiked: isLiked ?? this.isLiked,
+      attachments: attachments ?? this.attachments,
+      created: created ?? this.created,
+      modified: modified ?? this.modified,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      urgency: urgency ?? this.urgency,
+      contactName: contactName ?? this.contactName,
+      contactPhone: contactPhone ?? this.contactPhone,
+      info: info ?? this.info,
+      verified: verified ?? this.verified,
+      note: note ?? this.note,
+      active: active ?? this.active,
+    );
+  }
+
   factory CaseListItemModel.fromJson(Map<String, dynamic> json) {
     return CaseListItemModel(
       id: json['id'],
@@ -164,6 +207,54 @@ class CaseListItemModel {
       creator: creator,
       paymentDetails: paymentDetails,
       comments: comments + 1,
+      likers: likers,
+      isLiked: isLiked,
+      attachments: attachments,
+      created: created,
+      modified: modified,
+      name: name,
+      description: description,
+      category: category,
+      urgency: urgency,
+      contactName: contactName,
+      contactPhone: contactPhone,
+      info: info,
+      verified: verified,
+      note: note,
+      active: active,
+    );
+  }
+
+  CaseListItemModel copyWithCommentsDecremented() {
+    return CaseListItemModel(
+      id: id,
+      creator: creator,
+      paymentDetails: paymentDetails,
+      comments: (comments - 1).clamp(0, 999999),
+      likers: likers,
+      isLiked: isLiked,
+      attachments: attachments,
+      created: created,
+      modified: modified,
+      name: name,
+      description: description,
+      category: category,
+      urgency: urgency,
+      contactName: contactName,
+      contactPhone: contactPhone,
+      info: info,
+      verified: verified,
+      note: note,
+      active: active,
+    );
+  }
+
+  CaseListItemModel copyWithLike({required int likers, required bool isLiked}) {
+    return CaseListItemModel(
+      id: id,
+      creator: creator,
+      paymentDetails: paymentDetails,
+      comments: comments,
       likers: likers,
       isLiked: isLiked,
       attachments: attachments,
@@ -247,6 +338,7 @@ class CaseCommentModel {
     Creator? creator,
     DateTime? created,
     DateTime? modified,
+    String? comment,
     CommentStatus? status,
   }) {
     return CaseCommentModel(
@@ -254,7 +346,7 @@ class CaseCommentModel {
       creator: creator ?? this.creator,
       created: created ?? this.created,
       modified: modified ?? this.modified,
-      comment: comment,
+      comment: comment ?? this.comment,
       status: status ?? this.status,
       localId: localId,
     );

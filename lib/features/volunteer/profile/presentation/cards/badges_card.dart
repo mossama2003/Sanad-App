@@ -6,12 +6,16 @@ import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../../shared/auth/data/models/user_profile_model.dart';
 import '../../../../shared/badges/presentation/screens/badges_screen.dart';
 
 class BadgesCard extends StatelessWidget {
-  static const _badges = ['🌱', '🩸', '🌳', '⭐', '📚', '🏥'];
+  final List<VolunteerBadgeModel> badges;
 
-  const BadgesCard({super.key});
+  const BadgesCard({
+    super.key,
+    required this.badges,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,21 +28,22 @@ class BadgesCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cardColor,
-
         borderRadius: BorderRadius.circular(24),
-
-        border: Border.all(color: textColor.withValues(alpha: .15), width: .7),
-
+        border: Border.all(
+          color: textColor.withValues(alpha: .15),
+          width: .7,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? .3 : .05),
+            color: Colors.black.withValues(
+              alpha: isDark ? .3 : .05,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       padding: AppSize.padding(all: 15),
-
       child: Column(
         children: [
           Row(
@@ -49,41 +54,33 @@ class BadgesCard extends StatelessWidget {
                 width: AppSize.getSize(20),
                 height: AppSize.getSize(20),
               ),
-
               SizedBox(width: AppSize.getWidth(5)),
-
               Text(
                 'volunteer.profile.badges'.tr(),
-
                 style: TextStyle(
                   color: textColor,
                   fontSize: AppSize.font(15),
                   fontWeight: FontWeight.w700,
                 ),
               ),
-
               const Spacer(),
-
               TextButton(
                 onPressed: () {
-                  AppNavigator.push(const BadgesScreen());
+                  AppNavigator.push(
+                    const BadgesScreen(),
+                  );
                 },
-
                 style: TextButton.styleFrom(
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  tapTargetSize:
+                  MaterialTapTargetSize.shrinkWrap,
                   padding: EdgeInsets.zero,
                 ),
-
                 child: Text(
                   'volunteer.profile.view_all'.tr(),
-
                   style: TextStyle(
                     fontSize: AppSize.font(13),
-
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: .5),
-
+                    color: theme.colorScheme.onSurface
+                        .withValues(alpha: .5),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -93,33 +90,43 @@ class BadgesCard extends StatelessWidget {
 
           SizedBox(height: AppSize.getHeight(16)),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-
-            children: _badges
-                .map(
-                  (badge) => Container(
-                    width: AppSize.getWidth(40),
-
-                    height: AppSize.getWidth(40),
-
-                    decoration: BoxDecoration(
-                      color: theme.scaffoldBackgroundColor,
-
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-
-                    alignment: Alignment.center,
-
-                    child: Text(
-                      badge,
-
-                      style: TextStyle(fontSize: AppSize.font(22)),
+          if (badges.isEmpty)
+            Padding(
+              padding: AppSize.padding(vertical: 10),
+              child: Text(
+                'volunteer.profile.no_badges'.tr(),
+                style: TextStyle(
+                  color: textColor.withValues(alpha: .5),
+                  fontSize: AppSize.font(13),
+                ),
+              ),
+            )
+          else
+            Row(
+              mainAxisAlignment:
+              MainAxisAlignment.spaceAround,
+              children: badges.take(6).map((badge) {
+                return Container(
+                  width: AppSize.getWidth(40),
+                  height: AppSize.getWidth(40),
+                  decoration: BoxDecoration(
+                    color:
+                    theme.scaffoldBackgroundColor,
+                    borderRadius:
+                    BorderRadius.circular(12),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    badge.icon?.isNotEmpty == true
+                        ? badge.icon!
+                        : '🏅',
+                    style: TextStyle(
+                      fontSize: AppSize.font(22),
                     ),
                   ),
-                )
-                .toList(),
-          ),
+                );
+              }).toList(),
+            ),
         ],
       ),
     );

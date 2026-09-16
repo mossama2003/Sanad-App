@@ -22,45 +22,51 @@ class ContactInfoCard extends StatelessWidget {
     this.location,
   });
 
-  bool get isOrganization => website != null || location != null;
+  bool get isOrganization =>
+      website != null || location != null;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark =
+        theme.brightness == Brightness.dark;
 
-    final cardColor = theme.colorScheme.surface;
-    final textColor = theme.colorScheme.onSurface;
-    final secondaryTextColor = isDark ? AppColors.grey400 : AppColors.grey600;
+    final cardColor =
+        theme.colorScheme.surface;
+
+    final textColor =
+        theme.colorScheme.onSurface;
+
+    final secondaryTextColor =
+    isDark ? AppColors.grey400 : AppColors.grey600;
 
     return Container(
       width: double.infinity,
-
       decoration: BoxDecoration(
         color: cardColor,
-
         borderRadius: BorderRadius.circular(24),
-
-        border: Border.all(color: textColor.withValues(alpha: .15), width: .7),
-
+        border: Border.all(
+          color: textColor.withValues(alpha: .15),
+          width: .7,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? .3 : .05),
+            color: Colors.black.withValues(
+              alpha: isDark ? .3 : .05,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-
       padding: AppSize.padding(all: 16),
-
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-
+        crossAxisAlignment:
+        CrossAxisAlignment.start,
         children: [
           Text(
-            'volunteer.profile.contact_information'.tr(),
-
+            'volunteer.profile.contact_information'
+                .tr(),
             style: TextStyle(
               color: textColor,
               fontSize: AppSize.font(16),
@@ -68,29 +74,36 @@ class ContactInfoCard extends StatelessWidget {
             ),
           ),
 
-          SizedBox(height: AppSize.getHeight(14)),
-
-          /// Email
-          _ContactRow(
-            icon: AppIcons.email,
-            text: email,
-            color: secondaryTextColor,
+          SizedBox(
+            height: AppSize.getHeight(14),
           ),
 
-          SizedBox(height: AppSize.getHeight(10)),
+          if (email.trim().isNotEmpty)
+            _ContactRow(
+              icon: AppIcons.email,
+              text: email,
+              color: secondaryTextColor,
+            ),
 
-          /// Phone
-          _ContactRow(
-            icon: AppIcons.phone,
-            text: phone,
-            color: secondaryTextColor,
-          ),
+          if (email.trim().isNotEmpty &&
+              phone.trim().isNotEmpty)
+            SizedBox(
+              height: AppSize.getHeight(10),
+            ),
 
-          /// Organization Extra Info
+          if (phone.trim().isNotEmpty)
+            _ContactRow(
+              icon: AppIcons.phone,
+              text: phone,
+              color: secondaryTextColor,
+            ),
+
           if (isOrganization) ...[
-            if (location != null && location!.trim().isNotEmpty) ...[
-              SizedBox(height: AppSize.getHeight(10)),
-
+            if (location != null &&
+                location!.trim().isNotEmpty) ...[
+              SizedBox(
+                height: AppSize.getHeight(10),
+              ),
               _ContactRow(
                 icon: AppIcons.location,
                 text: location!,
@@ -98,9 +111,11 @@ class ContactInfoCard extends StatelessWidget {
               ),
             ],
 
-            if (website != null && website!.trim().isNotEmpty) ...[
-              SizedBox(height: AppSize.getHeight(10)),
-
+            if (website != null &&
+                website!.trim().isNotEmpty) ...[
+              SizedBox(
+                height: AppSize.getHeight(10),
+              ),
               _ContactRow(
                 icon: AppIcons.website,
                 text: website!,
@@ -128,6 +143,8 @@ class _ContactRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment:
+      CrossAxisAlignment.start,
       children: [
         CustomIcon(
           icon: icon,
@@ -135,10 +152,19 @@ class _ContactRow extends StatelessWidget {
           width: AppSize.getWidth(18),
           height: AppSize.getHeight(18),
         ),
-        SizedBox(width: AppSize.getHeight(10)),
-        Text(
-          text,
-          style: TextStyle(fontSize: AppSize.font(13), color: color),
+
+        SizedBox(
+          width: AppSize.getWidth(10),
+        ),
+
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: AppSize.font(13),
+              color: color,
+            ),
+          ),
         ),
       ],
     );

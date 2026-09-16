@@ -8,6 +8,7 @@
     "yes": "أيوه",
     "cancel": "إلغاء",
     "delete": "حذف",
+    "save": "حفظ",
     "time_ago": {
       "seconds": "منذ {value} ثانية",
       "minutes": "منذ {value} دقيقة",
@@ -318,21 +319,22 @@
         "raised_amount": "المبلغ المُجمّع بالفعل (اختياري)",
         "hint_raised_amount": "اتركه فارغًا لو مفيش"
       },
+      "edit": {
+        "title": "تعديل الحالة",
+        "desc": "قم بتحديث بيانات الحالة والتأكد من أن جميع المعلومات محدثة.",
+        "button": "تحديث الحالة"
+      },
       "comments": {
         "title": "التعليقات",
         "hint": "اكتب تعليقًا...",
-        "no_comments": "لا توجد تعليقات بعد.\nكن أول من يترك تعليق!"
+        "no_comments": "لا توجد تعليقات بعد.\nكن أول من يترك تعليق!",
+        "edit": "تعديل التعليق",
+        "delete": "حذف",
+        "comment_updated": "تم تعديل التعليق",
+        "comment_deleted": "تم حذف التعليق",
+        "confirm_delete_title": "حذف التعليق؟",
+        "confirm_delete_desc": "لا يمكن التراجع عن هذا الإجراء."
       }
-    },
-    "cases_removed": {
-      "days_Ago": "منذ يومين",
-      "family_displaced_by_fire": "عائلة فقدت منزلها بسبب حريق",
-      "a_family_of_6_lost": "عائلة مكونة من 6 أفراد فقدت منزلها بسبب حريق في منزلهم. هم بحاجة ضرورية لمأوى وملابس واحتياجات أساسية. الحريق دمر كل ممتلكاتهم وهم يقيمون حاليًا مع أقاربهم.",
-      "contact": "التواصل: محمد أحمد",
-      "national_bank": "0123456789 - البنك الأهلي المصري",
-      "mohamed": "محمد أحمد",
-      "EGP_75000": "75,000 جنيه",
-      "EGP_45000": "45,000 جنيه"
     },
     "notifications": {
       "title": "الإشعارات",
@@ -564,8 +566,12 @@
       "beach_cleanup_desc": "انضم لمجهودنا المجتمعي لتنظيف شواطئ الإسكندرية وحماية الحياة البحرية."
     },
     "profile": {
-      "verified_organization": "منظمة موثقة",
-      "social_media": "وسائل التواصل الاجتماعي"
+      "verified_organization": "منظمة موثوقة",
+      "social_media": "وسائل التواصل الاجتماعي",
+      "events_created": "الفعاليات المنشأة",
+      "volunteers_engaged": "المتطوعون المشاركون",
+      "donations_raised": "التبرعات التي تم جمعها",
+      "cases_completed": "الحالات المكتملة"
     }
   },
   "volunteer": {
@@ -799,42 +805,39 @@
       "posted": "تم النشر منذ ساعتين بواسطة الهلال الأحمر المصري"
     },
     "profile": {
-      "level": "المستوى 12",
-      "xp": "نقاط XP",
-      "streak": "سلسلة الأيام",
-      "attended": "الفعاليات اللي شاركت فيها",
+      "level": "المستوى ",
+      "xp": "نقاط الخبرة",
+      "streak": "أيام التتابع",
+      "attended": "الفعاليات التي تم حضورها",
       "donations": "إجمالي التبرعات",
-      "reliability_score": "نسبة الاعتمادية",
+      "reliability_score": "درجة الموثوقية",
       "badges": "الشارات",
       "view_all": "عرض الكل",
-      "contact_information": "بيانات التواصل",
-      "attendance_rate": "نسبة الحضور: 85%",
-      "completion_rate": "نسبة إتمام الفعاليات: 90%",
-      "emergency_response": "الاستجابة للطوارئ: 95%",
-      "org_ratings": "تقييم المنظمات: 4.5/5",
-      "priority_access": "أولوية الوصول للحالات الطارئة المهمة للمتطوعين أصحاب التقييم العالي.",
+      "contact_information": "معلومات التواصل",
+      "attendance_rate": "معدل الحضور: ",
+      "completion_rate": "معدل إتمام المهام: ",
+      "emergency_response": "معدل الاستجابة للطوارئ: ",
+      "org_ratings": "تقييمات المنظمات: ",
+      "priority_access": "أولوية الوصول إلى حالات الطوارئ الحرجة للمتطوعين الأعلى تقييمًا.",
       "volunteer_profile": "ملف المتطوع",
       "blood_type": "فصيلة الدم",
       "profession": "المهنة",
-      "own_vehicle": "عندي عربية",
-      "exp": "خبرة في الطوارئ",
-      "language": "اللغة",
+      "own_vehicle": "يمتلك مركبة",
+      "exp": "الخبرة في حالات الطوارئ",
+      "language": "اللغات",
       "skills_certifications": "المهارات والشهادات",
       "edit_volunteer_profile": "تعديل ملف المتطوع",
       "past_roles": "الأدوار السابقة",
-      "past_roles_desc": "الأدوار اللي اتكلفت بيها في شاتات الفعاليات محفوظة هنا.",
-      "settings": "الإعدادات"
-    },
-    "profile_removed": {
-      "nurse": "ممرض",
-      "yes": "أيوه",
-      "years": "3 سنين",
-      "team_lead": "قائد فريق",
-      "beach_cleanup": "حملة تنظيف الشاطئ",
-      "event_date1": "نوفمبر 2025",
-      "first_aid": "إسعافات أولية",
-      "blood_donation": "حملة التبرع بالدم",
-      "event_date2": "أكتوبر 2025"
+      "past_roles_desc": "يتم حفظ الأدوار التي تم تكليفك بها في محادثات الفعاليات هنا.",
+      "settings": "الإعدادات",
+      "no_badges": "لا توجد شارات حتى الآن",
+      "no_roles": "لا توجد أدوار سابقة حتى الآن",
+      "cases_engagement": "المشاركة في الحالات",
+      "donations_engagement": "المشاركة في التبرعات",
+      "available": "متاح",
+      "not_available": "غير متاح",
+      "yes": "نعم",
+      "no": "لا"
     },
     "edit_profile": {
       "appbar": "تعديل الملف الشخصي",
