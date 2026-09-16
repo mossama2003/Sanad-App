@@ -42,6 +42,15 @@
   },
   "validators": {
     "required": "* Required",
+    "instapay": {
+      "invalid": "Enter a valid Instapay link"
+    },
+    "iban": {
+      "must_start_eg": "IBAN must start with EG",
+      "length": "IBAN must be 29 characters",
+      "invalid": "Enter a valid IBAN format",
+      "checksum": "This IBAN number is invalid"
+    },
     "email": {
       "required": "* Required",
       "pattern": "Please enter a valid email address."
@@ -75,7 +84,8 @@
     },
     "phone": {
       "required": "* Required",
-      "invalid": "Invalid phone number"
+      "invalid": "Invalid phone number",
+      "egyptian_invalid": "Enter a valid Egyptian phone number (11 digits)"
     },
     "OTP": {
       "required": "* Required",
@@ -229,23 +239,38 @@
     "cases": {
       "title": "Urgent Cases",
       "desc": "Verified cases needing immediate support",
-      "all_cases_are_verified": "All cases are verified",
-      "our_team_verifies_every_case": "Our team verifies every case before publishing to ensure authenticity.",
+      "all_cases_are_verified": "Verified & Unverified Cases",
+      "our_team_verifies_every_case": "Some cases are verified by our team, while others are still pending verification.",
       "button": "Submit a Case for Review",
+      "case_created_successfully": "Case created successfully",
+      "all_cases": "All Cases",
+      "my_cases": "My Cases",
+      "no_cases": "No cases found",
       "card": {
         "verified": "Verified",
         "urgent": "Urgent",
         "required": "Required",
         "raised": "Raised",
-        "button": "Support This Case"
+        "share": "Share",
+        "button": "Support This Case",
+        "delete": "Delete",
+        "case_deleted_successfully": "Case deleted successfully",
+        "confirm_delete_title": "Delete Case?",
+        "confirm_delete_desc": "This action cannot be undone. Are you sure you want to delete this case?"
       },
       "pop_up": {
         "contact_person": "Contact Person",
         "phone": "Phone",
         "bank_account": "Bank Account",
+        "instapay_link": "Instapay Link",
+        "wallet_number": "Wallet Number",
+        "payment_details": "Payment Details",
         "you_can_support": "You can support this case by contacting directly or making a donation to the provided bank account.",
         "close": "Close",
-        "call_now": "Call Now"
+        "call_now": "Call Now",
+        "cant_call": "Unable to make a call on this device",
+        "cant_open_link": "Unable to open this link",
+        "copied": "Copied to clipboard"
       },
       "submit": {
         "title": "Submit Case for Review",
@@ -281,7 +306,21 @@
         "note_label": "Note:",
         "note_text": "By submitting this case, you confirm that all information provided is accurate and truthful. False or misleading information may result in account suspension.",
         "cancel_button": "Cancel",
-        "submit_button": "Submit for Review"
+        "submit_button": "Submit for Review",
+        "payment_type_instapay": "Instapay",
+        "payment_type_wallet": "Wallet",
+        "payment_type_bank_account": "Bank Account",
+        "instapay_link": "Instapay Link",
+        "hint_instapay_link": "Paste your Instapay payment link",
+        "wallet_phone": "Wallet Phone Number",
+        "iban": "IBAN",
+        "raised_amount": "Amount Already Raised (Optional)",
+        "hint_raised_amount": "Leave empty if none"
+      },
+      "comments": {
+        "title": "Comments",
+        "hint": "Write a comment...",
+        "no_comments": "No comments yet.\nBe the first to comment!"
       }
     },
     "cases_removed": {

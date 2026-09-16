@@ -67,6 +67,8 @@ dependencies:
   audioplayers: ^6.8.1
   flutter_linkify: ^6.0.0
   equatable: ^2.1.0
+  file_picker: ^12.3.0
+  cached_network_image: ^4.0.0
 
   #Caching
   hive: ^2.2.3
@@ -99,4 +101,3 @@ flutter:
     - assets/lottie/coming_soon.json
     - assets/sounds/message_received.mp3
     - assets/sounds/message_send.mp3
-

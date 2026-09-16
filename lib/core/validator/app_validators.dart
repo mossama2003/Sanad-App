@@ -221,6 +221,25 @@ class AppValidators {
     }
   }
 
+  /// REQUIRED POSITIVE DECIMAL AMOUNT VALIDATION
+  static String? requiredAmount(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'validators.required'.tr();
+    }
+
+    final amount = double.tryParse(value.trim());
+
+    if (amount == null) {
+      return 'validators.numbers.only'.tr();
+    }
+
+    if (amount <= 0) {
+      return 'validators.numbers.greater_than'.tr(namedArgs: {'min': '0'});
+    }
+
+    return null;
+  }
+
   /// OTP VALIDATION
   static String? otp(String? value) {
     if (value == null || value.isEmpty) {
@@ -266,5 +285,81 @@ class AppValidators {
     }
 
     return null;
+  }
+
+  /// INSTAPAY LINK VALIDATION
+  static String? instapayLink(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'validators.required'.tr();
+    }
+
+    final instapayRegex = RegExp(
+      r'^(https?://)?(www\.)?ipn\.eg/S/[\w.\-]+/instapay/[\w\-]+/?$',
+      caseSensitive: false,
+    );
+
+    if (!instapayRegex.hasMatch(value.trim())) {
+      return 'validators.instapay.invalid'.tr();
+    }
+
+    return null;
+  }
+
+  /// EGYPTIAN PHONE VALIDATION (WALLET) — 11 digits, starts 010/011/012/015
+  static String? egyptianPhone(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'validators.required'.tr();
+    }
+
+    final cleaned = value.trim();
+
+    if (!RegExp(r'^01[0125]\d{8}$').hasMatch(cleaned)) {
+      return 'validators.phone.egyptian_invalid'.tr();
+    }
+
+    return null;
+  }
+
+  /// EGYPTIAN IBAN VALIDATION — EG + 27 digits = 29 chars, + MOD-97 checksum
+  static String? egyptianIban(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'validators.required'.tr();
+    }
+
+    final cleaned = value.trim().toUpperCase().replaceAll(' ', '');
+
+    if (!cleaned.startsWith('EG')) {
+      return 'validators.iban.must_start_eg'.tr();
+    }
+
+    if (cleaned.length != 29) {
+      return 'validators.iban.length'.tr();
+    }
+
+    if (!RegExp(r'^EG\d{27}$').hasMatch(cleaned)) {
+      return 'validators.iban.invalid'.tr();
+    }
+
+    if (!_ibanChecksumValid(cleaned)) {
+      return 'validators.iban.checksum'.tr();
+    }
+
+    return null;
+  }
+
+  /// MOD-97 IBAN CHECKSUM (STANDARD ALGORITHM)
+  static bool _ibanChecksumValid(String iban) {
+    final rearranged = iban.substring(4) + iban.substring(0, 4);
+
+    final numericString = rearranged.split('').map((c) {
+      if (RegExp(r'[A-Z]').hasMatch(c)) {
+        return (c.codeUnitAt(0) - 55).toString();
+      }
+      return c;
+    }).join();
+
+    BigInt number = BigInt.parse(numericString);
+
+    return number % BigInt.from(97) == BigInt.one;
   }
 }

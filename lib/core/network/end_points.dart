@@ -27,6 +27,19 @@ String GET_EVENTS = 'v1/events/read_event/';
 
 String EVENT_QR(int ID) => 'v1/events/read_event/$ID/';
 
+String CREATE_CASE = 'v1/cases/manage_case/';
+
+String GET_CASES(bool me) => 'v1/cases/read_case/?me=$me';
+
+String GET_CASE_COMMENTS(int caseId) => 'v1/cases/case_comments/?case=$caseId';
+
+String ADD_CASE_COMMENT = 'v1/cases/case_comments/';
+
+String GET_CASE_CHAT_TOKEN(int caseId) =>
+    'v1/cases/read_case/$caseId/chat_token/';
+
+String DELETE_CASE(int id) => 'v1/cases/manage_case/$id/';
+
 /// Chat
 String GET_CHAT_TOKEN(int eventId) =>
     'v1/events/read_event/$eventId/chat_token/';

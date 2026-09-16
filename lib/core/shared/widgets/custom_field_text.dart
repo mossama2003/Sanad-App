@@ -36,10 +36,11 @@ class CustomFieldText extends StatelessWidget {
     this.titleColor,
     this.titleSize,
     this.borderRadius,
+    this.prefixText,
   });
 
   final TextEditingController controller;
-  final FocusNode? focusNode; // 👈 جديد
+  final FocusNode? focusNode;
 
   final bool iconColor;
   final Color? bgColor;
@@ -77,6 +78,7 @@ class CustomFieldText extends StatelessWidget {
   final Color? titleColor;
   final double? titleSize;
   final double? borderRadius;
+  final String? prefixText;
 
   @override
   Widget build(BuildContext context) {
@@ -141,6 +143,12 @@ class CustomFieldText extends StatelessWidget {
             fillColor: bgColor ?? Theme.of(context).cardColor,
             hintText: hintText ?? labelText ?? '',
             hintStyle: TextStyle(color: hintColor, fontSize: AppSize.font(12)),
+            prefixText: prefixText,
+            prefixStyle: TextStyle(
+              color: textColor,
+              fontSize: AppSize.font(14),
+              fontWeight: FontWeight.w600,
+            ),
             contentPadding: padding,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(radius),

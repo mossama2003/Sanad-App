@@ -261,7 +261,7 @@ class _EventDetailsCard extends StatelessWidget {
           SizedBox(height: AppSize.getHeight(10)),
 
           _EventDetailItem(
-            icon: AppIcons.phone,
+            icon: AppIcons.mobile,
             title: 'volunteer.events.bottom_sheet.phone'.tr(),
             value: event.creator?['phone'] ?? '-',
             isClickable: true,
@@ -287,16 +287,13 @@ class _EventDetailsCard extends StatelessWidget {
 }
 
 class _EventImage extends StatelessWidget {
-  const _EventImage({
-    required this.imageUrl,
-  }); // 👈 شلنا onClose من الـ constructor
+  const _EventImage({required this.imageUrl});
 
   final String? imageUrl;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      // 👈 مبقاش محتاج Stack هنا خالص، الـ close button طلع برا
       height: AppSize.getHeight(250),
       width: double.infinity,
       child: imageUrl != null && imageUrl!.isNotEmpty
@@ -420,10 +417,11 @@ class _EventDetailItem extends StatelessWidget {
 
                       if (isClickable)
                         Padding(
-                          padding: EdgeInsets.only(left: AppSize.getWidth(6)),
-                          child: Icon(
-                            Icons.phone,
-                            size: AppSize.getSize(16),
+                          padding: AppSize.padding(start: AppSize.getWidth(6)),
+                          child: CustomIcon(
+                            icon: AppIcons.call,
+                            width: AppSize.getSize(16),
+                            height: AppSize.getSize(16),
                             color: AppColors.primary,
                           ),
                         ),

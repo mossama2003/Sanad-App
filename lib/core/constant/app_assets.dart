@@ -66,6 +66,8 @@ class AppIcons {
   static String chat = '$icons/chat.svg';
   static String check = '$icons/check.svg';
   static String phone = '$icons/phone.svg';
+  static String mobile = '$icons/mobile.svg';
+  static String call = '$icons/call.svg';
   static String creditCard = '$icons/credit-card.svg';
   static String share = '$icons/share.svg';
   static String emergency = '$icons/emergency.svg';
@@ -126,4 +128,8 @@ class AppIcons {
   static String googleMaps = '$icons/google-maps.svg';
   static String usaFlag = '$icons/USA-flag.svg';
   static String egyptFlag = '$icons/EGY-flag.svg';
+  static String instapay = '$icons/instapay.svg';
+  static String bank = '$icons/bank.svg';
+  static String wallet = '$icons/wallet.svg';
+  static String copy = '$icons/copy.svg';
 }
