@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/shared/widgets/custom_button.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
+import '../../data/helper/case_attachment_helpers.dart';
 import '../dialogs/case_comments_bottom_sheet.dart';
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
@@ -41,9 +44,10 @@ class CasesCard extends StatelessWidget {
     return (_progressValue * 100).toStringAsFixed(0);
   }
 
-  String get _thumbnailUrl => caseItem.attachments.isNotEmpty
-      ? caseItem.attachments.first.attachment.url
-      : '';
+  List<String> get _imageUrls => caseItem.attachments
+      .where(isImageAttachment)
+      .map((a) => a.attachment.url)
+      .toList();
 
   bool get _hasPayment => caseItem.paymentDetails.estimatedAmount > 0;
 
@@ -85,34 +89,9 @@ class CasesCard extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: AppColors.grey.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: _thumbnailUrl.isNotEmpty
-                      ? CachedNetworkImage(
-                          imageUrl: _thumbnailUrl,
-                          width: double.infinity,
-                          height: AppSize.getHeight(180),
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            height: AppSize.getHeight(180),
-                            color: AppColors.grey300,
-                          ),
-                          errorWidget: (context, url, error) => Image.asset(
-                            AppImages.casesImage,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : Image.asset(
-                          AppImages.casesImage,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                ),
+                // 👇 السلايدر بدل الصورة المفردة
+                _CaseImageCarousel(imageUrls: _imageUrls),
+
                 Positioned(
                   bottom: AppSize.getHeight(10),
                   right: AppSize.getWidth(10),
@@ -516,7 +495,6 @@ class CasesCard extends StatelessWidget {
 
                     // ================= EDIT & DELETE =================
                     if (isOwner) ...[
-                      // EDIT
                       InkWell(
                         onTap: onEdit,
                         child: Container(
@@ -542,7 +520,6 @@ class CasesCard extends StatelessWidget {
 
                       SizedBox(width: AppSize.getWidth(5)),
 
-                      // DELETE
                       InkWell(
                         onTap: onDelete,
                         child: Container(
@@ -587,6 +564,141 @@ class CasesCard extends StatelessWidget {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Image Carousel
+// ─────────────────────────────────────────────────────────────────────────────
+class _CaseImageCarousel extends StatefulWidget {
+  final List<String> imageUrls;
+
+  const _CaseImageCarousel({required this.imageUrls});
+
+  @override
+  State<_CaseImageCarousel> createState() => _CaseImageCarouselState();
+}
+
+class _CaseImageCarouselState extends State<_CaseImageCarousel> {
+  late final PageController _pageController;
+  Timer? _autoScrollTimer;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+
+    if (widget.imageUrls.length > 1) {
+      _startAutoScroll();
+    }
+  }
+
+  void _startAutoScroll() {
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted || !_pageController.hasClients) return;
+
+      final nextPage = (_currentPage + 1) % widget.imageUrls.length;
+
+      _pageController.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _autoScrollTimer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.imageUrls.isEmpty) {
+      return Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
+        ),
+        child: Image.asset(
+          AppImages.casesImage,
+          width: double.infinity,
+          height: AppSize.getHeight(180),
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: AppSize.getHeight(180),
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            itemCount: widget.imageUrls.length,
+            onPageChanged: (index) {
+              setState(() => _currentPage = index);
+            },
+            itemBuilder: (context, index) {
+              return Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: AppColors.grey.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: CachedNetworkImage(
+                  imageUrl: widget.imageUrls[index],
+                  width: double.infinity,
+                  height: AppSize.getHeight(180),
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    height: AppSize.getHeight(180),
+                    color: AppColors.grey300,
+                  ),
+                  errorWidget: (context, url, error) => Image.asset(
+                    AppImages.casesImage,
+                    width: double.infinity,
+                    height: AppSize.getHeight(180),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // Dots indicator
+          if (widget.imageUrls.length > 1)
+            Padding(
+              padding: AppSize.padding(bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(widget.imageUrls.length, (index) {
+                  final isActive = index == _currentPage;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    margin: EdgeInsets.symmetric(
+                      horizontal: AppSize.getWidth(3),
+                    ),
+                    width: isActive
+                        ? AppSize.getWidth(16)
+                        : AppSize.getWidth(6),
+                    height: AppSize.getHeight(6),
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? AppColors.white
+                          : AppColors.white.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  );
+                }),
+              ),
+            ),
         ],
       ),
     );

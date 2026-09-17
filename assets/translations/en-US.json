@@ -271,7 +271,8 @@
         "call_now": "Call Now",
         "cant_call": "Unable to make a call on this device",
         "cant_open_link": "Unable to open this link",
-        "copied": "Copied to clipboard"
+        "copied": "Copied to clipboard",
+        "documents": "Documents"
       },
       "submit": {
         "title": "Submit Case for Review",
@@ -316,7 +317,9 @@
         "wallet_phone": "Wallet Phone Number",
         "iban": "IBAN",
         "raised_amount": "Amount Already Raised (Optional)",
-        "hint_raised_amount": "Leave empty if none"
+        "hint_raised_amount": "Leave empty if none",
+        "add_file": "Add",
+        "optional": "Optional"
       },
       "edit": {
         "title": "Edit Case",
@@ -858,10 +861,13 @@
       "available_for_logistics": "Available for logistics tasks",
       "languages": "Languages",
       "skills_certifications": "Skills & Certifications",
+      "country": "Country",
+      "address": "Address",
       "cancel": "Cancel",
       "save_changes": "Save Changes",
       "delete_account": "Delete Account",
-      "delete_account_desc": "Are you sure you want to permanently delete your account?\n\nThis action cannot be undone. You will lose your profile, data, and all activity associated with this account."
+      "delete_account_desc": "Are you sure you want to permanently delete your account?\n\nThis action cannot be undone. You will lose your profile, data, and all activity associated with this account.",
+      "profile_updated_successfully": "Profile Update Successfully"
     }
   }
 }

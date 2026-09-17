@@ -17,13 +17,17 @@ String REFRESH_TOKEN = 'auth/token/refresh/';
 
 String LOG_OUT = 'auth/logout/';
 
+String UPDATE_ACCOUNT = 'auth/user/';
+
+String UPDATE_VOLUNTEER_PROFILE = 'v1/users/profile/update/';
+
 String DELETE_ACCOUNT = 'v1/users/profile/delete/';
 
 /// Skills
 String GET_SKILLS = 'v1/categories/select_category/';
 
 /// Both Volunteering and Organization
-///
+
 //EVENTS
 String GET_EVENTS = 'v1/events/read_event/';
 

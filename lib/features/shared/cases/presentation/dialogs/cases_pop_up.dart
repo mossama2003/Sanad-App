@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../data/helper/case_attachment_helpers.dart';
 import '../../data/models/cases_model.dart';
 import '../controllers/case_cubit.dart';
 
@@ -20,10 +21,6 @@ class CasesPopUp extends StatelessWidget {
     required this.caseItem,
     required this.casesCubit,
   });
-
-  // ---------------------------------------------------------------------------
-  // Phone
-  // ---------------------------------------------------------------------------
 
   Future<void> _callPhone(String phone) async {
     final uri = Uri(scheme: 'tel', path: phone.trim());
@@ -41,10 +38,6 @@ class CasesPopUp extends StatelessWidget {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // InstaPay
-  // ---------------------------------------------------------------------------
-
   Future<void> _openInstaPayLink(String url) async {
     final value = url.trim();
 
@@ -55,7 +48,6 @@ class CasesPopUp extends StatelessWidget {
       return;
     }
 
-    // Make sure this is an HTTPS InstaPay link.
     if (uri.scheme.toLowerCase() != 'https' ||
         uri.host.toLowerCase() != 'ipn.eg') {
       AppToast.error('shared.cases.pop_up.cant_open_link'.tr());
@@ -69,10 +61,6 @@ class CasesPopUp extends StatelessWidget {
       );
 
       if (!opened) {
-        // Fallback:
-        //
-        // If the device does not expose InstaPay as an external
-        // application handler, open the official URL normally.
         final fallbackOpened = await launchUrl(
           uri,
           mode: LaunchMode.externalApplication,
@@ -89,39 +77,25 @@ class CasesPopUp extends StatelessWidget {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Clipboard
-  // ---------------------------------------------------------------------------
-
   Future<void> _copyToClipboard(String value) async {
     await Clipboard.setData(ClipboardData(text: value));
 
     AppToast.success('shared.cases.pop_up.copied'.tr());
   }
 
-  // ---------------------------------------------------------------------------
-  // Egyptian phone formatting
-  // ---------------------------------------------------------------------------
-
   String _formatEgyptianPhone(String phone) {
     final value = phone.trim();
 
-    // +201012345678 -> 01012345678
     if (value.startsWith('+20')) {
       return '0${value.substring(3)}';
     }
 
-    // 201012345678 -> 01012345678
     if (value.startsWith('20') && value.length == 12) {
       return '0${value.substring(2)}';
     }
 
     return value;
   }
-
-  // ---------------------------------------------------------------------------
-  // InstaPay validation
-  // ---------------------------------------------------------------------------
 
   bool get _isValidInstaPayLink {
     final description = caseItem.paymentDetails.description;
@@ -140,10 +114,6 @@ class CasesPopUp extends StatelessWidget {
         uri.host.toLowerCase() == 'ipn.eg';
   }
 
-  // ---------------------------------------------------------------------------
-  // Payment label
-  // ---------------------------------------------------------------------------
-
   String get _paymentLabel {
     switch (caseItem.paymentDetails.paymentType) {
       case 'instapay':
@@ -160,16 +130,11 @@ class CasesPopUp extends StatelessWidget {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Payment value
-  // ---------------------------------------------------------------------------
-
   Widget _paymentValueWidget() {
     final rawValue = caseItem.paymentDetails.description!.trim();
 
     final paymentType = caseItem.paymentDetails.paymentType;
 
-    // Wallet numbers are displayed in Egyptian local format.
     final value = paymentType == 'wallet'
         ? _formatEgyptianPhone(rawValue)
         : rawValue;
@@ -214,9 +179,112 @@ class CasesPopUp extends StatelessWidget {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Build
-  // ---------------------------------------------------------------------------
+  // 👇 جديد — بيتحكم في ظهور كارد Required/Raised بالكامل
+  bool get _hasPaymentAmounts =>
+      caseItem.paymentDetails.estimatedAmount > 0 ||
+      caseItem.paymentDetails.raisedAmount > 0;
+
+  List<CaseAttachment> get _documentAttachments =>
+      caseItem.attachments.where((a) => !isImageAttachment(a)).toList();
+
+  Future<void> _openDocument(String url) async {
+    final uri = Uri.tryParse(url);
+
+    if (uri == null) {
+      AppToast.error('shared.cases.pop_up.cant_open_link'.tr());
+      return;
+    }
+
+    try {
+      final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+      if (!opened) {
+        AppToast.error('shared.cases.pop_up.cant_open_link'.tr());
+      }
+    } catch (e) {
+      debugPrint('Failed to open document: $e');
+      AppToast.error('shared.cases.pop_up.cant_open_link'.tr());
+    }
+  }
+
+  IconData _iconForDocument(String contentType) {
+    switch (contentType.toLowerCase()) {
+      case 'pdf':
+        return Icons.picture_as_pdf_outlined;
+      case 'doc':
+      case 'docx':
+        return Icons.description_outlined;
+      default:
+        return Icons.insert_drive_file_outlined;
+    }
+  }
+
+  Widget _documentsSection() {
+    final documents = _documentAttachments;
+
+    if (documents.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      padding: AppSize.padding(all: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: AppColors.grey50,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'shared.cases.pop_up.documents'.tr(),
+            style: TextStyle(
+              fontSize: AppSize.font(13),
+              fontWeight: FontWeight.w700,
+              color: AppColors.black,
+            ),
+          ),
+          SizedBox(height: AppSize.getHeight(10)),
+          for (int i = 0; i < documents.length; i++) ...[
+            GestureDetector(
+              onTap: () => _openDocument(documents[i].attachment.url),
+              child: Row(
+                children: [
+                  Icon(
+                    _iconForDocument(documents[i].attachment.contentType),
+                    color: AppColors.laserBlue,
+                    size: AppSize.getSize(20),
+                  ),
+                  SizedBox(width: AppSize.getWidth(10)),
+                  Expanded(
+                    child: Text(
+                      documents[i].attachment.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: AppSize.font(13),
+                        color: AppColors.laserBlue,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.laserBlue,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: AppSize.getWidth(6)),
+                  Text(
+                    documents[i].attachment.size,
+                    style: TextStyle(
+                      fontSize: AppSize.font(11),
+                      color: AppColors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (i < documents.length - 1)
+              SizedBox(height: AppSize.getHeight(10)),
+          ],
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -232,10 +300,6 @@ class CasesPopUp extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ----------------------------------------------------------------
-              // Case name
-              // ----------------------------------------------------------------
-
               Text(
                 caseItem.name,
                 style: TextStyle(
@@ -247,9 +311,6 @@ class CasesPopUp extends StatelessWidget {
 
               SizedBox(height: AppSize.getHeight(10)),
 
-              // ----------------------------------------------------------------
-              // Case description
-              // ----------------------------------------------------------------
               if (caseItem.description.isNotEmpty) ...[
                 Text(
                   caseItem.description,
@@ -263,9 +324,6 @@ class CasesPopUp extends StatelessWidget {
                 SizedBox(height: AppSize.getHeight(15)),
               ],
 
-              // ----------------------------------------------------------------
-              // Contact + Payment
-              // ----------------------------------------------------------------
               Container(
                 width: double.infinity,
                 padding: AppSize.padding(all: 12),
@@ -276,10 +334,6 @@ class CasesPopUp extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ==========================================================
-                    // Contact Person
-                    // ==========================================================
-
                     Text(
                       'shared.cases.pop_up.contact_person'.tr(),
                       style: TextStyle(
@@ -301,9 +355,6 @@ class CasesPopUp extends StatelessWidget {
 
                     SizedBox(height: AppSize.getHeight(10)),
 
-                    // ==========================================================
-                    // Phone
-                    // ==========================================================
                     Text(
                       'shared.cases.pop_up.phone'.tr(),
                       style: TextStyle(
@@ -349,11 +400,10 @@ class CasesPopUp extends StatelessWidget {
                       ],
                     ),
 
-                    // ==========================================================
-                    // Payment
-                    // ==========================================================
+                    // 👇 تعديل: أضفنا شرط paymentType != null
                     if (paymentDescription != null &&
-                        paymentDescription.trim().isNotEmpty) ...[
+                        paymentDescription.trim().isNotEmpty &&
+                        caseItem.paymentDetails.paymentType != null) ...[
                       SizedBox(height: AppSize.getHeight(10)),
 
                       Text(
@@ -372,81 +422,78 @@ class CasesPopUp extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: AppSize.getHeight(15)),
-
-              // ----------------------------------------------------------------
-              // Required / Raised
-              // ----------------------------------------------------------------
-              Container(
-                width: double.infinity,
-                padding: AppSize.padding(all: 12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: AppColors.grey50,
-                ),
-                child: Row(
-                  children: [
-                    // ==========================================================
-                    // Required
-                    // ==========================================================
-
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'shared.cases.card.required'.tr(),
-                            style: TextStyle(
-                              fontSize: AppSize.font(12),
-                              color: AppColors.grey700,
+              // 👇 تعديل: الكارد كله دلوقتي بشرط
+              if (_hasPaymentAmounts) ...[
+                SizedBox(height: AppSize.getHeight(15)),
+                Container(
+                  width: double.infinity,
+                  padding: AppSize.padding(all: 12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: AppColors.grey50,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'shared.cases.card.required'.tr(),
+                              style: TextStyle(
+                                fontSize: AppSize.font(12),
+                                color: AppColors.grey700,
+                              ),
                             ),
-                          ),
 
-                          SizedBox(height: AppSize.getHeight(5)),
+                            SizedBox(height: AppSize.getHeight(5)),
 
-                          Text(
-                            'EGP ${caseItem.paymentDetails.estimatedAmount.toStringAsFixed(0)}',
-                            style: TextStyle(
-                              fontSize: AppSize.font(16),
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.black,
+                            Text(
+                              'EGP ${caseItem.paymentDetails.estimatedAmount.toStringAsFixed(0)}',
+                              style: TextStyle(
+                                fontSize: AppSize.font(16),
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.black,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
 
-                    // ==========================================================
-                    // Raised
-                    // ==========================================================
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            'shared.cases.card.raised'.tr(),
-                            style: TextStyle(
-                              fontSize: AppSize.font(12),
-                              color: AppColors.grey700,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              'shared.cases.card.raised'.tr(),
+                              style: TextStyle(
+                                fontSize: AppSize.font(12),
+                                color: AppColors.grey700,
+                              ),
                             ),
-                          ),
 
-                          SizedBox(height: AppSize.getHeight(5)),
+                            SizedBox(height: AppSize.getHeight(5)),
 
-                          Text(
-                            'EGP ${caseItem.paymentDetails.raisedAmount.toStringAsFixed(0)}',
-                            style: TextStyle(
-                              fontSize: AppSize.font(16),
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
+                            Text(
+                              'EGP ${caseItem.paymentDetails.raisedAmount.toStringAsFixed(0)}',
+                              style: TextStyle(
+                                fontSize: AppSize.font(16),
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+              ],
+
+              if (_documentAttachments.isNotEmpty) ...[
+                SizedBox(height: AppSize.getHeight(15)),
+                _documentsSection(),
+              ],
             ],
           ),
         ),
