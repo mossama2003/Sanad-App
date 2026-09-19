@@ -4,7 +4,7 @@
 // String BASE_URL = 'https://wazen.telasttechnologies.com/api/';
 
 /// Production
-String BASE_URL = 'https://testapi.joinsanad.org/api/';
+String BASE_URL = 'https://api.joinsanad.org/api/';
 
 /// Auth
 String SIGN_UP = 'auth/registration/';
@@ -19,7 +19,7 @@ String LOG_OUT = 'auth/logout/';
 
 String UPDATE_ACCOUNT = 'auth/user/';
 
-String UPDATE_VOLUNTEER_PROFILE = 'v1/users/profile/update/';
+String UPDATE_PROFILE = 'v1/users/profile/update/';
 
 String DELETE_ACCOUNT = 'v1/users/profile/delete/';
 

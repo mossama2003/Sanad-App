@@ -59,6 +59,10 @@ class OrganizationProfileScreen extends StatelessWidget {
 
                   _buildDescription(context, profile),
 
+                  SizedBox(height: AppSize.getHeight(16)),
+
+                  _buildOrganizationInfo(context, profile),
+
                   SizedBox(height: AppSize.getHeight(20)),
 
                   _buildStatsGrid(context, profile),
@@ -75,9 +79,12 @@ class OrganizationProfileScreen extends StatelessWidget {
                     ].where((e) => e != null && e.trim().isNotEmpty).join(', '),
                   ),
 
-                  SizedBox(height: AppSize.getHeight(16)),
-
-                  SocialMediaCard(),
+                  if (profile?.socialMediaLinks?.isNotEmpty == true) ...[
+                    SizedBox(height: AppSize.getHeight(16)),
+                    SocialMediaCard(
+                      socialMediaLinks: profile!.socialMediaLinks!,
+                    ),
+                  ],
 
                   if (profile?.branches?.isNotEmpty == true) ...[
                     SizedBox(height: AppSize.getHeight(16)),
@@ -118,61 +125,36 @@ class OrganizationProfileScreen extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: Stack(
-            children: [
-              Container(
-                width: double.infinity,
-                height: 170,
-                color: theme.colorScheme.surfaceContainerHighest,
-                child: Center(
-                  child: CustomIcon(
-                    icon: AppIcons.uploadFile,
-                    color: theme.colorScheme.onSurface.withValues(alpha: .4),
-                    width: AppSize.getSize(35),
-                    height: AppSize.getSize(35),
+          child: SizedBox(
+            width: double.infinity,
+            height: 170,
+            child: avatar != null && avatar.isNotEmpty
+                ? Image.network(
+                    avatar,
+                    width: double.infinity,
+                    height: 170,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) {
+                      return Container(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        child: _buildAvatarInitial(organizationName),
+                      );
+                    },
+                  )
+                : Container(
+                    color: theme.colorScheme.surfaceContainerHighest,
+                    child: _buildAvatarInitial(organizationName),
                   ),
-                ),
-              ),
-
-              Positioned(
-                top: 12,
-                right: 12,
-                child: Container(
-                  width: AppSize.getSize(36),
-                  height: AppSize.getSize(36),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: theme.cardColor,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(
-                          alpha: theme.brightness == Brightness.dark ? .4 : .15,
-                        ),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: CustomIcon(
-                      icon: AppIcons.edit,
-                      color: theme.colorScheme.onSurface,
-                      width: AppSize.getSize(18),
-                      height: AppSize.getSize(18),
-                    ),
-                  ),
-                ),
-              ),
-            ],
           ),
         ),
 
+        // Avatar
         Positioned(
           bottom: -30,
           left: 16,
           child: Container(
-            width: 64,
-            height: 64,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
               color: AppColors.primary,
               borderRadius: BorderRadius.circular(16),
@@ -186,8 +168,8 @@ class OrganizationProfileScreen extends StatelessWidget {
               child: avatar != null && avatar.isNotEmpty
                   ? Image.network(
                       avatar,
-                      width: 64,
-                      height: 64,
+                      width: 75,
+                      height: 75,
                       fit: BoxFit.cover,
                       errorBuilder: (_, _, _) {
                         return _buildAvatarInitial(organizationName);
@@ -221,17 +203,19 @@ class OrganizationProfileScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: Text(
-                user?.name ?? '',
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface,
-                  fontSize: AppSize.font(20),
-                  fontWeight: FontWeight.bold,
-                ),
+            Text(
+              user?.name ?? '',
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontSize: AppSize.font(20),
+                fontWeight: FontWeight.bold,
               ),
             ),
+
+            SizedBox(width: AppSize.getSize(10)),
+
             CustomIcon(
               icon: AppIcons.verified,
               color: AppColors.primary,
@@ -417,6 +401,160 @@ class OrganizationProfileScreen extends StatelessWidget {
           }),
         ],
       ),
+    );
+  }
+
+  Widget _buildOrganizationInfo(
+    BuildContext context,
+    OrganizationProfileModel? profile,
+  ) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final bio = profile?.bio?.trim() ?? '';
+    final organizationType = profile?.organizationType?.trim() ?? '';
+    final registrationNo = profile?.registerationNo?.trim() ?? '';
+
+    // لو مفيش أي بيانات، متعرضش الكارت
+    if (bio.isEmpty && organizationType.isEmpty && registrationNo.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: AppSize.padding(all: 16),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: theme.colorScheme.onSurface.withValues(
+            alpha: isDark ? .12 : .10,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: isDark ? .35 : .15),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Organization Information',
+            style: TextStyle(
+              color: theme.colorScheme.onSurface,
+              fontSize: AppSize.font(16),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          if (bio.isNotEmpty) ...[
+            SizedBox(height: AppSize.getHeight(12)),
+
+            Text(
+              'About',
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontSize: AppSize.font(13),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            SizedBox(height: AppSize.getHeight(5)),
+
+            Text(
+              bio,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface.withValues(alpha: .65),
+                fontSize: AppSize.font(13),
+                height: 1.5,
+              ),
+            ),
+          ],
+
+          if (organizationType.isNotEmpty) ...[
+            SizedBox(height: AppSize.getHeight(14)),
+            _buildInfoRow(
+              context,
+              icon: AppIcons.organization,
+              title: 'Organization Type',
+              value: organizationType,
+            ),
+          ],
+
+          if (registrationNo.isNotEmpty) ...[
+            SizedBox(height: AppSize.getHeight(12)),
+            _buildInfoRow(
+              context,
+              icon: AppIcons.idCard,
+              title: 'Registration No.',
+              value: registrationNo,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(
+    BuildContext context, {
+    required String icon,
+    required String title,
+    required String value,
+  }) {
+    final theme = Theme.of(context);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: .10),
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: CustomIcon(
+              icon: icon,
+              width: AppSize.getSize(18),
+              height: AppSize.getSize(18),
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+
+        SizedBox(width: AppSize.getWidth(10)),
+
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface.withValues(alpha: .5),
+                  fontSize: AppSize.font(11),
+                ),
+              ),
+
+              SizedBox(height: AppSize.getHeight(2)),
+
+              Text(
+                value,
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                  fontSize: AppSize.font(13),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

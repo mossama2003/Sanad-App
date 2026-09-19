@@ -132,4 +132,10 @@ class AppIcons {
   static String bank = '$icons/bank.svg';
   static String wallet = '$icons/wallet.svg';
   static String copy = '$icons/copy.svg';
+  static String facebook = '$icons/facebook.svg';
+  static String instagram = '$icons/instagram.svg';
+  static String linkedin = '$icons/linkedin.svg';
+  static String snapchat = '$icons/snapchat.svg';
+  static String twitter = '$icons/twitter.svg';
+  static String idCard = '$icons/id-card.svg';
 }

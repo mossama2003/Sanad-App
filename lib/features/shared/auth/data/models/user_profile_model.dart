@@ -207,6 +207,10 @@ class OrganizationProfileModel extends UserProfileModel {
 
   Map<String, dynamic>? socialMediaLinks;
 
+  String? bio; // 👈 جديد
+  String? organizationType; // 👈 جديد
+  String? registerationNo; // 👈 جديد
+
   bool? canManageCases;
 
   OrganizationProfileModel({
@@ -220,6 +224,9 @@ class OrganizationProfileModel extends UserProfileModel {
     this.headquarters,
     this.branches,
     this.socialMediaLinks,
+    this.bio, // 👈 جديد
+    this.organizationType, // 👈 جديد
+    this.registerationNo, // 👈 جديد
     this.canManageCases,
     super.created,
   }) : super(type: 'organization');
@@ -243,6 +250,12 @@ class OrganizationProfileModel extends UserProfileModel {
       socialMediaLinks: json['social_media_links'] != null
           ? Map<String, dynamic>.from(json['social_media_links'])
           : null,
+      bio: json['bio'],
+      // 👈 جديد
+      organizationType: json['organization_type'],
+      // 👈 جديد
+      registerationNo: json['registeration_no'],
+      // 👈 جديد
       canManageCases: json['can_manage_cases'],
     );
   }

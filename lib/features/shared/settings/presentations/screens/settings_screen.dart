@@ -14,7 +14,8 @@ import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/shared/widgets/custom_button.dart';
 import '../../../../../core/shared/widgets/custom_switch.dart';
 import '../../../../../core/style/app_theme.dart';
-import '../../../../volunteer/edit_profile/presentations/screens/edit_volunteer_profile_screen.dart';
+import '../../../../organization/edit_profile/presentation/screens/edit_org_profile_screen.dart';
+import '../../../../volunteer/edit_profile/presentations/screens/edit_vol_profile_screen.dart';
 import '../../../auth/presentation/sign_in/screens/sign_in_screen.dart';
 import '../cards/settings_card.dart';
 
@@ -40,11 +41,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     switch (user.role) {
       case 'volunteer':
-        AppNavigator.push(const EditVolunteerProfileScreen());
+        AppNavigator.push(const EditVolProfileScreen());
         break;
 
       case 'organization':
-        // AppNavigator.push(const OrganizationEditProfileScreen());
+        AppNavigator.push(const EditOrgProfileScreen());
         break;
 
       default:

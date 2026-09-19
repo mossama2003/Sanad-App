@@ -8,7 +8,7 @@ import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../../../shared/auth/data/models/user_profile_model.dart';
-import '../../../edit_profile/presentations/screens/edit_volunteer_profile_screen.dart';
+import '../../../edit_profile/presentations/screens/edit_vol_profile_screen.dart';
 
 class VolunteerProfileCard extends StatelessWidget {
   final VolunteerProfileModel? profile;
@@ -267,7 +267,7 @@ class VolunteerProfileCard extends StatelessWidget {
           // Edit button
           CustomButton(
             onTap: () {
-              AppNavigator.push(EditVolunteerProfileScreen());
+              AppNavigator.push(EditVolProfileScreen());
             },
             height: AppSize.getHeight(35),
             bgColor: AppColors.primary.withValues(alpha: isDark ? .2 : .1),
