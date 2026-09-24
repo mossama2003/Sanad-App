@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/helper/app_navigator.dart';
@@ -78,88 +79,95 @@ class _CasesScreenState extends State<CasesScreen> {
     return BlocProvider.value(
       value: casesCubit,
       child: SingleChildScrollView(
-        child: Padding(
-          padding: AppSize.padding(horizontal: 12, vertical: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'shared.cases.title'.tr(),
-                style: TextStyle(
-                  fontSize: AppSize.font(22),
-                  fontWeight: FontWeight.w700,
-                  color: textColor,
-                ),
+        padding: AppSize.padding(
+          horizontal: AppSize.getWidth(12),
+          top: AppSize.getHeight(15),
+          bottom: AppSize.getHeight(60),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'shared.cases.title'.tr(),
+              style: TextStyle(
+                fontSize: AppSize.font(22),
+                fontWeight: FontWeight.w700,
+                color: textColor,
               ),
-              SizedBox(height: AppSize.getHeight(3)),
-              Text(
-                'shared.cases.desc'.tr(),
-                style: TextStyle(
-                  fontSize: AppSize.font(15),
-                  fontWeight: FontWeight.w300,
-                  color: secondaryColor,
-                ),
+            ),
+
+            SizedBox(height: AppSize.getHeight(3)),
+
+            Text(
+              'shared.cases.desc'.tr(),
+              style: TextStyle(
+                fontSize: AppSize.font(15),
+                fontWeight: FontWeight.w300,
+                color: secondaryColor,
               ),
-              SizedBox(height: AppSize.getHeight(15)),
+            ),
 
-              if (isOrg) ...[
-                BlocBuilder<CasesCubit, CasesState>(
-                  buildWhen: (previous, current) {
-                    return current is Success ||
-                        current is Loading ||
-                        current is Error;
-                  },
-                  builder: (context, state) {
-                    return CasesTabSelector(
-                      isMySelected: casesCubit.isMySelected,
-                      myCasesCount: casesCubit.myCasesCount,
-                      onChanged: casesCubit.switchTab,
-                    );
-                  },
-                ),
-                SizedBox(height: AppSize.getHeight(15)),
-              ],
+            SizedBox(height: AppSize.getHeight(15)),
 
-              const VerifiedInfoCard(),
-              SizedBox(height: AppSize.getHeight(15)),
-
+            if (isOrg) ...[
               BlocBuilder<CasesCubit, CasesState>(
+                buildWhen: (previous, current) {
+                  return current is Success ||
+                      current is Loading ||
+                      current is Error;
+                },
                 builder: (context, state) {
-                  if (state is Loading && casesCubit.casesList.isEmpty) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (casesCubit.casesList.isEmpty) {
-                    return Center(
-                      child: Text(
-                        'shared.cases.no_cases'.tr(),
-                        style: TextStyle(color: textColor),
-                      ),
-                    );
-                  }
-
-                  return Column(
-                    children: [
-                      for (int i = 0; i < casesCubit.casesList.length; i++) ...[
-                        CasesCard(
-                          caseItem: casesCubit.casesList[i],
-                          isOwner:
-                              isOrg &&
-                              casesCubit.casesList[i].creator.id ==
-                                  currentUserId,
-                          onDelete: () =>
-                              _confirmDelete(casesCubit.casesList[i].id),
-                          onEdit: () => _editCase(casesCubit.casesList[i]),
-                        ),
-                        if (i < casesCubit.casesList.length - 1)
-                          SizedBox(height: AppSize.getHeight(15)),
-                      ],
-                    ],
+                  return CasesTabSelector(
+                    isMySelected: casesCubit.isMySelected,
+                    myCasesCount: casesCubit.myCasesCount,
+                    onChanged: casesCubit.switchTab,
                   );
                 },
               ),
+
+              SizedBox(height: AppSize.getHeight(15)),
             ],
-          ),
+
+            const VerifiedInfoCard(),
+
+            SizedBox(height: AppSize.getHeight(15)),
+
+            BlocBuilder<CasesCubit, CasesState>(
+              builder: (context, state) {
+                if (state is Loading && casesCubit.casesList.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (casesCubit.casesList.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'shared.cases.no_cases'.tr(),
+                      style: TextStyle(color: textColor),
+                    ),
+                  );
+                }
+
+                return Column(
+                  children: [
+                    for (int i = 0; i < casesCubit.casesList.length; i++) ...[
+                      CasesCard(
+                        caseItem: casesCubit.casesList[i],
+                        isOwner:
+                            isOrg &&
+                            casesCubit.casesList[i].creator.id == currentUserId,
+                        onDelete: () =>
+                            _confirmDelete(casesCubit.casesList[i].id),
+                        onEdit: () => _editCase(casesCubit.casesList[i]),
+                      ),
+
+                      if (i < casesCubit.casesList.length - 1)
+                        SizedBox(height: AppSize.getHeight(15)),
+                    ],
+                  ],
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -201,7 +209,8 @@ class CasesTabSelector extends StatelessWidget {
           ),
           Expanded(
             child: _CasesTabItem(
-              label: '${'shared.cases.my_cases'.tr()} ($myCasesCount)',
+              label:
+                  '${'shared.cases.my_cases'.tr()} (${myCasesCount.compact})',
               isSelected: isMySelected,
               onTap: () => onChanged(true),
             ),

@@ -41,6 +41,9 @@ class _ExistingAttachment {
 }
 
 class _CasesFormState extends State<CasesForm> {
+  static const int _maxCasePhotos = 5;
+  static const int _maxSupportingDocuments = 3;
+
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController titleController = TextEditingController();
@@ -120,6 +123,7 @@ class _CasesFormState extends State<CasesForm> {
     }
 
     final paymentType = caseItem.paymentDetails.paymentType;
+
     final paymentDescription = caseItem.paymentDetails.description ?? '';
 
     switch (paymentType) {
@@ -152,6 +156,43 @@ class _CasesFormState extends State<CasesForm> {
         existingSupportingDocuments.add(existing);
       }
     }
+
+    // Safety check:
+    // لو الـ API رجع بيانات قديمة فيها أكتر من الحد المسموح،
+    // نعرض أول الملفات فقط داخل الفورم.
+    if (existingCasePhotos.length > _maxCasePhotos) {
+      existingCasePhotos = existingCasePhotos.take(_maxCasePhotos).toList();
+    }
+
+    if (existingSupportingDocuments.length > _maxSupportingDocuments) {
+      existingSupportingDocuments = existingSupportingDocuments
+          .take(_maxSupportingDocuments)
+          .toList();
+    }
+  }
+
+  int get _currentCasePhotosCount =>
+      existingCasePhotos.length + casePhotos.length;
+
+  int get _currentSupportingDocumentsCount =>
+      existingSupportingDocuments.length + supportingDocuments.length;
+
+  int get _remainingCasePhotos => _maxCasePhotos - _currentCasePhotosCount;
+
+  int get _remainingSupportingDocuments =>
+      _maxSupportingDocuments - _currentSupportingDocumentsCount;
+
+  void _showAttachmentLimitMessage({required String type, required int max}) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('You can upload a maximum of $max $type.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
   Future<File?> _cropImage(String sourcePath) async {
@@ -173,12 +214,21 @@ class _CasesFormState extends State<CasesForm> {
       ],
     );
 
-    if (croppedFile == null) return null;
+    if (croppedFile == null) {
+      return null;
+    }
 
     return File(croppedFile.path);
   }
 
   Future<void> _pickCasePhotos() async {
+    final remaining = _remainingCasePhotos;
+
+    if (remaining <= 0) {
+      _showAttachmentLimitMessage(type: 'photos', max: _maxCasePhotos);
+      return;
+    }
+
     final files = await FilePicker.pickFiles(
       type: FileType.image,
       allowMultiple: true,
@@ -186,7 +236,17 @@ class _CasesFormState extends State<CasesForm> {
 
     if (files.isEmpty) return;
 
-    final validFiles = files.where((f) => f.path != null).toList();
+    final validFiles = files
+        .where((file) => file.path != null)
+        .take(remaining)
+        .toList();
+
+    final skippedCount =
+        files.where((file) => file.path != null).length - validFiles.length;
+
+    if (skippedCount > 0) {
+      _showAttachmentLimitMessage(type: 'photos', max: _maxCasePhotos);
+    }
 
     final List<File> croppedFiles = [];
 
@@ -197,30 +257,81 @@ class _CasesFormState extends State<CasesForm> {
 
       if (cropped != null) {
         croppedFiles.add(cropped);
+
+        if (croppedFiles.length >= remaining) {
+          break;
+        }
       }
     }
 
-    if (croppedFiles.isNotEmpty) {
-      setState(() {
-        casePhotos.addAll(croppedFiles);
-      });
+    if (!mounted || croppedFiles.isEmpty) {
+      return;
     }
+
+    setState(() {
+      final availableSlots =
+          _maxCasePhotos - existingCasePhotos.length - casePhotos.length;
+
+      if (availableSlots <= 0) {
+        return;
+      }
+
+      casePhotos.addAll(croppedFiles.take(availableSlots));
+    });
   }
 
   Future<void> _pickSupportingDocuments() async {
+    final remaining = _remainingSupportingDocuments;
+
+    if (remaining <= 0) {
+      _showAttachmentLimitMessage(
+        type: 'supporting documents',
+        max: _maxSupportingDocuments,
+      );
+      return;
+    }
+
     final files = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
       allowMultiple: true,
     );
 
-    if (files.isNotEmpty) {
-      setState(() {
-        supportingDocuments.addAll(
-          files.where((f) => f.path != null).map((f) => File(f.path!)),
-        );
-      });
+    if (files.isEmpty) return;
+
+    final validFiles = files
+        .where((file) => file.path != null)
+        .take(remaining)
+        .toList();
+
+    final skippedCount =
+        files.where((file) => file.path != null).length - validFiles.length;
+
+    if (skippedCount > 0) {
+      _showAttachmentLimitMessage(
+        type: 'supporting documents',
+        max: _maxSupportingDocuments,
+      );
     }
+
+    if (!mounted || validFiles.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      final availableSlots =
+          _maxSupportingDocuments -
+          existingSupportingDocuments.length -
+          supportingDocuments.length;
+
+      if (availableSlots <= 0) {
+        return;
+      }
+
+      supportingDocuments.addAll(
+        validFiles.take(availableSlots).map((file) => File(file.path!)),
+      );
+    });
   }
 
   String _normalizeEgyptianPhone(String phone) {
@@ -249,6 +360,7 @@ class _CasesFormState extends State<CasesForm> {
     instapayLinkController.dispose();
     walletPhoneController.dispose();
     ibanController.dispose();
+
     selectedCategory.dispose();
     selectedPaymentType.dispose();
 
@@ -266,16 +378,22 @@ class _CasesFormState extends State<CasesForm> {
   String? _paymentDescriptionForType(String? type) {
     switch (type) {
       case 'instapay':
-        final v = instapayLinkController.text.trim();
-        return v.isEmpty ? null : v;
+        final value = instapayLinkController.text.trim();
+
+        return value.isEmpty ? null : value;
 
       case 'wallet':
-        final v = walletPhoneController.text.trim();
-        return v.isEmpty ? null : v;
+        final value = walletPhoneController.text.trim();
+
+        return value.isEmpty ? null : value;
 
       case 'bank_account':
-        final v = ibanController.text.trim();
-        return v.isEmpty ? null : v.toUpperCase().replaceAll(' ', '');
+        final value = ibanController.text.trim().toUpperCase().replaceAll(
+          ' ',
+          '',
+        );
+
+        return value.isEmpty ? null : value;
 
       default:
         return null;
@@ -284,6 +402,20 @@ class _CasesFormState extends State<CasesForm> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    // Final safety check before submitting.
+    if (_currentCasePhotosCount > _maxCasePhotos) {
+      _showAttachmentLimitMessage(type: 'photos', max: _maxCasePhotos);
+      return;
+    }
+
+    if (_currentSupportingDocumentsCount > _maxSupportingDocuments) {
+      _showAttachmentLimitMessage(
+        type: 'supporting documents',
+        max: _maxSupportingDocuments,
+      );
       return;
     }
 
@@ -309,9 +441,7 @@ class _CasesFormState extends State<CasesForm> {
     if (widget.isEdit) {
       CasesCubit.get(context).updateCase(id: widget.caseItem!.id, param: param);
     } else {
-      CasesCubit.get(
-        context,
-      ).createCase(param, context: context); // 👈 تعديل هنا
+      CasesCubit.get(context).createCase(param, context: context);
     }
   }
 
@@ -347,7 +477,7 @@ class _CasesFormState extends State<CasesForm> {
               hintText: 'shared.cases.submit.hint_category'.tr(),
               selected: selectedCategory,
               isRequired: true,
-              validator: (v) => AppValidators.required(v),
+              validator: (value) => AppValidators.required(value),
               items: categories,
               onChanged: (_) {},
             ),
@@ -357,9 +487,9 @@ class _CasesFormState extends State<CasesForm> {
             _UrgencySelector(
               title: 'shared.cases.submit.urgency_level'.tr(),
               selected: selectedUrgency,
-              onTap: (i) {
+              onTap: (index) {
                 setState(() {
-                  selectedUrgency = i;
+                  selectedUrgency = index;
                 });
               },
               isRequired: true,
@@ -383,13 +513,21 @@ class _CasesFormState extends State<CasesForm> {
               title: 'shared.cases.submit.case_photos'.tr(),
               icon: AppIcons.addPhoto,
               isRequired: !widget.isEdit,
+              maxFiles: _maxCasePhotos,
+              currentFilesCount: _currentCasePhotosCount,
               onAdd: _pickCasePhotos,
               newFiles: casePhotos,
               existingFiles: existingCasePhotos,
-              onRemoveNew: (index) =>
-                  setState(() => casePhotos.removeAt(index)),
-              onRemoveExisting: (index) =>
-                  setState(() => existingCasePhotos.removeAt(index)),
+              onRemoveNew: (index) {
+                setState(() {
+                  casePhotos.removeAt(index);
+                });
+              },
+              onRemoveExisting: (index) {
+                setState(() {
+                  existingCasePhotos.removeAt(index);
+                });
+              },
             ),
 
             SizedBox(height: AppSize.getHeight(15)),
@@ -398,13 +536,21 @@ class _CasesFormState extends State<CasesForm> {
               title: 'shared.cases.submit.supporting_documents'.tr(),
               icon: AppIcons.uploadFile,
               isRequired: false,
+              maxFiles: _maxSupportingDocuments,
+              currentFilesCount: _currentSupportingDocumentsCount,
               onAdd: _pickSupportingDocuments,
               newFiles: supportingDocuments,
               existingFiles: existingSupportingDocuments,
-              onRemoveNew: (index) =>
-                  setState(() => supportingDocuments.removeAt(index)),
-              onRemoveExisting: (index) =>
-                  setState(() => existingSupportingDocuments.removeAt(index)),
+              onRemoveNew: (index) {
+                setState(() {
+                  supportingDocuments.removeAt(index);
+                });
+              },
+              onRemoveExisting: (index) {
+                setState(() {
+                  existingSupportingDocuments.removeAt(index);
+                });
+              },
             ),
 
             SizedBox(height: AppSize.getHeight(20)),
@@ -485,9 +631,15 @@ class _MultiAttachmentsField extends StatelessWidget {
   final String title;
   final String icon;
   final bool isRequired;
+
+  final int maxFiles;
+  final int currentFilesCount;
+
   final VoidCallback onAdd;
+
   final List<File> newFiles;
   final List<_ExistingAttachment> existingFiles;
+
   final void Function(int index) onRemoveNew;
   final void Function(int index) onRemoveExisting;
 
@@ -499,6 +651,8 @@ class _MultiAttachmentsField extends StatelessWidget {
     required this.existingFiles,
     required this.onRemoveNew,
     required this.onRemoveExisting,
+    required this.maxFiles,
+    required this.currentFilesCount,
     this.isRequired = false,
   });
 
@@ -509,6 +663,8 @@ class _MultiAttachmentsField extends StatelessWidget {
     final secondaryColor = textColor.withValues(alpha: .65);
     final borderColor = textColor.withValues(alpha: .18);
 
+    final canAdd = currentFilesCount < maxFiles;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -516,20 +672,29 @@ class _MultiAttachmentsField extends StatelessWidget {
           text: TextSpan(
             text: title,
             style: TextStyle(color: secondaryColor).xs,
-            children: isRequired
-                ? [
-                    TextSpan(
-                      text: ' *',
-                      style: TextStyle(
-                        color: AppColors.red,
-                        fontSize: AppSize.font(12),
-                      ),
-                    ),
-                  ]
-                : [],
+            children: [
+              if (isRequired)
+                TextSpan(
+                  text: ' *',
+                  style: TextStyle(
+                    color: AppColors.red,
+                    fontSize: AppSize.font(12),
+                  ),
+                ),
+              TextSpan(
+                text: '  ($currentFilesCount/$maxFiles)',
+                style: TextStyle(
+                  color: secondaryColor,
+                  fontSize: AppSize.font(11),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
+
         SizedBox(height: AppSize.getHeight(8)),
+
         Wrap(
           spacing: AppSize.getWidth(8),
           runSpacing: AppSize.getHeight(8),
@@ -539,41 +704,44 @@ class _MultiAttachmentsField extends StatelessWidget {
                 name: existingFiles[i].name,
                 onRemove: () => onRemoveExisting(i),
               ),
+
             for (int i = 0; i < newFiles.length; i++)
               _AttachmentChip(
                 name: newFiles[i].path.split('/').last,
                 onRemove: () => onRemoveNew(i),
               ),
-            GestureDetector(
-              onTap: onAdd,
-              child: Container(
-                width: AppSize.getSize(90),
-                height: AppSize.getSize(90),
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: borderColor, width: 1),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.add,
-                      color: secondaryColor,
-                      size: AppSize.getSize(24),
-                    ),
-                    SizedBox(height: AppSize.getHeight(4)),
-                    Text(
-                      'shared.cases.submit.add_file'.tr(),
-                      style: TextStyle(
-                        fontSize: AppSize.font(11),
+
+            if (canAdd)
+              GestureDetector(
+                onTap: onAdd,
+                child: Container(
+                  width: AppSize.getSize(90),
+                  height: AppSize.getSize(90),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: borderColor, width: 1),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add,
                         color: secondaryColor,
+                        size: AppSize.getSize(24),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: AppSize.getHeight(4)),
+                      Text(
+                        'shared.cases.submit.add_file'.tr(),
+                        style: TextStyle(
+                          fontSize: AppSize.font(11),
+                          color: secondaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ],
@@ -864,11 +1032,17 @@ class _ContactInfoSection extends StatelessWidget {
 
 class _PaymentMethodSection extends StatelessWidget {
   final ValueNotifier<String?> selectedPaymentType;
+
   final TextEditingController instapayLinkController;
+
   final TextEditingController walletPhoneController;
+
   final TextEditingController ibanController;
+
   final TextEditingController estimatedAmountController;
+
   final TextEditingController raisedAmountController;
+
   final String? Function(String?, String? Function(String?)) optionalValidator;
 
   const _PaymentMethodSection({
@@ -887,8 +1061,10 @@ class _PaymentMethodSection extends StatelessWidget {
     switch (type) {
       case 'instapay':
         return 'shared.cases.submit.payment_type_instapay'.tr();
+
       case 'wallet':
         return 'shared.cases.submit.payment_type_wallet'.tr();
+
       default:
         return 'shared.cases.submit.payment_type_bank_account'.tr();
     }
@@ -898,8 +1074,10 @@ class _PaymentMethodSection extends StatelessWidget {
     switch (type) {
       case 'instapay':
         return AppIcons.instapay;
+
       case 'wallet':
         return AppIcons.wallet;
+
       default:
         return AppIcons.bank;
     }
@@ -944,12 +1122,16 @@ class _PaymentMethodSection extends StatelessWidget {
               ),
             ],
           ),
+
           SizedBox(height: AppSize.getHeight(4)),
+
           Text(
             'shared.cases.submit.banking_desc'.tr(),
             style: TextStyle(fontSize: AppSize.font(12), color: secondaryColor),
           ),
+
           SizedBox(height: AppSize.getHeight(14)),
+
           ValueListenableBuilder<String?>(
             valueListenable: selectedPaymentType,
             builder: (context, selected, _) {
@@ -1011,7 +1193,9 @@ class _PaymentMethodSection extends StatelessWidget {
               );
             },
           ),
+
           SizedBox(height: AppSize.getHeight(14)),
+
           ValueListenableBuilder<String?>(
             valueListenable: selectedPaymentType,
             builder: (context, selected, _) {
@@ -1022,8 +1206,8 @@ class _PaymentMethodSection extends StatelessWidget {
                     title: 'shared.cases.submit.instapay_link'.tr(),
                     hintText: 'shared.cases.submit.hint_instapay_link'.tr(),
                     isRequired: false,
-                    validator: (v) =>
-                        optionalValidator(v, AppValidators.instapayLink),
+                    validator: (value) =>
+                        optionalValidator(value, AppValidators.instapayLink),
                     keyboardType: TextInputType.url,
                   );
 
@@ -1033,8 +1217,8 @@ class _PaymentMethodSection extends StatelessWidget {
                     title: 'shared.cases.submit.wallet_phone'.tr(),
                     hintText: '01xxxxxxxxx',
                     isRequired: false,
-                    validator: (v) =>
-                        optionalValidator(v, AppValidators.egyptianPhone),
+                    validator: (value) =>
+                        optionalValidator(value, AppValidators.egyptianPhone),
                     keyboardType: TextInputType.phone,
                     prefixText: '+20 ',
                     inputFormatters: [
@@ -1049,8 +1233,8 @@ class _PaymentMethodSection extends StatelessWidget {
                     title: 'shared.cases.submit.iban'.tr(),
                     hintText: 'EG380019000500000000263180002',
                     isRequired: false,
-                    validator: (v) =>
-                        optionalValidator(v, AppValidators.egyptianIban),
+                    validator: (value) =>
+                        optionalValidator(value, AppValidators.egyptianIban),
                     keyboardType: TextInputType.text,
                     inputFormatters: [LengthLimitingTextInputFormatter(29)],
                   );
@@ -1060,20 +1244,24 @@ class _PaymentMethodSection extends StatelessWidget {
               }
             },
           ),
+
           SizedBox(height: AppSize.getHeight(12)),
+
           CustomFieldText(
             controller: estimatedAmountController,
             title: 'shared.cases.submit.estimated_amount'.tr(),
             hintText: 'shared.cases.submit.hint_estimated_amount'.tr(),
             isRequired: false,
-            validator: (v) =>
-                optionalValidator(v, AppValidators.requiredAmount),
+            validator: (value) =>
+                optionalValidator(value, AppValidators.requiredAmount),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
             ],
           ),
+
           SizedBox(height: AppSize.getHeight(12)),
+
           CustomFieldText(
             controller: raisedAmountController,
             title: 'shared.cases.submit.raised_amount'.tr(),

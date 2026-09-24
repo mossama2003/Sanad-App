@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../../core/helper/app_toast.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../data/helper/case_attachment_helpers.dart';
@@ -464,7 +465,7 @@ class CasesPopUp extends StatelessWidget {
                             SizedBox(height: AppSize.getHeight(5)),
 
                             Text(
-                              'EGP ${caseItem.paymentDetails.estimatedAmount.toStringAsFixed(0)}',
+                              'EGP ${caseItem.paymentDetails.estimatedAmount.compact}',
                               style: TextStyle(
                                 fontSize: AppSize.font(16),
                                 fontWeight: FontWeight.bold,
@@ -490,7 +491,7 @@ class CasesPopUp extends StatelessWidget {
                             SizedBox(height: AppSize.getHeight(5)),
 
                             Text(
-                              'EGP ${caseItem.paymentDetails.raisedAmount.toStringAsFixed(0)}',
+                              'EGP ${caseItem.paymentDetails.raisedAmount.compact}',
                               style: TextStyle(
                                 fontSize: AppSize.font(16),
                                 fontWeight: FontWeight.bold,

@@ -56,13 +56,17 @@ class SocialMediaCard extends StatelessWidget {
             spacing: AppSize.getWidth(10),
             runSpacing: AppSize.getHeight(10),
             children: socialMediaLinks.entries.map((entry) {
-              final url = entry.value?.toString();
+              final value = entry.value?.toString().trim();
 
-              if (url == null || url.isEmpty) {
+              if (value == null || value.isEmpty) {
                 return const SizedBox.shrink();
               }
 
-              return _buildSocialIcon(context, platform: entry.key, url: url);
+              return _buildSocialIcon(
+                context,
+                platform: entry.key,
+                value: value,
+              );
             }).toList(),
           ),
         ],
@@ -73,21 +77,13 @@ class SocialMediaCard extends StatelessWidget {
   Widget _buildSocialIcon(
     BuildContext context, {
     required String platform,
-    required String url,
+    required String value,
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
     return GestureDetector(
-      onTap: () async {
-        final uri = Uri.tryParse(url);
-
-        if (uri == null) return;
-
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-        }
-      },
+      onTap: () => _openSocialLink(context, platform: platform, value: value),
       child: Container(
         width: AppSize.getWidth(30),
         height: AppSize.getHeight(30),
@@ -103,6 +99,69 @@ class SocialMediaCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _openSocialLink(
+    BuildContext context, {
+    required String platform,
+    required String value,
+  }) async {
+    final url = _buildSocialUrl(platform: platform, value: value);
+
+    final uri = Uri.tryParse(url);
+
+    if (uri == null) return;
+
+    try {
+      final canOpen = await canLaunchUrl(uri);
+
+      if (canOpen) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    } catch (_) {}
+
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Could not open ${platform.toUpperCase()}')),
+    );
+  }
+
+  String _buildSocialUrl({required String platform, required String value}) {
+    final normalizedPlatform = platform.toLowerCase().trim();
+    final normalizedValue = value.trim();
+
+    // لو الـ API رجع URL كامل، استخدمه كما هو.
+    if (normalizedValue.startsWith('http://') ||
+        normalizedValue.startsWith('https://')) {
+      return normalizedValue;
+    }
+
+    // لو رجع username فقط، ابني الـ URL.
+    switch (normalizedPlatform) {
+      case 'facebook':
+        return 'https://www.facebook.com/$normalizedValue';
+
+      case 'instagram':
+        return 'https://www.instagram.com/$normalizedValue';
+
+      case 'linkedin':
+        return 'https://www.linkedin.com/in/$normalizedValue';
+
+      case 'twitter':
+      case 'x':
+        return 'https://x.com/$normalizedValue';
+
+      case 'snapchat':
+        return 'https://www.snapchat.com/add/$normalizedValue';
+
+      case 'website':
+        return 'https://$normalizedValue';
+
+      default:
+        return normalizedValue;
+    }
   }
 
   String _getSocialIcon(String platform) {

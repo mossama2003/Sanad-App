@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter/material.dart';
 
+import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../../core/shared/widgets/custom_button.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../data/helper/case_attachment_helpers.dart';
@@ -262,7 +263,7 @@ class CasesCard extends StatelessWidget {
                                 ),
                                 SizedBox(height: AppSize.getHeight(5)),
                                 Text(
-                                  'EGP ${caseItem.paymentDetails.estimatedAmount.toStringAsFixed(0)}',
+                                  'EGP ${caseItem.paymentDetails.estimatedAmount.compact}',
                                   style: TextStyle(
                                     fontSize: AppSize.font(20),
                                     color: textColor,
@@ -287,7 +288,7 @@ class CasesCard extends StatelessWidget {
                                 ),
                                 SizedBox(height: AppSize.getHeight(5)),
                                 Text(
-                                  'EGP ${caseItem.paymentDetails.raisedAmount.toStringAsFixed(0)}',
+                                  'EGP ${caseItem.paymentDetails.raisedAmount.compact}',
                                   style: TextStyle(
                                     fontSize: AppSize.font(20),
                                     color: AppColors.primary,
@@ -457,7 +458,7 @@ class CasesCard extends StatelessWidget {
                                   ),
                             SizedBox(width: AppSize.getWidth(3)),
                             Text(
-                              '${caseItem.likers}',
+                              caseItem.likers.compact,
                               style: TextStyle(
                                 fontSize: AppSize.font(15),
                                 fontWeight: FontWeight.w300,
@@ -489,7 +490,7 @@ class CasesCard extends StatelessWidget {
                           ),
                           SizedBox(width: AppSize.getWidth(3)),
                           Text(
-                            '${caseItem.comments}',
+                            caseItem.comments.compact,
                             style: TextStyle(
                               fontSize: AppSize.font(15),
                               fontWeight: FontWeight.w300,

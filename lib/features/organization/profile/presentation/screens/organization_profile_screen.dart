@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/helper/app_navigator.dart';
+import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/shared/widgets/custom_button.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
@@ -264,7 +265,7 @@ class OrganizationProfileScreen extends StatelessWidget {
             ? AppColors.primary.withValues(alpha: .15)
             : const Color(0xFFEAF6F1),
         AppColors.primary,
-        '${profile?.eventsCreated ?? 0}',
+        (profile?.eventsCreated ?? 0).compact,
         'organization.profile.events_created'.tr(),
       ),
       (
@@ -273,7 +274,7 @@ class OrganizationProfileScreen extends StatelessWidget {
             ? Colors.blue.withValues(alpha: .15)
             : const Color(0xFFEAF1FB),
         const Color(0xFF3B82F6),
-        '${profile?.attendeesCount ?? 0}',
+        (profile?.attendeesCount ?? 0).compact,
         'organization.profile.volunteers_engaged'.tr(),
       ),
       (
@@ -282,7 +283,7 @@ class OrganizationProfileScreen extends StatelessWidget {
             ? Colors.orange.withValues(alpha: .15)
             : const Color(0xFFFDF1E4),
         const Color(0xFFE8A13D),
-        'EGP ${profile?.donationsRaised ?? 0}',
+        'EGP ${(profile?.donationsRaised ?? 0).compact}',
         'organization.profile.donations_raised'.tr(),
       ),
       (
@@ -291,7 +292,7 @@ class OrganizationProfileScreen extends StatelessWidget {
             ? AppColors.primary.withValues(alpha: .15)
             : const Color(0xFFEAF6F1),
         AppColors.primary,
-        '${profile?.casesCompleted ?? 0}',
+        (profile?.casesCompleted ?? 0).compact,
         'organization.profile.cases_completed'.tr(),
       ),
     ];

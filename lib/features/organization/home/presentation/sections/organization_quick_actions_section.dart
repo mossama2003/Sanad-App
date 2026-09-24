@@ -4,11 +4,21 @@ import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../../shared/cases/data/repos/cases_repo.dart';
+import '../../../../shared/cases/presentation/controllers/case_cubit.dart';
+import '../../../../shared/cases/presentation/screens/submit_case_screen.dart';
 import '../controllers/organization_home_cubit.dart';
 
 class OrganizationQuickActionsSection extends StatelessWidget {
   const OrganizationQuickActionsSection({super.key});
+
+  Future<void> _openCreateCase(BuildContext context) async {
+    await AppNavigator.push(
+      SubmitCaseScreen(casesCubit: CasesCubit(CasesRepoImpel())),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +87,8 @@ class OrganizationQuickActionsSection extends StatelessWidget {
               child: _buildActionCard(
                 context,
 
-                onTap: () {},
+                onTap: () => _openCreateCase(context),
+                // 👈 تعديل هنا
 
                 icon: AppIcons.file,
 

@@ -305,7 +305,10 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
                 )
               else
                 SliverPadding(
-                  padding: AppSize.padding(horizontal: 12),
+                  padding: AppSize.padding(
+                    horizontal: AppSize.getWidth(12),
+                    bottom: AppSize.getHeight(60),
+                  ),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -360,6 +363,7 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
                             },
                             onDeleteTap: () {
                               final eventId = event.id;
+
                               AppNavigator.dialog(
                                 ConfirmDialog(
                                   title: 'organization.events.delete'.tr(),

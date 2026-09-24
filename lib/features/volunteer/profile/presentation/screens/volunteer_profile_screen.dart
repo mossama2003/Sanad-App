@@ -6,6 +6,7 @@ import 'package:sanad_app/core/helper/app_navigator.dart';
 import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 
 import '../../../../../core/constant/app_assets.dart';
+import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../../../shared/auth/data/models/user_profile_model.dart';
@@ -96,14 +97,14 @@ class VolunteerProfileScreen extends StatelessWidget {
                         StatCard(
                           icon: AppIcons.voltage,
                           iconColor: const Color(0xFF7B5EA7),
-                          value: '${profile?.xp ?? 0}',
+                          value: (profile?.xp ?? 0).compact,
                           label: 'volunteer.profile.xp'.tr(),
                         ),
 
                         StatCard(
                           icon: AppIcons.fire,
                           iconColor: const Color(0xFFFF6B35),
-                          value: '${profile?.streak ?? 0}',
+                          value: (profile?.streak ?? 0).compact,
                           label: 'volunteer.profile.streak'.tr(),
                         ),
 
