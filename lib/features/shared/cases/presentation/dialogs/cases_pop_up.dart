@@ -130,7 +130,10 @@ class CasesPopUp extends StatelessWidget {
     }
   }
 
-  Widget _paymentValueWidget() {
+  Widget _paymentValueWidget({
+    required Color textColor,
+    required Color secondaryColor,
+  }) {
     final rawValue = caseItem.paymentDetails.description!.trim();
 
     final paymentType = caseItem.paymentDetails.paymentType;
@@ -152,34 +155,29 @@ class CasesPopUp extends StatelessWidget {
               value,
               style: TextStyle(
                 fontSize: AppSize.font(14),
-                color: isInstaPay ? AppColors.laserBlue : AppColors.black,
+                color: isInstaPay ? AppColors.laserBlue : textColor,
                 fontWeight: FontWeight.w400,
                 decoration: isInstaPay
                     ? TextDecoration.underline
                     : TextDecoration.none,
-                decorationColor: isInstaPay
-                    ? AppColors.laserBlue
-                    : AppColors.black,
+                decorationColor: isInstaPay ? AppColors.laserBlue : textColor,
               ),
             ),
           ),
         ),
-
         SizedBox(width: AppSize.getWidth(8)),
-
         GestureDetector(
           onTap: () => _copyToClipboard(value),
           child: Icon(
             Icons.copy_outlined,
             size: AppSize.getSize(16),
-            color: AppColors.grey700,
+            color: secondaryColor,
           ),
         ),
       ],
     );
   }
 
-  // 👇 جديد — بيتحكم في ظهور كارد Required/Raised بالكامل
   bool get _hasPaymentAmounts =>
       caseItem.paymentDetails.estimatedAmount > 0 ||
       caseItem.paymentDetails.raisedAmount > 0;
@@ -219,7 +217,11 @@ class CasesPopUp extends StatelessWidget {
     }
   }
 
-  Widget _documentsSection() {
+  Widget _documentsSection({
+    required Color cardColor,
+    required Color textColor,
+    required Color secondaryColor,
+  }) {
     final documents = _documentAttachments;
 
     if (documents.isEmpty) return const SizedBox.shrink();
@@ -229,7 +231,7 @@ class CasesPopUp extends StatelessWidget {
       padding: AppSize.padding(all: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: AppColors.grey50,
+        color: cardColor,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +241,7 @@ class CasesPopUp extends StatelessWidget {
             style: TextStyle(
               fontSize: AppSize.font(13),
               fontWeight: FontWeight.w700,
-              color: AppColors.black,
+              color: textColor,
             ),
           ),
           SizedBox(height: AppSize.getHeight(10)),
@@ -272,7 +274,7 @@ class CasesPopUp extends StatelessWidget {
                     documents[i].attachment.size,
                     style: TextStyle(
                       fontSize: AppSize.font(11),
-                      color: AppColors.grey,
+                      color: secondaryColor,
                     ),
                   ),
                 ],
@@ -288,10 +290,23 @@ class CasesPopUp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final textColor = colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .65);
+
+    final dialogColor =
+        theme.dialogTheme.backgroundColor ?? colorScheme.surface;
+
+    final sectionColor = theme.brightness == Brightness.dark
+        ? colorScheme.surfaceContainerHighest
+        : AppColors.grey50;
+
     final paymentDescription = caseItem.paymentDetails.description;
 
     return Dialog(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: dialogColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: AppSize.padding(all: 20),
@@ -305,7 +320,7 @@ class CasesPopUp extends StatelessWidget {
                 style: TextStyle(
                   fontSize: AppSize.font(20),
                   fontWeight: FontWeight.w600,
-                  color: AppColors.black,
+                  color: textColor,
                 ),
               ),
 
@@ -316,11 +331,10 @@ class CasesPopUp extends StatelessWidget {
                   caseItem.description,
                   style: TextStyle(
                     fontSize: AppSize.font(13),
-                    color: AppColors.grey700,
+                    color: secondaryColor,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-
                 SizedBox(height: AppSize.getHeight(15)),
               ],
 
@@ -329,7 +343,7 @@ class CasesPopUp extends StatelessWidget {
                 padding: AppSize.padding(all: 12),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
-                  color: AppColors.grey50,
+                  color: sectionColor,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,7 +352,7 @@ class CasesPopUp extends StatelessWidget {
                       'shared.cases.pop_up.contact_person'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(12),
-                        color: AppColors.grey700,
+                        color: secondaryColor,
                       ),
                     ),
 
@@ -348,7 +362,7 @@ class CasesPopUp extends StatelessWidget {
                       caseItem.contactName,
                       style: TextStyle(
                         fontSize: AppSize.font(14),
-                        color: AppColors.black,
+                        color: textColor,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -359,7 +373,7 @@ class CasesPopUp extends StatelessWidget {
                       'shared.cases.pop_up.phone'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(12),
-                        color: AppColors.grey700,
+                        color: secondaryColor,
                       ),
                     ),
 
@@ -394,13 +408,12 @@ class CasesPopUp extends StatelessWidget {
                             icon: AppIcons.copy,
                             width: AppSize.getSize(16),
                             height: AppSize.getSize(16),
-                            color: AppColors.grey700,
+                            color: secondaryColor,
                           ),
                         ),
                       ],
                     ),
 
-                    // 👇 تعديل: أضفنا شرط paymentType != null
                     if (paymentDescription != null &&
                         paymentDescription.trim().isNotEmpty &&
                         caseItem.paymentDetails.paymentType != null) ...[
@@ -410,19 +423,21 @@ class CasesPopUp extends StatelessWidget {
                         _paymentLabel,
                         style: TextStyle(
                           fontSize: AppSize.font(12),
-                          color: AppColors.grey700,
+                          color: secondaryColor,
                         ),
                       ),
 
                       SizedBox(height: AppSize.getHeight(5)),
 
-                      _paymentValueWidget(),
+                      _paymentValueWidget(
+                        textColor: textColor,
+                        secondaryColor: secondaryColor,
+                      ),
                     ],
                   ],
                 ),
               ),
 
-              // 👇 تعديل: الكارد كله دلوقتي بشرط
               if (_hasPaymentAmounts) ...[
                 SizedBox(height: AppSize.getHeight(15)),
                 Container(
@@ -430,7 +445,7 @@ class CasesPopUp extends StatelessWidget {
                   padding: AppSize.padding(all: 12),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
-                    color: AppColors.grey50,
+                    color: sectionColor,
                   ),
                   child: Row(
                     children: [
@@ -442,7 +457,7 @@ class CasesPopUp extends StatelessWidget {
                               'shared.cases.card.required'.tr(),
                               style: TextStyle(
                                 fontSize: AppSize.font(12),
-                                color: AppColors.grey700,
+                                color: secondaryColor,
                               ),
                             ),
 
@@ -453,7 +468,7 @@ class CasesPopUp extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: AppSize.font(16),
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.black,
+                                color: textColor,
                               ),
                             ),
                           ],
@@ -468,7 +483,7 @@ class CasesPopUp extends StatelessWidget {
                               'shared.cases.card.raised'.tr(),
                               style: TextStyle(
                                 fontSize: AppSize.font(12),
-                                color: AppColors.grey700,
+                                color: secondaryColor,
                               ),
                             ),
 
@@ -492,7 +507,11 @@ class CasesPopUp extends StatelessWidget {
 
               if (_documentAttachments.isNotEmpty) ...[
                 SizedBox(height: AppSize.getHeight(15)),
-                _documentsSection(),
+                _documentsSection(
+                  cardColor: sectionColor,
+                  textColor: textColor,
+                  secondaryColor: secondaryColor,
+                ),
               ],
             ],
           ),

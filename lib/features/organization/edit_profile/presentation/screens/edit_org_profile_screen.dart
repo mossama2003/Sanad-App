@@ -1,302 +1,89 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 
-import '../../../../../core/constant/app_assets.dart';
-import '../../../../../core/constant/app_size.dart';
-import '../../../../../core/helper/app_navigator.dart';
-import '../../../../../core/shared/controllers/user/app_cubit.dart';
-import '../../../../../core/shared/dialogs/confirm_dialog.dart';
-import '../../../../../core/shared/widgets/custom_button.dart';
-import '../../../../../core/shared/widgets/custom_field_dropdown.dart';
-import '../../../../../core/shared/widgets/custom_field_text.dart';
-import '../../../../../core/shared/widgets/custom_icon.dart';
-import '../../../../../core/style/app_colors.dart';
-import '../../../../shared/auth/data/models/user_profile_model.dart';
+import '../../../../../core/shared/widgets/custom_field_phone.dart';
 import '../../../../shared/auth/presentation/sign_in/screens/sign_in_screen.dart';
-import '../../data/params/update_org_profile_param.dart';
+import '../../../../../core/shared/widgets/custom_field_dropdown.dart';
+import '../../../../../core/shared/controllers/user/app_cubit.dart';
+import '../../../../../core/shared/widgets/custom_field_text.dart';
+import '../../../../../core/shared/widgets/custom_button.dart';
+import '../../../../../core/shared/dialogs/confirm_dialog.dart';
+import '../../../../../core/shared/widgets/custom_icon.dart';
+import '../../../../../core/helper/app_navigator.dart';
 import '../../data/repos/edit_org_profile_repo.dart';
+import '../../../../../core/constant/app_assets.dart';
 import '../controllers/edit_org_profile_cubit.dart';
+import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/style/app_colors.dart';
 
 class EditOrgProfileScreen extends StatefulWidget {
   const EditOrgProfileScreen({super.key});
 
   @override
-  State<EditOrgProfileScreen> createState() =>
-      _EditOrganizationProfileScreenState();
+  State<EditOrgProfileScreen> createState() => _EditOrgProfileScreenState();
 }
 
-class _EditOrganizationProfileScreenState extends State<EditOrgProfileScreen> {
+class _EditOrgProfileScreenState extends State<EditOrgProfileScreen> {
   late final EditOrgProfileCubit editProfileCubit;
 
-  File? newLogo;
-  String? existingLogoUrl;
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  final TextEditingController orgNameController = TextEditingController();
-  final TextEditingController registrationNoController =
-      TextEditingController();
-  final TextEditingController aboutController = TextEditingController();
-
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController websiteController = TextEditingController();
-
-  final TextEditingController governorateController = TextEditingController();
-  final TextEditingController cityController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
-
-  final TextEditingController facebookController = TextEditingController();
-  final TextEditingController twitterController = TextEditingController();
-  final TextEditingController instagramController = TextEditingController();
-  final TextEditingController linkedinController = TextEditingController();
-
-  final ValueNotifier<String?> selectedType = ValueNotifier(null);
-  final ValueNotifier<String?> selectedGovernorate = ValueNotifier(null);
-
-  final List<DropdownItem<String>> organizationTypes = [
-    DropdownItem(value: 'Non-Profit', child: Text('Non-Profit')),
-    DropdownItem(value: 'NGO', child: Text('NGO')),
-    DropdownItem(value: 'Charity', child: Text('Charity')),
-    DropdownItem(value: 'Foundation', child: Text('Foundation')),
-    DropdownItem(value: 'Community Group', child: Text('Community Group')),
-  ];
-
-  final List<DropdownItem<String>> governorates = [
-    'Cairo',
-    'Giza',
-    'Alexandria',
-    'Qalyubia',
-    'Sharqia',
-    'Dakahlia',
-    'Beheira',
-    'Minya',
-    'Assiut',
-    'Aswan',
-    'Luxor',
-  ].map((g) => DropdownItem(value: g, child: Text(g))).toList();
 
   @override
   void initState() {
     super.initState();
-    editProfileCubit = EditOrgProfileCubit(EditOrgProfileRepoImpel());
-    _fillFromCurrentUser();
-  }
 
-  void _fillFromCurrentUser() {
+    editProfileCubit = EditOrgProfileCubit(EditOrgProfileRepoImpel());
+
     final user = AppCubit.get(context).user;
 
-    if (user == null) return;
-
-    orgNameController.text = user.name ?? '';
-    emailController.text = user.email ?? '';
-    phoneController.text = user.phone ?? '';
-    existingLogoUrl = user.avatar;
-
-    final org = user.profile as OrganizationProfileModel?;
-
-    if (org != null) {
-      websiteController.text = org.website ?? '';
-      governorateController.text = org.state ?? '';
-
-      if (org.state != null && org.state!.isNotEmpty) {
-        final exists = governorates.any((item) => item.value == org.state);
-        if (!exists) {
-          governorates.add(
-            DropdownItem(value: org.state!, child: Text(org.state!)),
-          );
-        }
-      }
-
-      selectedGovernorate.value = org.state;
-
-      addressController.text = org.headquarters ?? '';
-      aboutController.text = org.bio ?? '';
-
-      selectedType.value = (org.organizationType?.isNotEmpty ?? false)
-          ? org.organizationType
-          : null;
-
-      if (selectedType.value != null) {
-        final typeExists = organizationTypes.any(
-          (item) => item.value == selectedType.value,
-        );
-        if (!typeExists) {
-          organizationTypes.add(
-            DropdownItem(
-              value: selectedType.value!,
-              child: Text(selectedType.value!),
-            ),
-          );
-        }
-      }
-
-      registrationNoController.text = org.registerationNo ?? '';
-
-      facebookController.text = org.socialMediaLinks?['facebook'] ?? '';
-      twitterController.text = org.socialMediaLinks?['twitter'] ?? '';
-      instagramController.text = org.socialMediaLinks?['instagram'] ?? '';
-      linkedinController.text = org.socialMediaLinks?['linkedin'] ?? '';
-    }
+    editProfileCubit.initialize(user);
   }
 
-  Future<void> _pickLogo() async {
-    final file = await FilePicker.pickFile(type: FileType.image);
-
-    if (file != null && file.path != null) {
-      setState(() => newLogo = File(file.path!));
-    }
-  }
-
-  String? _validateSocialUrl(
+  String? _validateSocialUsername(
     String? value, {
-    required List<String> allowedHosts,
     required String platformName,
   }) {
-    final url = value?.trim() ?? '';
+    final username = value?.trim() ?? '';
 
-    if (url.isEmpty) {
+    if (username.isEmpty) {
       return null;
     }
 
-    final uri = Uri.tryParse(url);
-
-    if (uri == null ||
-        (uri.scheme != 'http' && uri.scheme != 'https') ||
-        uri.host.isEmpty) {
-      return 'Please enter a valid $platformName URL';
-    }
-
-    final host = uri.host.toLowerCase();
-
-    final isValidHost = allowedHosts.any(
-      (allowedHost) => host == allowedHost || host.endsWith('.$allowedHost'),
-    );
-
-    if (!isValidHost) {
-      return 'Please enter a valid $platformName URL';
+    if (username.contains(' ') ||
+        username.contains('/') ||
+        username.contains('://')) {
+      return 'Please enter a valid $platformName username';
     }
 
     return null;
   }
 
-  String? _validateFacebookUrl(String? value) {
-    return _validateSocialUrl(
-      value,
-      allowedHosts: ['facebook.com', 'fb.com'],
-      platformName: 'Facebook',
-    );
+  String? _validateFacebookUsername(String? value) {
+    return _validateSocialUsername(value, platformName: 'Facebook');
   }
 
-  String? _validateTwitterUrl(String? value) {
-    return _validateSocialUrl(
-      value,
-      allowedHosts: ['twitter.com', 'x.com'],
-      platformName: 'Twitter / X',
-    );
+  String? _validateTwitterUsername(String? value) {
+    return _validateSocialUsername(value, platformName: 'Twitter / X');
   }
 
-  String? _validateInstagramUrl(String? value) {
-    return _validateSocialUrl(
-      value,
-      allowedHosts: ['instagram.com'],
-      platformName: 'Instagram',
-    );
+  String? _validateInstagramUsername(String? value) {
+    return _validateSocialUsername(value, platformName: 'Instagram');
   }
 
-  String? _validateLinkedInUrl(String? value) {
-    return _validateSocialUrl(
-      value,
-      allowedHosts: ['linkedin.com'],
-      platformName: 'LinkedIn',
-    );
+  String? _validateLinkedInUsername(String? value) {
+    return _validateSocialUsername(value, platformName: 'LinkedIn');
   }
 
   void _submit() {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    final accountParam = UpdateOrgAccountParam(
-      email: emailController.text.trim(),
-      lastName: orgNameController.text.trim(),
-      phone: phoneController.text.trim(),
-      avatar: newLogo,
-    );
-
-    final orgParam = UpdateOrgProfileParam(
-      website: websiteController.text.trim().isEmpty
-          ? null
-          : websiteController.text.trim(),
-      state: selectedGovernorate.value,
-      city: cityController.text.trim().isEmpty
-          ? null
-          : cityController.text.trim(),
-      headquarters: addressController.text.trim().isEmpty
-          ? null
-          : addressController.text.trim(),
-      bio: aboutController.text.trim().isEmpty
-          ? null
-          : aboutController.text.trim(),
-      organizationType: selectedType.value,
-      registerationNo: registrationNoController.text.trim().isEmpty
-          ? null
-          : registrationNoController.text.trim(),
-      facebook: facebookController.text.trim().isEmpty
-          ? null
-          : facebookController.text.trim(),
-      twitter: twitterController.text.trim().isEmpty
-          ? null
-          : twitterController.text.trim(),
-      instagram: instagramController.text.trim().isEmpty
-          ? null
-          : instagramController.text.trim(),
-      linkedin: linkedinController.text.trim().isEmpty
-          ? null
-          : linkedinController.text.trim(),
-    );
-
-    editProfileCubit.saveOrgProfile(
-      context: context,
-      accountParam: accountParam,
-      organizationParam: orgParam,
-    );
+    editProfileCubit.submit(context: context, formKey: _formKey);
   }
 
-  @override
-  void dispose() {
-    editProfileCubit.close();
+  Widget _sectionTitle(BuildContext context, String text) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
 
-    orgNameController.dispose();
-    registrationNoController.dispose();
-    aboutController.dispose();
-
-    emailController.dispose();
-    phoneController.dispose();
-    websiteController.dispose();
-
-    governorateController.dispose();
-    cityController.dispose();
-    addressController.dispose();
-
-    facebookController.dispose();
-    twitterController.dispose();
-    instagramController.dispose();
-    linkedinController.dispose();
-
-    selectedType.dispose();
-    selectedGovernorate.dispose();
-
-    super.dispose();
-  }
-
-  Widget _sectionTitle(String text) {
     return Padding(
       padding: AppSize.padding(bottom: 10),
       child: Text(
@@ -304,25 +91,35 @@ class _EditOrganizationProfileScreenState extends State<EditOrgProfileScreen> {
         style: TextStyle(
           fontSize: AppSize.font(13),
           fontWeight: FontWeight.w600,
-          color: AppColors.grey600,
+          color: textColor.withValues(alpha: .6),
         ),
       ),
     );
   }
 
-  Widget _whiteCard({required List<Widget> children}) {
+  Widget _whiteCard({
+    required BuildContext context,
+    required List<Widget> children,
+  }) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: AppSize.padding(all: 16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: isDark ? .2 : .05),
             blurRadius: 6,
           ),
         ],
+        border: Border.all(
+          color: textColor.withValues(alpha: isDark ? .08 : .04),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,22 +130,27 @@ class _EditOrganizationProfileScreenState extends State<EditOrgProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .6);
+    final backgroundColor = theme.scaffoldBackgroundColor;
+
     return BlocProvider.value(
       value: editProfileCubit,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: backgroundColor,
         appBar: AppBar(
-          backgroundColor: const Color(0xFFF7F8FA),
+          backgroundColor: backgroundColor,
           elevation: 0,
           scrolledUnderElevation: 0,
           leading: IconButton(
             onPressed: () => AppNavigator.pop(),
-            icon: Icon(Icons.arrow_back, color: AppColors.black),
+            icon: Icon(Icons.arrow_back, color: textColor),
           ),
           title: Text(
             'organization.edit_profile.title'.tr(),
             style: TextStyle(
-              color: AppColors.black,
+              color: textColor,
               fontSize: AppSize.font(18),
               fontWeight: FontWeight.w700,
             ),
@@ -359,70 +161,69 @@ class _EditOrganizationProfileScreenState extends State<EditOrgProfileScreen> {
             key: _formKey,
             child: SingleChildScrollView(
               padding: AppSize.padding(horizontal: 16, bottom: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: AppSize.getHeight(10)),
+              child: BlocBuilder<EditOrgProfileCubit, EditOrgProfileState>(
+                builder: (context, state) {
+                  final cubit = EditOrgProfileCubit.get(context);
 
-                  // ================= Logo & Cover =================
-                  _whiteCard(
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      SizedBox(height: AppSize.getHeight(10)),
+                      _whiteCard(
+                        context: context,
                         children: [
-                          newLogo != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: Image.file(
-                                    newLogo!,
-                                    width: AppSize.getWidth(50),
-                                    height: AppSize.getWidth(50),
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              : existingLogoUrl != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: CachedNetworkImage(
-                                    imageUrl: existingLogoUrl!,
-                                    width: AppSize.getWidth(50),
-                                    height: AppSize.getWidth(50),
-                                    fit: BoxFit.cover,
-                                    errorWidget: (context, url, error) =>
-                                        _logoPlaceholder(),
-                                  ),
-                                )
-                              : _logoPlaceholder(),
-
-                          SizedBox(width: AppSize.getWidth(12)),
-
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'organization.edit_profile.logo_cover'.tr(),
-                                  style: TextStyle(
-                                    fontSize: AppSize.font(15),
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.black,
-                                  ),
-                                ),
-                                SizedBox(height: AppSize.getHeight(3)),
-                                Text(
-                                  'organization.edit_profile.represent_org'
-                                      .tr(),
-                                  style: TextStyle(
-                                    fontSize: AppSize.font(12),
-                                    color: AppColors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          Column(
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              cubit.newLogo != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Image.file(
+                                        cubit.newLogo!,
+                                        width: AppSize.getWidth(50),
+                                        height: AppSize.getWidth(50),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : cubit.existingLogoUrl != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: CachedNetworkImage(
+                                        imageUrl: cubit.existingLogoUrl!,
+                                        width: AppSize.getWidth(50),
+                                        height: AppSize.getWidth(50),
+                                        fit: BoxFit.cover,
+                                        errorWidget: (context, url, error) =>
+                                            _logoPlaceholder(context),
+                                      ),
+                                    )
+                                  : _logoPlaceholder(context),
+                              SizedBox(width: AppSize.getWidth(12)),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'organization.edit_profile.logo_cover'
+                                          .tr(),
+                                      style: TextStyle(
+                                        fontSize: AppSize.font(15),
+                                        fontWeight: FontWeight.w700,
+                                        color: textColor,
+                                      ),
+                                    ),
+                                    SizedBox(height: AppSize.getHeight(3)),
+                                    Text(
+                                      'organization.edit_profile.represent_org'
+                                          .tr(),
+                                      style: TextStyle(
+                                        fontSize: AppSize.font(12),
+                                        color: secondaryColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                               SizedBox(
                                 width: AppSize.getWidth(80),
                                 child: CustomButton(
@@ -432,291 +233,250 @@ class _EditOrganizationProfileScreenState extends State<EditOrgProfileScreen> {
                                   borderColor: AppColors.primary,
                                   textColor: AppColors.primary,
                                   textSize: AppSize.font(12),
-                                  onTap: _pickLogo,
+                                  onTap: cubit.pickLogo,
                                 ),
                               ),
-                              // SizedBox(height: AppSize.getHeight(8)),
-                              // SizedBox(
-                              //   width: AppSize.getWidth(80),
-                              //   child: CustomButton(
-                              //     height: AppSize.getHeight(32),
-                              //     title: 'organization.edit_profile.cover'.tr(),
-                              //     bgColor: Colors.transparent,
-                              //     borderColor: AppColors.primary,
-                              //     textColor: AppColors.primary,
-                              //     textSize: AppSize.font(12),
-                              //     onTap: _pickLogo,
-                              //   ),
-                              // ),
                             ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-
-                  SizedBox(height: AppSize.getHeight(20)),
-
-                  // ================= Organization Information =================
-                  _sectionTitle(
-                    'organization.edit_profile.org_information'.tr(),
-                  ),
-                  _whiteCard(
-                    children: [
-                      CustomFieldText(
-                        controller: orgNameController,
-                        title: 'organization.edit_profile.org_name'.tr(),
-                        hintText: '',
-                        titleSize: AppSize.font(13),
-                        borderRadius: 14,
+                      SizedBox(height: AppSize.getHeight(20)),
+                      _sectionTitle(
+                        context,
+                        'organization.edit_profile.org_information'.tr(),
                       ),
-
-                      SizedBox(height: AppSize.getHeight(15)),
-
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      _whiteCard(
+                        context: context,
                         children: [
-                          Expanded(
-                            child: CustomFieldDropdown<String>(
-                              title: 'organization.edit_profile.type'.tr(),
-                              hintText: '',
-                              selected: selectedType,
-                              items: organizationTypes,
-                              onChanged: (_) {},
-                            ),
+                          CustomFieldText(
+                            controller: cubit.orgNameController,
+                            title: 'organization.edit_profile.org_name'.tr(),
+                            hintText: '',
+                            titleSize: AppSize.font(13),
+                            borderRadius: 14,
                           ),
-                          SizedBox(width: AppSize.getWidth(10)),
-                          Expanded(
-                            child: CustomFieldText(
-                              controller: registrationNoController,
-                              title: 'organization.edit_profile.registration_no'
-                                  .tr(),
-                              hintText: '',
-                              titleSize: AppSize.font(13),
-                              borderRadius: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: AppSize.getHeight(15)),
-
-                      CustomFieldText(
-                        controller: aboutController,
-                        title: 'organization.edit_profile.about'.tr(),
-                        hintText: '',
-                        titleSize: AppSize.font(13),
-                        borderRadius: 14,
-                        minLines: 3,
-                        maxLines: 3,
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: AppSize.getHeight(20)),
-
-                  // ================= Contact Information =================
-                  _sectionTitle(
-                    'organization.edit_profile.contact_information'.tr(),
-                  ),
-                  _whiteCard(
-                    children: [
-                      CustomFieldText(
-                        controller: emailController,
-                        title: 'organization.edit_profile.email'.tr(),
-                        hintText: '',
-                        keyboardType: TextInputType.emailAddress,
-                        titleSize: AppSize.font(13),
-                        borderRadius: 14,
-                      ),
-                      SizedBox(height: AppSize.getHeight(15)),
-                      CustomFieldText(
-                        controller: phoneController,
-                        title: 'organization.edit_profile.phone'.tr(),
-                        hintText: '',
-                        keyboardType: TextInputType.phone,
-                        titleSize: AppSize.font(13),
-                        borderRadius: 14,
-                      ),
-                      SizedBox(height: AppSize.getHeight(15)),
-                      CustomFieldText(
-                        controller: websiteController,
-                        title: 'organization.edit_profile.website'.tr(),
-                        hintText: '',
-                        keyboardType: TextInputType.url,
-                        titleSize: AppSize.font(13),
-                        borderRadius: 14,
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: AppSize.getHeight(20)),
-
-                  // ================= Location =================
-                  _sectionTitle('organization.edit_profile.location'.tr()),
-                  _whiteCard(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: CustomFieldDropdown<String>(
-                              title: 'organization.edit_profile.governorate'
-                                  .tr(),
-                              hintText: '',
-                              selected: selectedGovernorate,
-                              items: governorates,
-                              onChanged: (_) {},
-                            ),
-                          ),
-                          SizedBox(width: AppSize.getWidth(10)),
-                          Expanded(
-                            child: CustomFieldText(
-                              controller: cityController,
-                              title: 'organization.edit_profile.city'.tr(),
-                              hintText: '',
-                              titleSize: AppSize.font(13),
-                              borderRadius: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: AppSize.getHeight(15)),
-                      CustomFieldText(
-                        controller: addressController,
-                        title: 'organization.edit_profile.address'.tr(),
-                        hintText: '',
-                        titleSize: AppSize.font(13),
-                        borderRadius: 14,
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: AppSize.getHeight(20)),
-
-                  // ================= Social Media =================
-                  _sectionTitle('organization.edit_profile.social_media'.tr()),
-                  _whiteCard(
-                    children: [
-                      CustomFieldText(
-                        controller: facebookController,
-                        title: 'organization.edit_profile.facebook'.tr(),
-                        hintText: 'https://facebook.com/...',
-                        titleSize: AppSize.font(13),
-                        borderRadius: 14,
-                        keyboardType: TextInputType.url,
-                        validator: _validateFacebookUrl,
-                      ),
-
-                      SizedBox(height: AppSize.getHeight(15)),
-
-                      CustomFieldText(
-                        controller: twitterController,
-                        title: 'organization.edit_profile.twitter'.tr(),
-                        hintText: 'https://x.com/...',
-                        titleSize: AppSize.font(13),
-                        borderRadius: 14,
-                        keyboardType: TextInputType.url,
-                        validator: _validateTwitterUrl,
-                      ),
-
-                      SizedBox(height: AppSize.getHeight(15)),
-
-                      CustomFieldText(
-                        controller: instagramController,
-                        title: 'organization.edit_profile.instagram'.tr(),
-                        hintText: 'https://instagram.com/...',
-                        titleSize: AppSize.font(13),
-                        borderRadius: 14,
-                        keyboardType: TextInputType.url,
-                        validator: _validateInstagramUrl,
-                      ),
-
-                      SizedBox(height: AppSize.getHeight(15)),
-
-                      CustomFieldText(
-                        controller: linkedinController,
-                        title: 'organization.edit_profile.linkedin'.tr(),
-                        hintText: 'https://linkedin.com/in/...',
-                        titleSize: AppSize.font(13),
-                        borderRadius: 14,
-                        keyboardType: TextInputType.url,
-                        validator: _validateLinkedInUrl,
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: AppSize.getHeight(20)),
-
-                  // ================= Actions =================
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomButton(
-                          onTap: () => AppNavigator.pop(),
-                          title: 'organization.edit_profile.cancel'.tr(),
-                          bgColor: Colors.transparent,
-                          borderColor: AppColors.primary,
-                          textColor: AppColors.primary,
-                          height: AppSize.getHeight(45),
-                        ),
-                      ),
-                      SizedBox(width: AppSize.getWidth(10)),
-                      Expanded(
-                        child:
-                            BlocBuilder<
-                              EditOrgProfileCubit,
-                              EditOrgProfileState
-                            >(
-                              builder: (context, state) {
-                                return CustomButton(
+                          SizedBox(height: AppSize.getHeight(15)),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: CustomFieldDropdown<String>(
+                                  title: 'organization.edit_profile.type'.tr(),
+                                  hintText: '',
+                                  selected: cubit.selectedType,
+                                  items: cubit.organizationTypes,
+                                  onChanged: cubit.selectOrganizationType,
+                                ),
+                              ),
+                              SizedBox(width: AppSize.getWidth(10)),
+                              Expanded(
+                                child: CustomFieldText(
+                                  controller: cubit.registrationNoController,
                                   title:
-                                      'organization.edit_profile.save_changes'
+                                      'organization.edit_profile.registration_no'
                                           .tr(),
-                                  bgColor: AppColors.primary,
-                                  textColor: AppColors.white,
-                                  height: AppSize.getHeight(45),
-                                  loading: state is Loading,
-                                  onTap: state is Loading ? null : _submit,
-                                );
+                                  hintText: '',
+                                  titleSize: AppSize.font(13),
+                                  borderRadius: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: AppSize.getHeight(15)),
+                          CustomFieldText(
+                            controller: cubit.aboutController,
+                            title: 'organization.edit_profile.about'.tr(),
+                            hintText: '',
+                            titleSize: AppSize.font(13),
+                            borderRadius: 14,
+                            minLines: 3,
+                            maxLines: 3,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: AppSize.getHeight(20)),
+                      _sectionTitle(
+                        context,
+                        'organization.edit_profile.contact_information'.tr(),
+                      ),
+                      _whiteCard(
+                        context: context,
+                        children: [
+                          CustomFieldText(
+                            controller: cubit.emailController,
+                            title: 'organization.edit_profile.email'.tr(),
+                            hintText: '',
+                            keyboardType: TextInputType.emailAddress,
+                            titleSize: AppSize.font(13),
+                            borderRadius: 14,
+                          ),
+                          SizedBox(height: AppSize.getHeight(15)),
+                          CustomFieldPhone(
+                            controller: cubit.phoneController,
+                            titleSize: AppSize.font(13),
+                            titleColor: textColor,
+                            title: 'organization.edit_profile.phone'.tr(),
+                            hintText: 'organization.edit_profile.phone'.tr(),
+                            initialCountryCode: 'EG',
+                            onPhoneChanged: cubit.onPhoneChanged,
+                            onCountryChanged: cubit.onCountryChanged,
+                          ),
+                          SizedBox(height: AppSize.getHeight(15)),
+                          CustomFieldText(
+                            controller: cubit.websiteController,
+                            title: 'organization.edit_profile.website'.tr(),
+                            hintText: '',
+                            keyboardType: TextInputType.url,
+                            titleSize: AppSize.font(13),
+                            borderRadius: 14,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: AppSize.getHeight(20)),
+                      _sectionTitle(
+                        context,
+                        'organization.edit_profile.location'.tr(),
+                      ),
+                      _whiteCard(
+                        context: context,
+                        children: [
+                          CustomFieldDropdown<String>(
+                            title: 'organization.edit_profile.governorate'.tr(),
+                            hintText: '',
+                            selected: cubit.selectedGovernorate,
+                            items: cubit.governorates,
+                            onChanged: cubit.selectGovernorate,
+                          ),
+                          SizedBox(height: AppSize.getHeight(15)),
+                          CustomFieldText(
+                            controller: cubit.addressController,
+                            title: 'organization.edit_profile.address'.tr(),
+                            hintText: '',
+                            titleSize: AppSize.font(13),
+                            borderRadius: 14,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: AppSize.getHeight(20)),
+                      _sectionTitle(
+                        context,
+                        'organization.edit_profile.social_media'.tr(),
+                      ),
+                      _whiteCard(
+                        context: context,
+                        children: [
+                          CustomFieldText(
+                            controller: cubit.facebookController,
+                            title: 'organization.edit_profile.facebook'.tr(),
+                            hintText: 'Username',
+                            titleSize: AppSize.font(13),
+                            borderRadius: 14,
+                            keyboardType: TextInputType.text,
+                            validator: _validateFacebookUsername,
+                          ),
+                          SizedBox(height: AppSize.getHeight(15)),
+                          CustomFieldText(
+                            controller: cubit.twitterController,
+                            title: 'organization.edit_profile.twitter'.tr(),
+                            hintText: 'Username',
+                            titleSize: AppSize.font(13),
+                            borderRadius: 14,
+                            keyboardType: TextInputType.text,
+                            validator: _validateTwitterUsername,
+                          ),
+                          SizedBox(height: AppSize.getHeight(15)),
+                          CustomFieldText(
+                            controller: cubit.instagramController,
+                            title: 'organization.edit_profile.instagram'.tr(),
+                            hintText: 'Username',
+                            titleSize: AppSize.font(13),
+                            borderRadius: 14,
+                            keyboardType: TextInputType.text,
+                            validator: _validateInstagramUsername,
+                          ),
+                          SizedBox(height: AppSize.getHeight(15)),
+                          CustomFieldText(
+                            controller: cubit.linkedinController,
+                            title: 'organization.edit_profile.linkedin'.tr(),
+                            hintText: 'Username',
+                            titleSize: AppSize.font(13),
+                            borderRadius: 14,
+                            keyboardType: TextInputType.text,
+                            validator: _validateLinkedInUsername,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: AppSize.getHeight(20)),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomButton(
+                              onTap: () => AppNavigator.pop(),
+                              title: 'organization.edit_profile.cancel'.tr(),
+                              bgColor: Colors.transparent,
+                              borderColor: AppColors.primary,
+                              textColor: AppColors.primary,
+                              height: AppSize.getHeight(45),
+                            ),
+                          ),
+                          SizedBox(width: AppSize.getWidth(10)),
+                          Expanded(
+                            child: CustomButton(
+                              title: 'organization.edit_profile.save_changes'
+                                  .tr(),
+                              loading: state is Loading,
+                              bgColor: cubit.hasChanges
+                                  ? AppColors.primary
+                                  : AppColors.primary.withValues(alpha: .35),
+                              textColor: cubit.hasChanges
+                                  ? AppColors.white
+                                  : AppColors.white.withValues(alpha: .6),
+                              height: AppSize.getHeight(45),
+                              onTap: cubit.hasChanges && state is! Loading
+                                  ? _submit
+                                  : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: AppSize.getHeight(12)),
+                      CustomButton(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => ConfirmDialog(
+                              title: 'organization.edit_profile.delete_org'
+                                  .tr(),
+                              message:
+                                  'organization.edit_profile.delete_org_desc'
+                                      .tr(),
+                              confirmText: 'core.delete'.tr(),
+                              isDestructive: true,
+                              onConfirm: () async {
+                                await AppCubit.get(context).deleteAccount();
+
+                                if (!context.mounted) {
+                                  return;
+                                }
+
+                                AppNavigator.remove(const SignInScreen());
                               },
                             ),
+                          );
+                        },
+                        title: 'organization.edit_profile.delete_org'.tr(),
+                        icon: AppIcons.delete,
+                        iconSize: AppSize.getSize(17),
+                        textColor: AppColors.red,
+                        textSize: AppSize.font(14),
+                        bgColor: AppColors.red.withValues(alpha: .08),
+                        borderColor: Colors.transparent,
+                        height: AppSize.getHeight(45),
                       ),
+                      SizedBox(height: AppSize.getHeight(16)),
                     ],
-                  ),
-
-                  SizedBox(height: AppSize.getHeight(12)),
-
-                  CustomButton(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => ConfirmDialog(
-                          title: 'organization.edit_profile.delete_org'.tr(),
-                          message: 'organization.edit_profile.delete_org_desc'
-                              .tr(),
-                          confirmText: 'core.delete'.tr(),
-                          isDestructive: true,
-                          onConfirm: () async {
-                            await AppCubit.get(context).deleteAccount();
-
-                            if (!context.mounted) return;
-
-                            AppNavigator.remove(const SignInScreen());
-                          },
-                        ),
-                      );
-                    },
-                    title: 'organization.edit_profile.delete_org'.tr(),
-                    icon: AppIcons.delete,
-                    iconSize: AppSize.getSize(17),
-                    textColor: AppColors.red,
-                    textSize: AppSize.font(14),
-                    bgColor: AppColors.red.withValues(alpha: 0.08),
-                    borderColor: Colors.transparent,
-                    height: AppSize.getHeight(45),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
           ),
@@ -725,7 +485,7 @@ class _EditOrganizationProfileScreenState extends State<EditOrgProfileScreen> {
     );
   }
 
-  Widget _logoPlaceholder() {
+  Widget _logoPlaceholder(BuildContext context) {
     return Container(
       width: AppSize.getWidth(50),
       height: AppSize.getWidth(50),
@@ -742,5 +502,11 @@ class _EditOrganizationProfileScreenState extends State<EditOrgProfileScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    editProfileCubit.close();
+    super.dispose();
   }
 }

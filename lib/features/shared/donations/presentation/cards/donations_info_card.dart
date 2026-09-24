@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/constant/app_size.dart';
-import '../../../../../core/style/app_colors.dart';
 
 class DonationsInfoCard extends StatelessWidget {
   final String icon;
@@ -22,16 +21,27 @@ class DonationsInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+    final cardColor = theme.cardColor;
+
     return Container(
       height: AppSize.getHeight(120),
       padding: AppSize.padding(all: 10),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: AppColors.grey.withValues(alpha: 0.1)),
+        border: Border.all(
+          color: textColor.withValues(
+            alpha: isDark ? .12 : .1,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.2),
+            color: Colors.black.withValues(
+              alpha: isDark ? .25 : .1,
+            ),
             blurRadius: 3,
           ),
         ],
@@ -51,19 +61,22 @@ class DonationsInfoCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withValues(
+                          alpha: isDark ? .2 : .1,
+                        ),
                         blurRadius: 8,
                       ),
                     ],
                   ),
-                  child: CustomIcon(icon: icon, color: iconColor),
+                  child: CustomIcon(
+                    icon: icon,
+                    color: iconColor,
+                  ),
                 ),
               ),
             ),
           ),
-
           SizedBox(width: AppSize.getWidth(10)),
-
           Expanded(
             flex: 5,
             child: Column(
@@ -78,22 +91,20 @@ class DonationsInfoCard extends StatelessWidget {
                       title,
                       maxLines: 1,
                       style: TextStyle(
-                        color: AppColors.black,
+                        color: textColor,
                         fontWeight: FontWeight.w600,
                         fontSize: AppSize.font(25),
                       ),
                     ),
                   ),
                 ),
-
                 SizedBox(height: AppSize.getHeight(4)),
-
                 Text(
                   subtitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: AppColors.grey,
+                    color: textColor.withValues(alpha: .6),
                     fontWeight: FontWeight.w400,
                     fontSize: AppSize.font(12),
                   ),

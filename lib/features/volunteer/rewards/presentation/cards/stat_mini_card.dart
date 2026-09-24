@@ -20,18 +20,24 @@ class StatMiniCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .6);
+
     return Container(
       padding: AppSize.padding(all: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.2),
-          width: 0.7,
+          color: textColor.withValues(alpha: .12),
+          width: .7,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.grey.withValues(alpha: 0.05),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? .2 : .05,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -52,12 +58,15 @@ class StatMiniCard extends StatelessWidget {
             style: TextStyle(
               fontSize: AppSize.font(18),
               fontWeight: FontWeight.w800,
-              color: const Color(0xFF1A1A2E),
+              color: textColor,
             ),
           ),
           Text(
             label,
-            style: TextStyle(fontSize: AppSize.font(11), color: AppColors.grey),
+            style: TextStyle(
+              fontSize: AppSize.font(11),
+              color: secondaryColor,
+            ),
           ),
         ],
       ),
@@ -84,7 +93,7 @@ class StatsRow extends StatelessWidget {
         Expanded(
           child: StatMiniCard(
             icon: AppIcons.fire,
-            iconColor: Color(0xFFFF6B35),
+            iconColor: const Color(0xFFFF6B35),
             value: '7',
             label: 'Day Streak',
           ),

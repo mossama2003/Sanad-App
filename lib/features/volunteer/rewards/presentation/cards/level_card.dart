@@ -27,7 +27,11 @@ class LevelCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: const LinearGradient(
-          colors: [Color(0xFF7B2FBE), Color(0xFF4A90D9), Color(0xFF2ECFA0)],
+          colors: [
+            Color(0xFF7B2FBE),
+            Color(0xFF4A90D9),
+            Color(0xFF2ECFA0),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -37,12 +41,11 @@ class LevelCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              // Crown icon
               Container(
                 width: AppSize.getSize(44),
                 height: AppSize.getSize(44),
                 decoration: BoxDecoration(
-                  color: AppColors.white.withValues(alpha: 0.2),
+                  color: AppColors.white.withValues(alpha: .2),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -77,9 +80,12 @@ class LevelCard extends StatelessWidget {
               ),
               const Spacer(),
               Container(
-                padding: AppSize.padding(horizontal: 12, vertical: 6),
+                padding: AppSize.padding(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.25),
+                  color: AppColors.white.withValues(alpha: .25),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -118,8 +124,10 @@ class LevelCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: Colors.white.withValues(alpha: 0.3),
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.gold),
+              backgroundColor: AppColors.white.withValues(alpha: .3),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.gold,
+              ),
               minHeight: 8,
             ),
           ),

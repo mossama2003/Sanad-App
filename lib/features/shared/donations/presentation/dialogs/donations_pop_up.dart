@@ -12,9 +12,19 @@ class DonationsPopUp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+    final dialogColor = theme.dialogTheme.backgroundColor ??
+        theme.colorScheme.surface;
+    final secondaryColor = textColor.withValues(alpha: .45);
+    final amountColor = textColor.withValues(alpha: isDark ? .08 : .05);
+
     return Dialog(
-      backgroundColor: const Color(0xFFF5F5F7),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: dialogColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Padding(
         padding: AppSize.padding(all: 20),
         child: Column(
@@ -26,6 +36,7 @@ class DonationsPopUp extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppSize.font(20),
                 fontWeight: FontWeight.w400,
+                color: textColor,
               ),
             ),
             SizedBox(height: AppSize.getHeight(10)),
@@ -34,7 +45,7 @@ class DonationsPopUp extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppSize.font(15),
                 fontWeight: FontWeight.w400,
-                color: AppColors.black.withValues(alpha: 0.4),
+                color: secondaryColor,
               ),
             ),
             SizedBox(height: AppSize.getHeight(10)),
@@ -48,28 +59,46 @@ class DonationsPopUp extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: AppSize.padding(vertical: 10, horizontal: 12),
+                  padding: AppSize.padding(
+                    vertical: 10,
+                    horizontal: 12,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: AppColors.grey100,
+                    color: amountColor,
                   ),
-                  child: Center(child: Text('100 EGP')),
+                  child: Text(
+                    '100 EGP',
+                    style: TextStyle(color: textColor),
+                  ),
                 ),
                 Container(
-                  padding: AppSize.padding(vertical: 10, horizontal: 12),
+                  padding: AppSize.padding(
+                    vertical: 10,
+                    horizontal: 12,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: AppColors.grey100,
+                    color: amountColor,
                   ),
-                  child: Center(child: Text('250 EGP')),
+                  child: Text(
+                    '250 EGP',
+                    style: TextStyle(color: textColor),
+                  ),
                 ),
                 Container(
-                  padding: AppSize.padding(vertical: 10, horizontal: 12),
+                  padding: AppSize.padding(
+                    vertical: 10,
+                    horizontal: 12,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: AppColors.grey100,
+                    color: amountColor,
                   ),
-                  child: Center(child: Text('500 EGP')),
+                  child: Text(
+                    '500 EGP',
+                    style: TextStyle(color: textColor),
+                  ),
                 ),
               ],
             ),
@@ -81,10 +110,12 @@ class DonationsPopUp extends StatelessWidget {
                   child: CustomButton(
                     onTap: () => AppNavigator.pop(),
                     title: 'shared.donations.pop_up.cancel'.tr(),
-                    textColor: AppColors.black,
+                    textColor: textColor,
                     textSize: AppSize.font(15),
                     height: AppSize.getHeight(45),
-                    bgColor: AppColors.grey200,
+                    bgColor: isDark
+                        ? textColor.withValues(alpha: .08)
+                        : AppColors.grey200,
                   ),
                 ),
                 SizedBox(width: AppSize.getWidth(10)),

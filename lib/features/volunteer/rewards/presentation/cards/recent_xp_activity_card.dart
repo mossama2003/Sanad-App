@@ -19,19 +19,24 @@ class RecentXpActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+
     return Container(
       width: double.infinity,
       padding: AppSize.padding(all: 16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.2),
-          width: 0.7,
+          color: textColor.withValues(alpha: .12),
+          width: .7,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.grey.withValues(alpha: 0.05),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? .2 : .05,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -40,7 +45,6 @@ class RecentXpActivityCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(
             children: [
               CustomIcon(
@@ -55,6 +59,7 @@ class RecentXpActivityCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: AppSize.font(16),
                   fontWeight: FontWeight.w700,
+                  color: textColor,
                 ),
               ),
               const Spacer(),
@@ -67,7 +72,7 @@ class RecentXpActivityCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: AppSize.font(12),
                       fontWeight: FontWeight.w600,
-                      color: AppColors.black,
+                      color: textColor,
                     ),
                   ),
                 ),
@@ -75,9 +80,9 @@ class RecentXpActivityCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: AppSize.getHeight(14)),
-
-          // Activity rows
-          ...activities.map((a) => _XpActivityRow(activity: a)),
+          ...activities.map(
+                (a) => _XpActivityRow(activity: a),
+          ),
         ],
       ),
     );
@@ -87,15 +92,20 @@ class RecentXpActivityCard extends StatelessWidget {
 class _XpActivityRow extends StatelessWidget {
   final XpActivityModel activity;
 
-  const _XpActivityRow({required this.activity});
+  const _XpActivityRow({
+    required this.activity,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .6);
+
     return Padding(
       padding: AppSize.padding(vertical: 8),
       child: Row(
         children: [
-          // Icon circle
           Container(
             width: AppSize.getSize(42),
             height: AppSize.getSize(42),
@@ -112,8 +122,6 @@ class _XpActivityRow extends StatelessWidget {
             ),
           ),
           SizedBox(width: AppSize.getWidth(12)),
-
-          // Title + time
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +133,7 @@ class _XpActivityRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: AppSize.font(14),
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF1A1A2E),
+                    color: textColor,
                   ),
                 ),
                 SizedBox(height: AppSize.getHeight(2)),
@@ -133,18 +141,19 @@ class _XpActivityRow extends StatelessWidget {
                   activity.time,
                   style: TextStyle(
                     fontSize: AppSize.font(12),
-                    color: AppColors.grey,
+                    color: secondaryColor,
                   ),
                 ),
               ],
             ),
           ),
-
-          // XP pill
           Container(
-            padding: AppSize.padding(horizontal: 10, vertical: 5),
+            padding: AppSize.padding(
+              horizontal: 10,
+              vertical: 5,
+            ),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.12),
+              color: AppColors.primary.withValues(alpha: .12),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(

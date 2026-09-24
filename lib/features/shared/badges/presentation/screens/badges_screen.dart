@@ -1,6 +1,5 @@
 import 'package:sanad_app/features/shared/badges/presentation/widgets/tab_bar_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:sanad_app/core/style/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/constant/app_size.dart';
@@ -64,23 +63,31 @@ class _BadgesScreenState extends State<BadgesScreen> {
     if (_selectedTab == 1) {
       return _allBadges.where((b) => b.status == BadgeStatus.earned).toList();
     }
+
     if (_selectedTab == 2) {
       return _allBadges
           .where((b) => b.status == BadgeStatus.inProgress)
           .toList();
     }
+
     return _allBadges;
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .6);
+
+    final backgroundColor = theme.scaffoldBackgroundColor;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: Color(0xFFF5F5F7),
+        backgroundColor: backgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -88,24 +95,22 @@ class _BadgesScreenState extends State<BadgesScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── AppBar ──────────────────────────────────────────────
               Text(
                 'shared.badges.badges'.tr(),
                 style: TextStyle(
                   fontSize: AppSize.font(22),
                   fontWeight: FontWeight.w800,
+                  color: textColor,
                 ),
               ),
               Text(
                 'shared.badges.earn_badges'.tr(),
                 style: TextStyle(
                   fontSize: AppSize.font(15),
-                  color: AppColors.grey,
+                  color: secondaryColor,
                 ),
               ),
               SizedBox(height: AppSize.getHeight(20)),
-
-              // ── Collection Card ─────────────────────────────────────
               const CollectionCard(
                 collected: 5,
                 total: 12,
@@ -114,8 +119,6 @@ class _BadgesScreenState extends State<BadgesScreen> {
                 bronze: 2,
               ),
               SizedBox(height: AppSize.getHeight(20)),
-
-              // ── Tab Bar ─────────────────────────────────────────────
               TabBarWidget(
                 selected: _selectedTab,
                 onTap: (i) => setState(() => _selectedTab = i),
@@ -128,8 +131,6 @@ class _BadgesScreenState extends State<BadgesScreen> {
                     .length,
               ),
               SizedBox(height: AppSize.getHeight(20)),
-
-              // ── Grid ─────────────────────────────────────────────────
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

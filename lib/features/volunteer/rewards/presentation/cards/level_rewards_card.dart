@@ -11,23 +11,31 @@ import '../../data/models/rewards_model.dart';
 class LevelRewardsCard extends StatelessWidget {
   final List<RewardsModel> rewards;
 
-  const LevelRewardsCard({super.key, required this.rewards});
+  const LevelRewardsCard({
+    super.key,
+    required this.rewards,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+
     return Container(
       width: double.infinity,
       padding: AppSize.padding(all: 16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.2),
-          width: 0.7,
+          color: textColor.withValues(alpha: .12),
+          width: .7,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.grey.withValues(alpha: 0.05),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? .2 : .05,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -50,12 +58,15 @@ class LevelRewardsCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: AppSize.font(16),
                   fontWeight: FontWeight.w700,
+                  color: textColor,
                 ),
               ),
             ],
           ),
           SizedBox(height: AppSize.getHeight(14)),
-          ...rewards.map((r) => _RewardRow(reward: r)),
+          ...rewards.map(
+                (r) => _RewardRow(reward: r),
+          ),
         ],
       ),
     );
@@ -71,26 +82,36 @@ class _RewardRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .6);
+
+    final unlockedBackground =
+    AppColors.primary.withValues(alpha: .08);
+
+    final lockedBackground = textColor.withValues(alpha: .06);
+
+    final lockedCircleColor = textColor.withValues(alpha: .12);
+
     return Padding(
       padding: AppSize.padding(vertical: 6),
       child: Container(
         padding: AppSize.padding(all: 12),
         decoration: BoxDecoration(
           color: _isUnlocked
-              ? AppColors.primary.withValues(alpha: 0.08)
-              : AppColors.grey.withValues(alpha: 0.07),
+              ? unlockedBackground
+              : lockedBackground,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           children: [
-            // Level circle
             Container(
               width: AppSize.getSize(40),
               height: AppSize.getSize(40),
               decoration: BoxDecoration(
                 color: _isUnlocked
                     ? AppColors.primary
-                    : AppColors.grey.withValues(alpha: 0.2),
+                    : lockedCircleColor,
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
@@ -99,7 +120,9 @@ class _RewardRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: AppSize.font(13),
                   fontWeight: FontWeight.w700,
-                  color: _isUnlocked ? AppColors.white : AppColors.grey,
+                  color: _isUnlocked
+                      ? AppColors.white
+                      : secondaryColor,
                 ),
               ),
             ),
@@ -113,14 +136,14 @@ class _RewardRow extends StatelessWidget {
                     style: TextStyle(
                       fontSize: AppSize.font(14),
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1A1A2E),
+                      color: textColor,
                     ),
                   ),
                   Text(
                     reward.subtitle,
                     style: TextStyle(
                       fontSize: AppSize.font(12),
-                      color: AppColors.grey,
+                      color: secondaryColor,
                     ),
                   ),
                 ],
@@ -133,7 +156,9 @@ class _RewardRow extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppSize.font(13),
                 fontWeight: FontWeight.w600,
-                color: _isUnlocked ? AppColors.primary : AppColors.grey,
+                color: _isUnlocked
+                    ? AppColors.primary
+                    : secondaryColor,
               ),
             ),
           ],

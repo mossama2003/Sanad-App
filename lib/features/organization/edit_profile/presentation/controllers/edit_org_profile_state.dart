@@ -8,4 +8,6 @@ class Loading extends EditOrgProfileState {}
 
 class Success extends EditOrgProfileState {}
 
+class Changed extends EditOrgProfileState {}
+
 class Error extends EditOrgProfileState {}

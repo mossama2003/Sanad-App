@@ -13,19 +13,25 @@ class StreakTrackerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .6);
+
     return Container(
       width: double.infinity,
       padding: AppSize.padding(all: 16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.2),
-          width: 0.7,
+          color: textColor.withValues(alpha: .12),
+          width: .7,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.grey.withValues(alpha: 0.05),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? .2 : .05,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -37,17 +43,17 @@ class StreakTrackerCard extends StatelessWidget {
             children: [
               CustomIcon(
                 icon: AppIcons.fire,
-                color: Color(0xFFFF6B35),
+                color: const Color(0xFFFF6B35),
                 width: AppSize.getWidth(20),
                 height: AppSize.getHeight(20),
               ),
-
               SizedBox(width: AppSize.getWidth(6)),
               Text(
                 'shared.rewards.streak_tracker'.tr(),
                 style: TextStyle(
                   fontSize: AppSize.font(16),
                   fontWeight: FontWeight.w700,
+                  color: textColor,
                 ),
               ),
               const Spacer(),
@@ -55,7 +61,7 @@ class StreakTrackerCard extends StatelessWidget {
                 'shared.rewards.longest'.tr(),
                 style: TextStyle(
                   fontSize: AppSize.font(12),
-                  color: AppColors.grey,
+                  color: secondaryColor,
                 ),
               ),
             ],
@@ -66,46 +72,51 @@ class StreakTrackerCard extends StatelessWidget {
             children: _days
                 .map(
                   (d) => Column(
-                    children: [
-                      Container(
-                        width: AppSize.getSize(38),
-                        height: AppSize.getSize(38),
-
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [Color(0xFFFF8C00), Color(0xFFFF4500)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: Center(
-                          child: CustomIcon(
-                            icon: AppIcons.fire,
-                            color: AppColors.white,
-                            width: AppSize.getWidth(20),
-                            height: AppSize.getHeight(20),
-                          ),
-                        ),
+                children: [
+                  Container(
+                    width: AppSize.getSize(38),
+                    height: AppSize.getSize(38),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFFF8C00),
+                          Color(0xFFFF4500),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      SizedBox(height: AppSize.getHeight(6)),
-                      Text(
-                        d,
-                        style: TextStyle(
-                          fontSize: AppSize.font(11),
-                          color: AppColors.grey,
-                          fontWeight: FontWeight.w500,
-                        ),
+                    ),
+                    child: Center(
+                      child: CustomIcon(
+                        icon: AppIcons.fire,
+                        color: AppColors.white,
+                        width: AppSize.getWidth(20),
+                        height: AppSize.getHeight(20),
                       ),
-                    ],
+                    ),
                   ),
-                )
+                  SizedBox(height: AppSize.getHeight(6)),
+                  Text(
+                    d,
+                    style: TextStyle(
+                      fontSize: AppSize.font(11),
+                      color: secondaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            )
                 .toList(),
           ),
           SizedBox(height: AppSize.getHeight(12)),
           Text(
             'shared.rewards.volunteer_today'.tr(),
-            style: TextStyle(fontSize: AppSize.font(12), color: AppColors.grey),
+            style: TextStyle(
+              fontSize: AppSize.font(12),
+              color: secondaryColor,
+            ),
           ),
         ],
       ),

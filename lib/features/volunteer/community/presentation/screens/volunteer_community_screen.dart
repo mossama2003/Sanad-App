@@ -10,7 +10,6 @@ import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../controllers/volunteer_community_cubit.dart';
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
-import '../../../../../core/style/app_colors.dart';
 import '../cards/volunteer_community_card.dart';
 
 class VolunteerCommunityScreen extends StatefulWidget {
@@ -44,22 +43,44 @@ class _VolunteerCommunityScreenState extends State<VolunteerCommunityScreen> {
   @override
   Widget build(BuildContext context) {
     final cubit = context.watch<VolunteerCommunityCubit>();
+
     final theme = Theme.of(context);
+
+    final isDark = theme.brightness == Brightness.dark;
+
     final textColor = theme.colorScheme.onSurface;
+
     final cardColor = theme.cardColor;
+
     final secondaryColor = textColor.withValues(alpha: .6);
+
+    final borderColor = textColor.withValues(alpha: isDark ? .18 : .12);
+
+    final searchBorderColor = textColor.withValues(alpha: isDark ? .25 : .2);
+
+    final footerColor = textColor.withValues(alpha: isDark ? .55 : .7);
 
     return BlocBuilder<VolunteerCommunityCubit, VolunteerCommunityState>(
       builder: (context, state) {
         if (state is Loading) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(color: theme.colorScheme.primary),
+          );
         }
 
         if (state is Error) {
-          return Center(child: Text('core.error_title'.tr()));
+          return Center(
+            child: Text(
+              'core.error_title'.tr(),
+              style: TextStyle(color: textColor),
+            ),
+          );
         }
 
         return RefreshIndicator(
+          color: theme.colorScheme.primary,
+          backgroundColor: cardColor,
+
           onRefresh: () async {
             searchController.clear();
 
@@ -96,6 +117,7 @@ class _VolunteerCommunityScreenState extends State<VolunteerCommunityScreen> {
                   children: [
                     Text(
                       'volunteer.community.title'.tr(),
+
                       style: TextStyle(
                         fontSize: AppSize.font(22),
                         fontWeight: FontWeight.w700,
@@ -107,9 +129,10 @@ class _VolunteerCommunityScreenState extends State<VolunteerCommunityScreen> {
 
                     Text(
                       'volunteer.community.desc'.tr(),
+
                       style: TextStyle(
                         fontSize: AppSize.font(15),
-                        color: textColor.withValues(alpha: .5),
+                        color: secondaryColor,
                       ),
                     ),
 
@@ -117,9 +140,13 @@ class _VolunteerCommunityScreenState extends State<VolunteerCommunityScreen> {
 
                     CustomSearchField(
                       controller: searchController,
+
                       hint: 'volunteer.community.search'.tr(),
-                      borderColor: AppColors.grey300,
+
+                      borderColor: searchBorderColor,
+
                       borderRadius: 20,
+
                       borderWidth: 1,
 
                       onChanged: (value) {
@@ -143,16 +170,12 @@ class _VolunteerCommunityScreenState extends State<VolunteerCommunityScreen> {
 
                           borderRadius: BorderRadius.circular(15),
 
-                          border: Border.all(
-                            color: textColor.withValues(alpha: .12),
-                          ),
+                          border: Border.all(color: borderColor),
 
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(
-                                alpha: theme.brightness == Brightness.dark
-                                    ? .35
-                                    : .12,
+                                alpha: isDark ? .35 : .12,
                               ),
 
                               blurRadius: 8,
@@ -176,8 +199,11 @@ class _VolunteerCommunityScreenState extends State<VolunteerCommunityScreen> {
                               child: Center(
                                 child: CustomIcon(
                                   icon: AppIcons.community,
+
                                   color: textColor.withValues(alpha: .5),
+
                                   width: AppSize.getSize(20),
+
                                   height: AppSize.getSize(20),
                                 ),
                               ),
@@ -214,6 +240,7 @@ class _VolunteerCommunityScreenState extends State<VolunteerCommunityScreen> {
 
                             CustomButton(
                               width: AppSize.getWidth(150),
+
                               height: AppSize.getHeight(40),
 
                               title: 'volunteer.community.browse_events'.tr(),
@@ -250,7 +277,7 @@ class _VolunteerCommunityScreenState extends State<VolunteerCommunityScreen> {
                     Divider(
                       thickness: AppSize.font(1),
 
-                      color: AppColors.black.withValues(alpha: 0.1),
+                      color: textColor.withValues(alpha: isDark ? .15 : .1),
                     ),
 
                     SizedBox(height: AppSize.getHeight(10)),
@@ -265,7 +292,7 @@ class _VolunteerCommunityScreenState extends State<VolunteerCommunityScreen> {
                         style: TextStyle(
                           fontSize: AppSize.font(13),
                           fontWeight: FontWeight.w400,
-                          color: AppColors.black.withValues(alpha: 0.7),
+                          color: footerColor,
                         ),
                       ),
                     ),
@@ -279,7 +306,7 @@ class _VolunteerCommunityScreenState extends State<VolunteerCommunityScreen> {
                         style: TextStyle(
                           fontSize: AppSize.font(13),
                           fontWeight: FontWeight.w400,
-                          color: AppColors.black.withValues(alpha: 0.7),
+                          color: footerColor,
                         ),
                       ),
                     ),

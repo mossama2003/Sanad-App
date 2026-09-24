@@ -53,13 +53,18 @@ class VolunteerRewardsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .6);
+    final backgroundColor = theme.scaffoldBackgroundColor;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F5F7),
+        backgroundColor: backgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -67,46 +72,37 @@ class VolunteerRewardsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title
               Text(
                 'shared.rewards.rewards'.tr(),
                 style: TextStyle(
                   fontSize: AppSize.font(22),
                   fontWeight: FontWeight.w800,
+                  color: textColor,
                 ),
               ),
               Text(
                 'shared.rewards.track_your_progress'.tr(),
                 style: TextStyle(
                   fontSize: AppSize.font(13),
-                  color: AppColors.grey,
+                  color: secondaryColor,
                 ),
               ),
               SizedBox(height: AppSize.getHeight(20)),
-
-              // Level Card
               const LevelCard(currentXp: 2450, nextLevelXp: 3000, level: 12),
               SizedBox(height: AppSize.getHeight(16)),
-
-              // Stats Row
               const StatsRow(),
               SizedBox(height: AppSize.getHeight(16)),
-
-              // Streak Tracker
               const StreakTrackerCard(),
               SizedBox(height: AppSize.getHeight(16)),
-
-              // Level Rewards
               LevelRewardsCard(rewards: _rewards),
               SizedBox(height: AppSize.getHeight(16)),
-
               RecentXpActivityCard(
                 onViewAll: () {},
                 activities: [
                   XpActivityModel(
                     icon: AppIcons.calendar,
                     iconColor: AppColors.primary,
-                    iconBgColor: AppColors.primary.withValues(alpha: 0.12),
+                    iconBgColor: AppColors.primary.withValues(alpha: .12),
                     title: 'Attended Beach Cleanup',
                     time: 'Today, 10:32 AM',
                     xp: 150,
@@ -114,9 +110,7 @@ class VolunteerRewardsScreen extends StatelessWidget {
                   XpActivityModel(
                     icon: AppIcons.fire,
                     iconColor: const Color(0xFFFF6B35),
-                    iconBgColor: const Color(
-                      0xFFFF6B35,
-                    ).withValues(alpha: 0.12),
+                    iconBgColor: const Color(0xFFFF6B35).withValues(alpha: .12),
                     title: 'Daily streak bonus',
                     time: 'Today, 9:00 AM',
                     xp: 25,
@@ -124,9 +118,7 @@ class VolunteerRewardsScreen extends StatelessWidget {
                   XpActivityModel(
                     icon: AppIcons.badge,
                     iconColor: const Color(0xFFFFD700),
-                    iconBgColor: const Color(
-                      0xFFFFD700,
-                    ).withValues(alpha: 0.12),
+                    iconBgColor: const Color(0xFFFFD700).withValues(alpha: .12),
                     title: "Earned 'Tree Hugger' badge",
                     time: 'Yesterday',
                     xp: 150,
@@ -134,9 +126,7 @@ class VolunteerRewardsScreen extends StatelessWidget {
                   XpActivityModel(
                     icon: AppIcons.star,
                     iconColor: const Color(0xFFE05C5C),
-                    iconBgColor: const Color(
-                      0xFFE05C5C,
-                    ).withValues(alpha: 0.12),
+                    iconBgColor: const Color(0xFFE05C5C).withValues(alpha: .12),
                     title: 'Donated to Hope Foundation',
                     time: 'Yesterday',
                     xp: 100,
@@ -144,9 +134,7 @@ class VolunteerRewardsScreen extends StatelessWidget {
                   XpActivityModel(
                     icon: AppIcons.qr,
                     iconColor: const Color(0xFF4A90D9),
-                    iconBgColor: const Color(
-                      0xFF4A90D9,
-                    ).withValues(alpha: 0.12),
+                    iconBgColor: const Color(0xFF4A90D9).withValues(alpha: .12),
                     title: 'QR Check-in completed',
                     time: '2 days ago',
                     xp: 50,
@@ -154,9 +142,7 @@ class VolunteerRewardsScreen extends StatelessWidget {
                   XpActivityModel(
                     icon: AppIcons.community,
                     iconColor: const Color(0xFF7B2FBE),
-                    iconBgColor: const Color(
-                      0xFF7B2FBE,
-                    ).withValues(alpha: 0.12),
+                    iconBgColor: const Color(0xFF7B2FBE).withValues(alpha: .12),
                     title: 'Invited a friend',
                     time: '3 days ago',
                     xp: 75,
@@ -164,7 +150,6 @@ class VolunteerRewardsScreen extends StatelessWidget {
                 ],
               ),
               SizedBox(height: AppSize.getHeight(16)),
-
               WeeklyLeaderboardCard(
                 entries: [
                   LeaderboardModel(rank: 1, name: 'Sara Hassan', xp: 5820),

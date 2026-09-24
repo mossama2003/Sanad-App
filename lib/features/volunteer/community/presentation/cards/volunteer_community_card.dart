@@ -20,15 +20,32 @@ class VolunteerCommunityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final isDark = theme.brightness == Brightness.dark;
+
+    final textColor = theme.colorScheme.onSurface;
+
+    final cardColor = theme.cardColor;
+
+    final secondaryColor = textColor.withValues(alpha: isDark ? .6 : .55);
+
+    final creatorColor = textColor.withValues(alpha: isDark ? .8 : .8);
+
     final latestMessage = event.latestMessage?['message']?.toString() ?? '';
+
     final latestMessageDate = DateTime.tryParse(
       event.latestMessage?['created']?.toString() ?? '',
     );
 
     final unread = event.unreadChatMessages;
+
     final joiners = event.joiners;
+
     final date = event.date;
+
     final status = event.status.toLowerCase();
+
     final isEnded = status == 'completed';
 
     return GestureDetector(
@@ -39,36 +56,55 @@ class VolunteerCommunityCard extends StatelessWidget {
           event: event.toChatEvent(),
         ),
       ),
+
       child: Container(
         padding: AppSize.padding(all: 15),
+
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: cardColor,
+
           borderRadius: BorderRadius.circular(30),
+
+          border: Border.all(
+            color: textColor.withValues(alpha: isDark ? .12 : .06),
+          ),
+
           boxShadow: [
             BoxShadow(
-              color: AppColors.black.withValues(alpha: .1),
+              color: Colors.black.withValues(alpha: isDark ? .3 : .1),
+
               blurRadius: 8,
             ),
           ],
         ),
+
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
+
               children: [
                 Container(
                   width: AppSize.getSize(40),
+
                   height: AppSize.getSize(40),
+
                   decoration: BoxDecoration(
                     color: AppColors.primary,
+
                     borderRadius: BorderRadius.circular(15),
                   ),
+
                   child: Center(
                     child: CustomIcon(
                       icon: AppIcons.chat,
+
                       color: AppColors.white,
+
                       width: AppSize.getSize(22),
+
                       height: AppSize.getSize(22),
                     ),
                   ),
@@ -79,17 +115,24 @@ class VolunteerCommunityCard extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+
                     children: [
                       Row(
                         children: [
                           Expanded(
                             child: Text(
                               event.name,
+
                               maxLines: 1,
+
                               overflow: TextOverflow.ellipsis,
+
                               style: TextStyle(
                                 fontSize: AppSize.font(15),
+
                                 fontWeight: FontWeight.w500,
+
+                                color: textColor,
                               ),
                             ),
                           ),
@@ -98,9 +141,11 @@ class VolunteerCommunityCard extends StatelessWidget {
 
                           Text(
                             AppHelper.timeAgoShort(latestMessageDate ?? date),
+
                             style: TextStyle(
                               fontSize: AppSize.font(11),
-                              color: AppColors.black.withValues(alpha: .55),
+
+                              color: secondaryColor,
                             ),
                           ),
 
@@ -111,20 +156,27 @@ class VolunteerCommunityCard extends StatelessWidget {
                               horizontal: 10,
                               vertical: 3,
                             ),
+
                             decoration: BoxDecoration(
                               color: isEnded
                                   ? Colors.transparent
                                   : AppColors.primary,
+
                               borderRadius: BorderRadius.circular(20),
+
                               border: Border.all(color: AppColors.primary),
                             ),
+
                             child: Text(
                               isEnded
                                   ? 'volunteer.community.ended'.tr()
                                   : 'volunteer.community.active'.tr(),
+
                               style: TextStyle(
                                 fontSize: AppSize.font(12),
+
                                 fontWeight: FontWeight.w400,
+
                                 color: isEnded
                                     ? AppColors.primary
                                     : AppColors.white,
@@ -134,22 +186,31 @@ class VolunteerCommunityCard extends StatelessWidget {
 
                           if (unread > 0) ...[
                             SizedBox(width: AppSize.getWidth(5)),
+
                             Container(
                               constraints: BoxConstraints(
                                 minWidth: AppSize.getSize(20),
+
                                 minHeight: AppSize.getSize(20),
                               ),
+
                               padding: AppSize.padding(horizontal: 5),
+
                               decoration: BoxDecoration(
                                 color: AppColors.primary,
+
                                 borderRadius: BorderRadius.circular(12),
                               ),
+
                               child: Center(
                                 child: Text(
                                   unread.toString(),
+
                                   style: TextStyle(
                                     fontSize: AppSize.font(12),
+
                                     color: AppColors.white,
+
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -163,9 +224,11 @@ class VolunteerCommunityCard extends StatelessWidget {
 
                       Text(
                         event.creator?['name'] ?? '',
+
                         style: TextStyle(
                           fontSize: AppSize.font(13),
-                          color: AppColors.black.withValues(alpha: .8),
+
+                          color: creatorColor,
                         ),
                       ),
 
@@ -175,8 +238,11 @@ class VolunteerCommunityCard extends StatelessWidget {
                         children: [
                           CustomIcon(
                             icon: AppIcons.community,
-                            color: AppColors.black.withValues(alpha: .5),
+
+                            color: secondaryColor,
+
                             width: AppSize.getSize(18),
+
                             height: AppSize.getSize(18),
                           ),
 
@@ -184,9 +250,11 @@ class VolunteerCommunityCard extends StatelessWidget {
 
                           Text(
                             joiners.compact,
+
                             style: TextStyle(
                               fontSize: AppSize.font(13),
-                              color: AppColors.black.withValues(alpha: .5),
+
+                              color: secondaryColor,
                             ),
                           ),
 
@@ -194,8 +262,11 @@ class VolunteerCommunityCard extends StatelessWidget {
 
                           CustomIcon(
                             icon: AppIcons.events,
-                            color: AppColors.black.withValues(alpha: .5),
+
+                            color: secondaryColor,
+
                             width: AppSize.getSize(18),
+
                             height: AppSize.getSize(18),
                           ),
 
@@ -203,9 +274,11 @@ class VolunteerCommunityCard extends StatelessWidget {
 
                           Text(
                             DateFormat('dd MMM yyyy', 'en').format(date),
+
                             style: TextStyle(
                               fontSize: AppSize.font(13),
-                              color: AppColors.black.withValues(alpha: .5),
+
+                              color: secondaryColor,
                             ),
                           ),
                         ],
@@ -217,11 +290,17 @@ class VolunteerCommunityCard extends StatelessWidget {
                         latestMessage.isEmpty
                             ? 'volunteer.community.no_messages_yet'.tr()
                             : latestMessage,
+
                         maxLines: 1,
+
                         overflow: TextOverflow.ellipsis,
+
                         style: TextStyle(
                           fontSize: AppSize.font(13),
+
                           fontWeight: FontWeight.w300,
+
+                          color: textColor,
                         ),
                       ),
                     ],

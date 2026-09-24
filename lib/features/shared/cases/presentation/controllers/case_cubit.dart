@@ -47,8 +47,10 @@ class CasesCubit extends Cubit<CasesState> {
   }
 
   // ===================== Create Case =====================
-  // ===================== Create Case =====================
-  Future<void> createCase(CreateCaseParam param) async {
+  Future<void> createCase(
+    CreateCaseParam param, {
+    required BuildContext context,
+  }) async {
     if (isUpdatingCase) return;
 
     isUpdatingCase = true;
@@ -56,18 +58,55 @@ class CasesCubit extends Cubit<CasesState> {
 
     final result = await repo.createCase(param);
 
-    await result.fold(
-      (l) async {
+    result.fold(
+      (l) {
         isUpdatingCase = false;
-
         emit(Error());
-
         AppToast.error(l.errMessage);
       },
-      (r) async {
+      (r) {
+        final user = context.mounted ? AppCubit.get(context).user : null;
+
+        final newCase = CaseListItemModel(
+          id: r.id,
+          creator: Creator(
+            id: user?.id ?? 0,
+            name: user?.name ?? '',
+            avatar: user?.avatar,
+          ),
+          paymentDetails: CasePaymentDetails(
+            paymentType: r.paymentDetails?.paymentType ?? r.paymentType,
+            description: r.paymentDetails?.description ?? r.paymentDescription,
+            estimatedAmount:
+                r.paymentDetails?.estimatedAmount ?? r.paymentEstimatedAmount,
+            raisedAmount:
+                r.paymentDetails?.raisedAmount ?? r.paymentRaisedAmount,
+          ),
+          comments: 0,
+          likers: 0,
+          isLiked: false,
+          attachments: const [],
+          created: r.created,
+          modified: r.modified,
+          name: r.name,
+          description: r.description,
+          category: r.category,
+          urgency: r.urgency,
+          contactName: r.contactName,
+          contactPhone: r.contactPhone,
+          info: r.info,
+          verified: false,
+          note: r.note,
+          active: r.active,
+        );
+
+        casesList.removeWhere((item) => item.id == newCase.id);
+        casesList.insert(0, newCase);
+
+        myCasesCount++;
         isUpdatingCase = false;
 
-        await getCases(me: isMySelected);
+        emit(Success());
 
         AppToast.success('shared.cases.case_created_successfully'.tr());
       },
@@ -454,7 +493,7 @@ class CasesCubit extends Cubit<CasesState> {
 
         emit(Success());
 
-        AppToast.success('Case updated successfully');
+        AppToast.success('shared.cases.edit.case_updated'.tr());
       },
     );
   }

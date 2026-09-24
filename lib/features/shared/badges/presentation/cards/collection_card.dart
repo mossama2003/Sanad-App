@@ -20,6 +20,9 @@ class CollectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -29,15 +32,21 @@ class CollectionCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? .25 : .08),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Stack(
         children: [
-          // Trophy watermark
           Positioned(
             right: -10,
             top: 55,
             child: Opacity(
-              opacity: 0.15,
+              opacity: .15,
               child: CustomIcon(
                 icon: AppIcons.cup,
                 color: AppColors.white,
@@ -82,13 +91,11 @@ class CollectionCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: AppSize.getHeight(6)),
-
-                // Progress bar
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
                     value: collected / total,
-                    backgroundColor: AppColors.white.withValues(alpha: 0.3),
+                    backgroundColor: AppColors.white.withValues(alpha: .3),
                     valueColor: AlwaysStoppedAnimation<Color>(
                       AppColors.primary,
                     ),
@@ -96,8 +103,6 @@ class CollectionCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: AppSize.getHeight(14)),
-
-                // Tier dots
                 Row(
                   children: [
                     _TierDot(color: AppColors.gold, label: '$gold Gold'),

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:sanad_app/core/shared/widgets/custom_field_dropdown.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:sanad_app/core/style/app_text_style.dart';
@@ -153,6 +154,75 @@ class _CasesFormState extends State<CasesForm> {
     }
   }
 
+  Future<File?> _cropImage(String sourcePath) async {
+    final croppedFile = await ImageCropper().cropImage(
+      sourcePath: sourcePath,
+      compressQuality: 85,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'shared.cases.submit.crop_image'.tr(),
+          toolbarColor: AppColors.primary,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false,
+        ),
+        IOSUiSettings(
+          title: 'shared.cases.submit.crop_image'.tr(),
+          aspectRatioLockEnabled: false,
+        ),
+      ],
+    );
+
+    if (croppedFile == null) return null;
+
+    return File(croppedFile.path);
+  }
+
+  Future<void> _pickCasePhotos() async {
+    final files = await FilePicker.pickFiles(
+      type: FileType.image,
+      allowMultiple: true,
+    );
+
+    if (files.isEmpty) return;
+
+    final validFiles = files.where((f) => f.path != null).toList();
+
+    final List<File> croppedFiles = [];
+
+    for (final file in validFiles) {
+      if (!mounted) return;
+
+      final cropped = await _cropImage(file.path!);
+
+      if (cropped != null) {
+        croppedFiles.add(cropped);
+      }
+    }
+
+    if (croppedFiles.isNotEmpty) {
+      setState(() {
+        casePhotos.addAll(croppedFiles);
+      });
+    }
+  }
+
+  Future<void> _pickSupportingDocuments() async {
+    final files = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
+      allowMultiple: true,
+    );
+
+    if (files.isNotEmpty) {
+      setState(() {
+        supportingDocuments.addAll(
+          files.where((f) => f.path != null).map((f) => File(f.path!)),
+        );
+      });
+    }
+  }
+
   String _normalizeEgyptianPhone(String phone) {
     final value = phone.trim();
 
@@ -179,47 +249,17 @@ class _CasesFormState extends State<CasesForm> {
     instapayLinkController.dispose();
     walletPhoneController.dispose();
     ibanController.dispose();
-
     selectedCategory.dispose();
     selectedPaymentType.dispose();
 
     super.dispose();
   }
 
-  Future<void> _pickCasePhotos() async {
-    final files = await FilePicker.pickFiles(
-      type: FileType.image,
-      allowMultiple: true,
-    );
-
-    if (files.isNotEmpty) {
-      setState(() {
-        casePhotos.addAll(
-          files.where((f) => f.path != null).map((f) => File(f.path!)),
-        );
-      });
-    }
-  }
-
-  Future<void> _pickSupportingDocuments() async {
-    final files = await FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
-      allowMultiple: true,
-    );
-
-    if (files.isNotEmpty) {
-      setState(() {
-        supportingDocuments.addAll(
-          files.where((f) => f.path != null).map((f) => File(f.path!)),
-        );
-      });
-    }
-  }
-
-  // ===================== Optional Validators =====================
   String? _optional(String? value, String? Function(String?) validator) {
-    if (value == null || value.trim().isEmpty) return null;
+    if (value == null || value.trim().isEmpty) {
+      return null;
+    }
+
     return validator(value);
   }
 
@@ -269,7 +309,9 @@ class _CasesFormState extends State<CasesForm> {
     if (widget.isEdit) {
       CasesCubit.get(context).updateCase(id: widget.caseItem!.id, param: param);
     } else {
-      CasesCubit.get(context).createCase(param);
+      CasesCubit.get(
+        context,
+      ).createCase(param, context: context); // 👈 تعديل هنا
     }
   }
 
@@ -406,13 +448,13 @@ class _CasesFormState extends State<CasesForm> {
                   child: CustomButton(
                     onTap: () => Navigator.pop(context),
                     title: 'shared.cases.submit.cancel_button'.tr(),
-                    bgColor: AppColors.grey.withValues(alpha: 0.15),
-                    textColor: const Color(0xFF1A1A2E),
+                    bgColor: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: .08),
+                    textColor: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-
                 SizedBox(width: AppSize.getWidth(12)),
-
                 Expanded(
                   flex: 2,
                   child: BlocBuilder<CasesCubit, CasesState>(
@@ -439,9 +481,6 @@ class _CasesFormState extends State<CasesForm> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Multi Attachments Field
-// ─────────────────────────────────────────────────────────────────────────────
 class _MultiAttachmentsField extends StatelessWidget {
   final String title;
   final String icon;
@@ -465,13 +504,18 @@ class _MultiAttachmentsField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .65);
+    final borderColor = textColor.withValues(alpha: .18);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RichText(
           text: TextSpan(
             text: title,
-            style: TextStyle(color: AppColors.grey700).xs,
+            style: TextStyle(color: secondaryColor).xs,
             children: isRequired
                 ? [
                     TextSpan(
@@ -495,29 +539,27 @@ class _MultiAttachmentsField extends StatelessWidget {
                 name: existingFiles[i].name,
                 onRemove: () => onRemoveExisting(i),
               ),
-
             for (int i = 0; i < newFiles.length; i++)
               _AttachmentChip(
                 name: newFiles[i].path.split('/').last,
                 onRemove: () => onRemoveNew(i),
               ),
-
             GestureDetector(
               onTap: onAdd,
               child: Container(
                 width: AppSize.getSize(90),
                 height: AppSize.getSize(90),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.grey300, width: 1),
+                  border: Border.all(color: borderColor, width: 1),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.add,
-                      color: AppColors.grey600,
+                      color: secondaryColor,
                       size: AppSize.getSize(24),
                     ),
                     SizedBox(height: AppSize.getHeight(4)),
@@ -525,7 +567,7 @@ class _MultiAttachmentsField extends StatelessWidget {
                       'shared.cases.submit.add_file'.tr(),
                       style: TextStyle(
                         fontSize: AppSize.font(11),
-                        color: AppColors.grey600,
+                        color: secondaryColor,
                       ),
                     ),
                   ],
@@ -547,13 +589,18 @@ class _AttachmentChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .65);
+    final borderColor = textColor.withValues(alpha: .18);
+
     return Container(
       width: AppSize.getSize(90),
       height: AppSize.getSize(90),
       decoration: BoxDecoration(
-        color: AppColors.grey.withValues(alpha: 0.08),
+        color: textColor.withValues(alpha: .06),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.grey300),
+        border: Border.all(color: borderColor),
       ),
       child: Stack(
         children: [
@@ -564,7 +611,7 @@ class _AttachmentChip extends StatelessWidget {
               children: [
                 Icon(
                   Icons.insert_drive_file_outlined,
-                  color: AppColors.grey700,
+                  color: secondaryColor,
                   size: AppSize.getSize(22),
                 ),
                 SizedBox(height: AppSize.getHeight(4)),
@@ -575,7 +622,7 @@ class _AttachmentChip extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: AppSize.font(9),
-                    color: AppColors.grey700,
+                    color: secondaryColor,
                   ),
                 ),
               ],
@@ -606,9 +653,6 @@ class _AttachmentChip extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Verification Banner
-// ─────────────────────────────────────────────────────────────────────────────
 class _VerificationBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -619,7 +663,7 @@ class _VerificationBanner extends StatelessWidget {
         color: const Color(0xFFE8F4FF),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFF4A90D9).withValues(alpha: 0.3),
+          color: const Color(0xFF4A90D9).withValues(alpha: .3),
           width: 1,
         ),
       ),
@@ -662,9 +706,6 @@ class _VerificationBanner extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Urgency Selector
-// ─────────────────────────────────────────────────────────────────────────────
 class _UrgencySelector extends StatelessWidget {
   final String title;
   final int selected;
@@ -682,13 +723,17 @@ class _UrgencySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final borderColor = textColor.withValues(alpha: .18);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RichText(
           text: TextSpan(
             text: title,
-            style: TextStyle(color: AppColors.grey700).xs,
+            style: TextStyle(color: textColor.withValues(alpha: .65)).xs,
             children: isRequired
                 ? [
                     TextSpan(
@@ -706,6 +751,7 @@ class _UrgencySelector extends StatelessWidget {
         Row(
           children: List.generate(_labels.length, (i) {
             final isSelected = selected == i;
+
             return Expanded(
               child: GestureDetector(
                 onTap: () => onTap(i),
@@ -717,11 +763,11 @@ class _UrgencySelector extends StatelessWidget {
                   padding: AppSize.padding(vertical: 12),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppColors.primary.withValues(alpha: 0.08)
-                        : AppColors.white,
+                        ? AppColors.primary.withValues(alpha: .08)
+                        : theme.cardColor,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: isSelected ? AppColors.primary : AppColors.grey300,
+                      color: isSelected ? AppColors.primary : borderColor,
                       width: isSelected ? 1.5 : 1,
                     ),
                   ),
@@ -731,9 +777,7 @@ class _UrgencySelector extends StatelessWidget {
                     style: TextStyle(
                       fontSize: AppSize.font(14),
                       fontWeight: FontWeight.w600,
-                      color: isSelected
-                          ? AppColors.primary
-                          : const Color(0xFF1A1A2E),
+                      color: isSelected ? AppColors.primary : textColor,
                     ),
                   ),
                 ),
@@ -746,9 +790,6 @@ class _UrgencySelector extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Contact Information Section
-// ─────────────────────────────────────────────────────────────────────────────
 class _ContactInfoSection extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController phoneController;
@@ -760,11 +801,15 @@ class _ContactInfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final sectionColor = theme.colorScheme.onSurface.withValues(alpha: .06);
+
     return Container(
       width: double.infinity,
       padding: AppSize.padding(all: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F7),
+        color: sectionColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -776,7 +821,7 @@ class _ContactInfoSection extends StatelessWidget {
                 icon: AppIcons.phone,
                 width: AppSize.getSize(18),
                 height: AppSize.getSize(18),
-                color: AppColors.black,
+                color: textColor,
               ),
               SizedBox(width: AppSize.getWidth(6)),
               Text(
@@ -784,7 +829,7 @@ class _ContactInfoSection extends StatelessWidget {
                 style: TextStyle(
                   fontSize: AppSize.font(15),
                   fontWeight: FontWeight.w700,
-                  color: AppColors.black,
+                  color: textColor,
                 ),
               ),
             ],
@@ -817,9 +862,6 @@ class _ContactInfoSection extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Payment Method Section
-// ─────────────────────────────────────────────────────────────────────────────
 class _PaymentMethodSection extends StatelessWidget {
   final ValueNotifier<String?> selectedPaymentType;
   final TextEditingController instapayLinkController;
@@ -865,11 +907,17 @@ class _PaymentMethodSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .6);
+    final sectionColor = textColor.withValues(alpha: .06);
+    final borderColor = textColor.withValues(alpha: .18);
+
     return Container(
       width: double.infinity,
       padding: AppSize.padding(all: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F7),
+        color: sectionColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -881,7 +929,7 @@ class _PaymentMethodSection extends StatelessWidget {
                 icon: AppIcons.creditCard,
                 width: AppSize.getSize(18),
                 height: AppSize.getSize(18),
-                color: AppColors.black,
+                color: textColor,
               ),
               SizedBox(width: AppSize.getWidth(6)),
               Expanded(
@@ -890,7 +938,7 @@ class _PaymentMethodSection extends StatelessWidget {
                   style: TextStyle(
                     fontSize: AppSize.font(15),
                     fontWeight: FontWeight.w700,
-                    color: AppColors.black,
+                    color: textColor,
                   ),
                 ),
               ),
@@ -899,10 +947,9 @@ class _PaymentMethodSection extends StatelessWidget {
           SizedBox(height: AppSize.getHeight(4)),
           Text(
             'shared.cases.submit.banking_desc'.tr(),
-            style: TextStyle(fontSize: AppSize.font(12), color: AppColors.grey),
+            style: TextStyle(fontSize: AppSize.font(12), color: secondaryColor),
           ),
           SizedBox(height: AppSize.getHeight(14)),
-
           ValueListenableBuilder<String?>(
             valueListenable: selectedPaymentType,
             builder: (context, selected, _) {
@@ -910,10 +957,12 @@ class _PaymentMethodSection extends StatelessWidget {
                 children: List.generate(_types.length, (i) {
                   final type = _types[i];
                   final isSelected = selected == type;
+
                   return Expanded(
                     child: GestureDetector(
-                      onTap: () =>
-                          selectedPaymentType.value = isSelected ? null : type,
+                      onTap: () {
+                        selectedPaymentType.value = isSelected ? null : type;
+                      },
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         margin: EdgeInsets.only(
@@ -924,13 +973,11 @@ class _PaymentMethodSection extends StatelessWidget {
                         padding: AppSize.padding(vertical: 10, horizontal: 4),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.primary.withValues(alpha: 0.08)
-                              : AppColors.white,
+                              ? AppColors.primary.withValues(alpha: .08)
+                              : theme.cardColor,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.grey300,
+                            color: isSelected ? AppColors.primary : borderColor,
                             width: isSelected ? 1.5 : 1,
                           ),
                         ),
@@ -941,9 +988,7 @@ class _PaymentMethodSection extends StatelessWidget {
                               icon: _iconFor(type),
                               width: AppSize.getSize(18),
                               height: AppSize.getSize(18),
-                              color: isSelected
-                                  ? AppColors.primary
-                                  : const Color(0xFF1A1A2E),
+                              color: isSelected ? AppColors.primary : textColor,
                             ),
                             SizedBox(height: AppSize.getHeight(4)),
                             Text(
@@ -954,7 +999,7 @@ class _PaymentMethodSection extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                                 color: isSelected
                                     ? AppColors.primary
-                                    : const Color(0xFF1A1A2E),
+                                    : textColor,
                               ),
                             ),
                           ],
@@ -967,7 +1012,6 @@ class _PaymentMethodSection extends StatelessWidget {
             },
           ),
           SizedBox(height: AppSize.getHeight(14)),
-
           ValueListenableBuilder<String?>(
             valueListenable: selectedPaymentType,
             builder: (context, selected, _) {
@@ -1017,7 +1061,6 @@ class _PaymentMethodSection extends StatelessWidget {
             },
           ),
           SizedBox(height: AppSize.getHeight(12)),
-
           CustomFieldText(
             controller: estimatedAmountController,
             title: 'shared.cases.submit.estimated_amount'.tr(),
@@ -1031,7 +1074,6 @@ class _PaymentMethodSection extends StatelessWidget {
             ],
           ),
           SizedBox(height: AppSize.getHeight(12)),
-
           CustomFieldText(
             controller: raisedAmountController,
             title: 'shared.cases.submit.raised_amount'.tr(),
@@ -1049,9 +1091,6 @@ class _PaymentMethodSection extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Warning Note Banner
-// ─────────────────────────────────────────────────────────────────────────────
 class _WarningNoteBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -1062,7 +1101,7 @@ class _WarningNoteBanner extends StatelessWidget {
         color: const Color(0xFFFFF8E1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFFB300).withValues(alpha: 0.4),
+          color: const Color(0xFFFFB300).withValues(alpha: .4),
           width: 1,
         ),
       ),

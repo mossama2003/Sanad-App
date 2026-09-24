@@ -53,7 +53,7 @@ class OrganizationProfileScreen extends StatelessWidget {
 
                   SizedBox(height: AppSize.getHeight(44)),
 
-                  _buildNameAndBadge(context, user),
+                  _buildNameAndBadge(context, user, profile),
 
                   SizedBox(height: AppSize.getHeight(10)),
 
@@ -196,52 +196,37 @@ class OrganizationProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNameAndBadge(BuildContext context, UserModel? user) {
+  Widget _buildNameAndBadge(
+    BuildContext context,
+    UserModel? user,
+    OrganizationProfileModel? profile,
+  ) {
     final theme = Theme.of(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              user?.name ?? '',
-              style: TextStyle(
-                color: theme.colorScheme.onSurface,
-                fontSize: AppSize.font(20),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            SizedBox(width: AppSize.getSize(10)),
-
-            CustomIcon(
-              icon: AppIcons.verified,
-              color: AppColors.primary,
-              width: AppSize.getSize(20),
-              height: AppSize.getSize(20),
-            ),
-          ],
-        ),
-
-        SizedBox(height: AppSize.getHeight(8)),
-
-        Container(
-          padding: AppSize.padding(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: .15),
-            borderRadius: BorderRadius.circular(20),
-          ),
+        Flexible(
           child: Text(
-            'organization.profile.verified_organization'.tr(),
+            user?.name ?? '',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: AppColors.primary,
-              fontSize: AppSize.font(12),
-              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+              fontSize: AppSize.font(20),
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
+        if (profile?.isVerified == true) ...[
+          SizedBox(width: AppSize.getSize(10)),
+          CustomIcon(
+            icon: AppIcons.verified,
+            color: AppColors.primary,
+            width: AppSize.getSize(20),
+            height: AppSize.getSize(20),
+          ),
+        ],
       ],
     );
   }

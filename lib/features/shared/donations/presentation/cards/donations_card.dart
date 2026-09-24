@@ -14,6 +14,13 @@ class DonationsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+    final cardColor = theme.cardColor;
+    final secondaryColor = textColor.withValues(alpha: .8);
+    final mutedColor = textColor.withValues(alpha: .45);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -22,17 +29,24 @@ class DonationsCard extends StatelessWidget {
           style: TextStyle(
             fontSize: AppSize.font(18),
             fontWeight: FontWeight.w500,
-            color: AppColors.black,
+            color: textColor,
           ),
         ),
         SizedBox(height: AppSize.getHeight(10)),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: cardColor,
             borderRadius: BorderRadius.circular(30),
+            border: Border.all(
+              color: textColor.withValues(
+                alpha: isDark ? .12 : .06,
+              ),
+            ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.black.withValues(alpha: 0.2),
+                color: Colors.black.withValues(
+                  alpha: isDark ? .3 : .1,
+                ),
                 blurRadius: 8,
               ),
             ],
@@ -50,7 +64,7 @@ class DonationsCard extends StatelessWidget {
                     Container(
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: AppColors.grey.withValues(alpha: 0.3),
+                          color: textColor.withValues(alpha: .15),
                           width: 1,
                         ),
                       ),
@@ -60,20 +74,26 @@ class DonationsCard extends StatelessWidget {
                         fit: BoxFit.cover,
                       ),
                     ),
-
                     Positioned(
                       top: AppSize.getHeight(10),
                       right: AppSize.getWidth(10),
                       child: Container(
-                        padding: AppSize.padding(horizontal: 10, vertical: 5),
+                        padding: AppSize.padding(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
-                          color: AppColors.divider,
+                          color: isDark
+                              ? Colors.black.withValues(alpha: .55)
+                              : AppColors.divider,
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: Text(
                           'shared.donations_removed.days_left'.tr(),
                           style: TextStyle(
-                            color: AppColors.black,
+                            color: isDark
+                                ? Colors.white
+                                : AppColors.black,
                             fontSize: AppSize.font(11),
                             fontWeight: FontWeight.w500,
                           ),
@@ -93,6 +113,7 @@ class DonationsCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: AppSize.font(20),
                         fontWeight: FontWeight.w400,
+                        color: textColor,
                       ),
                     ),
                     SizedBox(height: AppSize.getHeight(8)),
@@ -101,7 +122,7 @@ class DonationsCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: AppSize.font(15),
                         fontWeight: FontWeight.w400,
-                        color: AppColors.black.withValues(alpha: 0.8),
+                        color: secondaryColor,
                       ),
                     ),
                     SizedBox(height: AppSize.getHeight(8)),
@@ -110,7 +131,7 @@ class DonationsCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: AppSize.font(12),
                         fontWeight: FontWeight.w400,
-                        color: AppColors.black.withValues(alpha: 0.4),
+                        color: mutedColor,
                       ),
                     ),
                     SizedBox(height: AppSize.getHeight(8)),
@@ -121,22 +142,25 @@ class DonationsCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: AppSize.font(13),
                             fontWeight: FontWeight.w400,
-                            color: AppColors.black.withValues(alpha: 0.8),
+                            color: secondaryColor,
                           ),
                         ),
-                        Spacer(),
+                        const Spacer(),
                         Text(
                           'shared.donations_removed.goal'.tr(),
                           style: TextStyle(
                             fontSize: AppSize.font(13),
                             fontWeight: FontWeight.w400,
-                            color: AppColors.black.withValues(alpha: 0.8),
+                            color: secondaryColor,
                           ),
                         ),
                       ],
                     ),
                     SizedBox(height: AppSize.getHeight(6)),
-                    CustomProgressBar(percent: 65, color: AppColors.magenta),
+                    CustomProgressBar(
+                      percent: 65,
+                      color: AppColors.magenta,
+                    ),
                     SizedBox(height: AppSize.getHeight(6)),
                     Row(
                       children: [
@@ -148,13 +172,13 @@ class DonationsCard extends StatelessWidget {
                             color: AppColors.magenta,
                           ),
                         ),
-                        Spacer(),
+                        const Spacer(),
                         Text(
                           'shared.donations_removed.days_left'.tr(),
                           style: TextStyle(
                             fontSize: AppSize.font(13),
                             fontWeight: FontWeight.w400,
-                            color: AppColors.black.withValues(alpha: 0.8),
+                            color: secondaryColor,
                           ),
                         ),
                       ],
@@ -165,7 +189,9 @@ class DonationsCard extends StatelessWidget {
                       icon: AppIcons.donations,
                       bgColor: AppColors.magenta,
                       height: AppSize.getHeight(50),
-                      onTap: () => AppNavigator.dialog(const DonationsPopUp()),
+                      onTap: () => AppNavigator.dialog(
+                        const DonationsPopUp(),
+                      ),
                     ),
                   ],
                 ),

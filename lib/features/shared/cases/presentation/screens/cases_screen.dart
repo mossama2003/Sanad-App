@@ -1,13 +1,12 @@
+import 'package:sanad_app/features/shared/cases/presentation/screens/submit_case_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:sanad_app/features/shared/cases/presentation/screens/submit_case_screen.dart';
 
-import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
-import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
-import '../../../../../core/style/app_colors.dart';
+import '../../../../../core/helper/app_navigator.dart';
+import '../../../../../core/constant/app_size.dart';
 import '../../data/models/cases_model.dart';
 import '../../data/repos/cases_repo.dart';
 import '../cards/verified_info_card.dart';
@@ -56,17 +55,26 @@ class _CasesScreenState extends State<CasesScreen> {
     );
   }
 
-  void _editCase(CaseListItemModel caseItem) {
-    AppNavigator.push(
-      SubmitCaseScreen(
-        caseItem: caseItem,
-        casesCubit: casesCubit,
-      ),
+  Future<void> _editCase(CaseListItemModel caseItem) async {
+    await AppNavigator.push(
+      SubmitCaseScreen(caseItem: caseItem, casesCubit: casesCubit),
     );
+
+    if (mounted) {
+      await casesCubit.getCases(me: casesCubit.isMySelected);
+    }
+  }
+
+  Future<void> openCreateCase(BuildContext context) async {
+    await AppNavigator.push(SubmitCaseScreen(casesCubit: casesCubit));
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .7);
+
     return BlocProvider.value(
       value: casesCubit,
       child: SingleChildScrollView(
@@ -80,7 +88,7 @@ class _CasesScreenState extends State<CasesScreen> {
                 style: TextStyle(
                   fontSize: AppSize.font(22),
                   fontWeight: FontWeight.w700,
-                  color: AppColors.black,
+                  color: textColor,
                 ),
               ),
               SizedBox(height: AppSize.getHeight(3)),
@@ -89,15 +97,18 @@ class _CasesScreenState extends State<CasesScreen> {
                 style: TextStyle(
                   fontSize: AppSize.font(15),
                   fontWeight: FontWeight.w300,
-                  color: AppColors.black.withValues(alpha: 0.7),
+                  color: secondaryColor,
                 ),
               ),
               SizedBox(height: AppSize.getHeight(15)),
 
               if (isOrg) ...[
                 BlocBuilder<CasesCubit, CasesState>(
-                  buildWhen: (previous, current) =>
-                      current is Success || current is Loading,
+                  buildWhen: (previous, current) {
+                    return current is Success ||
+                        current is Loading ||
+                        current is Error;
+                  },
                   builder: (context, state) {
                     return CasesTabSelector(
                       isMySelected: casesCubit.isMySelected,
@@ -109,7 +120,7 @@ class _CasesScreenState extends State<CasesScreen> {
                 SizedBox(height: AppSize.getHeight(15)),
               ],
 
-              VerifiedInfoCard(),
+              const VerifiedInfoCard(),
               SizedBox(height: AppSize.getHeight(15)),
 
               BlocBuilder<CasesCubit, CasesState>(
@@ -119,7 +130,12 @@ class _CasesScreenState extends State<CasesScreen> {
                   }
 
                   if (casesCubit.casesList.isEmpty) {
-                    return Center(child: Text('shared.cases.no_cases'.tr()));
+                    return Center(
+                      child: Text(
+                        'shared.cases.no_cases'.tr(),
+                        style: TextStyle(color: textColor),
+                      ),
+                    );
                   }
 
                   return Column(
@@ -164,10 +180,14 @@ class CasesTabSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final backgroundColor = textColor.withValues(alpha: .08);
+
     return Container(
       padding: AppSize.padding(all: 4),
       decoration: BoxDecoration(
-        color: AppColors.grey.withValues(alpha: 0.1),
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -205,18 +225,25 @@ class _CasesTabItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+
+    final selectedColor = theme.cardColor;
+    final unselectedColor = textColor.withValues(alpha: .6);
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: AppSize.padding(vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.white : Colors.transparent,
+          color: isSelected ? selectedColor : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
+                    color: Colors.black.withValues(alpha: isDark ? .25 : .06),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -229,7 +256,7 @@ class _CasesTabItem extends StatelessWidget {
           style: TextStyle(
             fontSize: AppSize.font(13),
             fontWeight: FontWeight.w600,
-            color: isSelected ? AppColors.black : AppColors.grey,
+            color: isSelected ? textColor : unselectedColor,
           ),
         ),
       ),

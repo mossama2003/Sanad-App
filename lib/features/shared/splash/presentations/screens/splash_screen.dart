@@ -25,57 +25,85 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
     );
+
     _scaleAnimation = Tween<double>(
       begin: 0.6,
       end: 1,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutBack,
+      ),
+    );
+
     _fadeAnimation = Tween<double>(
       begin: 0,
       end: 1,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeIn,
+      ),
+    );
+
     _controller.forward();
     _navigate();
   }
 
   Future<void> _navigate() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(
+      const Duration(seconds: 2),
+    );
 
     if (!mounted) return;
 
-    final isFirstUse = CacheHelper.get(CacheKeys.firstUse) ?? true;
+    final isFirstUse =
+        CacheHelper.get(CacheKeys.firstUse) ?? true;
 
     if (isFirstUse) {
-      AppNavigator.remove(const OnboardingScreen());
-
+      AppNavigator.remove(
+        const OnboardingScreen(),
+      );
       return;
     }
 
-    final token = CacheHelper.get(CacheKeys.accessToken);
+    final token =
+    CacheHelper.get(CacheKeys.accessToken);
 
     if (token == null) {
-      AppNavigator.remove(const SignInScreen());
-
+      AppNavigator.remove(
+        const SignInScreen(),
+      );
       return;
     }
 
-    final user = await AppCubit.get(context).getUser();
+    final user =
+    await AppCubit.get(context).getUser();
 
     if (user == null) {
-      AppNavigator.remove(const SignInScreen());
-
+      AppNavigator.remove(
+        const SignInScreen(),
+      );
       return;
     }
 
-    if (user.role == "volunteer") {
-      AppNavigator.remove(const VolunteerHomeBody());
-    } else if (user.role == "organization") {
-      AppNavigator.remove(const OrganizationHomeBody());
+    if (user.role == 'volunteer') {
+      AppNavigator.remove(
+        const VolunteerHomeBody(),
+      );
+    } else if (user.role == 'organization') {
+      AppNavigator.remove(
+        const OrganizationHomeBody(),
+      );
     } else {
-      AppNavigator.remove(const SignInScreen());
+      AppNavigator.remove(
+        const SignInScreen(),
+      );
     }
   }
 
@@ -98,10 +126,16 @@ class _SplashScreenState extends State<SplashScreen>
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: AppColors.white.withValues(alpha: 0.15),
+                color: AppColors.white.withValues(
+                  alpha: .15,
+                ),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.handshake, color: AppColors.white, size: 60),
+              child: const Icon(
+                Icons.handshake,
+                color: AppColors.white,
+                size: 60,
+              ),
             ),
           ),
         ),

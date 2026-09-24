@@ -39,13 +39,36 @@ class BadgeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .6);
+
+    final cardColor = theme.cardColor;
+
+    final inactiveIconColor = isDark
+        ? textColor.withValues(alpha: .25)
+        : const Color(0xFFDDDDDD);
+
+    final inactiveCircleColor = isDark
+        ? textColor.withValues(alpha: .08)
+        : const Color(0xFFF0F0F0);
+
+    final inactiveEmojiColor = isDark
+        ? textColor.withValues(alpha: .3)
+        : const Color(0xFFCCCCCC);
+
+    final progressBackgroundColor = isDark
+        ? textColor.withValues(alpha: .12)
+        : const Color(0xFFEEEEEE);
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: isDark ? .2 : .05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -55,54 +78,47 @@ class BadgeCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Sparkle icon (top-right)
           Align(
             alignment: Alignment.topRight,
             child: CustomIcon(
               icon: AppIcons.sparkle,
-              color: _isEarned ? _tierColor : const Color(0xFFDDDDDD),
+              color: _isEarned ? _tierColor : inactiveIconColor,
               width: AppSize.getSize(15),
               height: AppSize.getSize(15),
             ),
           ),
-
-          // Emoji circle
           Container(
             width: AppSize.getWidth(54),
             height: AppSize.getWidth(54),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: _isEarned
-                  ? _tierColor.withValues(alpha: 0.15)
-                  : const Color(0xFFF0F0F0),
+                  ? _tierColor.withValues(alpha: .15)
+                  : inactiveCircleColor,
             ),
             alignment: Alignment.center,
             child: Text(
               badge.emoji,
               style: TextStyle(
                 fontSize: AppSize.font(26),
-                color: _isEarned ? null : const Color(0xFFCCCCCC),
+                color: _isEarned ? null : inactiveEmojiColor,
               ),
             ),
           ),
-
-          // Name
           Text(
             badge.name,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: AppSize.font(11),
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1A1A2E),
+              color: textColor,
             ),
           ),
-
-          // Tier pill OR progress bar
           if (badge.progress == null)
             Container(
               padding: AppSize.padding(horizontal: 10, vertical: 3),
               decoration: BoxDecoration(
-                color: _tierColor.withValues(alpha: 0.15),
+                color: _tierColor.withValues(alpha: .15),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -120,7 +136,7 @@ class BadgeCard extends StatelessWidget {
                 Container(
                   padding: AppSize.padding(horizontal: 10, vertical: 3),
                   decoration: BoxDecoration(
-                    color: _tierColor.withValues(alpha: 0.15),
+                    color: _tierColor.withValues(alpha: .15),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -133,12 +149,11 @@ class BadgeCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: AppSize.getHeight(6)),
-
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
                     value: badge.progress! / badge.total!,
-                    backgroundColor: const Color(0xFFEEEEEE),
+                    backgroundColor: progressBackgroundColor,
                     valueColor: AlwaysStoppedAnimation<Color>(_tierColor),
                     minHeight: 5,
                   ),
@@ -148,7 +163,7 @@ class BadgeCard extends StatelessWidget {
                   '${badge.progress}/${badge.total}',
                   style: TextStyle(
                     fontSize: AppSize.font(9),
-                    color: Color(0xFFAAAAAA),
+                    color: secondaryColor,
                   ),
                 ),
               ],

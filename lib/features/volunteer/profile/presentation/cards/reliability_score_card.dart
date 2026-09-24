@@ -141,19 +141,63 @@ class ReliabilityScoreCard extends StatelessWidget {
           SizedBox(height: AppSize.getHeight(12)),
 
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _ScoreItem(
                 title: 'volunteer.profile.donations_engagement'.tr(),
                 value: _percentage(donations),
               ),
-              _ScoreItem(
-                title: 'volunteer.profile.priority_access'.tr(),
-                value: score >= 80
-                    ? 'volunteer.profile.available'.tr()
-                    : 'volunteer.profile.not_available'.tr(),
-              ),
             ],
+          ),
+
+          SizedBox(height: AppSize.getHeight(16)),
+
+          Container(
+            width: double.infinity,
+            padding: AppSize.padding(
+              vertical: 12,
+              horizontal: 12,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'volunteer.profile.priority_access'.tr(),
+                  style: TextStyle(
+                    color: AppColors.white,
+                    fontSize: AppSize.font(13),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+
+                SizedBox(height: AppSize.getHeight(4)),
+
+                Text(
+                  'volunteer.profile.priority_access_desc'.tr(),
+                  style: TextStyle(
+                    color: AppColors.white.withValues(alpha: 0.75),
+                    fontSize: AppSize.font(11),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+
+                SizedBox(height: AppSize.getHeight(8)),
+
+                Text(
+                  score >= 80
+                      ? 'volunteer.profile.available'.tr()
+                      : 'volunteer.profile.not_available'.tr(),
+                  style: TextStyle(
+                    color: AppColors.white,
+                    fontSize: AppSize.font(13),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -44,13 +44,17 @@ class CaseCommentsBottomSheet extends StatefulWidget {
 
 class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
   final TextEditingController commentController = TextEditingController();
+
   final FocusNode focusNode = FocusNode();
+
   int? currentUserId;
 
   @override
   void initState() {
     super.initState();
+
     currentUserId = AppCubit.get(context).user?.id;
+
     widget.casesCubit.getCaseComments(widget.caseId);
     widget.casesCubit.connectToCommentsChannel(widget.caseId);
   }
@@ -65,6 +69,7 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
 
   void _send() {
     final text = commentController.text.trim();
+
     if (text.isEmpty) return;
 
     widget.casesCubit.addCaseComment(
@@ -77,12 +82,13 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
     FocusScope.of(context).unfocus();
   }
 
-  // ===================== Long Press Options =====================
-
   void _showCommentOptions(CaseCommentModel comment) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -94,13 +100,13 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
             ListTile(
               leading: CustomIcon(
                 icon: AppIcons.edit,
-                color: AppColors.black,
+                color: textColor,
                 width: AppSize.getSize(20),
                 height: AppSize.getSize(20),
               ),
               title: Text(
                 'shared.cases.comments.edit'.tr(),
-                style: TextStyle(fontSize: AppSize.font(15)),
+                style: TextStyle(fontSize: AppSize.font(15), color: textColor),
               ),
               onTap: () {
                 AppNavigator.pop();
@@ -134,10 +140,15 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
   }
 
   void _showEditDialog(CaseCommentModel comment) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final fieldColor = textColor.withValues(alpha: .06);
     final editController = TextEditingController(text: comment.comment);
 
     AppNavigator.dialog(
       Dialog(
+        backgroundColor:
+            theme.dialogTheme.backgroundColor ?? theme.colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: AppSize.padding(all: 20),
@@ -150,6 +161,7 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
                 style: TextStyle(
                   fontSize: AppSize.font(16),
                   fontWeight: FontWeight.w700,
+                  color: textColor,
                 ),
               ),
               SizedBox(height: AppSize.getHeight(12)),
@@ -157,9 +169,10 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
                 controller: editController,
                 minLines: 2,
                 maxLines: 4,
+                style: TextStyle(color: textColor, fontSize: AppSize.font(14)),
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: AppColors.grey.withValues(alpha: 0.06),
+                  fillColor: fieldColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -172,8 +185,8 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
                   Expanded(
                     child: CustomButton(
                       title: 'core.cancel'.tr(),
-                      bgColor: AppColors.grey200,
-                      textColor: AppColors.black,
+                      bgColor: textColor.withValues(alpha: .08),
+                      textColor: textColor,
                       height: AppSize.getHeight(42),
                       onTap: () => AppNavigator.pop(),
                     ),
@@ -187,9 +200,11 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
                       height: AppSize.getHeight(42),
                       onTap: () {
                         final newText = editController.text.trim();
+
                         if (newText.isEmpty) return;
 
                         AppNavigator.pop();
+
                         widget.casesCubit.editComment(
                           commentId: comment.id,
                           newComment: newText,
@@ -223,44 +238,44 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final dividerColor = textColor.withValues(alpha: .12);
+    final inputColor = textColor.withValues(alpha: .07);
+
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return SafeArea(
       child: Padding(
         padding: AppSize.padding(bottom: bottomInset),
         child: Container(
-          height: MediaQuery.of(context).size.height * 0.65,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          height: MediaQuery.of(context).size.height * .65,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             children: [
               SizedBox(height: AppSize.getHeight(10)),
-
               Container(
                 width: AppSize.getWidth(40),
                 height: AppSize.getHeight(4),
                 decoration: BoxDecoration(
-                  color: AppColors.grey300,
+                  color: textColor.withValues(alpha: .2),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-
               SizedBox(height: AppSize.getHeight(12)),
-
               Text(
                 'shared.cases.comments.title'.tr(),
                 style: TextStyle(
                   fontSize: AppSize.font(16),
                   fontWeight: FontWeight.w700,
-                  color: AppColors.black,
+                  color: textColor,
                 ),
               ),
-
               SizedBox(height: AppSize.getHeight(10)),
-              Divider(height: 1, color: AppColors.grey300),
-
+              Divider(height: 1, color: dividerColor),
               Expanded(
                 child: BlocBuilder<CasesCubit, CasesState>(
                   bloc: widget.casesCubit,
@@ -282,7 +297,7 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: AppSize.font(13),
-                            color: AppColors.grey,
+                            color: textColor.withValues(alpha: .6),
                           ),
                         ),
                       );
@@ -295,6 +310,7 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
                           SizedBox(height: AppSize.getHeight(16)),
                       itemBuilder: (context, index) {
                         final comment = cubit.comments[index];
+
                         final isOwner =
                             currentUserId != null &&
                             comment.creator?.id == currentUserId;
@@ -318,9 +334,7 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
                   },
                 ),
               ),
-
-              Divider(height: 1, color: AppColors.grey300),
-
+              Divider(height: 1, color: dividerColor),
               Padding(
                 padding: AppSize.padding(all: 12),
                 child: Row(
@@ -329,7 +343,7 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
                       child: Container(
                         padding: AppSize.padding(horizontal: 14, vertical: 4),
                         decoration: BoxDecoration(
-                          color: AppColors.grey.withValues(alpha: 0.08),
+                          color: inputColor,
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: TextField(
@@ -339,13 +353,16 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
                           maxLines: 4,
                           textInputAction: TextInputAction.send,
                           onSubmitted: (_) => _send(),
-                          style: TextStyle(fontSize: AppSize.font(14)),
+                          style: TextStyle(
+                            fontSize: AppSize.font(14),
+                            color: textColor,
+                          ),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: 'shared.cases.comments.hint'.tr(),
                             hintStyle: TextStyle(
                               fontSize: AppSize.font(13),
-                              color: AppColors.grey,
+                              color: textColor.withValues(alpha: .5),
                             ),
                           ),
                         ),
@@ -405,12 +422,18 @@ class _CaseCommentsBottomSheetState extends State<CaseCommentsBottomSheet> {
 class _CommentTile extends StatelessWidget {
   final CaseCommentModel comment;
   final VoidCallback? onRetry;
-  final VoidCallback? onLongPress; // 👈 جديد
+  final VoidCallback? onLongPress;
 
   const _CommentTile({required this.comment, this.onRetry, this.onLongPress});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .6);
+    final avatarColor = textColor.withValues(alpha: .12);
+    final commentColor = textColor.withValues(alpha: .06);
+
     final creatorName = comment.creator?.name ?? '';
     final avatarUrl = comment.creator?.avatar;
     final isSending = comment.status == CommentStatus.sending;
@@ -419,7 +442,7 @@ class _CommentTile extends StatelessWidget {
     return GestureDetector(
       onLongPress: onLongPress,
       child: Opacity(
-        opacity: isSending ? 0.5 : 1,
+        opacity: isSending ? .5 : 1,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -433,15 +456,15 @@ class _CommentTile extends StatelessWidget {
                       placeholder: (context, url) => Container(
                         width: AppSize.getSize(36),
                         height: AppSize.getSize(36),
-                        color: AppColors.grey300,
+                        color: avatarColor,
                       ),
                       errorWidget: (context, url, error) => Container(
                         width: AppSize.getSize(36),
                         height: AppSize.getSize(36),
-                        color: AppColors.grey300,
+                        color: avatarColor,
                         child: Icon(
                           Icons.person,
-                          color: AppColors.grey700,
+                          color: secondaryColor,
                           size: AppSize.getSize(18),
                         ),
                       ),
@@ -449,10 +472,10 @@ class _CommentTile extends StatelessWidget {
                   : Container(
                       width: AppSize.getSize(36),
                       height: AppSize.getSize(36),
-                      color: AppColors.grey300,
+                      color: avatarColor,
                       child: Icon(
                         Icons.person,
-                        color: AppColors.grey700,
+                        color: secondaryColor,
                         size: AppSize.getSize(18),
                       ),
                     ),
@@ -463,8 +486,8 @@ class _CommentTile extends StatelessWidget {
                 padding: AppSize.padding(all: 12),
                 decoration: BoxDecoration(
                   color: isFailed
-                      ? AppColors.red.withValues(alpha: 0.08)
-                      : AppColors.grey.withValues(alpha: 0.06),
+                      ? AppColors.red.withValues(alpha: .08)
+                      : commentColor,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Column(
@@ -478,7 +501,7 @@ class _CommentTile extends StatelessWidget {
                             style: TextStyle(
                               fontSize: AppSize.font(13),
                               fontWeight: FontWeight.w600,
-                              color: AppColors.black,
+                              color: textColor,
                             ),
                           ),
                         ),
@@ -495,7 +518,7 @@ class _CommentTile extends StatelessWidget {
                             timeago.format(comment.created),
                             style: TextStyle(
                               fontSize: AppSize.font(11),
-                              color: AppColors.grey,
+                              color: secondaryColor,
                             ),
                           ),
                       ],
@@ -505,7 +528,7 @@ class _CommentTile extends StatelessWidget {
                       comment.comment,
                       style: TextStyle(
                         fontSize: AppSize.font(13),
-                        color: AppColors.grey700,
+                        color: secondaryColor,
                       ),
                     ),
                     if (isFailed) ...[

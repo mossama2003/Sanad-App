@@ -8,4 +8,6 @@ class Loading extends EditVolProfileState {}
 
 class Success extends EditVolProfileState {}
 
+class Changed extends EditVolProfileState {}
+
 class Error extends EditVolProfileState {}

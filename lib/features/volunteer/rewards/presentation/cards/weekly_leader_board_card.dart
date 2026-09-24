@@ -11,23 +11,32 @@ class WeeklyLeaderboardCard extends StatelessWidget {
   final List<LeaderboardModel> entries;
   final String? period;
 
-  const WeeklyLeaderboardCard({super.key, required this.entries, this.period});
+  const WeeklyLeaderboardCard({
+    super.key,
+    required this.entries,
+    this.period,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+
     return Container(
       width: double.infinity,
       padding: AppSize.padding(all: 16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.2),
-          width: 0.7,
+          color: textColor.withValues(alpha: .12),
+          width: .7,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.grey.withValues(alpha: 0.05),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? .2 : .05,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -35,7 +44,6 @@ class WeeklyLeaderboardCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Header
           Row(
             children: [
               CustomIcon(
@@ -50,19 +58,23 @@ class WeeklyLeaderboardCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: AppSize.font(16),
                   fontWeight: FontWeight.w700,
+                  color: textColor,
                 ),
               ),
               const Spacer(),
               Text(
                 period ?? 'shared.rewards.this_week'.tr(),
-                style: TextStyle(fontSize: AppSize.font(13)),
+                style: TextStyle(
+                  fontSize: AppSize.font(13),
+                  color: textColor,
+                ),
               ),
             ],
           ),
           SizedBox(height: AppSize.getHeight(14)),
-
-          // Entries
-          ...entries.map((e) => _LeaderboardRow(entry: e)),
+          ...entries.map(
+                (e) => _LeaderboardRow(entry: e),
+          ),
         ],
       ),
     );
@@ -72,18 +84,20 @@ class WeeklyLeaderboardCard extends StatelessWidget {
 class _LeaderboardRow extends StatelessWidget {
   final LeaderboardModel entry;
 
-  const _LeaderboardRow({required this.entry});
+  const _LeaderboardRow({
+    required this.entry,
+  });
 
   Color get _rankBgColor {
     switch (entry.rank) {
       case 1:
-        return const Color(0xFFFFD700).withValues(alpha: 0.15);
+        return const Color(0xFFFFD700).withValues(alpha: .15);
       case 2:
-        return const Color(0xFFB0B0B0).withValues(alpha: 0.15);
+        return const Color(0xFFB0B0B0).withValues(alpha: .15);
       case 3:
-        return const Color(0xFFCD7F32).withValues(alpha: 0.15);
+        return const Color(0xFFCD7F32).withValues(alpha: .15);
       default:
-        return AppColors.grey.withValues(alpha: 0.1);
+        return AppColors.grey.withValues(alpha: .1);
     }
   }
 
@@ -102,25 +116,30 @@ class _LeaderboardRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+
     return Padding(
       padding: AppSize.padding(vertical: 5),
       child: Container(
-        padding: AppSize.padding(horizontal: 10, vertical: 10),
+        padding: AppSize.padding(
+          horizontal: 10,
+          vertical: 10,
+        ),
         decoration: BoxDecoration(
           color: entry.isCurrentUser
-              ? AppColors.primary.withValues(alpha: 0.08)
+              ? AppColors.primary.withValues(alpha: .08)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
           border: entry.isCurrentUser
               ? Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.25),
-                  width: 1,
-                )
+            color: AppColors.primary.withValues(alpha: .25),
+            width: 1,
+          )
               : null,
         ),
         child: Row(
           children: [
-            // Rank badge
             Container(
               width: AppSize.getSize(32),
               height: AppSize.getSize(32),
@@ -139,15 +158,16 @@ class _LeaderboardRow extends StatelessWidget {
               ),
             ),
             SizedBox(width: AppSize.getWidth(10)),
-
-            // Avatar circle
             Container(
               width: AppSize.getSize(38),
               height: AppSize.getSize(38),
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  colors: [Color(0xFF2ECFA0), Color(0xFF1BB88A)],
+                  colors: [
+                    Color(0xFF2ECFA0),
+                    Color(0xFF1BB88A),
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -158,13 +178,11 @@ class _LeaderboardRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: AppSize.font(14),
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
               ),
             ),
             SizedBox(width: AppSize.getWidth(10)),
-
-            // Name
             Expanded(
               child: Text(
                 entry.name,
@@ -173,16 +191,17 @@ class _LeaderboardRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: AppSize.font(14),
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF1A1A2E),
+                  color: textColor,
                 ),
               ),
             ),
-
-            // XP pill
             Container(
-              padding: AppSize.padding(horizontal: 10, vertical: 5),
+              padding: AppSize.padding(
+                horizontal: 10,
+                vertical: 5,
+              ),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.12),
+                color: AppColors.primary.withValues(alpha: .12),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -202,10 +221,13 @@ class _LeaderboardRow extends StatelessWidget {
 
   String _formatXp(int xp) {
     if (xp >= 1000) {
-      final formatted = (xp / 1000).toStringAsFixed(xp % 1000 == 0 ? 0 : 3);
+      final formatted = (xp / 1000)
+          .toStringAsFixed(xp % 1000 == 0 ? 0 : 3);
+
       return '${formatted.replaceAll(RegExp(r'0+$'), '').replaceAll(RegExp(r'\.$'), '')}K'
           .replaceAll(RegExp(r'(\.\d*?)0+K'), r'$1K');
     }
+
     return '$xp';
   }
 }

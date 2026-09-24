@@ -240,8 +240,8 @@
     "cases": {
       "title": "Urgent Cases",
       "desc": "Verified cases needing immediate support",
-      "all_cases_are_verified": "Verified & Unverified Cases",
-      "our_team_verifies_every_case": "Some cases are verified by our team, while others are still pending verification.",
+      "cases_verification_title": "Case Verification",
+      "cases_verification_description": "Some cases are verified by our team, while others have not been verified yet.",
       "button": "Submit a Case for Review",
       "case_created_successfully": "Case created successfully",
       "all_cases": "All Cases",
@@ -319,12 +319,14 @@
         "raised_amount": "Amount Already Raised (Optional)",
         "hint_raised_amount": "Leave empty if none",
         "add_file": "Add",
-        "optional": "Optional"
+        "optional": "Optional",
+        "crop_image": "Crop Image"
       },
       "edit": {
         "title": "Edit Case",
         "desc": "Update your case information and keep the details up to date.",
-        "button": "Update Case"
+        "button": "Update Case",
+        "case_updated": "Case updated successfully"
       },
       "comments": {
         "title": "Comments",
@@ -851,7 +853,8 @@
       "completion_rate": "Completion rate: ",
       "emergency_response": "Emergency response: ",
       "org_ratings": "Org ratings: ",
-      "priority_access": "Priority access to critical emergencies for top-rated volunteers.",
+      "priority_access": "Priority access",
+      "priority_access_desc": "Priority access to critical emergencies for top-rated volunteers.",
       "volunteer_profile": "Volunteer Profile",
       "blood_type": "Blood Type",
       "profession": "Profession",

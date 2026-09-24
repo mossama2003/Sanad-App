@@ -20,18 +20,33 @@ class TabBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .6);
+
     final labels = [
       '${'shared.badges.all'.tr()} ($allCount)',
       '${'shared.badges.earned'.tr()} ($earnedCount)',
       '${'shared.badges.in_progress'.tr()} ($inProgressCount)',
     ];
 
+    final backgroundColor = isDark
+        ? theme.colorScheme.surfaceContainerHighest
+        : AppColors.grey200;
+
+    final selectedColor = isDark ? theme.colorScheme.surface : AppColors.white;
+
+    final borderColor = isDark
+        ? textColor.withValues(alpha: .08)
+        : AppColors.white;
+
     return Container(
       padding: AppSize.padding(all: 4),
       decoration: BoxDecoration(
-        color: AppColors.grey200,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.transparent, width: 0.7),
+        border: Border.all(color: Colors.transparent, width: .7),
       ),
       child: Row(
         children: List.generate(
@@ -42,14 +57,23 @@ class TabBarWidget extends StatelessWidget {
               child: Container(
                 padding: AppSize.padding(all: 5),
                 decoration: BoxDecoration(
-                  color: selected == i ? Colors.white : Colors.transparent,
+                  color: selected == i ? selectedColor : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
                   border: selected == i
-                      ? Border.all(color: AppColors.white, width: 1.5)
+                      ? Border.all(color: borderColor, width: 1.5)
                       : null,
                 ),
                 alignment: Alignment.center,
-                child: Text(labels[i]),
+                child: Text(
+                  labels[i],
+                  style: TextStyle(
+                    fontSize: AppSize.font(12),
+                    fontWeight: selected == i
+                        ? FontWeight.w600
+                        : FontWeight.w400,
+                    color: selected == i ? textColor : secondaryColor,
+                  ),
+                ),
               ),
             ),
           ),

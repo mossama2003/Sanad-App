@@ -67,13 +67,29 @@ class CasesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final textColor = colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .65);
+
+    final cardColor = theme.cardColor;
+
+    final sectionColor = theme.brightness == Brightness.dark
+        ? colorScheme.surfaceContainerHighest
+        : AppColors.grey300.withValues(alpha: 0.3);
+
+    final dividerColor = theme.dividerColor;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.2),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? 0.35 : 0.2,
+            ),
             blurRadius: 8,
           ),
         ],
@@ -89,7 +105,6 @@ class CasesCard extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                // 👇 السلايدر بدل الصورة المفردة
                 _CaseImageCarousel(imageUrls: _imageUrls),
 
                 Positioned(
@@ -98,13 +113,17 @@ class CasesCard extends StatelessWidget {
                   child: Container(
                     padding: AppSize.padding(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: AppColors.divider,
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.black.withValues(alpha: .6)
+                          : AppColors.divider,
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
                       timeago.format(caseItem.created),
                       style: TextStyle(
-                        color: AppColors.black,
+                        color: theme.brightness == Brightness.dark
+                            ? Colors.white
+                            : AppColors.black,
                         fontSize: AppSize.font(11),
                         fontWeight: FontWeight.w500,
                       ),
@@ -112,48 +131,16 @@ class CasesCard extends StatelessWidget {
                   ),
                 ),
 
-                if (caseItem.urgency == 'high')
+                if (caseItem.verified)
                   Positioned(
                     top: AppSize.getHeight(10),
                     left: AppSize.getWidth(10),
                     child: Container(
                       padding: AppSize.padding(horizontal: 15, vertical: 5),
                       decoration: BoxDecoration(
-                        color: AppColors.brand200.withValues(alpha: 0.8),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Row(
-                        children: [
-                          CustomIcon(
-                            icon: AppIcons.cases,
-                            color: AppColors.red,
-                            width: AppSize.getSize(17),
-                            height: AppSize.getSize(17),
-                          ),
-                          SizedBox(width: AppSize.getWidth(5)),
-                          Text(
-                            'shared.cases.card.urgent'.tr(),
-                            style: TextStyle(
-                              color: AppColors.red,
-                              fontSize: AppSize.font(11),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                if (caseItem.verified)
-                  Positioned(
-                    top: AppSize.getHeight(10),
-                    left: AppSize.getWidth(
-                      caseItem.urgency == 'high' ? 101 : 10,
-                    ),
-                    child: Container(
-                      padding: AppSize.padding(horizontal: 15, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: AppColors.white.withValues(alpha: 0.7),
+                        color: theme.brightness == Brightness.dark
+                            ? Colors.black.withValues(alpha: .6)
+                            : AppColors.white.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Row(
@@ -180,36 +167,82 @@ class CasesCard extends StatelessWidget {
               ],
             ),
           ),
+
           Padding(
             padding: AppSize.padding(all: 15),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  caseItem.name,
-                  style: TextStyle(
-                    fontSize: AppSize.font(15),
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        caseItem.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: AppSize.font(15),
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                        ),
+                      ),
+                    ),
+
+                    if (caseItem.urgency == 'high') ...[
+                      SizedBox(width: AppSize.getWidth(8)),
+                      Container(
+                        padding: AppSize.padding(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: AppColors.brand200.withValues(alpha: 0.8),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CustomIcon(
+                              icon: AppIcons.cases,
+                              color: AppColors.red,
+                              width: AppSize.getSize(16),
+                              height: AppSize.getSize(16),
+                            ),
+                            SizedBox(width: AppSize.getWidth(4)),
+                            Text(
+                              'shared.cases.card.urgent'.tr(),
+                              style: TextStyle(
+                                color: AppColors.red,
+                                fontSize: AppSize.font(11),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                SizedBox(height: AppSize.getHeight(8)),
+
+                SizedBox(height: AppSize.getHeight(16)),
+
                 Text(
                   caseItem.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: AppSize.font(13),
-                    color: AppColors.grey,
+                    color: secondaryColor,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
+
                 SizedBox(height: AppSize.getHeight(15)),
+
                 if (_hasPayment) ...[
                   Container(
                     padding: AppSize.padding(all: 12),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(25),
-                      color: AppColors.grey300.withValues(alpha: 0.3),
+                      color: sectionColor,
                     ),
                     child: Column(
                       children: [
@@ -223,7 +256,7 @@ class CasesCard extends StatelessWidget {
                                   'shared.cases.card.required'.tr(),
                                   style: TextStyle(
                                     fontSize: AppSize.font(13),
-                                    color: AppColors.grey600,
+                                    color: secondaryColor,
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
@@ -232,7 +265,7 @@ class CasesCard extends StatelessWidget {
                                   'EGP ${caseItem.paymentDetails.estimatedAmount.toStringAsFixed(0)}',
                                   style: TextStyle(
                                     fontSize: AppSize.font(20),
-                                    color: AppColors.black,
+                                    color: textColor,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -248,7 +281,7 @@ class CasesCard extends StatelessWidget {
                                   'shared.cases.card.raised'.tr(),
                                   style: TextStyle(
                                     fontSize: AppSize.font(13),
-                                    color: AppColors.grey600,
+                                    color: secondaryColor,
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
@@ -273,8 +306,10 @@ class CasesCard extends StatelessWidget {
                           child: LinearProgressIndicator(
                             value: _progressValue,
                             minHeight: 8,
-                            backgroundColor: AppColors.grey300,
-                            valueColor: AlwaysStoppedAnimation(
+                            backgroundColor: theme.brightness == Brightness.dark
+                                ? colorScheme.onSurface.withValues(alpha: .15)
+                                : AppColors.grey300,
+                            valueColor: const AlwaysStoppedAnimation(
                               AppColors.primary,
                             ),
                           ),
@@ -289,7 +324,7 @@ class CasesCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: AppSize.font(12),
                               fontWeight: FontWeight.w600,
-                              color: AppColors.grey700,
+                              color: secondaryColor,
                             ),
                           ),
                         ),
@@ -299,34 +334,40 @@ class CasesCard extends StatelessWidget {
 
                   SizedBox(height: AppSize.getHeight(10)),
                 ],
+
                 SizedBox(height: AppSize.getHeight(10)),
+
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomIcon(
                       icon: AppIcons.contact,
-                      color: AppColors.grey700,
+                      color: secondaryColor,
                       width: AppSize.getSize(20),
                       height: AppSize.getSize(20),
                     ),
                     SizedBox(width: AppSize.getWidth(10)),
-                    Text(
-                      caseItem.contactName,
-                      style: TextStyle(
-                        fontSize: AppSize.font(13),
-                        color: AppColors.grey700,
-                        fontWeight: FontWeight.w400,
+                    Expanded(
+                      child: Text(
+                        caseItem.contactName,
+                        style: TextStyle(
+                          fontSize: AppSize.font(13),
+                          color: secondaryColor,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ),
                   ],
                 ),
+
                 SizedBox(height: AppSize.getHeight(10)),
+
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomIcon(
                       icon: AppIcons.mobile,
-                      color: AppColors.grey700,
+                      color: secondaryColor,
                       width: AppSize.getSize(20),
                       height: AppSize.getSize(20),
                     ),
@@ -335,12 +376,13 @@ class CasesCard extends StatelessWidget {
                       _formatEgyptianPhone(caseItem.contactPhone),
                       style: TextStyle(
                         fontSize: AppSize.font(13),
-                        color: AppColors.grey700,
+                        color: secondaryColor,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
                   ],
                 ),
+
                 if (caseItem.paymentDetails.description != null) ...[
                   SizedBox(height: AppSize.getHeight(10)),
                   Row(
@@ -348,7 +390,7 @@ class CasesCard extends StatelessWidget {
                     children: [
                       CustomIcon(
                         icon: AppIcons.creditCard,
-                        color: AppColors.grey700,
+                        color: secondaryColor,
                         width: AppSize.getSize(20),
                         height: AppSize.getSize(20),
                       ),
@@ -360,9 +402,11 @@ class CasesCard extends StatelessWidget {
                                   caseItem.paymentDetails.description!,
                                 )
                               : caseItem.paymentDetails.description!,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: AppSize.font(13),
-                            color: AppColors.grey700,
+                            color: secondaryColor,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
@@ -370,14 +414,17 @@ class CasesCard extends StatelessWidget {
                     ],
                   ),
                 ],
+
                 SizedBox(height: AppSize.getHeight(10)),
-                Divider(thickness: 0.3, height: 1, color: AppColors.grey300),
+
+                Divider(thickness: 0.3, height: 1, color: dividerColor),
+
                 SizedBox(height: AppSize.getHeight(15)),
+
                 Row(
                   children: [
                     SizedBox(width: AppSize.getWidth(10)),
 
-                    // ================= LIKE =================
                     InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () {
@@ -404,7 +451,7 @@ class CasesCard extends StatelessWidget {
                                     icon: AppIcons.donations,
                                     color: caseItem.isLiked
                                         ? AppColors.red
-                                        : AppColors.grey600,
+                                        : secondaryColor,
                                     width: AppSize.getWidth(18),
                                     height: AppSize.getHeight(18),
                                   ),
@@ -416,7 +463,7 @@ class CasesCard extends StatelessWidget {
                                 fontWeight: FontWeight.w300,
                                 color: caseItem.isLiked
                                     ? AppColors.red
-                                    : AppColors.black,
+                                    : textColor,
                               ),
                             ),
                           ],
@@ -426,7 +473,6 @@ class CasesCard extends StatelessWidget {
 
                     SizedBox(width: AppSize.getWidth(10)),
 
-                    // ================= COMMENTS =================
                     GestureDetector(
                       onTap: () => CaseCommentsBottomSheet.show(
                         context,
@@ -437,7 +483,7 @@ class CasesCard extends StatelessWidget {
                         children: [
                           CustomIcon(
                             icon: AppIcons.comment,
-                            color: AppColors.grey600,
+                            color: secondaryColor,
                             width: AppSize.getWidth(18),
                             height: AppSize.getHeight(18),
                           ),
@@ -447,20 +493,17 @@ class CasesCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: AppSize.font(15),
                               fontWeight: FontWeight.w300,
+                              color: textColor,
                             ),
                           ),
                         ],
                       ),
                     ),
 
-                    Spacer(),
+                    const Spacer(),
 
-                    // ================= SHARE =================
                     InkWell(
-                      onTap: () {
-                        /// TODO
-                        // Create share link here
-                      },
+                      onTap: () {},
                       child: Container(
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.12),
@@ -473,7 +516,7 @@ class CasesCard extends StatelessWidget {
                           children: [
                             CustomIcon(
                               icon: AppIcons.share,
-                              color: AppColors.black,
+                              color: textColor,
                               width: AppSize.getWidth(15),
                               height: AppSize.getHeight(15),
                             ),
@@ -482,7 +525,7 @@ class CasesCard extends StatelessWidget {
                               'shared.cases.card.share'.tr(),
                               style: TextStyle(
                                 fontSize: AppSize.font(15),
-                                color: AppColors.black,
+                                color: textColor,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
@@ -493,7 +536,6 @@ class CasesCard extends StatelessWidget {
 
                     SizedBox(width: AppSize.getWidth(5)),
 
-                    // ================= EDIT & DELETE =================
                     if (isOwner) ...[
                       InkWell(
                         onTap: onEdit,
@@ -547,6 +589,7 @@ class CasesCard extends StatelessWidget {
                     ],
                   ],
                 ),
+
                 if (!isOwner) ...[
                   SizedBox(height: AppSize.getHeight(20)),
                   CustomButton(
@@ -570,9 +613,6 @@ class CasesCard extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Image Carousel
-// ─────────────────────────────────────────────────────────────────────────────
 class _CaseImageCarousel extends StatefulWidget {
   final List<String> imageUrls;
 
@@ -620,10 +660,14 @@ class _CaseImageCarouselState extends State<_CaseImageCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final onSurface = theme.colorScheme.onSurface;
+
     if (widget.imageUrls.isEmpty) {
       return Container(
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
+          border: Border.all(color: onSurface.withValues(alpha: .15)),
         ),
         child: Image.asset(
           AppImages.casesImage,
@@ -648,9 +692,7 @@ class _CaseImageCarouselState extends State<_CaseImageCarousel> {
             itemBuilder: (context, index) {
               return Container(
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: AppColors.grey.withValues(alpha: 0.3),
-                  ),
+                  border: Border.all(color: onSurface.withValues(alpha: .15)),
                 ),
                 child: CachedNetworkImage(
                   imageUrl: widget.imageUrls[index],
@@ -659,7 +701,9 @@ class _CaseImageCarouselState extends State<_CaseImageCarousel> {
                   fit: BoxFit.cover,
                   placeholder: (context, url) => Container(
                     height: AppSize.getHeight(180),
-                    color: AppColors.grey300,
+                    color: isDark
+                        ? theme.colorScheme.surfaceContainerHighest
+                        : AppColors.grey300,
                   ),
                   errorWidget: (context, url, error) => Image.asset(
                     AppImages.casesImage,
@@ -672,7 +716,6 @@ class _CaseImageCarouselState extends State<_CaseImageCarousel> {
             },
           ),
 
-          // Dots indicator
           if (widget.imageUrls.length > 1)
             Padding(
               padding: AppSize.padding(bottom: 8),
@@ -680,6 +723,7 @@ class _CaseImageCarouselState extends State<_CaseImageCarousel> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(widget.imageUrls.length, (index) {
                   final isActive = index == _currentPage;
+
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
                     margin: EdgeInsets.symmetric(
@@ -691,8 +735,8 @@ class _CaseImageCarouselState extends State<_CaseImageCarousel> {
                     height: AppSize.getHeight(6),
                     decoration: BoxDecoration(
                       color: isActive
-                          ? AppColors.white
-                          : AppColors.white.withValues(alpha: 0.5),
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   );

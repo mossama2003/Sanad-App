@@ -19,9 +19,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void _markAllAsRead() {
     setState(() {
       for (int i = 0; i < _notifications.length; i++) {
-        _notifications[i] = _notifications[i].copyWith(
-          isRead: true,
-        );
+        _notifications[i] = _notifications[i].copyWith(isRead: true);
       }
     });
   }
@@ -84,13 +82,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final backgroundColor = theme.scaffoldBackgroundColor;
+    final secondaryColor = textColor.withValues(alpha: .6);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: Color(0xFFF5F5F7),
+        backgroundColor: backgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: Padding(
         padding: AppSize.padding(horizontal: 12),
@@ -102,37 +105,27 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               style: TextStyle(
                 fontSize: AppSize.font(22),
                 fontWeight: FontWeight.w700,
-                color: AppColors.black,
+                color: textColor,
               ),
             ),
-
             SizedBox(height: AppSize.getHeight(3)),
-
             Text(
               'shared.notifications.desc'.tr(),
               style: TextStyle(
                 fontSize: AppSize.font(15),
                 fontWeight: FontWeight.w300,
-                color: AppColors.black.withValues(alpha: 0.7),
+                color: secondaryColor,
               ),
             ),
-
             SizedBox(height: AppSize.getHeight(15)),
-            // Mark all as read banner
-            _MarkAllBanner(
-              onTap: _markAllAsRead,
-            ),
+            _MarkAllBanner(onTap: _markAllAsRead),
             SizedBox(height: AppSize.getHeight(12)),
-
-            // Tab bar
             _NotifTabBar(
               selected: _selectedTab,
               unreadCount: _unreadCount,
               onTap: (i) => setState(() => _selectedTab = i),
             ),
             SizedBox(height: AppSize.getHeight(16)),
-
-            // List
             Expanded(
               child: ListView.separated(
                 padding: AppSize.padding(horizontal: 16, bottom: 24),
@@ -150,9 +143,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Mark All Banner
-// ─────────────────────────────────────────────────────────────────────────────
 class _MarkAllBanner extends StatelessWidget {
   final VoidCallback onTap;
 
@@ -194,9 +184,6 @@ class _MarkAllBanner extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tab Bar
-// ─────────────────────────────────────────────────────────────────────────────
 class _NotifTabBar extends StatelessWidget {
   final int selected;
   final int unreadCount;
@@ -210,6 +197,11 @@ class _NotifTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+    final surfaceColor = theme.cardColor;
+
     final tabs = [
       ('shared.notifications.all'.tr(), null),
       ('shared.notifications.unread'.tr(), unreadCount),
@@ -220,10 +212,10 @@ class _NotifTabBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: surfaceColor,
         borderRadius: BorderRadius.circular(30),
         border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.2),
+          color: textColor.withValues(alpha: isDark ? .2 : .2),
           width: 0.7,
         ),
       ),
@@ -231,6 +223,7 @@ class _NotifTabBar extends StatelessWidget {
         children: List.generate(tabs.length, (i) {
           final isSelected = selected == i;
           final (label, badge) = tabs[i];
+
           return Expanded(
             child: GestureDetector(
               onTap: () => onTap(i),
@@ -238,7 +231,11 @@ class _NotifTabBar extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 padding: AppSize.padding(vertical: 9),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.white : Colors.transparent,
+                  color: isSelected
+                      ? (isDark
+                            ? AppColors.primary.withValues(alpha: .12)
+                            : Colors.white)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                   border: isSelected
                       ? Border.all(color: AppColors.primary, width: 1.5)
@@ -252,7 +249,9 @@ class _NotifTabBar extends StatelessWidget {
                       style: TextStyle(
                         fontSize: AppSize.font(11),
                         fontWeight: FontWeight.w600,
-                        color: isSelected ? AppColors.primary : AppColors.grey,
+                        color: isSelected
+                            ? AppColors.primary
+                            : textColor.withValues(alpha: .6),
                       ),
                     ),
                     if (badge != null && badge > 0) ...[
@@ -284,9 +283,6 @@ class _NotifTabBar extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Notification Card
-// ─────────────────────────────────────────────────────────────────────────────
 class _NotificationCard extends StatelessWidget {
   final NotificationModel notification;
 
@@ -333,18 +329,24 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+    final cardColor = theme.cardColor;
+    final secondaryColor = textColor.withValues(alpha: isDark ? .6 : .65);
+
     return Container(
       padding: AppSize.padding(all: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.15),
+          color: textColor.withValues(alpha: isDark ? .12 : .15),
           width: 0.7,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.grey.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: isDark ? .25 : .05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -353,7 +355,6 @@ class _NotificationCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Icon circle
           Container(
             width: AppSize.getSize(44),
             height: AppSize.getSize(44),
@@ -364,8 +365,6 @@ class _NotificationCard extends StatelessWidget {
             child: Icon(_icon, color: _iconColor, size: AppSize.getSize(20)),
           ),
           SizedBox(width: AppSize.getWidth(12)),
-
-          // Content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,7 +377,7 @@ class _NotificationCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: AppSize.font(14),
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF1A1A2E),
+                          color: textColor,
                         ),
                       ),
                     ),
@@ -398,7 +397,7 @@ class _NotificationCard extends StatelessWidget {
                   notification.body,
                   style: TextStyle(
                     fontSize: AppSize.font(12),
-                    color: AppColors.grey,
+                    color: secondaryColor,
                     height: 1.4,
                   ),
                 ),
@@ -409,7 +408,7 @@ class _NotificationCard extends StatelessWidget {
                       notification.time,
                       style: TextStyle(
                         fontSize: AppSize.font(11),
-                        color: AppColors.grey,
+                        color: secondaryColor,
                       ),
                     ),
                     const Spacer(),

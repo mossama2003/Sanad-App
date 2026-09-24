@@ -12,6 +12,10 @@ class DonationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .7);
+
     return SingleChildScrollView(
       child: Padding(
         padding: AppSize.padding(horizontal: 12, vertical: 15),
@@ -23,7 +27,7 @@ class DonationsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppSize.font(22),
                 fontWeight: FontWeight.w700,
-                color: AppColors.black,
+                color: textColor,
               ),
             ),
             SizedBox(height: AppSize.getHeight(3)),
@@ -32,7 +36,7 @@ class DonationsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppSize.font(15),
                 fontWeight: FontWeight.w300,
-                color: AppColors.black.withValues(alpha: 0.7),
+                color: secondaryColor,
               ),
             ),
             SizedBox(height: AppSize.getHeight(15)),
@@ -49,9 +53,7 @@ class DonationsScreen extends StatelessWidget {
                     subtitle: 'shared.donations.your_total_donations'.tr(),
                   ),
                 ),
-
                 SizedBox(width: AppSize.getWidth(13)),
-
                 Expanded(
                   child: DonationsInfoCard(
                     icon: AppIcons.growthArrow,
@@ -66,7 +68,7 @@ class DonationsScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: AppSize.getHeight(15)),
-            DonationsCard(),
+            const DonationsCard(),
           ],
         ),
       ),

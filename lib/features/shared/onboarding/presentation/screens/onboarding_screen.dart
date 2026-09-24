@@ -57,7 +57,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
   ];
 
-  bool get _isLastPage => _cubit.index == _cubit.onboarding.length - 1;
+  bool get _isLastPage =>
+      _cubit.index == _cubit.onboarding.length - 1;
 
   Future<void> _toggleLanguage() async {
     final newLang = AppLocales.currentLang == AppLanguage.english
@@ -66,40 +67,59 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     await AppLocales.changeLang(context, newLang);
 
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _toggleTheme() async {
-    final currentTheme = CacheHelper.get(CacheKeys.theme) ?? CacheKeys.light;
+    final currentTheme =
+        CacheHelper.get(CacheKeys.theme) ?? CacheKeys.light;
 
     final isDark = currentTheme == CacheKeys.dark;
-
     final newTheme = isDark ? CacheKeys.light : CacheKeys.dark;
 
-    await CacheHelper.save(CacheKeys.theme, newTheme);
+    await CacheHelper.save(
+      CacheKeys.theme,
+      newTheme,
+    );
 
     AppTheme.setTheme(
-      newTheme == CacheKeys.dark ? AppThemeEnum.dark : AppThemeEnum.light,
+      newTheme == CacheKeys.dark
+          ? AppThemeEnum.dark
+          : AppThemeEnum.light,
     );
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _finishOnboarding() async {
-    await CacheHelper.save(CacheKeys.firstUse, false);
+    await CacheHelper.save(
+      CacheKeys.firstUse,
+      false,
+    );
 
-    AppNavigator.remove(const SignInScreen());
+    AppNavigator.remove(
+      const SignInScreen(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            _buildAppBar(isDark),
+            _buildAppBar(
+              context,
+              isDark,
+            ),
             _buildPageView(),
             _buildBottomNavigation(),
           ],
@@ -108,10 +128,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildAppBar(bool isDark) {
-    final textColor = Theme.of(context).textTheme.bodyMedium?.color;
+  Widget _buildAppBar(
+      BuildContext context,
+      bool isDark,
+      ) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final cardColor = theme.cardColor;
+    final borderColor = theme.dividerColor;
+
     return Padding(
-      padding: AppSize.padding(horizontal: 20, vertical: 8),
+      padding: AppSize.padding(
+        horizontal: 20,
+        vertical: 8,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -121,11 +151,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onTap: _toggleTheme,
                 borderRadius: BorderRadius.circular(30),
                 child: Container(
-                  padding: AppSize.padding(horizontal: 12, vertical: 8),
+                  padding: AppSize.padding(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
+                    color: cardColor,
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: Theme.of(context).dividerColor),
+                    border: Border.all(
+                      color: borderColor,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -136,25 +171,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         size: 18,
                         color: textColor,
                       ),
-                      SizedBox(width: AppSize.getWidth(6)),
+                      SizedBox(
+                        width: AppSize.getWidth(6),
+                      ),
                       Text(
                         isDark
                             ? 'shared.onboarding.light'.tr()
                             : 'shared.onboarding.dark'.tr(),
-                        style: TextStyle(color: textColor).xs,
+                        style: TextStyle(
+                          color: textColor,
+                        ).xs,
                       ),
                     ],
                   ),
                 ),
               ),
-              SizedBox(width: AppSize.getWidth(8)),
+              SizedBox(
+                width: AppSize.getWidth(8),
+              ),
               TextButton(
                 onPressed: _toggleLanguage,
                 child: Text(
                   AppLocales.currentLang == AppLanguage.english
                       ? 'العربية'
                       : 'English',
-                  style: TextStyle(color: textColor).sm,
+                  style: TextStyle(
+                    color: textColor,
+                  ).sm,
                 ),
               ),
             ],
@@ -163,7 +206,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             onPressed: _finishOnboarding,
             child: Text(
               'shared.onboarding.skip'.tr(),
-              style: TextStyle(color: textColor?.withValues(alpha: .6)).sm,
+              style: TextStyle(
+                color: textColor.withValues(alpha: .6),
+              ).sm,
             ),
           ),
         ],
@@ -179,7 +224,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         physics: const BouncingScrollPhysics(),
         onPageChanged: _cubit.updateIndex,
         itemBuilder: (_, index) {
-          return OnboardingCard(onboarding: _cubit.onboarding[index]);
+          return OnboardingCard(
+            onboarding: _cubit.onboarding[index],
+          );
         },
       ),
     );
@@ -189,8 +236,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return BlocBuilder<OnboardingCubit, OnboardingState>(
       bloc: _cubit,
       builder: (context, state) {
+        final theme = Theme.of(context);
+
         return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+          padding: const EdgeInsets.fromLTRB(
+            20,
+            0,
+            20,
+            30,
+          ),
           child: Column(
             children: [
               SmoothPageIndicator(
@@ -200,21 +254,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   dotHeight: 8,
                   dotWidth: 8,
                   activeDotColor: AppColors.primary,
-                  dotColor: Theme.of(context).dividerColor,
+                  dotColor: theme.dividerColor,
                 ),
               ),
-
-              SizedBox(height: AppSize.getHeight(16)),
-
+              SizedBox(
+                height: AppSize.getHeight(16),
+              ),
               SizedBox(
                 width: double.infinity,
-
                 child: CustomButton(
                   title: _isLastPage
                       ? 'shared.onboarding.get_started'.tr()
                       : 'shared.onboarding.next'.tr(),
-
-                  onTap: _isLastPage ? _finishOnboarding : _cubit.nextTap,
+                  onTap: _isLastPage
+                      ? _finishOnboarding
+                      : _cubit.nextTap,
                 ),
               ),
             ],
