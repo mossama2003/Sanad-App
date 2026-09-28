@@ -20,19 +20,29 @@ class CasesCubit extends Cubit<CasesState> {
 
   static CasesCubit get(BuildContext context) => BlocProvider.of(context);
 
+  // Cases created locally during the current session.
+  static final List<CaseListItemModel> _sessionCreatedCases = [];
+
   final List<CaseCommentModel> comments = [];
 
   final Set<int> _likingCases = {};
 
   bool isUpdatingCase = false;
 
-  final List<CaseListItemModel> casesList = [];
+  final List<CaseListItemModel> _allCases = [];
+  final List<CaseListItemModel> _myCases = [];
+
+  bool isMySelected = false;
+
+  List<CaseListItemModel> get casesList =>
+      isMySelected ? _myCases : _allCases;
+
   int currentPage = 1;
   int maxPages = 1;
   bool isLoadingMore = false;
 
-  bool isMySelected = false;
   int myCasesCount = 0;
+  int? _currentUserId;
 
   bool isCommentsLoading = false;
   bool isSendingComment = false;
@@ -46,134 +56,375 @@ class CasesCubit extends Cubit<CasesState> {
     return _likingCases.contains(caseId);
   }
 
-  // ===================== Create Case =====================
+  void refreshCurrentList() {
+    emit(Success());
+  }
+
+  void notifyCasesChanged() {
+    emit(Success());
+  }
+
+  // ============================================================
+  // Helpers
+  // ============================================================
+
+  List<CaseListItemModel> _withPendingOwnCases(
+      List<CaseListItemModel> server,
+      ) {
+    final serverIds = server.map((c) => c.id).toSet();
+
+    // Once the server returns a locally-created case,
+    // remove it from the temporary session list.
+    _sessionCreatedCases.removeWhere(
+          (c) => serverIds.contains(c.id),
+    );
+
+    final pending = _sessionCreatedCases
+        .where((c) => c.creator.id == _currentUserId)
+        .toList();
+
+    return [
+      ...pending,
+      ...server,
+    ];
+  }
+
+  // Applies any case modification to All Cases, My Cases,
+  // and the temporary session list.
+  void _updateCaseEverywhere(
+      int id,
+      CaseListItemModel Function(CaseListItemModel) update,
+      ) {
+    for (final list in [
+      _allCases,
+      _myCases,
+      _sessionCreatedCases,
+    ]) {
+      final index = list.indexWhere(
+            (c) => c.id == id,
+      );
+
+      if (index != -1) {
+        list[index] = update(list[index]);
+      }
+    }
+  }
+
+  // ============================================================
+  // Create Case
+  // ============================================================
+
   Future<void> createCase(
-    CreateCaseParam param, {
-    required BuildContext context,
-  }) async {
+      CreateCaseParam param, {
+        required BuildContext context,
+      }) async {
     if (isUpdatingCase) return;
 
     isUpdatingCase = true;
+
     emit(Loading());
 
     final result = await repo.createCase(param);
 
     result.fold(
-      (l) {
+          (l) {
         isUpdatingCase = false;
+
         emit(Error());
+
         AppToast.error(l.errMessage);
       },
-      (r) {
-        final user = context.mounted ? AppCubit.get(context).user : null;
+          (r) {
+        final user = AppCubit.get(context).user;
+
+        _currentUserId ??= user?.id;
 
         final newCase = CaseListItemModel(
           id: r.id,
+
           creator: Creator(
             id: user?.id ?? 0,
             name: user?.name ?? '',
             avatar: user?.avatar,
           ),
+
           paymentDetails: CasePaymentDetails(
-            paymentType: r.paymentDetails?.paymentType ?? r.paymentType,
-            description: r.paymentDetails?.description ?? r.paymentDescription,
+            paymentType:
+            r.paymentDetails?.paymentType ??
+                r.paymentType,
+
+            description:
+            r.paymentDetails?.description ??
+                r.paymentDescription,
+
             estimatedAmount:
-                r.paymentDetails?.estimatedAmount ?? r.paymentEstimatedAmount,
+            r.paymentDetails?.estimatedAmount ??
+                r.paymentEstimatedAmount,
+
             raisedAmount:
-                r.paymentDetails?.raisedAmount ?? r.paymentRaisedAmount,
+            r.paymentDetails?.raisedAmount ??
+                r.paymentRaisedAmount,
           ),
+
           comments: 0,
           likers: 0,
           isLiked: false,
+
+          // The create API response doesn't contain
+          // attachment details, so we keep it empty locally.
           attachments: const [],
+
           created: r.created,
           modified: r.modified,
+
           name: r.name,
           description: r.description,
           category: r.category,
           urgency: r.urgency,
+
           contactName: r.contactName,
           contactPhone: r.contactPhone,
+
           info: r.info,
+
           verified: false,
+
           note: r.note,
           active: r.active,
         );
 
-        casesList.removeWhere((item) => item.id == newCase.id);
-        casesList.insert(0, newCase);
+        // --------------------------------------------------------
+        // Check if the case already exists BEFORE modifying lists.
+        // --------------------------------------------------------
 
-        myCasesCount++;
+        final alreadyExists = _myCases.any(
+              (caseItem) => caseItem.id == newCase.id,
+        );
+
+        // --------------------------------------------------------
+        // Remove old local copies if they exist.
+        // --------------------------------------------------------
+
+        _myCases.removeWhere(
+              (caseItem) => caseItem.id == newCase.id,
+        );
+
+        _sessionCreatedCases.removeWhere(
+              (caseItem) => caseItem.id == newCase.id,
+        );
+
+        // --------------------------------------------------------
+        // Keep a temporary copy so it survives an API refresh
+        // until the server starts returning it.
+        // --------------------------------------------------------
+
+        _sessionCreatedCases.insert(
+          0,
+          newCase,
+        );
+
+        // --------------------------------------------------------
+        // Immediately show it in My Cases.
+        // --------------------------------------------------------
+
+        _myCases.insert(
+          0,
+          newCase,
+        );
+
+        // --------------------------------------------------------
+        // Update count only if it wasn't already there.
+        // --------------------------------------------------------
+
+        if (!alreadyExists) {
+          myCasesCount++;
+        }
+
+        // --------------------------------------------------------
+        // Automatically switch to My Cases.
+        // IMPORTANT: do this BEFORE emit().
+        // --------------------------------------------------------
+
+        isMySelected = true;
+
         isUpdatingCase = false;
 
-        emit(Success());
+        // --------------------------------------------------------
+        // Debug
+        // --------------------------------------------------------
 
-        AppToast.success('shared.cases.case_created_successfully'.tr());
+        debugPrint('======================================');
+        debugPrint('CREATE CASE SUCCESS');
+        debugPrint(
+          'Cubit: ${identityHashCode(this)}',
+        );
+        debugPrint(
+          'Created ID: ${newCase.id}',
+        );
+        debugPrint(
+          'isMySelected: $isMySelected',
+        );
+        debugPrint(
+          'myCasesCount: $myCasesCount',
+        );
+        debugPrint(
+          'My Cases: ${_myCases.map((e) => e.id).toList()}',
+        );
+        debugPrint(
+          'All Cases: ${_allCases.map((e) => e.id).toList()}',
+        );
+        debugPrint('======================================');
+
+        // --------------------------------------------------------
+        // Notify both:
+        // 1. CasesScreen -> rebuild
+        // 2. CasesForm -> pop
+        // --------------------------------------------------------
+
+        emit(
+          CaseCreated(newCase.id),
+        );
+
+        AppToast.success(
+          'shared.cases.case_created_successfully'.tr(),
+        );
       },
     );
   }
 
-  // ===================== Init Screen =====================
-  Future<void> initCasesScreen({required bool isOrg}) async {
-    if (isOrg) {
-      final myResult = await repo.getCases(me: true);
+  // ============================================================
+  // Init Screen
+  // ============================================================
 
-      myResult.fold((l) {}, (r) => myCasesCount = r.count);
+  Future<void> initCasesScreen({
+    required bool isOrg,
+    int? currentUserId,
+  }) async {
+    _currentUserId = currentUserId;
+
+    if (isOrg) {
+      final myResult = await repo.getCases(
+        me: true,
+      );
+
+      myResult.fold(
+            (l) {},
+            (r) {
+          final merged = _withPendingOwnCases(
+            r.results,
+          );
+
+          _myCases
+            ..clear()
+            ..addAll(merged);
+
+          myCasesCount =
+              r.count +
+                  (merged.length - r.results.length);
+
+          emit(Success());
+        },
+      );
     }
 
-    await getCases(me: false);
+    await getCases(
+      me: false,
+    );
   }
 
-  // ===================== Switch Tab (All / My Cases) =====================
-  Future<void> switchTab(bool toMyCases) async {
+  // ============================================================
+  // Switch Tab
+  // ============================================================
+
+  Future<void> switchTab(
+      bool toMyCases,
+      ) async {
     isMySelected = toMyCases;
 
-    await getCases(me: toMyCases);
+    // Immediately show whatever is already available locally.
+    emit(Success());
+
+    await getCases(
+      me: toMyCases,
+    );
   }
 
-  // ===================== Get Cases (List) =====================
-  Future<void> getCases({required bool me}) async {
-    emit(Loading());
+  // ============================================================
+  // Get Cases
+  // ============================================================
 
-    final result = await repo.getCases(me: me);
+  Future<void> getCases({
+    required bool me,
+  }) async {
+    final target = me
+        ? _myCases
+        : _allCases;
+
+    if (target.isEmpty) {
+      emit(Loading());
+    }
+
+    final result = await repo.getCases(
+      me: me,
+    );
 
     result.fold(
-      (l) {
+          (l) {
         emit(Error());
 
-        AppToast.error(l.errMessage);
+        AppToast.error(
+          l.errMessage,
+        );
       },
-      (r) {
-        casesList
+          (r) {
+        final merged = me
+            ? _withPendingOwnCases(r.results)
+            : r.results;
+
+        target
           ..clear()
-          ..addAll(r.results);
+          ..addAll(merged);
 
         maxPages = r.maxPages;
         currentPage = 1;
 
-        if (me) myCasesCount = r.count;
+        if (me) {
+          myCasesCount =
+              r.count +
+                  (merged.length - r.results.length);
+        }
 
         emit(Success());
       },
     );
   }
 
-  // ===================== Get Comments (History) =====================
+  // ============================================================
+  // Comments
+  // ============================================================
 
-  Future<void> getCaseComments(int caseId) async {
+  Future<void> getCaseComments(
+      int caseId,
+      ) async {
     isCommentsLoading = true;
+
     emit(Loading());
 
-    final result = await repo.getCaseComments(caseId);
+    final result = await repo.getCaseComments(
+      caseId,
+    );
 
     isCommentsLoading = false;
 
     result.fold(
-      (l) {
+          (l) {
         emit(Error());
-        AppToast.error(l.errMessage);
+
+        AppToast.error(
+          l.errMessage,
+        );
       },
-      (r) {
+          (r) {
         comments
           ..clear()
           ..addAll(r.results);
@@ -183,22 +434,32 @@ class CasesCubit extends Cubit<CasesState> {
     );
   }
 
-  // ===================== Connect To Ably & Subscribe =====================
+  // ============================================================
+  // Ably
+  // ============================================================
 
-  Future<void> connectToCommentsChannel(int caseId) async {
-    final tokenResult = await repo.getChatToken(caseId);
+  Future<void> connectToCommentsChannel(
+      int caseId,
+      ) async {
+    final tokenResult =
+    await repo.getChatToken(caseId);
 
     tokenResult.fold(
-      (l) {
-        AppToast.error(l.errMessage);
+          (l) {
+        AppToast.error(
+          l.errMessage,
+        );
       },
-      (token) async {
+          (token) async {
         _currentClientId = token.clientId;
 
         final tokenRequest = ably.TokenRequest(
           keyName: token.keyName,
           clientId: token.clientId,
-          timestamp: DateTime.fromMillisecondsSinceEpoch(token.timestamp),
+          timestamp:
+          DateTime.fromMillisecondsSinceEpoch(
+            token.timestamp,
+          ),
           nonce: token.nonce,
           mac: token.mac,
           ttl: token.ttl,
@@ -207,53 +468,88 @@ class CasesCubit extends Cubit<CasesState> {
 
         _ablyRealtime = ably.Realtime(
           options: ably.ClientOptions(
-            clientId:
-                token.clientId, // 👈 بقى بارامتر في الـ constructor مش cascade
-          )..authCallback = (params) async => tokenRequest,
+            clientId: token.clientId,
+          )..authCallback = (
+              params,
+              ) async {
+            return tokenRequest;
+          },
         );
 
-        _commentsChannel = _ablyRealtime!.channels.get('cases:$caseId');
+        _commentsChannel =
+            _ablyRealtime!.channels.get(
+              'cases:$caseId',
+            );
 
-        // 👇 subscribe بيرجع Stream — بنعمل listen ونحتفظ بالـ subscription
-        _commentsSubscription = _commentsChannel!
-            .subscribe(name: 'comment.created')
-            .listen(_handleIncomingComment);
+        _commentsSubscription =
+            _commentsChannel!
+                .subscribe(
+              name: 'comment.created',
+            )
+                .listen(
+              _handleIncomingComment,
+            );
       },
     );
   }
 
-  void _handleIncomingComment(ably.Message message) {
+  void _handleIncomingComment(
+      ably.Message message,
+      ) {
     final data = message.data;
 
-    if (data == null || data is! Map) return;
-
-    final incoming = CaseCommentModel.fromJson(Map<String, dynamic>.from(data));
-
-    final isOwnMessage =
-        incoming.creator?.id.toString() ==
-        _currentClientId?.replaceFirst('user:', '');
-
-    if (isOwnMessage) {
-      final index = comments.indexWhere(
-        (c) => c.status == CommentStatus.sending,
-      );
-      if (index != -1) {
-        comments[index] = incoming.copyWith(status: CommentStatus.sent);
-        emit(Success());
-        return;
-      }
+    if (data == null || data is! Map) {
       return;
     }
 
-    comments.insert(0, incoming);
+    final incoming =
+    CaseCommentModel.fromJson(
+      Map<String, dynamic>.from(data),
+    );
+
+    final isOwnMessage =
+        incoming.creator?.id.toString() ==
+            _currentClientId?.replaceFirst(
+              'user:',
+              '',
+            );
+
+    if (isOwnMessage) {
+      final index = comments.indexWhere(
+            (c) => c.status == CommentStatus.sending,
+      );
+
+      if (index != -1) {
+        comments[index] =
+            incoming.copyWith(
+              status: CommentStatus.sent,
+            );
+
+        emit(Success());
+
+        return;
+      }
+
+      return;
+    }
+
+    comments.insert(
+      0,
+      incoming,
+    );
+
     emit(Success());
   }
 
-  // ===================== Disconnect =====================
+  // ============================================================
+  // Disconnect
+  // ============================================================
 
   Future<void> disconnectFromCommentsChannel() async {
     await _commentsSubscription?.cancel();
+
     await _commentsChannel?.detach();
+
     _ablyRealtime?.close();
 
     _commentsSubscription = null;
@@ -261,83 +557,121 @@ class CasesCubit extends Cubit<CasesState> {
     _ablyRealtime = null;
   }
 
-  // ===================== Add Comment (Optimistic) =====================
+  // ============================================================
+  // Add Comment
+  // ============================================================
 
   Future<void> addCaseComment({
     required int caseId,
     required String comment,
     required BuildContext context,
   }) async {
-    final currentUser = AppCubit.get(context).user;
-    final localId = DateTime.now().microsecondsSinceEpoch.toString();
+    final currentUser =
+        AppCubit.get(context).user;
 
-    final optimisticComment = CaseCommentModel(
+    final localId =
+    DateTime.now().microsecondsSinceEpoch.toString();
+
+    final optimisticComment =
+    CaseCommentModel(
       id: -1,
+
       creator: currentUser != null
           ? Creator(
-              id: currentUser.id ?? 0,
-              name: currentUser.name ?? '',
-              avatar: currentUser.avatar,
-            )
+        id: currentUser.id ?? 0,
+        name: currentUser.name ?? '',
+        avatar: currentUser.avatar,
+      )
           : null,
+
       created: DateTime.now(),
       modified: DateTime.now(),
+
       comment: comment,
+
       status: CommentStatus.sending,
+
       localId: localId,
     );
 
-    comments.insert(0, optimisticComment);
+    comments.insert(
+      0,
+      optimisticComment,
+    );
+
     emit(Success());
 
-    final result = await repo.addCaseComment(caseId: caseId, comment: comment);
+    final result =
+    await repo.addCaseComment(
+      caseId: caseId,
+      comment: comment,
+    );
 
     result.fold(
-      (l) {
-        final index = comments.indexWhere((c) => c.localId == localId);
+          (l) {
+        final index = comments.indexWhere(
+              (c) => c.localId == localId,
+        );
+
         if (index != -1) {
-          comments[index] = comments[index].copyWith(
-            status: CommentStatus.failed,
-          );
-          emit(Success());
-        }
-        AppToast.error(l.errMessage);
-      },
-      (r) {
-        final index = comments.indexWhere((c) => c.localId == localId);
-        if (index != -1) {
-          comments[index] = CaseCommentModel(
-            id: r.id,
-            creator: optimisticComment.creator,
-            created: r.created,
-            modified: r.modified,
-            comment: r.comment,
-            status: CommentStatus.sent,
-          );
+          comments[index] =
+              comments[index].copyWith(
+                status: CommentStatus.failed,
+              );
+
           emit(Success());
         }
 
-        final caseIndex = casesList.indexWhere((c) => c.id == caseId);
-        if (caseIndex != -1) {
-          casesList[caseIndex] = casesList[caseIndex]
-              .copyWithCommentsIncremented();
+        AppToast.error(
+          l.errMessage,
+        );
+      },
+          (r) {
+        final index = comments.indexWhere(
+              (c) => c.localId == localId,
+        );
+
+        if (index != -1) {
+          comments[index] =
+              CaseCommentModel(
+                id: r.id,
+                creator: optimisticComment.creator,
+                created: r.created,
+                modified: r.modified,
+                comment: r.comment,
+                status: CommentStatus.sent,
+              );
+
+          emit(Success());
         }
+
+        _updateCaseEverywhere(
+          caseId,
+              (c) => c.copyWithCommentsIncremented(),
+        );
       },
     );
   }
 
-  // ===================== Retry Failed Comment =====================
+  // ============================================================
+  // Retry Comment
+  // ============================================================
 
   Future<void> retryFailedComment({
     required int caseId,
     required String localId,
     required BuildContext context,
   }) async {
-    final index = comments.indexWhere((c) => c.localId == localId);
+    final index = comments.indexWhere(
+          (c) => c.localId == localId,
+    );
+
     if (index == -1) return;
 
     final failedComment = comments[index];
+
     comments.removeAt(index);
+
     emit(Success());
 
     await addCaseComment(
@@ -347,104 +681,183 @@ class CasesCubit extends Cubit<CasesState> {
     );
   }
 
-  Future<void> deleteCase(int id) async {
-    final result = await repo.deleteCase(id);
+  // ============================================================
+  // Delete Case
+  // ============================================================
+
+  Future<void> deleteCase(
+      int id,
+      ) async {
+    final result =
+    await repo.deleteCase(id);
 
     result.fold(
-      (l) {
-        AppToast.error(l.errMessage);
+          (l) {
+        AppToast.error(
+          l.errMessage,
+        );
       },
-      (r) {
-        casesList.removeWhere((c) => c.id == id);
+          (r) {
+        final wasMine = _myCases.any(
+              (c) => c.id == id,
+        );
 
-        if (isMySelected) myCasesCount = (myCasesCount - 1).clamp(0, 999999);
+        _allCases.removeWhere(
+              (c) => c.id == id,
+        );
+
+        _myCases.removeWhere(
+              (c) => c.id == id,
+        );
+
+        _sessionCreatedCases.removeWhere(
+              (c) => c.id == id,
+        );
+
+        if (wasMine) {
+          myCasesCount =
+              (myCasesCount - 1)
+                  .clamp(0, 999999);
+        }
 
         emit(Success());
 
-        AppToast.success('shared.cases.card.case_deleted_successfully'.tr());
+        AppToast.success(
+          'shared.cases.card.case_deleted_successfully'
+              .tr(),
+        );
       },
     );
   }
+
+  // ============================================================
+  // Edit Comment
+  // ============================================================
 
   Future<void> editComment({
     required int commentId,
     required String newComment,
   }) async {
-    final result = await repo.editComment(id: commentId, comment: newComment);
+    final result =
+    await repo.editComment(
+      id: commentId,
+      comment: newComment,
+    );
 
     result.fold(
-      (l) {
-        AppToast.error(l.errMessage);
+          (l) {
+        AppToast.error(
+          l.errMessage,
+        );
       },
-      (r) {
-        final index = comments.indexWhere((c) => c.id == commentId);
+          (r) {
+        final index = comments.indexWhere(
+              (c) => c.id == commentId,
+        );
 
         if (index != -1) {
-          comments[index] = comments[index].copyWith(comment: r);
+          comments[index] =
+              comments[index].copyWith(
+                comment: r,
+              );
 
           emit(Success());
         }
 
-        AppToast.success('shared.cases.comments.comment_updated'.tr());
+        AppToast.success(
+          'shared.cases.comments.comment_updated'
+              .tr(),
+        );
       },
     );
   }
+
+  // ============================================================
+  // Delete Comment
+  // ============================================================
 
   Future<void> deleteComment({
     required int commentId,
     required int caseId,
   }) async {
-    final result = await repo.deleteComment(commentId);
+    final result =
+    await repo.deleteComment(
+      commentId,
+    );
 
     result.fold(
-      (l) {
-        AppToast.error(l.errMessage);
+          (l) {
+        AppToast.error(
+          l.errMessage,
+        );
       },
-      (r) {
-        comments.removeWhere((c) => c.id == commentId);
+          (r) {
+        comments.removeWhere(
+              (c) => c.id == commentId,
+        );
+
         emit(Success());
 
-        final caseIndex = casesList.indexWhere((c) => c.id == caseId);
-        if (caseIndex != -1) {
-          casesList[caseIndex] = casesList[caseIndex]
-              .copyWithCommentsDecremented();
-        }
+        _updateCaseEverywhere(
+          caseId,
+              (c) => c.copyWithCommentsDecremented(),
+        );
 
-        AppToast.success('shared.cases.comments.comment_deleted'.tr());
+        AppToast.success(
+          'shared.cases.comments.comment_deleted'
+              .tr(),
+        );
       },
     );
   }
 
-  Future<void> likeCase(int caseId) async {
-    if (_likingCases.contains(caseId)) return;
+  // ============================================================
+  // Like
+  // ============================================================
+
+  Future<void> likeCase(
+      int caseId,
+      ) async {
+    if (_likingCases.contains(caseId)) {
+      return;
+    }
 
     _likingCases.add(caseId);
+
     emit(Success());
 
-    final result = await repo.likeCase(caseId);
+    final result =
+    await repo.likeCase(caseId);
 
     result.fold(
-      (l) {
+          (l) {
         _likingCases.remove(caseId);
+
         emit(Success());
 
-        AppToast.error(l.errMessage);
+        AppToast.error(
+          l.errMessage,
+        );
       },
-      (r) {
-        final index = casesList.indexWhere((c) => c.id == caseId);
-
-        if (index != -1) {
-          casesList[index] = casesList[index].copyWithLike(
+          (r) {
+        _updateCaseEverywhere(
+          caseId,
+              (c) => c.copyWithLike(
             likers: r.likers,
             isLiked: r.isLiked,
-          );
-        }
+          ),
+        );
 
         _likingCases.remove(caseId);
+
         emit(Success());
       },
     );
   }
+
+  // ============================================================
+  // Update Case
+  // ============================================================
 
   Future<void> updateCase({
     required int id,
@@ -453,30 +866,37 @@ class CasesCubit extends Cubit<CasesState> {
     if (isUpdatingCase) return;
 
     isUpdatingCase = true;
+
     emit(Loading());
 
-    final result = await repo.updateCase(id: id, param: param);
+    final result =
+    await repo.updateCase(
+      id: id,
+      param: param,
+    );
 
     result.fold(
-      (l) {
+          (l) {
         isUpdatingCase = false;
 
-        AppToast.error(l.errMessage);
+        AppToast.error(
+          l.errMessage,
+        );
 
         emit(Error());
       },
-      (data) {
-        final index = casesList.indexWhere((caseItem) => caseItem.id == id);
-
-        if (index != -1) {
-          final oldCase = casesList[index];
-
-          casesList[index] = oldCase.copyWith(
-            paymentDetails: CasePaymentDetails.fromJson(
+          (data) {
+        _updateCaseEverywhere(
+          id,
+              (oldCase) => oldCase.copyWith(
+            paymentDetails:
+            CasePaymentDetails.fromJson(
               data['payment_details'],
             ),
-            created: DateTime.parse(data['created']),
-            modified: DateTime.parse(data['modified']),
+            created:
+            DateTime.parse(data['created']),
+            modified:
+            DateTime.parse(data['modified']),
             name: data['name'],
             description: data['description'],
             category: data['category'],
@@ -486,14 +906,16 @@ class CasesCubit extends Cubit<CasesState> {
             info: data['info'],
             note: data['note'],
             active: data['active'],
-          );
-        }
+          ),
+        );
 
         isUpdatingCase = false;
 
         emit(Success());
 
-        AppToast.success('shared.cases.edit.case_updated'.tr());
+        AppToast.success(
+          'shared.cases.edit.case_updated'.tr(),
+        );
       },
     );
   }
@@ -501,6 +923,7 @@ class CasesCubit extends Cubit<CasesState> {
   @override
   Future<void> close() {
     disconnectFromCommentsChannel();
+
     return super.close();
   }
 }

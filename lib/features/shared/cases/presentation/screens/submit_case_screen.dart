@@ -14,11 +14,7 @@ class SubmitCaseScreen extends StatefulWidget {
   final CaseListItemModel? caseItem;
   final CasesCubit casesCubit;
 
-  const SubmitCaseScreen({
-    super.key,
-    this.caseItem,
-    required this.casesCubit,
-  });
+  const SubmitCaseScreen({super.key, this.caseItem, required this.casesCubit});
 
   bool get isEdit => caseItem != null;
 
@@ -35,35 +31,33 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
 
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) {
-        setState(() => showForm = true);
+        setState(() {
+          showForm = true;
+        });
       }
     });
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final textColor = theme.colorScheme.onSurface;
+
     final secondaryColor = textColor.withValues(alpha: .6);
+
     final closeBackgroundColor = textColor.withValues(alpha: .08);
 
     return BlocProvider.value(
       value: widget.casesCubit,
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
+
         body: SafeArea(
           child: Column(
             children: [
               Padding(
-                padding: AppSize.padding(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
+                padding: AppSize.padding(horizontal: 16, vertical: 16),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -75,19 +69,21 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
                             widget.isEdit
                                 ? 'shared.cases.edit.title'.tr()
                                 : 'shared.cases.submit.title'.tr(),
+
                             style: TextStyle(
                               fontSize: AppSize.font(20),
                               fontWeight: FontWeight.w800,
                               color: textColor,
                             ),
                           ),
-                          SizedBox(
-                            height: AppSize.getHeight(4),
-                          ),
+
+                          SizedBox(height: AppSize.getHeight(4)),
+
                           Text(
                             widget.isEdit
                                 ? 'shared.cases.edit.desc'.tr()
                                 : 'shared.cases.submit.desc'.tr(),
+
                             style: TextStyle(
                               fontSize: AppSize.font(13),
                               color: secondaryColor,
@@ -96,15 +92,20 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
                         ],
                       ),
                     ),
+
                     GestureDetector(
-                      onTap: () => AppNavigator.pop(),
+                      onTap: () {
+                        AppNavigator.pop();
+                      },
                       child: Container(
                         width: AppSize.getSize(36),
                         height: AppSize.getSize(36),
+
                         decoration: BoxDecoration(
                           color: closeBackgroundColor,
                           shape: BoxShape.circle,
                         ),
+
                         child: Center(
                           child: CustomIcon(
                             icon: AppIcons.close,
@@ -118,24 +119,24 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
                   ],
                 ),
               ),
+
               Expanded(
                 child: AnimatedSlide(
-                  offset: showForm
-                      ? Offset.zero
-                      : const Offset(0, 0.3),
+                  offset: showForm ? Offset.zero : const Offset(0, 0.3),
+
                   duration: const Duration(milliseconds: 400),
+
                   curve: Curves.easeOutCubic,
+
                   child: AnimatedOpacity(
                     opacity: showForm ? 1 : 0,
+
                     duration: const Duration(milliseconds: 400),
+
                     child: SingleChildScrollView(
-                      padding: AppSize.padding(
-                        horizontal: 16,
-                        bottom: 24,
-                      ),
-                      child: CasesForm(
-                        caseItem: widget.caseItem,
-                      ),
+                      padding: AppSize.padding(horizontal: 16, bottom: 24),
+
+                      child: CasesForm(caseItem: widget.caseItem),
                     ),
                   ),
                 ),

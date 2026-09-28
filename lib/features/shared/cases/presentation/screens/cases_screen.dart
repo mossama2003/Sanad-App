@@ -9,167 +9,197 @@ import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../data/models/cases_model.dart';
-import '../../data/repos/cases_repo.dart';
 import '../cards/verified_info_card.dart';
 import '../controllers/case_cubit.dart';
 import '../cards/cases_card.dart';
 
-class CasesScreen extends StatefulWidget {
-  const CasesScreen({super.key});
+class CasesScreen extends StatelessWidget {
+  final CasesCubit casesCubit;
 
-  @override
-  State<CasesScreen> createState() => _CasesScreenState();
-}
+  const CasesScreen({super.key, required this.casesCubit});
 
-class _CasesScreenState extends State<CasesScreen> {
-  late final CasesCubit casesCubit;
-  late final bool isOrg;
-  int? currentUserId;
+  // ============================================================
+  // Delete
+  // ============================================================
 
-  @override
-  void initState() {
-    super.initState();
-    casesCubit = CasesCubit(CasesRepoImpel());
-
-    final user = AppCubit.get(context).user;
-    isOrg = user?.role == 'organization';
-    currentUserId = user?.id;
-
-    casesCubit.initCasesScreen(isOrg: isOrg);
-  }
-
-  @override
-  void dispose() {
-    casesCubit.close();
-    super.dispose();
-  }
-
-  void _confirmDelete(int id) {
+  void _confirmDelete(BuildContext context, int id) {
     AppNavigator.dialog(
       ConfirmDialog(
         title: 'shared.cases.card.confirm_delete_title'.tr(),
         message: 'shared.cases.card.confirm_delete_desc'.tr(),
         confirmText: 'shared.cases.card.delete'.tr(),
         isDestructive: true,
-        onConfirm: () => casesCubit.deleteCase(id),
+        onConfirm: () {
+          casesCubit.deleteCase(id);
+        },
       ),
     );
   }
 
-  Future<void> _editCase(CaseListItemModel caseItem) async {
-    await AppNavigator.push(
-      SubmitCaseScreen(caseItem: caseItem, casesCubit: casesCubit),
+  // ============================================================
+  // Edit
+  // ============================================================
+
+  Future<void> _editCase(
+    BuildContext context,
+    CaseListItemModel caseItem,
+  ) async {
+    debugPrint(
+      'OPEN EDIT => '
+      'cubit=${identityHashCode(casesCubit)} '
+      'caseId=${caseItem.id}',
     );
 
-    if (mounted) {
-      await casesCubit.getCases(me: casesCubit.isMySelected);
-    }
+    await AppNavigator.push(
+      BlocProvider.value(
+        value: casesCubit,
+        child: SubmitCaseScreen(caseItem: caseItem, casesCubit: casesCubit),
+      ),
+    );
+
+    if (!context.mounted) return;
+
+    await casesCubit.getCases(me: casesCubit.isMySelected);
   }
 
-  Future<void> openCreateCase(BuildContext context) async {
-    await AppNavigator.push(SubmitCaseScreen(casesCubit: casesCubit));
-  }
+  // ============================================================
+  // Build
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final textColor = theme.colorScheme.onSurface;
+
     final secondaryColor = textColor.withValues(alpha: .7);
 
-    return BlocProvider.value(
-      value: casesCubit,
-      child: SingleChildScrollView(
-        padding: AppSize.padding(
-          horizontal: AppSize.getWidth(12),
-          top: AppSize.getHeight(15),
-          bottom: AppSize.getHeight(60),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'shared.cases.title'.tr(),
-              style: TextStyle(
-                fontSize: AppSize.font(22),
-                fontWeight: FontWeight.w700,
-                color: textColor,
-              ),
-            ),
+    debugPrint(
+      'CASES SCREEN BUILD => '
+      'cubit=${identityHashCode(casesCubit)}',
+    );
 
-            SizedBox(height: AppSize.getHeight(3)),
-
-            Text(
-              'shared.cases.desc'.tr(),
-              style: TextStyle(
-                fontSize: AppSize.font(15),
-                fontWeight: FontWeight.w300,
-                color: secondaryColor,
-              ),
-            ),
-
-            SizedBox(height: AppSize.getHeight(15)),
-
-            if (isOrg) ...[
-              BlocBuilder<CasesCubit, CasesState>(
-                buildWhen: (previous, current) {
-                  return current is Success ||
-                      current is Loading ||
-                      current is Error;
-                },
-                builder: (context, state) {
-                  return CasesTabSelector(
-                    isMySelected: casesCubit.isMySelected,
-                    myCasesCount: casesCubit.myCasesCount,
-                    onChanged: casesCubit.switchTab,
-                  );
-                },
-              ),
-
-              SizedBox(height: AppSize.getHeight(15)),
-            ],
-
-            const VerifiedInfoCard(),
-
-            SizedBox(height: AppSize.getHeight(15)),
-
-            BlocBuilder<CasesCubit, CasesState>(
-              builder: (context, state) {
-                if (state is Loading && casesCubit.casesList.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (casesCubit.casesList.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'shared.cases.no_cases'.tr(),
-                      style: TextStyle(color: textColor),
-                    ),
-                  );
-                }
-
-                return Column(
-                  children: [
-                    for (int i = 0; i < casesCubit.casesList.length; i++) ...[
-                      CasesCard(
-                        caseItem: casesCubit.casesList[i],
-                        isOwner:
-                            isOrg &&
-                            casesCubit.casesList[i].creator.id == currentUserId,
-                        onDelete: () =>
-                            _confirmDelete(casesCubit.casesList[i].id),
-                        onEdit: () => _editCase(casesCubit.casesList[i]),
-                      ),
-
-                      if (i < casesCubit.casesList.length - 1)
-                        SizedBox(height: AppSize.getHeight(15)),
-                    ],
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
+    return SingleChildScrollView(
+      padding: AppSize.padding(
+        horizontal: AppSize.getWidth(12),
+        top: AppSize.getHeight(15),
+        bottom: AppSize.getHeight(60),
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'shared.cases.title'.tr(),
+            style: TextStyle(
+              fontSize: AppSize.font(22),
+              fontWeight: FontWeight.w700,
+              color: textColor,
+            ),
+          ),
+
+          SizedBox(height: AppSize.getHeight(3)),
+
+          Text(
+            'shared.cases.desc'.tr(),
+            style: TextStyle(
+              fontSize: AppSize.font(15),
+              fontWeight: FontWeight.w300,
+              color: secondaryColor,
+            ),
+          ),
+
+          SizedBox(height: AppSize.getHeight(15)),
+
+          BlocBuilder<CasesCubit, CasesState>(
+            bloc: casesCubit,
+            builder: (context, state) {
+              return Column(
+                children: [
+                  CasesTabSelector(
+                    isMySelected: casesCubit.isMySelected,
+
+                    myCasesCount: casesCubit.myCasesCount,
+
+                    onChanged: casesCubit.switchTab,
+                  ),
+
+                  SizedBox(height: AppSize.getHeight(15)),
+
+                  const VerifiedInfoCard(),
+
+                  SizedBox(height: AppSize.getHeight(15)),
+
+                  _buildCasesList(context, state, textColor),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // Cases List
+  // ============================================================
+
+  Widget _buildCasesList(
+    BuildContext context,
+    CasesState state,
+    Color textColor,
+  ) {
+    final cases = casesCubit.casesList;
+
+    debugPrint(
+      'CASES SCREEN REBUILD => '
+      'cubit=${identityHashCode(casesCubit)} '
+      'state=${state.runtimeType} '
+      'isMy=${casesCubit.isMySelected} '
+      'count=${cases.length} '
+      'ids=${cases.map((e) => e.id).toList()}',
+    );
+
+    if (state is Loading && cases.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (cases.isEmpty) {
+      return Center(
+        child: Text(
+          'shared.cases.no_cases'.tr(),
+          style: TextStyle(color: textColor),
+        ),
+      );
+    }
+
+    final user = AppCubit.get(context).user;
+
+    final currentUserId = user?.id;
+
+    final isOrg = user?.role == 'organization';
+
+    return Column(
+      children: [
+        for (int i = 0; i < cases.length; i++) ...[
+          CasesCard(
+            key: ValueKey(cases[i].id),
+
+            caseItem: cases[i],
+
+            isOwner: isOrg && cases[i].creator.id == currentUserId,
+
+            onDelete: () {
+              _confirmDelete(context, cases[i].id);
+            },
+
+            onEdit: () {
+              _editCase(context, cases[i]);
+            },
+          ),
+
+          if (i < cases.length - 1) SizedBox(height: AppSize.getHeight(15)),
+        ],
+      ],
     );
   }
 }
@@ -189,7 +219,9 @@ class CasesTabSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final textColor = theme.colorScheme.onSurface;
+
     final backgroundColor = textColor.withValues(alpha: .08);
 
     return Container(
@@ -207,10 +239,12 @@ class CasesTabSelector extends StatelessWidget {
               onTap: () => onChanged(false),
             ),
           ),
+
           Expanded(
             child: _CasesTabItem(
               label:
-                  '${'shared.cases.my_cases'.tr()} (${myCasesCount.compact})',
+                  '${'shared.cases.my_cases'.tr()} '
+                  '(${myCasesCount.compact})',
               isSelected: isMySelected,
               onTap: () => onChanged(true),
             ),
@@ -235,10 +269,13 @@ class _CasesTabItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final isDark = theme.brightness == Brightness.dark;
+
     final textColor = theme.colorScheme.onSurface;
 
     final selectedColor = theme.cardColor;
+
     final unselectedColor = textColor.withValues(alpha: .6);
 
     return GestureDetector(

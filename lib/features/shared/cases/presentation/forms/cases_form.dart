@@ -405,9 +405,10 @@ class _CasesFormState extends State<CasesForm> {
       return;
     }
 
-    // Final safety check before submitting.
+    // Final safety check.
     if (_currentCasePhotosCount > _maxCasePhotos) {
       _showAttachmentLimitMessage(type: 'photos', max: _maxCasePhotos);
+
       return;
     }
 
@@ -416,32 +417,46 @@ class _CasesFormState extends State<CasesForm> {
         type: 'supporting documents',
         max: _maxSupportingDocuments,
       );
+
       return;
     }
 
     final param = CreateCaseParam(
       name: titleController.text.trim(),
+
       description: descriptionController.text.trim(),
+
       category: selectedCategory.value!,
+
       urgency: _urgencyValues[selectedUrgency],
+
       contactName: contactNameController.text.trim(),
+
       contactPhone: contactPhoneController.text.trim(),
+
       paymentType: selectedPaymentType.value,
+
       paymentDescription: _paymentDescriptionForType(selectedPaymentType.value),
+
       paymentEstimatedAmount: estimatedAmountController.text.trim().isEmpty
           ? null
           : double.tryParse(estimatedAmountController.text.trim()),
+
       paymentRaisedAmount: raisedAmountController.text.trim().isEmpty
           ? null
           : double.tryParse(raisedAmountController.text.trim()),
+
       note: additionalNotesController.text.trim(),
+
       attachments: [...casePhotos, ...supportingDocuments],
     );
 
+    final cubit = context.read<CasesCubit>();
+
     if (widget.isEdit) {
-      CasesCubit.get(context).updateCase(id: widget.caseItem!.id, param: param);
+      cubit.updateCase(id: widget.caseItem!.id, param: param);
     } else {
-      CasesCubit.get(context).createCase(param, context: context);
+      cubit.createCase(param, context: context);
     }
   }
 
@@ -449,10 +464,24 @@ class _CasesFormState extends State<CasesForm> {
   Widget build(BuildContext context) {
     return BlocListener<CasesCubit, CasesState>(
       listener: (context, state) {
-        if (state is Success) {
+        final cubit = context.read<CasesCubit>();
+
+        debugPrint(
+          'SUBMIT CASE LISTENER => '
+          'cubit=${identityHashCode(cubit)} '
+          'state=${state.runtimeType}',
+        );
+
+        if (state is CaseCreated) {
+          debugPrint(
+            'SUBMIT CASE => POP '
+            'caseId=${state.caseId}',
+          );
+
           AppNavigator.pop();
         }
       },
+
       child: Form(
         key: _formKey,
         child: Column(
@@ -607,10 +636,13 @@ class _CasesFormState extends State<CasesForm> {
                     builder: (context, state) {
                       return CustomButton(
                         loading: state is Loading,
-                        onTap: state is Loading ? null : _submit,
+                        onTap: state is Loading
+                            ? null
+                            : _submit,
                         title: widget.isEdit
                             ? 'shared.cases.edit.button'.tr()
-                            : 'shared.cases.submit.submit_button'.tr(),
+                            : 'shared.cases.submit.submit_button'
+                            .tr(),
                         bgColor: AppColors.primary,
                       );
                     },

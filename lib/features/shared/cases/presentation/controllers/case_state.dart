@@ -10,4 +10,12 @@ class Error extends CasesState {}
 
 class Sending extends CasesState {}
 
+class CaseCreated extends CasesState {
+  final int caseId;
+
+  CaseCreated(this.caseId);
+
+  List<Object?> get props => [caseId];
+}
+
 class Success extends CasesState {}

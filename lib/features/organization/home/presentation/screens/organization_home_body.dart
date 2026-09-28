@@ -8,6 +8,7 @@ import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../../../shared/cases/data/repos/cases_repo.dart';
 import '../../../../shared/cases/presentation/controllers/case_cubit.dart';
+import '../../../../shared/cases/presentation/screens/cases_screen.dart';
 import '../../../../shared/cases/presentation/screens/submit_case_screen.dart';
 import '../../data/enums/organization_home_navbar_enum.dart';
 import '../controllers/organization_home_cubit.dart';
@@ -32,14 +33,26 @@ class _OrganizationHomeBodyState extends State<OrganizationHomeBody> {
     casesCubit = CasesCubit(CasesRepoImpel());
 
     final user = AppCubit.get(context).user;
+
     final isOrg = user?.role == 'organization';
 
-    casesCubit.initCasesScreen(isOrg: isOrg);
+    debugPrint(
+      'HOME BODY INIT => '
+      'casesCubit=${identityHashCode(casesCubit)}',
+    );
+
+    casesCubit.initCasesScreen(isOrg: isOrg, currentUserId: user?.id);
   }
 
   @override
   void dispose() {
+    debugPrint(
+      'HOME BODY DISPOSE => '
+      'casesCubit=${identityHashCode(casesCubit)}',
+    );
+
     casesCubit.close();
+
     super.dispose();
   }
 
@@ -49,6 +62,8 @@ class _OrganizationHomeBodyState extends State<OrganizationHomeBody> {
       builder: (context, state) {
         final cubit = OrganizationHomeCubit.get(context);
 
+        final isCases = cubit.selectedItem == OrganizationHomeNavbarItem.cases;
+
         return Scaffold(
           body: SafeArea(
             child: Column(
@@ -56,25 +71,37 @@ class _OrganizationHomeBodyState extends State<OrganizationHomeBody> {
                 const OrganizationHomeAppbarWidget(),
 
                 Expanded(
-                  child: BlocProvider.value(
-                    value: casesCubit,
-                    child: cubit.currentScreen,
-                  ),
+                  child: isCases
+                      ? BlocProvider.value(
+                          value: casesCubit,
+                          child: CasesScreen(casesCubit: casesCubit),
+                        )
+                      : cubit.currentScreen,
                 ),
               ],
             ),
           ),
 
+          // ======================================================
+          // Floating Action Button
+          // ======================================================
           floatingActionButton:
               cubit.selectedItem == OrganizationHomeNavbarItem.events
               ? FloatingActionButton(
                   heroTag: 'organization_events_fab',
-                  onPressed: () => cubit.openEventForm(null),
+
+                  onPressed: () {
+                    cubit.openEventForm(null);
+                  },
+
                   backgroundColor: AppColors.primary,
+
                   elevation: 5,
+
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
+
                   child: CustomIcon(
                     icon: AppIcons.add,
                     color: AppColors.white,
@@ -85,14 +112,29 @@ class _OrganizationHomeBodyState extends State<OrganizationHomeBody> {
               : cubit.selectedItem == OrganizationHomeNavbarItem.cases
               ? FloatingActionButton(
                   heroTag: 'organization_cases_fab',
+
                   onPressed: () {
-                    AppNavigator.push(SubmitCaseScreen(casesCubit: casesCubit));
+                    debugPrint(
+                      'CASES FAB => '
+                      'cubit=${identityHashCode(casesCubit)}',
+                    );
+
+                    AppNavigator.push(
+                      BlocProvider.value(
+                        value: casesCubit,
+                        child: SubmitCaseScreen(casesCubit: casesCubit),
+                      ),
+                    );
                   },
+
                   backgroundColor: AppColors.laserBlue,
+
                   elevation: 5,
+
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
+
                   child: CustomIcon(
                     icon: AppIcons.add,
                     color: AppColors.white,
@@ -102,6 +144,9 @@ class _OrganizationHomeBodyState extends State<OrganizationHomeBody> {
                 )
               : null,
 
+          // ======================================================
+          // Bottom Navigation
+          // ======================================================
           bottomNavigationBar: OrganizationHomeNavbarWidget(
             selected: cubit.selectedItem,
             onTap: cubit.updateSelectedNavbarItem,
