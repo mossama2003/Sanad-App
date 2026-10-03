@@ -15,8 +15,13 @@ import '../cards/cases_card.dart';
 
 class CasesScreen extends StatelessWidget {
   final CasesCubit casesCubit;
+  final bool isOrg;
 
-  const CasesScreen({super.key, required this.casesCubit});
+  const CasesScreen({
+    super.key,
+    required this.casesCubit,
+    required this.isOrg,
+  });
 
   // ============================================================
   // Delete
@@ -37,19 +42,30 @@ class CasesScreen extends StatelessWidget {
   }
 
   // ============================================================
+  // Complete
+  // ============================================================
+
+  void _confirmComplete(BuildContext context, int id) {
+    AppNavigator.dialog(
+      ConfirmDialog(
+        title: 'shared.cases.card.confirm_complete_title'.tr(),
+        message: 'shared.cases.card.confirm_complete_desc'.tr(),
+        confirmText: 'shared.cases.card.complete'.tr(),
+        onConfirm: () {
+          casesCubit.completeCase(id);
+        },
+      ),
+    );
+  }
+
+  // ============================================================
   // Edit
   // ============================================================
 
   Future<void> _editCase(
-    BuildContext context,
-    CaseListItemModel caseItem,
-  ) async {
-    debugPrint(
-      'OPEN EDIT => '
-      'cubit=${identityHashCode(casesCubit)} '
-      'caseId=${caseItem.id}',
-    );
-
+      BuildContext context,
+      CaseListItemModel caseItem,
+      ) async {
     await AppNavigator.push(
       BlocProvider.value(
         value: casesCubit,
@@ -73,11 +89,6 @@ class CasesScreen extends StatelessWidget {
     final textColor = theme.colorScheme.onSurface;
 
     final secondaryColor = textColor.withValues(alpha: .7);
-
-    debugPrint(
-      'CASES SCREEN BUILD => '
-      'cubit=${identityHashCode(casesCubit)}',
-    );
 
     return SingleChildScrollView(
       padding: AppSize.padding(
@@ -115,15 +126,16 @@ class CasesScreen extends StatelessWidget {
             builder: (context, state) {
               return Column(
                 children: [
-                  CasesTabSelector(
-                    isMySelected: casesCubit.isMySelected,
+                  /// Tabs (Org only)
+                  if (isOrg) ...[
+                    CasesTabSelector(
+                      isMySelected: casesCubit.isMySelected,
+                      myCasesCount: casesCubit.myCasesCount,
+                      onChanged: casesCubit.switchTab,
+                    ),
 
-                    myCasesCount: casesCubit.myCasesCount,
-
-                    onChanged: casesCubit.switchTab,
-                  ),
-
-                  SizedBox(height: AppSize.getHeight(15)),
+                    SizedBox(height: AppSize.getHeight(15)),
+                  ],
 
                   const VerifiedInfoCard(),
 
@@ -144,20 +156,11 @@ class CasesScreen extends StatelessWidget {
   // ============================================================
 
   Widget _buildCasesList(
-    BuildContext context,
-    CasesState state,
-    Color textColor,
-  ) {
+      BuildContext context,
+      CasesState state,
+      Color textColor,
+      ) {
     final cases = casesCubit.casesList;
-
-    debugPrint(
-      'CASES SCREEN REBUILD => '
-      'cubit=${identityHashCode(casesCubit)} '
-      'state=${state.runtimeType} '
-      'isMy=${casesCubit.isMySelected} '
-      'count=${cases.length} '
-      'ids=${cases.map((e) => e.id).toList()}',
-    );
 
     if (state is Loading && cases.isEmpty) {
       return const Center(child: CircularProgressIndicator());
@@ -172,11 +175,7 @@ class CasesScreen extends StatelessWidget {
       );
     }
 
-    final user = AppCubit.get(context).user;
-
-    final currentUserId = user?.id;
-
-    final isOrg = user?.role == 'organization';
+    final currentUserId = AppCubit.get(context).user?.id;
 
     return Column(
       children: [
@@ -194,6 +193,10 @@ class CasesScreen extends StatelessWidget {
 
             onEdit: () {
               _editCase(context, cases[i]);
+            },
+
+            onComplete: () {
+              _confirmComplete(context, cases[i].id);
             },
           ),
 
@@ -243,7 +246,7 @@ class CasesTabSelector extends StatelessWidget {
           Expanded(
             child: _CasesTabItem(
               label:
-                  '${'shared.cases.my_cases'.tr()} '
+              '${'shared.cases.my_cases'.tr()} '
                   '(${myCasesCount.compact})',
               isSelected: isMySelected,
               onTap: () => onChanged(true),
@@ -288,12 +291,12 @@ class _CasesTabItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: isSelected
               ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? .25 : .06),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? .25 : .06),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ]
               : null,
         ),
         alignment: Alignment.center,

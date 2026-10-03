@@ -73,7 +73,7 @@ class OrganizationProfileScreen extends StatelessWidget {
                   ContactInfoCard(
                     email: user?.email ?? '',
                     phone: user?.phone?.replaceFirst('+20', '0') ?? '',
-                    website: profile?.website ?? '',
+                    website: _normalizeUrl(profile?.website),
                     location: [
                       profile?.state,
                       profile?.headquarters,
@@ -87,15 +87,16 @@ class OrganizationProfileScreen extends StatelessWidget {
                     ),
                   ],
 
-                  if (profile?.branches?.isNotEmpty == true) ...[
-                    SizedBox(height: AppSize.getHeight(16)),
-                    _buildBranchesCard(context, profile!.branches!),
-                  ],
-
+                  // if (profile?.branches?.isNotEmpty == true) ...[
+                  //   SizedBox(height: AppSize.getHeight(16)),
+                  //   _buildBranchesCard(context, profile!.branches!),
+                  // ],
                   SizedBox(height: AppSize.getHeight(16)),
 
                   CustomButton(
-                    onTap: () => AppNavigator.push(const SettingsScreen()),
+                    onTap: () {
+                      AppNavigator.push(const SettingsScreen());
+                    },
                     title: 'volunteer.profile.settings'.tr(),
                     textSize: AppSize.font(14),
                     iconSize: AppSize.getSize(17),
@@ -113,6 +114,21 @@ class OrganizationProfileScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  /// Ensures the website always has a valid HTTP/HTTPS scheme.
+  String _normalizeUrl(String? url) {
+    final value = url?.trim() ?? '';
+
+    if (value.isEmpty) {
+      return '';
+    }
+
+    if (value.startsWith('https://') || value.startsWith('http://')) {
+      return value;
+    }
+
+    return 'https://$value';
   }
 
   Widget _buildCoverAndAvatar(BuildContext context, UserModel? user) {
@@ -149,7 +165,6 @@ class OrganizationProfileScreen extends StatelessWidget {
           ),
         ),
 
-        // Avatar
         Positioned(
           bottom: -30,
           left: 16,
@@ -219,6 +234,7 @@ class OrganizationProfileScreen extends StatelessWidget {
             ),
           ),
         ),
+
         if (profile?.isVerified == true) ...[
           SizedBox(width: AppSize.getSize(10)),
           CustomIcon(
@@ -310,85 +326,87 @@ class OrganizationProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBranchesCard(BuildContext context, List<String> branches) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Container(
-      width: double.infinity,
-      padding: AppSize.padding(all: 16),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: theme.colorScheme.onSurface.withValues(
-            alpha: isDark ? .12 : .10,
-          ),
-        ),
-        boxShadow: [
-          BoxShadow(
-            offset: const Offset(0, 2),
-            color: Colors.black.withValues(alpha: isDark ? .35 : .15),
-            blurRadius: 8,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Branches',
-            style: TextStyle(
-              color: theme.colorScheme.onSurface,
-              fontSize: AppSize.font(16),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          SizedBox(height: AppSize.getHeight(12)),
-
-          ...branches.asMap().entries.map((entry) {
-            final index = entry.key;
-            final branch = entry.value;
-
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: index == branches.length - 1
-                    ? 0
-                    : AppSize.getHeight(10),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${index + 1}.',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: AppSize.font(13),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(width: AppSize.getWidth(8)),
-                  Expanded(
-                    child: Text(
-                      branch,
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: .65,
-                        ),
-                        fontSize: AppSize.font(13),
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
+  // Widget _buildBranchesCard(BuildContext context, List<String> branches) {
+  //   final theme = Theme.of(context);
+  //   final isDark = theme.brightness == Brightness.dark;
+  //
+  //   return Container(
+  //     width: double.infinity,
+  //     padding: AppSize.padding(all: 16),
+  //     decoration: BoxDecoration(
+  //       color: theme.cardColor,
+  //       borderRadius: BorderRadius.circular(20),
+  //       border: Border.all(
+  //         color: theme.colorScheme.onSurface.withValues(
+  //           alpha: isDark ? .12 : .10,
+  //         ),
+  //       ),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           offset: const Offset(0, 2),
+  //           color: Colors.black.withValues(alpha: isDark ? .35 : .15),
+  //           blurRadius: 8,
+  //         ),
+  //       ],
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(
+  //           'Branches',
+  //           style: TextStyle(
+  //             color: theme.colorScheme.onSurface,
+  //             fontSize: AppSize.font(16),
+  //             fontWeight: FontWeight.bold,
+  //           ),
+  //         ),
+  //
+  //         SizedBox(height: AppSize.getHeight(12)),
+  //
+  //         ...branches.asMap().entries.map((entry) {
+  //           final index = entry.key;
+  //           final branch = entry.value;
+  //
+  //           return Padding(
+  //             padding: EdgeInsets.only(
+  //               bottom: index == branches.length - 1
+  //                   ? 0
+  //                   : AppSize.getHeight(10),
+  //             ),
+  //             child: Row(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   '${index + 1}.',
+  //                   style: TextStyle(
+  //                     color: AppColors.primary,
+  //                     fontSize: AppSize.font(13),
+  //                     fontWeight: FontWeight.w600,
+  //                   ),
+  //                 ),
+  //
+  //                 SizedBox(width: AppSize.getWidth(8)),
+  //
+  //                 Expanded(
+  //                   child: Text(
+  //                     branch,
+  //                     style: TextStyle(
+  //                       color: theme.colorScheme.onSurface.withValues(
+  //                         alpha: .65,
+  //                       ),
+  //                       fontSize: AppSize.font(13),
+  //                       height: 1.4,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           );
+  //         }),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildOrganizationInfo(
     BuildContext context,
@@ -401,7 +419,6 @@ class OrganizationProfileScreen extends StatelessWidget {
     final organizationType = profile?.organizationType?.trim() ?? '';
     final registrationNo = profile?.registerationNo?.trim() ?? '';
 
-    // لو مفيش أي بيانات، متعرضش الكارت
     if (bio.isEmpty && organizationType.isEmpty && registrationNo.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -463,6 +480,7 @@ class OrganizationProfileScreen extends StatelessWidget {
 
           if (organizationType.isNotEmpty) ...[
             SizedBox(height: AppSize.getHeight(14)),
+
             _buildInfoRow(
               context,
               icon: AppIcons.organization,
@@ -473,6 +491,7 @@ class OrganizationProfileScreen extends StatelessWidget {
 
           if (registrationNo.isNotEmpty) ...[
             SizedBox(height: AppSize.getHeight(12)),
+
             _buildInfoRow(
               context,
               icon: AppIcons.idCard,

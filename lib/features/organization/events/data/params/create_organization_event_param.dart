@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
+
 class CreateOrganizationEventParam {
   final String name;
   final String description;
@@ -39,9 +41,30 @@ class CreateOrganizationEventParam {
       "location_state": locationState,
       "location_description": locationDescription,
       "date": date.toIso8601String(),
-      "skills": skills,
       "spots": spots,
       "status": status,
     };
+  }
+
+  Future<FormData> toFormData() async {
+    final formData = FormData.fromMap(toJson());
+
+    for (var i = 0; i < skills.length; i++) {
+      formData.fields.add(MapEntry('skills[$i]', skills[i]));
+    }
+
+    if (cover != null) {
+      formData.files.add(
+        MapEntry(
+          'cover',
+          await MultipartFile.fromFile(
+            cover!.path,
+            filename: cover!.path.split('/').last,
+          ),
+        ),
+      );
+    }
+
+    return formData;
   }
 }

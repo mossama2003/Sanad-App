@@ -10,15 +10,7 @@ class OrganizationEventsRepoImpel implements OrganizationEventsRepo {
     CreateOrganizationEventParam param,
   ) async {
     try {
-      final formData = FormData.fromMap({
-        ...param.toJson(),
-
-        if (param.cover != null)
-          "cover": await MultipartFile.fromFile(
-            param.cover!.path,
-            filename: param.cover!.path.split('/').last,
-          ),
-      });
+      final formData = await param.toFormData();
 
       final response = await DioHelper.post(
         url: CREATE_ORGANIZATION_EVENT,

@@ -6,6 +6,7 @@ import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../shared/cases/data/repos/cases_repo.dart';
 import '../../../../shared/cases/presentation/controllers/case_cubit.dart';
+import '../../../../shared/cases/presentation/screens/cases_screen.dart';
 import '../../../../shared/donations/presentation/screens/donations_screen.dart';
 import '../../../events/presentation/screens/volunteer_events_screen.dart';
 import '../../../community/presentation/screens/volunteer_community_screen.dart';
@@ -40,14 +41,20 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
 
   late final CasesCubit casesCubit;
 
-  final Map<VolunteerHomeNavbarItem, Widget> _screens = {
-    VolunteerHomeNavbarItem.home: const VolunteerHomeScreen(),
-    VolunteerHomeNavbarItem.events: const VolunteerEventsScreen(),
-    VolunteerHomeNavbarItem.community: const VolunteerCommunityScreen(),
-    VolunteerHomeNavbarItem.donations: const DonationsScreen(),
-  };
-
-  Widget get currentScreen => _screens[selectedItem]!;
+  Widget get currentScreen {
+    switch (selectedItem) {
+      case VolunteerHomeNavbarItem.home:
+        return const VolunteerHomeScreen();
+      case VolunteerHomeNavbarItem.events:
+        return const VolunteerEventsScreen();
+      case VolunteerHomeNavbarItem.cases:
+        return CasesScreen(casesCubit: casesCubit, isOrg: false);
+      case VolunteerHomeNavbarItem.community:
+        return const VolunteerCommunityScreen();
+      case VolunteerHomeNavbarItem.donations:
+        return const DonationsScreen();
+    }
+  }
 
   // ===================== Get Home =====================
 
@@ -64,14 +71,14 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
     final result = await repo.getVolunteerHome();
 
     result.fold(
-      (failure) {
+          (failure) {
         if (home == null) {
           emit(Error());
         }
 
         AppToast.error(failure.errMessage);
       },
-      (data) async {
+          (data) async {
         home = data;
 
         await _homeBox.put('home', data);
@@ -85,10 +92,10 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
     final result = await repo.joinEvent(eventId);
 
     result.fold(
-      (failure) {
+          (failure) {
         AppToast.error(failure.errMessage);
       },
-      (_) async {
+          (_) async {
         _updateEventJoinStatus(eventId, joined: true);
 
         await _saveHomeCache();
@@ -104,10 +111,10 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
     final result = await repo.leaveEvent(eventId);
 
     result.fold(
-      (failure) {
+          (failure) {
         AppToast.error(failure.errMessage);
       },
-      (_) async {
+          (_) async {
         _updateEventJoinStatus(eventId, joined: false);
 
         await _saveHomeCache();
@@ -150,8 +157,8 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
 
       spots: joined
           ? event.spots > 0
-                ? event.spots - 1
-                : 0
+          ? event.spots - 1
+          : 0
           : event.spots + 1,
     );
   }

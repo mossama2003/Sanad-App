@@ -23,6 +23,7 @@ class CasesCard extends StatelessWidget {
   final bool isOwner;
   final VoidCallback? onDelete;
   final VoidCallback? onEdit;
+  final VoidCallback? onComplete;
 
   const CasesCard({
     super.key,
@@ -30,6 +31,7 @@ class CasesCard extends StatelessWidget {
     this.isOwner = false,
     this.onDelete,
     this.onEdit,
+    this.onComplete,
   });
 
   double get _progressValue {
@@ -81,6 +83,10 @@ class CasesCard extends StatelessWidget {
         : AppColors.grey300.withValues(alpha: 0.3);
 
     final dividerColor = theme.dividerColor;
+
+    final isCompleting = CasesCubit.get(context).isCompletingCase(caseItem.id);
+
+    final showEngagement = !(isOwner && !caseItem.active);
 
     return Container(
       decoration: BoxDecoration(
@@ -422,124 +428,102 @@ class CasesCard extends StatelessWidget {
 
                 SizedBox(height: AppSize.getHeight(15)),
 
-                Row(
-                  children: [
-                    SizedBox(width: AppSize.getWidth(10)),
+                // ===================== Actions Row =====================
+                // ملفوفة في SingleChildScrollView أفقي عشان لو الأزرار كتير
+                // (لايك + كومنت + شير + Edit + Complete + Delete) متتعملش overflow
+                // على الشاشات الصغيرة بدل ما تتكسر الـ Row.
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      SizedBox(width: AppSize.getWidth(10)),
 
-                    InkWell(
-                      borderRadius: BorderRadius.circular(20),
-                      onTap: () {
-                        final cubit = CasesCubit.get(context);
+                      if (showEngagement) ...[
+                        InkWell(
+                          borderRadius: BorderRadius.circular(20),
+                          onTap: () {
+                            final cubit = CasesCubit.get(context);
 
-                        if (!cubit.isLikingCase(caseItem.id)) {
-                          cubit.likeCase(caseItem.id);
-                        }
-                      },
-                      child: Padding(
-                        padding: AppSize.padding(vertical: 5, horizontal: 3),
-                        child: Row(
-                          children: [
-                            CasesCubit.get(context).isLikingCase(caseItem.id)
-                                ? SizedBox(
-                                    width: AppSize.getWidth(18),
-                                    height: AppSize.getHeight(18),
-                                    child: const CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: AppColors.primary,
-                                    ),
-                                  )
-                                : CustomIcon(
-                                    icon: AppIcons.donations,
+                            if (!cubit.isLikingCase(caseItem.id)) {
+                              cubit.likeCase(caseItem.id);
+                            }
+                          },
+                          child: Padding(
+                            padding: AppSize.padding(
+                              vertical: 5,
+                              horizontal: 3,
+                            ),
+                            child: Row(
+                              children: [
+                                CasesCubit.get(
+                                      context,
+                                    ).isLikingCase(caseItem.id)
+                                    ? SizedBox(
+                                        width: AppSize.getWidth(18),
+                                        height: AppSize.getHeight(18),
+                                        child: const CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: AppColors.primary,
+                                        ),
+                                      )
+                                    : CustomIcon(
+                                        icon: AppIcons.donations,
+                                        color: caseItem.isLiked
+                                            ? AppColors.red
+                                            : secondaryColor,
+                                        width: AppSize.getWidth(18),
+                                        height: AppSize.getHeight(18),
+                                      ),
+                                SizedBox(width: AppSize.getWidth(3)),
+                                Text(
+                                  caseItem.likers.compact,
+                                  style: TextStyle(
+                                    fontSize: AppSize.font(15),
+                                    fontWeight: FontWeight.w300,
                                     color: caseItem.isLiked
                                         ? AppColors.red
-                                        : secondaryColor,
-                                    width: AppSize.getWidth(18),
-                                    height: AppSize.getHeight(18),
+                                        : textColor,
                                   ),
-                            SizedBox(width: AppSize.getWidth(3)),
-                            Text(
-                              caseItem.likers.compact,
-                              style: TextStyle(
-                                fontSize: AppSize.font(15),
-                                fontWeight: FontWeight.w300,
-                                color: caseItem.isLiked
-                                    ? AppColors.red
-                                    : textColor,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(width: AppSize.getWidth(10)),
+
+                        GestureDetector(
+                          onTap: () => CaseCommentsBottomSheet.show(
+                            context,
+                            caseItem.id,
+                            CasesCubit.get(context),
+                          ),
+                          child: Row(
+                            children: [
+                              CustomIcon(
+                                icon: AppIcons.comment,
+                                color: secondaryColor,
+                                width: AppSize.getWidth(18),
+                                height: AppSize.getHeight(18),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(width: AppSize.getWidth(10)),
-
-                    GestureDetector(
-                      onTap: () => CaseCommentsBottomSheet.show(
-                        context,
-                        caseItem.id,
-                        CasesCubit.get(context),
-                      ),
-                      child: Row(
-                        children: [
-                          CustomIcon(
-                            icon: AppIcons.comment,
-                            color: secondaryColor,
-                            width: AppSize.getWidth(18),
-                            height: AppSize.getHeight(18),
-                          ),
-                          SizedBox(width: AppSize.getWidth(3)),
-                          Text(
-                            caseItem.comments.compact,
-                            style: TextStyle(
-                              fontSize: AppSize.font(15),
-                              fontWeight: FontWeight.w300,
-                              color: textColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const Spacer(),
-
-                    InkWell(
-                      onTap: () {},
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.12),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(30),
-                          ),
-                        ),
-                        padding: AppSize.padding(vertical: 5, horizontal: 10),
-                        child: Row(
-                          children: [
-                            CustomIcon(
-                              icon: AppIcons.share,
-                              color: textColor,
-                              width: AppSize.getWidth(15),
-                              height: AppSize.getHeight(15),
-                            ),
-                            SizedBox(width: AppSize.getWidth(5)),
-                            Text(
-                              'shared.cases.card.share'.tr(),
-                              style: TextStyle(
-                                fontSize: AppSize.font(15),
-                                color: textColor,
-                                fontWeight: FontWeight.w400,
+                              SizedBox(width: AppSize.getWidth(3)),
+                              Text(
+                                caseItem.comments.compact,
+                                style: TextStyle(
+                                  fontSize: AppSize.font(15),
+                                  fontWeight: FontWeight.w300,
+                                  color: textColor,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
 
-                    SizedBox(width: AppSize.getWidth(5)),
+                        SizedBox(width: AppSize.getWidth(10)),
+                      ],
 
-                    if (isOwner) ...[
                       InkWell(
-                        onTap: onEdit,
+                        onTap: () {},
                         child: Container(
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.12),
@@ -551,10 +535,19 @@ class CasesCard extends StatelessWidget {
                           child: Row(
                             children: [
                               CustomIcon(
-                                icon: AppIcons.edit,
-                                color: AppColors.primary,
-                                width: AppSize.getSize(18),
-                                height: AppSize.getSize(18),
+                                icon: AppIcons.share,
+                                color: textColor,
+                                width: AppSize.getWidth(15),
+                                height: AppSize.getHeight(15),
+                              ),
+                              SizedBox(width: AppSize.getWidth(5)),
+                              Text(
+                                'shared.cases.card.share'.tr(),
+                                style: TextStyle(
+                                  fontSize: AppSize.font(15),
+                                  color: textColor,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
                             ],
                           ),
@@ -563,32 +556,81 @@ class CasesCard extends StatelessWidget {
 
                       SizedBox(width: AppSize.getWidth(5)),
 
-                      InkWell(
-                        onTap: onDelete,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.red.withValues(alpha: 0.12),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(30),
+                      if (isOwner) ...[
+                        /// Edit
+                        InkWell(
+                          onTap: onEdit,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.12),
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(30),
+                              ),
+                            ),
+                            padding: AppSize.padding(
+                              vertical: 5,
+                              horizontal: 10,
+                            ),
+                            child: Row(
+                              children: [
+                                CustomIcon(
+                                  icon: AppIcons.edit,
+                                  color: AppColors.primary,
+                                  width: AppSize.getSize(18),
+                                  height: AppSize.getSize(18),
+                                ),
+                              ],
                             ),
                           ),
-                          padding: AppSize.padding(vertical: 5, horizontal: 10),
-                          child: Row(
-                            children: [
-                              CustomIcon(
-                                icon: AppIcons.delete,
-                                color: AppColors.red,
-                                width: AppSize.getSize(18),
-                                height: AppSize.getSize(18),
-                              ),
-                            ],
+                        ),
+
+                        SizedBox(width: AppSize.getWidth(5)),
+
+                        /// Complete Case — Toggle
+                        InkWell(
+                          borderRadius: BorderRadius.circular(30),
+                          onTap: caseItem.active && !isCompleting
+                              ? onComplete
+                              : null,
+                          child: _ActiveToggleButton(
+                            isActive: caseItem.active,
+                            isLoading: isCompleting,
                           ),
                         ),
-                      ),
 
-                      SizedBox(width: AppSize.getWidth(10)),
+                        SizedBox(width: AppSize.getWidth(5)),
+
+                        /// Delete
+                        InkWell(
+                          onTap: onDelete,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.red.withValues(alpha: 0.12),
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(30),
+                              ),
+                            ),
+                            padding: AppSize.padding(
+                              vertical: 5,
+                              horizontal: 10,
+                            ),
+                            child: Row(
+                              children: [
+                                CustomIcon(
+                                  icon: AppIcons.delete,
+                                  color: AppColors.red,
+                                  width: AppSize.getSize(18),
+                                  height: AppSize.getSize(18),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(width: AppSize.getWidth(10)),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
 
                 if (!isOwner) ...[
@@ -610,6 +652,85 @@ class CasesCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ActiveToggleButton extends StatelessWidget {
+  final bool isActive;
+  final bool isLoading;
+
+  const _ActiveToggleButton({required this.isActive, required this.isLoading});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isActive ? AppColors.grey500 : AppColors.green;
+
+    // ===================== حالة الكيس المكتمل =====================
+    if (!isActive) {
+      return Container(
+        padding: AppSize.padding(vertical: 5, horizontal: 10),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: const BorderRadius.all(Radius.circular(30)),
+        ),
+        child: Text(
+          'Completed',
+          style: TextStyle(
+            fontSize: AppSize.font(11),
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      );
+    }
+
+    // ===================== حالة الكيس لسه شغالة (OFF) =====================
+    return Container(
+      padding: AppSize.padding(vertical: 5, horizontal: 10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: const BorderRadius.all(Radius.circular(30)),
+      ),
+      child: isLoading
+          ? SizedBox(
+              width: AppSize.getSize(18),
+              height: AppSize.getSize(18),
+              child: CircularProgressIndicator(strokeWidth: 2, color: color),
+            )
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: AppSize.getWidth(30),
+                  height: AppSize.getHeight(16),
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    width: AppSize.getWidth(12),
+                    height: AppSize.getHeight(12),
+                    decoration: const BoxDecoration(
+                      color: AppColors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                SizedBox(width: AppSize.getWidth(6)),
+                Text(
+                  'Complete',
+                  style: TextStyle(
+                    fontSize: AppSize.font(11),
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }

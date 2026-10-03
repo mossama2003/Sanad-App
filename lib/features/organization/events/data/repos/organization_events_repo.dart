@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
 
 import '../../../../../core/network/end_points.dart';

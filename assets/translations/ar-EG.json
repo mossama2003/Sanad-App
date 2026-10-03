@@ -257,7 +257,11 @@
         "delete": "حذف",
         "case_deleted_successfully": "تم حذف الحالة بنجاح",
         "confirm_delete_title": "حذف الحالة؟",
-        "confirm_delete_desc": "هذا الإجراء لا يمكن التراجع عنه. هل أنت متأكد من حذف هذه الحالة؟"
+        "confirm_delete_desc": "هذا الإجراء لا يمكن التراجع عنه. هل أنت متأكد من حذف هذه الحالة؟",
+        "confirm_complete_title": "إكمال الحالة",
+        "confirm_complete_desc": "هل أنت متأكد من إكمال هذه الحالة؟ لن تظهر كحالة نشطة بعد ذلك.",
+        "complete": "إكمال",
+        "case_completed": "تم إكمال الحالة بنجاح"
       },
       "pop_up": {
         "contact_person": "الشخص المسؤول",

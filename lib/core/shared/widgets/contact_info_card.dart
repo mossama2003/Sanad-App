@@ -121,12 +121,9 @@ class ContactInfoCard extends StatelessWidget {
     if (uri == null) return;
 
     try {
-      final canOpen = await canLaunchUrl(uri);
+      final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
 
-      if (canOpen) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-        return;
-      }
+      if (opened) return;
     } catch (_) {}
 
     if (!context.mounted) return;

@@ -74,7 +74,10 @@ class _OrganizationHomeBodyState extends State<OrganizationHomeBody> {
                   child: isCases
                       ? BlocProvider.value(
                           value: casesCubit,
-                          child: CasesScreen(casesCubit: casesCubit),
+                          child: CasesScreen(
+                            casesCubit: casesCubit,
+                            isOrg: true,
+                          ),
                         )
                       : cubit.currentScreen,
                 ),

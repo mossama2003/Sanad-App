@@ -39,4 +39,9 @@ abstract class CasesRepo {
     required int id,
     required CreateCaseParam param,
   });
+
+  Future<Either<Failure, void>> updateCaseActive({
+    required int id,
+    required bool active,
+  });
 }

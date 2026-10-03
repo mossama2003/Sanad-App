@@ -4,6 +4,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_intl_phone_field/countries.dart';
 import 'package:flutter_intl_phone_field/phone_number.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:sanad_app/features/organization/edit_profile/data/params/update_org_profile_param.dart';
 import 'package:sanad_app/features/organization/edit_profile/data/repos/edit_org_profile_repo.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
@@ -379,13 +380,37 @@ class EditOrgProfileCubit extends Cubit<EditOrgProfileState> {
   Future<void> pickLogo() async {
     final file = await FilePicker.pickFile(type: FileType.image);
 
-    if (file != null && file.path != null) {
-      newLogo = File(file.path!);
-
-      logoRemoved = false;
-
-      emit(Changed());
+    if (file == null || file.path == null) {
+      return;
     }
+
+    final croppedFile = await ImageCropper().cropImage(
+      sourcePath: file.path!,
+      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Crop Logo',
+          lockAspectRatio: true,
+          aspectRatioPresets: [CropAspectRatioPreset.square],
+        ),
+        IOSUiSettings(
+          title: 'Crop Logo',
+          aspectRatioLockEnabled: true,
+          resetAspectRatioEnabled: false,
+          aspectRatioPresets: [CropAspectRatioPreset.square],
+        ),
+      ],
+    );
+
+    if (croppedFile == null) {
+      return;
+    }
+
+    newLogo = File(croppedFile.path);
+
+    logoRemoved = false;
+
+    emit(Changed());
   }
 
   void removeLogo() {

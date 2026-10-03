@@ -257,7 +257,11 @@
         "delete": "Delete",
         "case_deleted_successfully": "Case deleted successfully",
         "confirm_delete_title": "Delete Case?",
-        "confirm_delete_desc": "This action cannot be undone. Are you sure you want to delete this case?"
+        "confirm_delete_desc": "This action cannot be undone. Are you sure you want to delete this case?",
+        "confirm_complete_title": "Complete Case",
+        "confirm_complete_desc": "Are you sure you want to complete this case? It will no longer be active.",
+        "complete": "Complete",
+        "case_completed": "Case completed successfully"
       },
       "pop_up": {
         "contact_person": "Contact Person",

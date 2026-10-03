@@ -175,29 +175,62 @@ class _EditOrgProfileScreenState extends State<EditOrgProfileScreen> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              cubit.newLogo != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: Image.file(
-                                        cubit.newLogo!,
-                                        width: AppSize.getWidth(50),
-                                        height: AppSize.getWidth(50),
-                                        fit: BoxFit.cover,
+                              Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  cubit.newLogo != null
+                                      ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          child: Image.file(
+                                            cubit.newLogo!,
+                                            width: AppSize.getWidth(50),
+                                            height: AppSize.getWidth(50),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        )
+                                      : cubit.existingLogoUrl != null
+                                      ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          child: CachedNetworkImage(
+                                            imageUrl: cubit.existingLogoUrl!,
+                                            width: AppSize.getWidth(50),
+                                            height: AppSize.getWidth(50),
+                                            fit: BoxFit.cover,
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    _logoPlaceholder(context),
+                                          ),
+                                        )
+                                      : _logoPlaceholder(context),
+
+                                  if (cubit.newLogo != null ||
+                                      (cubit.existingLogoUrl != null &&
+                                          !cubit.logoRemoved))
+                                    Positioned(
+                                      top: -4,
+                                      right: -4,
+                                      child: GestureDetector(
+                                        onTap: cubit.removeLogo,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(3),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.black54,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            Icons.close,
+                                            color: Colors.white,
+                                            size: AppSize.getSize(12),
+                                          ),
+                                        ),
                                       ),
-                                    )
-                                  : cubit.existingLogoUrl != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: CachedNetworkImage(
-                                        imageUrl: cubit.existingLogoUrl!,
-                                        width: AppSize.getWidth(50),
-                                        height: AppSize.getWidth(50),
-                                        fit: BoxFit.cover,
-                                        errorWidget: (context, url, error) =>
-                                            _logoPlaceholder(context),
-                                      ),
-                                    )
-                                  : _logoPlaceholder(context),
+                                    ),
+                                ],
+                              ),
                               SizedBox(width: AppSize.getWidth(12)),
                               Expanded(
                                 child: Column(

@@ -38,8 +38,8 @@ class CasesRepoImpel implements CasesRepo {
   // ================= GET CASE COMMENTS =================
   @override
   Future<Either<Failure, CaseCommentsListModel>> getCaseComments(
-    int caseId,
-  ) async {
+      int caseId,
+      ) async {
     try {
       final response = await DioHelper.get(url: GET_CASE_COMMENTS(caseId));
 
@@ -179,6 +179,30 @@ class CasesRepoImpel implements CasesRepo {
 
       if (response.statusCode == 200) {
         return right(Map<String, dynamic>.from(response.data));
+      }
+
+      return left(ServerFailure.fromResponse(response));
+    } catch (e) {
+      return left(ServerFailure.fromCatchError(e));
+    }
+  }
+
+  // ================= UPDATE CASE ACTIVE =================
+  @override
+  Future<Either<Failure, void>> updateCaseActive({
+    required int id,
+    required bool active,
+  }) async {
+    try {
+      final formData = FormData.fromMap({'active': active});
+
+      final response = await DioHelper.patch(
+        url: UPDATE_CASE(id),
+        data: formData,
+      );
+
+      if (response.statusCode == 200) {
+        return right(null);
       }
 
       return left(ServerFailure.fromResponse(response));

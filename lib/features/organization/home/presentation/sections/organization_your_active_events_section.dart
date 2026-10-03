@@ -6,8 +6,11 @@ import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/helper/app_navigator.dart';
+import '../../../../../core/network/local/cache/cache_helper.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/shared/widgets/custom_button.dart';
+import '../../../../shared/chat/data/models/chat_model.dart';
+import '../../../../shared/chat/presentation/screens/chat_screen.dart';
 import '../../../events/presentation/cards/organization_events_card.dart';
 import '../../../events/presentation/dialogs/organization_publish_dialog.dart';
 import '../../../events/presentation/screens/organization_event_form_screen.dart';
@@ -180,6 +183,16 @@ class OrganizationYourActiveEventsSection extends StatelessWidget {
 
                   onQrTap: () {
                     AppNavigator.push(OrganizationQrCodeScreen(event: event));
+                  },
+
+                  onChatTap: () {
+                    AppNavigator.push(
+                      ChatScreen(
+                        eventId: event.id,
+                        currentUserId: CacheHelper.get(CacheKeys.userId),
+                        event: event.toChatEvent(),
+                      ),
+                    );
                   },
 
                   onPublishTap: () {
