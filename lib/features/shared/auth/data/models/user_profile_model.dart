@@ -171,6 +171,7 @@ class VolunteerRoleModel {
   int? id;
   String? volunteer;
   String? role;
+  String? event;
   int? userId;
   String? created;
 
@@ -178,6 +179,7 @@ class VolunteerRoleModel {
     this.id,
     this.volunteer,
     this.role,
+    this.event,
     this.userId,
     this.created,
   });
@@ -187,6 +189,9 @@ class VolunteerRoleModel {
       id: json['id'],
       volunteer: json['volunteer'],
       role: json['role'],
+
+      event: json['event'] ?? json['event_name'] ?? json['event_title'],
+
       userId: json['user_id'],
       created: json['created'],
     );

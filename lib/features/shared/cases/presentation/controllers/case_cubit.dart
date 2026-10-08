@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:ably_flutter/ably_flutter.dart' as ably;
 import 'package:easy_localization/easy_localization.dart';
@@ -18,39 +19,81 @@ class CasesCubit extends Cubit<CasesState> {
 
   final CasesRepo repo;
 
-  static CasesCubit get(BuildContext context) => BlocProvider.of(context);
+  static CasesCubit get(BuildContext context) =>
+      BlocProvider.of<CasesCubit>(context);
 
-  // Cases created locally during the current session.
+  // ============================================================
+  // Session Cases
+  // ============================================================
+
   static final List<CaseListItemModel> _sessionCreatedCases = [];
 
+  // صور محلية للكيسيس اللي لسه السيرفر مرجعش الـ attachments بتاعتها
+  static final Map<int, List<File>> _localCaseImages = {};
+
+  static const _imageExtensions = ['jpg', 'jpeg', 'png'];
+
+  List<File> localImagesFor(int caseId) {
+    return _localCaseImages[caseId] ?? const [];
+  }
+
+  // ============================================================
+  // Comments
+  // ============================================================
+
   final List<CaseCommentModel> comments = [];
+
+  // ============================================================
+  // Loading / Actions
+  // ============================================================
 
   final Set<int> _likingCases = {};
   final Set<int> _completingCases = {};
 
   bool isUpdatingCase = false;
+  bool isCommentsLoading = false;
+  bool isSendingComment = false;
+
+  // ============================================================
+  // Cases Lists
+  // ============================================================
 
   final List<CaseListItemModel> _allCases = [];
   final List<CaseListItemModel> _myCases = [];
 
   bool isMySelected = false;
 
-  List<CaseListItemModel> get casesList => isMySelected ? _myCases : _allCases;
+  List<CaseListItemModel> get casesList =>
+      isMySelected ? _myCases : _allCases;
+
+  // ============================================================
+  // Pagination
+  // ============================================================
 
   int currentPage = 1;
   int maxPages = 1;
   bool isLoadingMore = false;
 
+  // ============================================================
+  // User
+  // ============================================================
+
   int myCasesCount = 0;
   int? _currentUserId;
 
-  bool isCommentsLoading = false;
-  bool isSendingComment = false;
+  // ============================================================
+  // Ably
+  // ============================================================
 
   ably.Realtime? _ablyRealtime;
   ably.RealtimeChannel? _commentsChannel;
   StreamSubscription<ably.Message>? _commentsSubscription;
+
   String? _currentClientId;
+
+  // ============================================================
+  // Helpers
+  // ============================================================
 
   bool isLikingCase(int caseId) {
     return _likingCases.contains(caseId);
@@ -68,34 +111,32 @@ class CasesCubit extends Cubit<CasesState> {
     emit(Success());
   }
 
-  // ============================================================
-  // Helpers
-  // ============================================================
-
   List<CaseListItemModel> _withPendingOwnCases(
       List<CaseListItemModel> server,
       ) {
-    final serverIds = server.map((c) => c.id).toSet();
+    final serverIds = server.map((caseItem) => caseItem.id).toSet();
 
     // Once the server returns a locally-created case,
     // remove it from the temporary session list.
-    _sessionCreatedCases.removeWhere((c) => serverIds.contains(c.id));
+    _sessionCreatedCases.removeWhere(
+          (caseItem) => serverIds.contains(caseItem.id),
+    );
 
     final pending = _sessionCreatedCases
-        .where((c) => c.creator.id == _currentUserId)
+        .where((caseItem) => caseItem.creator.id == _currentUserId)
         .toList();
 
     return [...pending, ...server];
   }
 
-  // Applies any case modification to All Cases, My Cases,
-  // and the temporary session list.
+  // Applies any case modification to:
+  // All Cases, My Cases, and Session Created Cases.
   void _updateCaseEverywhere(
       int id,
       CaseListItemModel Function(CaseListItemModel) update,
       ) {
     for (final list in [_allCases, _myCases, _sessionCreatedCases]) {
-      final index = list.indexWhere((c) => c.id == id);
+      final index = list.indexWhere((caseItem) => caseItem.id == id);
 
       if (index != -1) {
         list[index] = update(list[index]);
@@ -114,7 +155,6 @@ class CasesCubit extends Cubit<CasesState> {
     if (isUpdatingCase) return;
 
     isUpdatingCase = true;
-
     emit(Loading());
 
     final result = await repo.createCase(param);
@@ -124,7 +164,6 @@ class CasesCubit extends Cubit<CasesState> {
         isUpdatingCase = false;
 
         emit(Error());
-
         AppToast.error(l.errMessage);
       },
           (r) {
@@ -134,78 +173,79 @@ class CasesCubit extends Cubit<CasesState> {
 
         final newCase = CaseListItemModel(
           id: r.id,
-
           creator: Creator(
             id: user?.id ?? 0,
             name: user?.name ?? '',
             avatar: user?.avatar,
           ),
-
           paymentDetails: CasePaymentDetails(
             paymentType: r.paymentDetails?.paymentType ?? r.paymentType,
-
-            description: r.paymentDetails?.description ?? r.paymentDescription,
-
+            description:
+            r.paymentDetails?.description ?? r.paymentDescription,
             estimatedAmount:
             r.paymentDetails?.estimatedAmount ?? r.paymentEstimatedAmount,
-
             raisedAmount:
             r.paymentDetails?.raisedAmount ?? r.paymentRaisedAmount,
           ),
-
           comments: 0,
           likers: 0,
           isLiked: false,
 
-          // The create API response doesn't contain
-          // attachment details, so we keep it empty locally.
+          // CaseModel does not contain attachments.
+          // Real attachments will come from GET /cases/.
           attachments: const [],
 
           created: r.created,
           modified: r.modified,
-
           name: r.name,
           description: r.description,
           category: r.category,
           urgency: r.urgency,
-
           contactName: r.contactName,
           contactPhone: r.contactPhone,
-
           info: r.info,
 
+          // CaseModel does not contain verified.
           verified: false,
 
           note: r.note,
           active: r.active,
         );
 
-        // Check if the case already exists BEFORE modifying lists.
-        final alreadyExists = _myCases.any(
-              (caseItem) => caseItem.id == newCase.id,
-        );
+        // احتفظ بالصور المحلية اللي المستخدم رفعها فعلاً عشان تظهر فورًا
+        // لحد ما السيرفر يرجّع الـ attachments الحقيقية
+        _localCaseImages[newCase.id] = param.attachments.where((file) {
+          final ext = file.path.split('.').last.toLowerCase();
+          return _imageExtensions.contains(ext);
+        }).toList();
 
-        // Remove old local copies if they exist.
+        // ======================================================
+        // Remove old copies
+        // ======================================================
+
         _myCases.removeWhere((caseItem) => caseItem.id == newCase.id);
 
         _sessionCreatedCases.removeWhere(
               (caseItem) => caseItem.id == newCase.id,
         );
 
-        // Keep a temporary copy so it survives an API refresh
-        // until the server starts returning it.
-        _sessionCreatedCases.insert(0, newCase);
+        // ======================================================
+        // Add the new case immediately
+        // ======================================================
 
-        // Immediately show it in My Cases.
+        _sessionCreatedCases.insert(0, newCase);
         _myCases.insert(0, newCase);
 
-        // Update count only if it wasn't already there.
-        if (!alreadyExists) {
-          myCasesCount++;
-        }
+        // ======================================================
+        // Update count
+        // ======================================================
 
-        // Automatically switch to My Cases.
-        // IMPORTANT: do this BEFORE emit().
+        myCasesCount++;
+
+        // ======================================================
+        // Automatically select My Cases
+        // ======================================================
+
         isMySelected = true;
 
         isUpdatingCase = false;
@@ -217,12 +257,16 @@ class CasesCubit extends Cubit<CasesState> {
         debugPrint('isMySelected: $isMySelected');
         debugPrint('myCasesCount: $myCasesCount');
         debugPrint('My Cases: ${_myCases.map((e) => e.id).toList()}');
-        debugPrint('All Cases: ${_allCases.map((e) => e.id).toList()}');
+        debugPrint(
+          'Session Cases: '
+              '${_sessionCreatedCases.map((e) => e.id).toList()}',
+        );
         debugPrint('======================================');
 
-        // Notify both:
-        // 1. CasesScreen -> rebuild
-        // 2. CasesForm -> pop
+        // ======================================================
+        // Notify CasesScreen
+        // ======================================================
+
         emit(CaseCreated(newCase.id));
 
         AppToast.success('shared.cases.case_created_successfully'.tr());
@@ -288,7 +332,6 @@ class CasesCubit extends Cubit<CasesState> {
     result.fold(
           (l) {
         emit(Error());
-
         AppToast.error(l.errMessage);
       },
           (r) {
@@ -326,7 +369,6 @@ class CasesCubit extends Cubit<CasesState> {
     result.fold(
           (l) {
         emit(Error());
-
         AppToast.error(l.errMessage);
       },
           (r) {
@@ -386,9 +428,7 @@ class CasesCubit extends Cubit<CasesState> {
       return;
     }
 
-    final incoming = CaseCommentModel.fromJson(
-      Map<String, dynamic>.from(data),
-    );
+    final incoming = CaseCommentModel.fromJson(Map<String, dynamic>.from(data));
 
     final isOwnMessage =
         incoming.creator?.id.toString() ==
@@ -396,14 +436,13 @@ class CasesCubit extends Cubit<CasesState> {
 
     if (isOwnMessage) {
       final index = comments.indexWhere(
-            (c) => c.status == CommentStatus.sending,
+            (comment) => comment.status == CommentStatus.sending,
       );
 
       if (index != -1) {
         comments[index] = incoming.copyWith(status: CommentStatus.sent);
 
         emit(Success());
-
         return;
       }
 
@@ -416,7 +455,7 @@ class CasesCubit extends Cubit<CasesState> {
   }
 
   // ============================================================
-  // Disconnect
+  // Disconnect Ably
   // ============================================================
 
   Future<void> disconnectFromCommentsChannel() async {
@@ -446,7 +485,6 @@ class CasesCubit extends Cubit<CasesState> {
 
     final optimisticComment = CaseCommentModel(
       id: -1,
-
       creator: currentUser != null
           ? Creator(
         id: currentUser.id ?? 0,
@@ -454,14 +492,10 @@ class CasesCubit extends Cubit<CasesState> {
         avatar: currentUser.avatar,
       )
           : null,
-
       created: DateTime.now(),
       modified: DateTime.now(),
-
       comment: comment,
-
       status: CommentStatus.sending,
-
       localId: localId,
     );
 
@@ -501,7 +535,10 @@ class CasesCubit extends Cubit<CasesState> {
           emit(Success());
         }
 
-        _updateCaseEverywhere(caseId, (c) => c.copyWithCommentsIncremented());
+        _updateCaseEverywhere(
+          caseId,
+              (c) => c.copyWithCommentsIncremented(),
+        );
       },
     );
   }
@@ -536,21 +573,23 @@ class CasesCubit extends Cubit<CasesState> {
   // Delete Case
   // ============================================================
 
-  Future<void> deleteCase(int id) async {
+  Future<void> deleteCase(int id, {BuildContext? context}) async {
     final result = await repo.deleteCase(id);
 
     result.fold(
           (l) {
         AppToast.error(l.errMessage);
       },
-          (r) {
-        final wasMine = _myCases.any((c) => c.id == id);
+          (r) async {
+        final wasMine = _myCases.any((caseItem) => caseItem.id == id);
 
-        _allCases.removeWhere((c) => c.id == id);
+        _allCases.removeWhere((caseItem) => caseItem.id == id);
 
-        _myCases.removeWhere((c) => c.id == id);
+        _myCases.removeWhere((caseItem) => caseItem.id == id);
 
-        _sessionCreatedCases.removeWhere((c) => c.id == id);
+        _sessionCreatedCases.removeWhere((caseItem) => caseItem.id == id);
+
+        _localCaseImages.remove(id);
 
         if (wasMine) {
           myCasesCount = (myCasesCount - 1).clamp(0, 999999);
@@ -559,6 +598,12 @@ class CasesCubit extends Cubit<CasesState> {
         emit(Success());
 
         AppToast.success('shared.cases.card.case_deleted_successfully'.tr());
+
+        // تحديث بيانات اليوزر (ومعاها الإحصائيات زي casesCompleted)
+        // عشان تفضل متزامنة مع السيرفر.
+        if (context != null && context.mounted) {
+          await AppCubit.get(context).getUser();
+        }
       },
     );
   }
@@ -567,8 +612,10 @@ class CasesCubit extends Cubit<CasesState> {
   // Complete Case
   // ============================================================
 
-  Future<void> completeCase(int id) async {
-    if (_completingCases.contains(id)) return;
+  Future<void> completeCase(int id, {BuildContext? context}) async {
+    if (_completingCases.contains(id)) {
+      return;
+    }
 
     _completingCases.add(id);
 
@@ -584,7 +631,7 @@ class CasesCubit extends Cubit<CasesState> {
 
         AppToast.error(l.errMessage);
       },
-          (_) {
+          (_) async {
         _updateCaseEverywhere(id, (c) => c.copyWith(active: false));
 
         _completingCases.remove(id);
@@ -592,6 +639,12 @@ class CasesCubit extends Cubit<CasesState> {
         emit(Success());
 
         AppToast.success('shared.cases.card.case_completed'.tr());
+
+        // تحديث بيانات اليوزر (ومعاها الإحصائيات زي casesCompleted)
+        // عشان تفضل متزامنة مع السيرفر.
+        if (context != null && context.mounted) {
+          await AppCubit.get(context).getUser();
+        }
       },
     );
   }
@@ -643,7 +696,10 @@ class CasesCubit extends Cubit<CasesState> {
 
         emit(Success());
 
-        _updateCaseEverywhere(caseId, (c) => c.copyWithCommentsDecremented());
+        _updateCaseEverywhere(
+          caseId,
+              (c) => c.copyWithCommentsDecremented(),
+        );
 
         AppToast.success('shared.cases.comments.comment_deleted'.tr());
       },
@@ -739,6 +795,10 @@ class CasesCubit extends Cubit<CasesState> {
       },
     );
   }
+
+  // ============================================================
+  // Close
+  // ============================================================
 
   @override
   Future<void> close() {

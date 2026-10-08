@@ -17,6 +17,7 @@ import '../../../../../core/style/app_theme.dart';
 import '../../../../organization/edit_profile/presentation/screens/edit_org_profile_screen.dart';
 import '../../../../volunteer/edit_profile/presentations/screens/edit_vol_profile_screen.dart';
 import '../../../auth/presentation/sign_in/screens/sign_in_screen.dart';
+import '../../../faq/presentation/screens/faq_screen.dart';
 import '../cards/settings_card.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -240,6 +241,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     trailing: _arrowIcon(),
                   ),
                   SizedBox(height: AppSize.getHeight(10)),
+
+                  SettingsTile(
+                    icon: AppIcons.helpSupport,
+                    title: 'shared.faq.title'.tr(),
+                    trailing: _arrowIcon(),
+                    onTap: () {
+                      AppNavigator.push(const FaqScreen());
+                    },
+                  ),
+                  SizedBox(height: AppSize.getHeight(10)),
+
                   SettingsTile(
                     icon: AppIcons.contactSupport,
                     title: 'shared.settings.contact_support'.tr(),

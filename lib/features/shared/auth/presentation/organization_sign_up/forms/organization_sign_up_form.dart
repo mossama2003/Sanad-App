@@ -15,7 +15,7 @@ import '../../../../../../core/shared/widgets/custom_field_text.dart';
 import '../../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../../core/style/app_colors.dart';
 import '../../../../../../core/validator/app_validators.dart';
-import '../../../data/repos/organization/organization_repo.dart';
+import '../../../data/repos/organization/organization_sign_up_repo.dart';
 import '../controllers/organization_sign_up_cubit.dart';
 
 class OrganizationSignUpForm extends StatefulWidget {
@@ -38,7 +38,7 @@ class _OrganizationSignUpFormState extends State<OrganizationSignUpForm> {
   void initState() {
     super.initState();
 
-    _cubit = OrganizationSignUpCubit(OrganizationRepoImpel());
+    _cubit = OrganizationSignUpCubit(OrganizationSignUpRepoImpel());
     _cubit.loadLocationData();
 
     _startAnimations();

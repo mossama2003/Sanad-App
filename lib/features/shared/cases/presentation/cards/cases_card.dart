@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sanad_app/core/helper/app_navigator.dart';
@@ -20,6 +21,7 @@ import '../dialogs/cases_pop_up.dart';
 
 class CasesCard extends StatelessWidget {
   final CaseListItemModel caseItem;
+  final CasesCubit casesCubit;
   final bool isOwner;
   final VoidCallback? onDelete;
   final VoidCallback? onEdit;
@@ -28,6 +30,7 @@ class CasesCard extends StatelessWidget {
   const CasesCard({
     super.key,
     required this.caseItem,
+    required this.casesCubit,
     this.isOwner = false,
     this.onDelete,
     this.onEdit,
@@ -53,6 +56,12 @@ class CasesCard extends StatelessWidget {
       .toList();
 
   bool get _hasPayment => caseItem.paymentDetails.estimatedAmount > 0;
+
+  /// Completed is only considered for the owner.
+  bool get _isCompleted => isOwner && !caseItem.active;
+
+  /// Like / comments / share should disappear when owner case is completed.
+  bool get _showEngagement => !_isCompleted;
 
   String _formatEgyptianPhone(String phone) {
     final value = phone.trim();
@@ -84,9 +93,15 @@ class CasesCard extends StatelessWidget {
 
     final dividerColor = theme.dividerColor;
 
-    final isCompleting = CasesCubit.get(context).isCompletingCase(caseItem.id);
+    final isCompleting = casesCubit.isCompletingCase(caseItem.id);
 
-    final showEngagement = !(isOwner && !caseItem.active);
+    // لو مفيش صور من السيرفر لسه، استخدم الصور المحلية
+    // اللي اتحفظت وقت الإنشاء مباشرة
+    final imageUrls = _imageUrls;
+
+    final localImages = imageUrls.isEmpty
+        ? casesCubit.localImagesFor(caseItem.id)
+        : const <File>[];
 
     return Container(
       decoration: BoxDecoration(
@@ -104,6 +119,9 @@ class CasesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ============================================================
+          // Image
+          // ============================================================
           ClipRRect(
             clipBehavior: Clip.hardEdge,
             borderRadius: const BorderRadius.only(
@@ -112,8 +130,12 @@ class CasesCard extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                _CaseImageCarousel(imageUrls: _imageUrls),
+                _CaseImageCarousel(
+                  imageUrls: imageUrls,
+                  localImages: localImages,
+                ),
 
+                // Created time
                 Positioned(
                   bottom: AppSize.getHeight(10),
                   right: AppSize.getWidth(10),
@@ -138,6 +160,7 @@ class CasesCard extends StatelessWidget {
                   ),
                 ),
 
+                // Verified badge
                 if (caseItem.verified)
                   Positioned(
                     top: AppSize.getHeight(10),
@@ -151,6 +174,7 @@ class CasesCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           CustomIcon(
                             icon: AppIcons.check,
@@ -175,14 +199,21 @@ class CasesCard extends StatelessWidget {
             ),
           ),
 
+          // ============================================================
+          // Content
+          // ============================================================
           Padding(
             padding: AppSize.padding(all: 15),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // ========================================================
+                // Name + Completed + Urgent
+                // ========================================================
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Case name
                     Expanded(
                       child: Text(
                         caseItem.name,
@@ -196,6 +227,13 @@ class CasesCard extends StatelessWidget {
                       ),
                     ),
 
+                    // Completed badge
+                    if (_isCompleted) ...[
+                      SizedBox(width: AppSize.getWidth(8)),
+                      const _CompletedBadge(),
+                    ],
+
+                    // Urgent badge
                     if (caseItem.urgency == 'high') ...[
                       SizedBox(width: AppSize.getWidth(8)),
                       Container(
@@ -231,6 +269,9 @@ class CasesCard extends StatelessWidget {
 
                 SizedBox(height: AppSize.getHeight(16)),
 
+                // ========================================================
+                // Description
+                // ========================================================
                 Text(
                   caseItem.description,
                   maxLines: 2,
@@ -244,6 +285,9 @@ class CasesCard extends StatelessWidget {
 
                 SizedBox(height: AppSize.getHeight(15)),
 
+                // ========================================================
+                // Payment
+                // ========================================================
                 if (_hasPayment) ...[
                   Container(
                     padding: AppSize.padding(all: 12),
@@ -344,6 +388,9 @@ class CasesCard extends StatelessWidget {
 
                 SizedBox(height: AppSize.getHeight(10)),
 
+                // ========================================================
+                // Contact Name
+                // ========================================================
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -369,6 +416,9 @@ class CasesCard extends StatelessWidget {
 
                 SizedBox(height: AppSize.getHeight(10)),
 
+                // ========================================================
+                // Contact Phone
+                // ========================================================
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -390,6 +440,9 @@ class CasesCard extends StatelessWidget {
                   ],
                 ),
 
+                // ========================================================
+                // Payment Description
+                // ========================================================
                 if (caseItem.paymentDetails.description != null) ...[
                   SizedBox(height: AppSize.getHeight(10)),
                   Row(
@@ -428,170 +481,188 @@ class CasesCard extends StatelessWidget {
 
                 SizedBox(height: AppSize.getHeight(15)),
 
-                // ===================== Actions Row =====================
-                // ملفوفة في SingleChildScrollView أفقي عشان لو الأزرار كتير
-                // (لايك + كومنت + شير + Edit + Complete + Delete) متتعملش overflow
-                // على الشاشات الصغيرة بدل ما تتكسر الـ Row.
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      SizedBox(width: AppSize.getWidth(10)),
-
-                      if (showEngagement) ...[
-                        InkWell(
-                          borderRadius: BorderRadius.circular(20),
-                          onTap: () {
-                            final cubit = CasesCubit.get(context);
-
-                            if (!cubit.isLikingCase(caseItem.id)) {
-                              cubit.likeCase(caseItem.id);
-                            }
-                          },
-                          child: Padding(
-                            padding: AppSize.padding(
-                              vertical: 5,
-                              horizontal: 3,
-                            ),
-                            child: Row(
-                              children: [
-                                CasesCubit.get(
-                                      context,
-                                    ).isLikingCase(caseItem.id)
-                                    ? SizedBox(
-                                        width: AppSize.getWidth(18),
-                                        height: AppSize.getHeight(18),
-                                        child: const CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: AppColors.primary,
+                // ========================================================
+                // Actions Row
+                //
+                // LEFT:
+                //   Like + Comments
+                //
+                // RIGHT:
+                //   Share + Edit + Complete + Delete
+                //
+                // Completed owner:
+                //   Delete ONLY
+                // ========================================================
+                Row(
+                  children: [
+                    // ======================================================
+                    // LEFT SIDE
+                    // Like + Comments
+                    // ======================================================
+                    if (_showEngagement)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Like
+                          InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {
+                              if (!casesCubit.isLikingCase(caseItem.id)) {
+                                casesCubit.likeCase(caseItem.id);
+                              }
+                            },
+                            child: Padding(
+                              padding: AppSize.padding(
+                                vertical: 5,
+                                horizontal: 3,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  casesCubit.isLikingCase(caseItem.id)
+                                      ? SizedBox(
+                                          width: AppSize.getWidth(18),
+                                          height: AppSize.getHeight(18),
+                                          child:
+                                              const CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: AppColors.primary,
+                                              ),
+                                        )
+                                      : CustomIcon(
+                                          icon: AppIcons.donations,
+                                          color: caseItem.isLiked
+                                              ? AppColors.red
+                                              : secondaryColor,
+                                          width: AppSize.getWidth(18),
+                                          height: AppSize.getHeight(18),
                                         ),
-                                      )
-                                    : CustomIcon(
-                                        icon: AppIcons.donations,
-                                        color: caseItem.isLiked
-                                            ? AppColors.red
-                                            : secondaryColor,
-                                        width: AppSize.getWidth(18),
-                                        height: AppSize.getHeight(18),
-                                      ),
+
+                                  SizedBox(width: AppSize.getWidth(3)),
+
+                                  Text(
+                                    caseItem.likers.compact,
+                                    style: TextStyle(
+                                      fontSize: AppSize.font(15),
+                                      fontWeight: FontWeight.w300,
+                                      color: caseItem.isLiked
+                                          ? AppColors.red
+                                          : textColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(width: AppSize.getWidth(12)),
+
+                          // Comments
+                          GestureDetector(
+                            onTap: () {
+                              CaseCommentsBottomSheet.show(
+                                context,
+                                caseItem.id,
+                                casesCubit,
+                              );
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CustomIcon(
+                                  icon: AppIcons.comment,
+                                  color: secondaryColor,
+                                  width: AppSize.getWidth(18),
+                                  height: AppSize.getHeight(18),
+                                ),
                                 SizedBox(width: AppSize.getWidth(3)),
                                 Text(
-                                  caseItem.likers.compact,
+                                  caseItem.comments.compact,
                                   style: TextStyle(
                                     fontSize: AppSize.font(15),
                                     fontWeight: FontWeight.w300,
-                                    color: caseItem.isLiked
-                                        ? AppColors.red
-                                        : textColor,
+                                    color: textColor,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
+                        ],
+                      ),
 
-                        SizedBox(width: AppSize.getWidth(10)),
+                    // ======================================================
+                    // Push everything else to the right
+                    // ======================================================
+                    const Spacer(),
 
-                        GestureDetector(
-                          onTap: () => CaseCommentsBottomSheet.show(
-                            context,
-                            caseItem.id,
-                            CasesCubit.get(context),
-                          ),
-                          child: Row(
-                            children: [
-                              CustomIcon(
-                                icon: AppIcons.comment,
-                                color: secondaryColor,
-                                width: AppSize.getWidth(18),
-                                height: AppSize.getHeight(18),
-                              ),
-                              SizedBox(width: AppSize.getWidth(3)),
-                              Text(
-                                caseItem.comments.compact,
-                                style: TextStyle(
-                                  fontSize: AppSize.font(15),
-                                  fontWeight: FontWeight.w300,
-                                  color: textColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        SizedBox(width: AppSize.getWidth(10)),
-                      ],
-
+                    // ======================================================
+                    // SHARE
+                    // Volunteer + Active Owner only
+                    // ======================================================
+                    if (_showEngagement) ...[
                       InkWell(
-                        onTap: () {},
+                        borderRadius: BorderRadius.circular(30),
+                        onTap: () {
+                          // TODO: Add share functionality.
+                        },
                         child: Container(
+                          width: AppSize.getWidth(36),
+                          height: AppSize.getHeight(36),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.12),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(30),
-                            ),
+                            shape: BoxShape.circle,
                           ),
-                          padding: AppSize.padding(vertical: 5, horizontal: 10),
-                          child: Row(
-                            children: [
-                              CustomIcon(
-                                icon: AppIcons.share,
-                                color: textColor,
-                                width: AppSize.getWidth(15),
-                                height: AppSize.getHeight(15),
-                              ),
-                              SizedBox(width: AppSize.getWidth(5)),
-                              Text(
-                                'shared.cases.card.share'.tr(),
-                                style: TextStyle(
-                                  fontSize: AppSize.font(15),
-                                  color: textColor,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                          alignment: Alignment.center,
+                          child: CustomIcon(
+                            icon: AppIcons.share,
+                            color: textColor,
+                            width: AppSize.getWidth(17),
+                            height: AppSize.getHeight(17),
                           ),
                         ),
                       ),
 
-                      SizedBox(width: AppSize.getWidth(5)),
+                      if (isOwner) SizedBox(width: AppSize.getWidth(5)),
+                    ],
 
-                      if (isOwner) ...[
-                        /// Edit
+                    // ======================================================
+                    // OWNER ACTIONS
+                    // ======================================================
+                    if (isOwner) ...[
+                      // ====================================================
+                      // EDIT
+                      // Active owner only
+                      // ====================================================
+                      if (caseItem.active) ...[
                         InkWell(
                           onTap: onEdit,
+                          borderRadius: BorderRadius.circular(30),
                           child: Container(
+                            width: AppSize.getWidth(36),
+                            height: AppSize.getHeight(36),
                             decoration: BoxDecoration(
                               color: AppColors.primary.withValues(alpha: 0.12),
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(30),
-                              ),
+                              shape: BoxShape.circle,
                             ),
-                            padding: AppSize.padding(
-                              vertical: 5,
-                              horizontal: 10,
-                            ),
-                            child: Row(
-                              children: [
-                                CustomIcon(
-                                  icon: AppIcons.edit,
-                                  color: AppColors.primary,
-                                  width: AppSize.getSize(18),
-                                  height: AppSize.getSize(18),
-                                ),
-                              ],
+                            alignment: Alignment.center,
+                            child: CustomIcon(
+                              icon: AppIcons.edit,
+                              color: AppColors.primary,
+                              width: AppSize.getSize(18),
+                              height: AppSize.getSize(18),
                             ),
                           ),
                         ),
 
                         SizedBox(width: AppSize.getWidth(5)),
 
-                        /// Complete Case — Toggle
+                        // ==================================================
+                        // COMPLETE
+                        // Active owner only
+                        // ==================================================
                         InkWell(
                           borderRadius: BorderRadius.circular(30),
-                          onTap: caseItem.active && !isCompleting
-                              ? onComplete
-                              : null,
+                          onTap: !isCompleting ? onComplete : null,
                           child: _ActiveToggleButton(
                             isActive: caseItem.active,
                             isLoading: isCompleting,
@@ -599,50 +670,47 @@ class CasesCard extends StatelessWidget {
                         ),
 
                         SizedBox(width: AppSize.getWidth(5)),
+                      ],
 
-                        /// Delete
-                        InkWell(
-                          onTap: onDelete,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.red.withValues(alpha: 0.12),
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(30),
-                              ),
-                            ),
-                            padding: AppSize.padding(
-                              vertical: 5,
-                              horizontal: 10,
-                            ),
-                            child: Row(
-                              children: [
-                                CustomIcon(
-                                  icon: AppIcons.delete,
-                                  color: AppColors.red,
-                                  width: AppSize.getSize(18),
-                                  height: AppSize.getSize(18),
-                                ),
-                              ],
-                            ),
+                      // ====================================================
+                      // DELETE
+                      // Always visible for owner
+                      // ====================================================
+                      InkWell(
+                        onTap: onDelete,
+                        borderRadius: BorderRadius.circular(30),
+                        child: Container(
+                          width: AppSize.getWidth(36),
+                          height: AppSize.getHeight(36),
+                          decoration: BoxDecoration(
+                            color: AppColors.red.withValues(alpha: 0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          child: CustomIcon(
+                            icon: AppIcons.delete,
+                            color: AppColors.red,
+                            width: AppSize.getSize(18),
+                            height: AppSize.getSize(18),
                           ),
                         ),
-
-                        SizedBox(width: AppSize.getWidth(10)),
-                      ],
+                      ),
                     ],
-                  ),
+                  ],
                 ),
 
+                // ============================================================
+                // Donate / Help Button
+                // Only for non-owner
+                // ============================================================
                 if (!isOwner) ...[
                   SizedBox(height: AppSize.getHeight(20)),
+
                   CustomButton(
                     title: 'shared.cases.card.button'.tr(),
                     height: AppSize.getHeight(40),
                     onTap: () => AppNavigator.dialog(
-                      CasesPopUp(
-                        caseItem: caseItem,
-                        casesCubit: CasesCubit.get(context),
-                      ),
+                      CasesPopUp(caseItem: caseItem, casesCubit: casesCubit),
                     ),
                     bgColor: AppColors.laserBlue,
                   ),
@@ -656,6 +724,51 @@ class CasesCard extends StatelessWidget {
   }
 }
 
+// ============================================================================
+// Completed Badge
+// ============================================================================
+
+class _CompletedBadge extends StatelessWidget {
+  const _CompletedBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: AppSize.padding(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.green.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CustomIcon(
+            icon: AppIcons.check,
+            color: AppColors.green,
+            width: AppSize.getSize(15),
+            height: AppSize.getSize(15),
+          ),
+
+          SizedBox(width: AppSize.getWidth(4)),
+
+          Text(
+            'shared.cases.card.completed'.tr(),
+            style: TextStyle(
+              color: AppColors.green,
+              fontSize: AppSize.font(11),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// Active / Complete Toggle
+// ============================================================================
+
 class _ActiveToggleButton extends StatelessWidget {
   final bool isActive;
   final bool isLoading;
@@ -666,26 +779,11 @@ class _ActiveToggleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = isActive ? AppColors.grey500 : AppColors.green;
 
-    // ===================== حالة الكيس المكتمل =====================
+    // Completed state is represented by the Completed badge.
     if (!isActive) {
-      return Container(
-        padding: AppSize.padding(vertical: 5, horizontal: 10),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          borderRadius: const BorderRadius.all(Radius.circular(30)),
-        ),
-        child: Text(
-          'Completed',
-          style: TextStyle(
-            fontSize: AppSize.font(11),
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-      );
+      return const SizedBox.shrink();
     }
 
-    // ===================== حالة الكيس لسه شغالة (OFF) =====================
     return Container(
       padding: AppSize.padding(vertical: 5, horizontal: 10),
       decoration: BoxDecoration(
@@ -720,9 +818,11 @@ class _ActiveToggleButton extends StatelessWidget {
                     ),
                   ),
                 ),
+
                 SizedBox(width: AppSize.getWidth(6)),
+
                 Text(
-                  'Complete',
+                  'shared.cases.card.complete'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(11),
                     fontWeight: FontWeight.bold,
@@ -735,10 +835,18 @@ class _ActiveToggleButton extends StatelessWidget {
   }
 }
 
+// ============================================================================
+// Case Image Carousel
+// ============================================================================
+
 class _CaseImageCarousel extends StatefulWidget {
   final List<String> imageUrls;
+  final List<File> localImages;
 
-  const _CaseImageCarousel({required this.imageUrls});
+  const _CaseImageCarousel({
+    required this.imageUrls,
+    this.localImages = const [],
+  });
 
   @override
   State<_CaseImageCarousel> createState() => _CaseImageCarouselState();
@@ -746,24 +854,35 @@ class _CaseImageCarousel extends StatefulWidget {
 
 class _CaseImageCarouselState extends State<_CaseImageCarousel> {
   late final PageController _pageController;
+
   Timer? _autoScrollTimer;
+
   int _currentPage = 0;
+
+  int get _itemCount => widget.imageUrls.isNotEmpty
+      ? widget.imageUrls.length
+      : widget.localImages.length;
+
+  bool get _useNetwork => widget.imageUrls.isNotEmpty;
 
   @override
   void initState() {
     super.initState();
+
     _pageController = PageController();
 
-    if (widget.imageUrls.length > 1) {
+    if (_itemCount > 1) {
       _startAutoScroll();
     }
   }
 
   void _startAutoScroll() {
     _autoScrollTimer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!mounted || !_pageController.hasClients) return;
+      if (!mounted || !_pageController.hasClients) {
+        return;
+      }
 
-      final nextPage = (_currentPage + 1) % widget.imageUrls.length;
+      final nextPage = (_currentPage + 1) % _itemCount;
 
       _pageController.animateToPage(
         nextPage,
@@ -777,16 +896,19 @@ class _CaseImageCarouselState extends State<_CaseImageCarousel> {
   void dispose() {
     _autoScrollTimer?.cancel();
     _pageController.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final isDark = theme.brightness == Brightness.dark;
+
     final onSurface = theme.colorScheme.onSurface;
 
-    if (widget.imageUrls.isEmpty) {
+    if (_itemCount == 0) {
       return Container(
         decoration: BoxDecoration(
           border: Border.all(color: onSurface.withValues(alpha: .15)),
@@ -807,43 +929,59 @@ class _CaseImageCarouselState extends State<_CaseImageCarousel> {
         children: [
           PageView.builder(
             controller: _pageController,
-            itemCount: widget.imageUrls.length,
+            itemCount: _itemCount,
             onPageChanged: (index) {
-              setState(() => _currentPage = index);
+              setState(() {
+                _currentPage = index;
+              });
             },
             itemBuilder: (context, index) {
               return Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: onSurface.withValues(alpha: .15)),
                 ),
-                child: CachedNetworkImage(
-                  imageUrl: widget.imageUrls[index],
-                  width: double.infinity,
-                  height: AppSize.getHeight(180),
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    height: AppSize.getHeight(180),
-                    color: isDark
-                        ? theme.colorScheme.surfaceContainerHighest
-                        : AppColors.grey300,
-                  ),
-                  errorWidget: (context, url, error) => Image.asset(
-                    AppImages.casesImage,
-                    width: double.infinity,
-                    height: AppSize.getHeight(180),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                child: _useNetwork
+                    ? CachedNetworkImage(
+                        imageUrl: widget.imageUrls[index],
+                        width: double.infinity,
+                        height: AppSize.getHeight(180),
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          height: AppSize.getHeight(180),
+                          color: isDark
+                              ? theme.colorScheme.surfaceContainerHighest
+                              : AppColors.grey300,
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          AppImages.casesImage,
+                          width: double.infinity,
+                          height: AppSize.getHeight(180),
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Image.file(
+                        widget.localImages[index],
+                        width: double.infinity,
+                        height: AppSize.getHeight(180),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset(
+                              AppImages.casesImage,
+                              width: double.infinity,
+                              height: AppSize.getHeight(180),
+                              fit: BoxFit.cover,
+                            ),
+                      ),
               );
             },
           ),
 
-          if (widget.imageUrls.length > 1)
+          if (_itemCount > 1)
             Padding(
               padding: AppSize.padding(bottom: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(widget.imageUrls.length, (index) {
+                children: List.generate(_itemCount, (index) {
                   final isActive = index == _currentPage;
 
                   return AnimatedContainer(

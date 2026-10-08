@@ -86,7 +86,7 @@
     "phone": {
       "required": "* Required",
       "invalid": "Invalid phone number",
-      "egyptian_invalid": "Enter a valid Egyptian phone number (11 digits)"
+      "egyptian_invalid": "Enter a valid Egyptian phone number (10 digits)"
     },
     "OTP": {
       "required": "* Required",
@@ -137,7 +137,8 @@
       "or": " or ",
       "sign_up_as_organization": "Organization",
       "account_signed_in": "Account Signed In",
-      "user_role_not_found": "User role not found"
+      "user_role_not_found": "User role not found",
+      "user_not_found": "User not found"
     },
     "chat": {
       "no_messages_title": "No messages yet",
@@ -261,6 +262,7 @@
         "confirm_complete_title": "Complete Case",
         "confirm_complete_desc": "Are you sure you want to complete this case? It will no longer be active.",
         "complete": "Complete",
+        "completed": "Completed",
         "case_completed": "Case completed successfully"
       },
       "pop_up": {
@@ -400,8 +402,18 @@
       "support": "Support",
       "help_center": "Help Center",
       "contact_support": "Contact Support",
+      "faqs": "FAQs",
       "sign_out": "Sign Out",
       "sign_out_desc": "Are you sure you want to sign out of your account?"
+    },
+    "faq": {
+      "title": "FAQs",
+      "search_hint": "Search frequently asked questions...",
+      "no_results": "No FAQs found",
+      "no_results_desc": "Try searching with a different keyword.",
+      "still_need_help": "Still need help?",
+      "contact_support_desc": "Contact our support team and we will be happy to help.",
+      "error": "Something went wrong while loading FAQs."
     }
   },
   "organization": {
@@ -731,6 +743,7 @@
       "leave_confirm": "Leave",
       "started": "Event Started",
       "no_cover": "No Image Available",
+      "chat": "Chat",
       "bottom_sheet": {
         "date_time": "Date & Time",
         "duration": "Duration",

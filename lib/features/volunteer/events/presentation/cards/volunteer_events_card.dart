@@ -15,12 +15,14 @@ class VolunteerEventsCard extends StatelessWidget {
     required this.event,
     this.onDetailsTap,
     this.onJoinTap,
+    this.onChatTap,
     this.isLoading = false,
   });
 
   final VolunteerEventDetailsModel event;
   final VoidCallback? onDetailsTap;
   final VoidCallback? onJoinTap;
+  final VoidCallback? onChatTap;
   final bool isLoading;
 
   @override
@@ -37,15 +39,14 @@ class VolunteerEventsCard extends StatelessWidget {
 
     final location = event.location != null
         ? [
-            event.location?['description'] ?? event.location?['address'],
-            event.location?['city'],
-          ].where((e) => e != null && e.toString().isNotEmpty).join(', ')
+      event.location?['description'] ?? event.location?['address'],
+      event.location?['city'],
+    ].where((e) => e != null && e.toString().isNotEmpty).join(', ')
         : '';
 
     final joined = event.joined;
 
     final spots = event.spots;
-
     final joiners = event.joiners;
 
     final status = event.status.toLowerCase();
@@ -67,37 +68,42 @@ class VolunteerEventsCard extends StatelessWidget {
 
     final cover = event.cover;
 
+    final showChat = joined;
+
     return Container(
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: .15), blurRadius: 8),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: .15),
+            blurRadius: 8,
+          ),
         ],
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
+          // -----------------------------------------------------------------
+          // Cover
+          // -----------------------------------------------------------------
           ClipRRect(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(30),
               topRight: Radius.circular(30),
             ),
-
             child: Stack(
               children: [
                 SizedBox(
                   height: AppSize.getHeight(200),
                   width: double.infinity,
-
                   child: cover != null && cover.isNotEmpty
                       ? Image.network(
-                          cover,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => _buildPlaceholder(context),
-                        )
+                    cover,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) =>
+                        _buildPlaceholder(context),
+                  )
                       : _buildPlaceholder(context),
                 ),
 
@@ -105,19 +111,18 @@ class VolunteerEventsCard extends StatelessWidget {
                   top: AppSize.getHeight(10),
                   left: AppSize.getWidth(10),
                   right: AppSize.getWidth(10),
-
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
                     children: [
                       Container(
-                        padding: AppSize.padding(horizontal: 12, vertical: 2),
-
+                        padding: AppSize.padding(
+                          horizontal: 12,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.brand50,
                           borderRadius: BorderRadius.circular(15),
                         ),
-
                         child: Text(
                           category,
                           style: TextStyle(
@@ -130,13 +135,14 @@ class VolunteerEventsCard extends StatelessWidget {
 
                       if (joined)
                         Container(
-                          padding: AppSize.padding(horizontal: 12, vertical: 2),
-
+                          padding: AppSize.padding(
+                            horizontal: 12,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.grey200,
                             borderRadius: BorderRadius.circular(15),
                           ),
-
                           child: Row(
                             children: [
                               CustomIcon(
@@ -145,9 +151,7 @@ class VolunteerEventsCard extends StatelessWidget {
                                 height: AppSize.getSize(14),
                                 color: AppColors.primary,
                               ),
-
                               SizedBox(width: AppSize.getWidth(5)),
-
                               Text(
                                 'volunteer.events.joined'.tr(),
                                 style: TextStyle(
@@ -166,13 +170,15 @@ class VolunteerEventsCard extends StatelessWidget {
             ),
           ),
 
+          // -----------------------------------------------------------------
+          // Content
+          // -----------------------------------------------------------------
           Padding(
             padding: AppSize.padding(all: 15),
-
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-
               children: [
+                // Event name
                 Text(
                   name,
                   maxLines: 1,
@@ -186,6 +192,7 @@ class VolunteerEventsCard extends StatelessWidget {
 
                 SizedBox(height: AppSize.getHeight(3)),
 
+                // Description
                 Text(
                   description,
                   maxLines: 1,
@@ -198,6 +205,7 @@ class VolunteerEventsCard extends StatelessWidget {
 
                 SizedBox(height: AppSize.getHeight(15)),
 
+                // Date & Time
                 Row(
                   children: [
                     CustomIcon(
@@ -240,6 +248,7 @@ class VolunteerEventsCard extends StatelessWidget {
 
                 SizedBox(height: AppSize.getHeight(8)),
 
+                // Location
                 Row(
                   children: [
                     CustomIcon(
@@ -267,6 +276,7 @@ class VolunteerEventsCard extends StatelessWidget {
 
                 SizedBox(height: AppSize.getHeight(8)),
 
+                // Participants
                 Row(
                   children: [
                     CustomIcon(
@@ -283,33 +293,39 @@ class VolunteerEventsCard extends StatelessWidget {
                         children: [
                           TextSpan(
                             text:
-                                '${joiners.compact} ${'volunteer.events.joined'.tr()}',
+                            '${joiners.compact} ${'volunteer.events.joined'.tr()}',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: textColor,
                             ),
                           ),
-
                           TextSpan(
                             text: ' • ',
-                            style: TextStyle(color: secondaryColor),
+                            style: TextStyle(
+                              color: secondaryColor,
+                            ),
                           ),
-
                           TextSpan(
                             text:
-                                '${spotsLeft.compact} ${'volunteer.events.spot_left'.tr()}',
-                            style: TextStyle(color: secondaryColor),
+                            '${spotsLeft.compact} ${'volunteer.events.spot_left'.tr()}',
+                            style: TextStyle(
+                              color: secondaryColor,
+                            ),
                           ),
                         ],
                       ),
-
-                      style: TextStyle(fontSize: AppSize.font(13)),
+                      style: TextStyle(
+                        fontSize: AppSize.font(13),
+                      ),
                     ),
                   ],
                 ),
 
                 SizedBox(height: AppSize.getHeight(15)),
 
+                // -----------------------------------------------------------------
+                // Main Actions
+                // -----------------------------------------------------------------
                 Row(
                   children: [
                     Expanded(
@@ -329,14 +345,10 @@ class VolunteerEventsCard extends StatelessWidget {
                     Expanded(
                       child: Opacity(
                         opacity: isDisabled ? .45 : 1,
-
                         child: CustomButton(
                           loading: isLoading,
-
                           icon: joined ? AppIcons.check : null,
-
                           iconSize: AppSize.getSize(15),
-
                           title: isCompleted
                               ? 'volunteer.events.completed'.tr()
                               : isFull && !joined
@@ -344,13 +356,56 @@ class VolunteerEventsCard extends StatelessWidget {
                               : joined
                               ? 'volunteer.events.joined'.tr()
                               : 'volunteer.events.join_event'.tr(),
-
                           onTap: isDisabled ? null : onJoinTap,
                         ),
                       ),
                     ),
                   ],
                 ),
+
+                // -----------------------------------------------------------------
+                // Chat
+                // -----------------------------------------------------------------
+                if (showChat) ...[
+                  SizedBox(height: AppSize.getHeight(10)),
+
+                  GestureDetector(
+                    onTap: onChatTap,
+                    child: Container(
+                      width: double.infinity,
+                      height: AppSize.getHeight(42),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: .08),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: .18),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomIcon(
+                            icon: AppIcons.chat,
+                            width: AppSize.getSize(18),
+                            height: AppSize.getSize(18),
+                            color: AppColors.primary,
+                          ),
+
+                          SizedBox(width: AppSize.getWidth(8)),
+
+                          Text(
+                            'volunteer.events.chat'.tr(),
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontSize: AppSize.font(14),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -381,7 +436,9 @@ class VolunteerEventsCard extends StatelessWidget {
                 color: AppColors.grey,
               ),
             ),
+
             SizedBox(height: AppSize.getHeight(12)),
+
             Text(
               'volunteer.events.no_cover'.tr(),
               style: TextStyle(

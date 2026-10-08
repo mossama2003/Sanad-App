@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:sanad_app/features/shared/auth/data/repos/volunteer/volunteer_repo.dart';
+import 'package:sanad_app/features/shared/auth/data/repos/volunteer/volunteer_sign_up_repo.dart';
 import 'package:sanad_app/features/shared/auth/data/params/volunteer_sign_up_param.dart';
 import 'package:sanad_app/features/shared/auth/data/models/skills_model.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -25,7 +25,7 @@ part 'volunteer_sign_up_state.dart';
 class VolunteerSignUpCubit extends Cubit<VolunteerSignUpState> {
   VolunteerSignUpCubit(this.repo) : super(SignUpInitial());
 
-  VolunteerRepo repo;
+  VolunteerSignUpRepo repo;
 
   static VolunteerSignUpCubit get(BuildContext context) =>
       BlocProvider.of(context);

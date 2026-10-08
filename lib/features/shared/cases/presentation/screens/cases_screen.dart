@@ -17,11 +17,25 @@ class CasesScreen extends StatelessWidget {
   final CasesCubit casesCubit;
   final bool isOrg;
 
-  const CasesScreen({
-    super.key,
-    required this.casesCubit,
-    required this.isOrg,
-  });
+  const CasesScreen({super.key, required this.casesCubit, required this.isOrg});
+
+  // ============================================================
+  // Create
+  // ============================================================
+
+  Future<void> _createCase(BuildContext context) async {
+    await AppNavigator.push(
+      BlocProvider.value(
+        value: casesCubit,
+        child: SubmitCaseScreen(casesCubit: casesCubit),
+      ),
+    );
+
+    if (!context.mounted) return;
+
+    // Refresh the currently selected tab after returning.
+    await casesCubit.getCases(me: casesCubit.isMySelected);
+  }
 
   // ============================================================
   // Delete
@@ -35,7 +49,7 @@ class CasesScreen extends StatelessWidget {
         confirmText: 'shared.cases.card.delete'.tr(),
         isDestructive: true,
         onConfirm: () {
-          casesCubit.deleteCase(id);
+          casesCubit.deleteCase(id, context: context);
         },
       ),
     );
@@ -52,7 +66,7 @@ class CasesScreen extends StatelessWidget {
         message: 'shared.cases.card.confirm_complete_desc'.tr(),
         confirmText: 'shared.cases.card.complete'.tr(),
         onConfirm: () {
-          casesCubit.completeCase(id);
+          casesCubit.completeCase(id, context: context);
         },
       ),
     );
@@ -63,9 +77,9 @@ class CasesScreen extends StatelessWidget {
   // ============================================================
 
   Future<void> _editCase(
-      BuildContext context,
-      CaseListItemModel caseItem,
-      ) async {
+    BuildContext context,
+    CaseListItemModel caseItem,
+  ) async {
     await AppNavigator.push(
       BlocProvider.value(
         value: casesCubit,
@@ -75,6 +89,7 @@ class CasesScreen extends StatelessWidget {
 
     if (!context.mounted) return;
 
+    // Refresh after returning from edit.
     await casesCubit.getCases(me: casesCubit.isMySelected);
   }
 
@@ -99,6 +114,10 @@ class CasesScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ============================================================
+          // Title
+          // ============================================================
+
           Text(
             'shared.cases.title'.tr(),
             style: TextStyle(
@@ -110,6 +129,9 @@ class CasesScreen extends StatelessWidget {
 
           SizedBox(height: AppSize.getHeight(3)),
 
+          // ============================================================
+          // Description
+          // ============================================================
           Text(
             'shared.cases.desc'.tr(),
             style: TextStyle(
@@ -121,12 +143,18 @@ class CasesScreen extends StatelessWidget {
 
           SizedBox(height: AppSize.getHeight(15)),
 
+          // ============================================================
+          // Content
+          // ============================================================
           BlocBuilder<CasesCubit, CasesState>(
             bloc: casesCubit,
             builder: (context, state) {
               return Column(
                 children: [
-                  /// Tabs (Org only)
+                  // ========================================================
+                  // Tabs
+                  // ========================================================
+
                   if (isOrg) ...[
                     CasesTabSelector(
                       isMySelected: casesCubit.isMySelected,
@@ -137,10 +165,16 @@ class CasesScreen extends StatelessWidget {
                     SizedBox(height: AppSize.getHeight(15)),
                   ],
 
+                  // ========================================================
+                  // Verified Info
+                  // ========================================================
                   const VerifiedInfoCard(),
 
                   SizedBox(height: AppSize.getHeight(15)),
 
+                  // ========================================================
+                  // Cases
+                  // ========================================================
                   _buildCasesList(context, state, textColor),
                 ],
               );
@@ -156,15 +190,23 @@ class CasesScreen extends StatelessWidget {
   // ============================================================
 
   Widget _buildCasesList(
-      BuildContext context,
-      CasesState state,
-      Color textColor,
-      ) {
+    BuildContext context,
+    CasesState state,
+    Color textColor,
+  ) {
     final cases = casesCubit.casesList;
+
+    // ============================================================
+    // Loading
+    // ============================================================
 
     if (state is Loading && cases.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
+
+    // ============================================================
+    // Empty
+    // ============================================================
 
     if (cases.isEmpty) {
       return Center(
@@ -177,6 +219,10 @@ class CasesScreen extends StatelessWidget {
 
     final currentUserId = AppCubit.get(context).user?.id;
 
+    // ============================================================
+    // List
+    // ============================================================
+
     return Column(
       children: [
         for (int i = 0; i < cases.length; i++) ...[
@@ -185,16 +231,28 @@ class CasesScreen extends StatelessWidget {
 
             caseItem: cases[i],
 
+            // Use the same Cubit instance.
+            casesCubit: casesCubit,
+
             isOwner: isOrg && cases[i].creator.id == currentUserId,
 
+            // ========================================================
+            // Delete
+            // ========================================================
             onDelete: () {
               _confirmDelete(context, cases[i].id);
             },
 
+            // ========================================================
+            // Edit
+            // ========================================================
             onEdit: () {
               _editCase(context, cases[i]);
             },
 
+            // ========================================================
+            // Complete
+            // ========================================================
             onComplete: () {
               _confirmComplete(context, cases[i].id);
             },
@@ -206,6 +264,10 @@ class CasesScreen extends StatelessWidget {
     );
   }
 }
+
+// ============================================================================
+// Cases Tabs
+// ============================================================================
 
 class CasesTabSelector extends StatelessWidget {
   final bool isMySelected;
@@ -235,21 +297,32 @@ class CasesTabSelector extends StatelessWidget {
       ),
       child: Row(
         children: [
+          // ==========================================================
+          // All Cases
+          // ==========================================================
+
           Expanded(
             child: _CasesTabItem(
               label: 'shared.cases.all_cases'.tr(),
               isSelected: !isMySelected,
-              onTap: () => onChanged(false),
+              onTap: () {
+                onChanged(false);
+              },
             ),
           ),
 
+          // ==========================================================
+          // My Cases
+          // ==========================================================
           Expanded(
             child: _CasesTabItem(
               label:
-              '${'shared.cases.my_cases'.tr()} '
+                  '${'shared.cases.my_cases'.tr()} '
                   '(${myCasesCount.compact})',
               isSelected: isMySelected,
-              onTap: () => onChanged(true),
+              onTap: () {
+                onChanged(true);
+              },
             ),
           ),
         ],
@@ -257,6 +330,10 @@ class CasesTabSelector extends StatelessWidget {
     );
   }
 }
+
+// ============================================================================
+// Tab Item
+// ============================================================================
 
 class _CasesTabItem extends StatelessWidget {
   final String label;
@@ -291,12 +368,12 @@ class _CasesTabItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: isSelected
               ? [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? .25 : .06),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ]
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? .25 : .06),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
               : null,
         ),
         alignment: Alignment.center,

@@ -24,8 +24,9 @@ import '../controllers/case_cubit.dart';
 
 class CasesForm extends StatefulWidget {
   final CaseListItemModel? caseItem;
+  final CasesCubit casesCubit;
 
-  const CasesForm({super.key, this.caseItem});
+  const CasesForm({super.key, this.caseItem, required this.casesCubit});
 
   bool get isEdit => caseItem != null;
 
@@ -335,14 +336,18 @@ class _CasesFormState extends State<CasesForm> {
   }
 
   String _normalizeEgyptianPhone(String phone) {
-    final value = phone.trim();
+    var value = phone.trim();
 
     if (value.startsWith('+20')) {
-      return '0${value.substring(3)}';
+      value = value.substring(3);
     }
 
     if (value.startsWith('20') && value.length == 12) {
-      return '0${value.substring(2)}';
+      value = value.substring(2);
+    }
+
+    if (value.startsWith('0') && value.length == 11) {
+      value = value.substring(1);
     }
 
     return value;
@@ -451,7 +456,9 @@ class _CasesFormState extends State<CasesForm> {
       attachments: [...casePhotos, ...supportingDocuments],
     );
 
-    final cubit = context.read<CasesCubit>();
+    // IMPORTANT:
+    // Use the exact Cubit instance passed from CasesScreen.
+    final cubit = widget.casesCubit;
 
     if (widget.isEdit) {
       cubit.updateCase(id: widget.caseItem!.id, param: param);
@@ -463,12 +470,11 @@ class _CasesFormState extends State<CasesForm> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<CasesCubit, CasesState>(
+      bloc: widget.casesCubit,
       listener: (context, state) {
-        final cubit = context.read<CasesCubit>();
-
         debugPrint(
           'SUBMIT CASE LISTENER => '
-          'cubit=${identityHashCode(cubit)} '
+          'cubit=${identityHashCode(widget.casesCubit)} '
           'state=${state.runtimeType}',
         );
 
@@ -481,7 +487,6 @@ class _CasesFormState extends State<CasesForm> {
           AppNavigator.pop();
         }
       },
-
       child: Form(
         key: _formKey,
         child: Column(
@@ -636,13 +641,10 @@ class _CasesFormState extends State<CasesForm> {
                     builder: (context, state) {
                       return CustomButton(
                         loading: state is Loading,
-                        onTap: state is Loading
-                            ? null
-                            : _submit,
+                        onTap: state is Loading ? null : _submit,
                         title: widget.isEdit
                             ? 'shared.cases.edit.button'.tr()
-                            : 'shared.cases.submit.submit_button'
-                            .tr(),
+                            : 'shared.cases.submit.submit_button'.tr(),
                         bgColor: AppColors.primary,
                       );
                     },
@@ -1046,14 +1048,15 @@ class _ContactInfoSection extends StatelessWidget {
           CustomFieldText(
             controller: phoneController,
             title: 'shared.cases.submit.contact_phone'.tr(),
-            hintText: '01xxxxxxxxx',
+            hintText: '1xxxxxxxxx',
             isRequired: true,
-            validator: AppValidators.egyptianPhone,
+            validator: AppValidators.egyptianPhoneWithoutZero,
             keyboardType: TextInputType.phone,
             prefixText: '+20 ',
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
-              LengthLimitingTextInputFormatter(11),
+              LengthLimitingTextInputFormatter(10),
+              FilteringTextInputFormatter.deny(RegExp(r'^0')),
             ],
           ),
         ],
@@ -1247,15 +1250,17 @@ class _PaymentMethodSection extends StatelessWidget {
                   return CustomFieldText(
                     controller: walletPhoneController,
                     title: 'shared.cases.submit.wallet_phone'.tr(),
-                    hintText: '01xxxxxxxxx',
+                    hintText: '1xxxxxxxxx',
                     isRequired: false,
-                    validator: (value) =>
-                        optionalValidator(value, AppValidators.egyptianPhone),
+                    validator: (value) => optionalValidator(
+                      value,
+                      AppValidators.egyptianPhoneWithoutZero,
+                    ),
                     keyboardType: TextInputType.phone,
                     prefixText: '+20 ',
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(11),
+                      LengthLimitingTextInputFormatter(10),
                     ],
                   );
 

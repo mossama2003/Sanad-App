@@ -14,7 +14,7 @@ import '../../../../../../core/helper/app_navigator.dart';
 import '../../../../../../core/helper/app_toast.dart';
 import '../../../../../../core/shared/models/governorate_model.dart';
 import '../../../data/params/organization_sign_up_param.dart';
-import '../../../data/repos/organization/organization_repo.dart';
+import '../../../data/repos/organization/organization_sign_up_repo.dart';
 import '../../sign_in/screens/sign_in_screen.dart';
 
 part 'organization_sign_up_state.dart';
@@ -22,7 +22,7 @@ part 'organization_sign_up_state.dart';
 class OrganizationSignUpCubit extends Cubit<OrganizationSignUpState> {
   OrganizationSignUpCubit(this.repo) : super(OrganizationSignUpInitial());
 
-  final OrganizationRepo repo;
+  final OrganizationSignUpRepo repo;
 
   static OrganizationSignUpCubit get(BuildContext context) =>
       BlocProvider.of(context);

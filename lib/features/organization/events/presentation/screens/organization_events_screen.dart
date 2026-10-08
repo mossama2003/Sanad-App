@@ -159,19 +159,27 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
                             menuChildren: [
                               StatefulBuilder(
                                 builder: (context, menuSetState) {
-                                  void applyFilters() {
+                                  Future<void> applyFilters() async {
                                     final statuses = <String>[];
 
-                                    if (upcoming) statuses.add('upcoming');
-                                    if (ongoing) statuses.add('ongoing');
-                                    if (completed) statuses.add('completed');
-                                    if (draft) statuses.add('draft');
+                                    if (upcoming) {
+                                      statuses.add('upcoming');
+                                    }
 
-                                    _cubit.getOrganizationEvents(
-                                      refresh: true,
-                                      statuses: statuses.isEmpty
-                                          ? null
-                                          : statuses,
+                                    if (ongoing) {
+                                      statuses.add('ongoing');
+                                    }
+
+                                    if (completed) {
+                                      statuses.add('completed');
+                                    }
+
+                                    if (draft) {
+                                      statuses.add('draft');
+                                    }
+
+                                    await _cubit.applyStatusFilters(
+                                      statuses.isEmpty ? null : statuses,
                                     );
                                   }
 
@@ -284,8 +292,6 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
                           ),
                         ],
                       ),
-
-                      SizedBox(height: AppSize.getHeight(20)),
                     ],
                   ),
                 ),

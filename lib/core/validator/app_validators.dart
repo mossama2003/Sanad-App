@@ -305,15 +305,15 @@ class AppValidators {
     return null;
   }
 
-  /// EGYPTIAN PHONE VALIDATION (WALLET) — 11 digits, starts 010/011/012/015
-  static String? egyptianPhone(String? value) {
+  /// EGYPTIAN PHONE VALIDATION (WALLET) — 10 digits, starts 010/011/012/015
+  static String? egyptianPhoneWithoutZero(String? value) {
     if (value == null || value.isEmpty) {
       return 'validators.required'.tr();
     }
 
     final cleaned = value.trim();
 
-    if (!RegExp(r'^01[0125]\d{8}$').hasMatch(cleaned)) {
+    if (!RegExp(r'^(10|11|12|15)\d{8}$').hasMatch(cleaned)) {
       return 'validators.phone.egyptian_invalid'.tr();
     }
 

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:image_cropper/image_cropper.dart';
 import 'package:sanad_app/features/organization/events/data/models/organization_event_details_model.dart';
 import 'package:sanad_app/features/organization/events/data/params/get_organization_events_param.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -12,6 +13,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../home/presentation/controllers/organization_home_cubit.dart';
 import '../../../../../core/shared/models/governorate_model.dart';
 import '../../data/params/create_organization_event_param.dart';
@@ -58,14 +60,33 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   final locationAddressController = TextEditingController();
   final requiredVolunteersController = TextEditingController();
 
-  // ===================== Search =====================
+  // ===================== Search & Filters =====================
 
   final TextEditingController searchController = TextEditingController();
 
   Timer? debounce;
 
+  /// Current search value sent to API.
   String? search;
 
+  /// Current selected status filters.
+  List<String>? selectedStatuses;
+
+  /// Returns the current search value after trimming.
+  String? get currentSearch {
+    final value = searchController.text.trim();
+
+    if (value.isEmpty) {
+      return null;
+    }
+
+    return value;
+  }
+
+  /// Search with debounce.
+  ///
+  /// Important:
+  /// The current selected filters are always preserved.
   void onSearchChanged(String value) {
     debounce?.cancel();
 
@@ -76,6 +97,35 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
         searchText: value,
       );
     });
+  }
+
+  /// Apply status filters while keeping the current search.
+  Future<void> applyStatusFilters(List<String>? statuses) async {
+    // Cancel any pending search request.
+    debounce?.cancel();
+
+    // Save the new filters.
+    selectedStatuses = statuses;
+
+    // Apply filters + current search together.
+    await getOrganizationEvents(
+      refresh: true,
+      statuses: selectedStatuses,
+      searchText: currentSearch,
+    );
+  }
+
+  /// Clear search and keep the currently selected filters.
+  Future<void> clearSearch() async {
+    debounce?.cancel();
+
+    searchController.clear();
+
+    await getOrganizationEvents(
+      refresh: true,
+      statuses: selectedStatuses,
+      searchText: null,
+    );
   }
 
   // ===================== Edit Mode =====================
@@ -94,19 +144,19 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
   bool removeOldCover = false;
 
-  // 👈 جديد - المصدر الوحيد اللي المفروض الشاشة تعتمد عليه لعرض صورة الشبكة
-  // بيرجع null لو المستخدم دوس على X ومسح الصورة القديمة، عشان الـ CustomUploadFile
-  // ميعرضش صورة الشبكة تاني حتى لو widget.event?.cover لسه موجودة
+  // المصدر الوحيد اللي الشاشة تعتمد عليه لعرض صورة الشبكة.
   String? get displayNetworkCover {
-    if (removeOldCover) return null;
+    if (removeOldCover) {
+      return null;
+    }
+
     return editingEvent?.cover;
   }
-
-  List<String>? selectedStatuses;
 
   // ===================== Time =====================
 
   TimeOfDay? startTime;
+
   TimeOfDay? endTime;
 
   // ===================== Location =====================
@@ -131,7 +181,8 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
   bool isLoadingMore = false;
 
-  // ===================== Hive Refresh Events =====================l
+  // ===================== Hive Refresh Events =====================
+
   bool shouldRefreshEvents() {
     final lastUpdated = HiveBoxes.cacheInfoBox.get(_eventsLastUpdatedKey);
 
@@ -231,8 +282,8 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   }
 
   // ===================== Load Location Data =====================
+
   Future<void> loadLocationData() async {
-    // Already loaded
     if (governorates.isNotEmpty && cities.isNotEmpty) {
       return;
     }
@@ -328,40 +379,59 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
     filteredCities = cities.where((e) => e.governorateId == gov.id).toList();
 
-    final city = filteredCities.firstWhere(
-      (e) => e.nameEn == cityName,
-      orElse: () => filteredCities.first,
-    );
+    if (filteredCities.isNotEmpty) {
+      final city = filteredCities.firstWhere(
+        (e) => e.nameEn == cityName,
+        orElse: () => filteredCities.first,
+      );
 
-    selectedCity.value = city;
+      selectedCity.value = city;
+    }
 
     emit(Success());
   }
 
   // ===================== Reset Create Form =====================
+
   void resetForm() {
     eventCover = null;
+
     removeOldCover = false;
 
     eventNameController.clear();
+
     eventDescriptionController.clear();
+
     otherCategoryController.clear();
+
     dateController.clear();
+
     startTimeController.clear();
+
     endTimeController.clear();
+
     locationLinkController.clear();
+
     locationAddressController.clear();
+
     requiredVolunteersController.clear();
 
     selectedCategory.value = null;
+
     selectedSkills.value = [];
+
     selectedGov.value = null;
+
     selectedCity.value = null;
 
+    filteredCities.clear();
+
     startTime = null;
+
     endTime = null;
 
     editingEvent = null;
+
     formMode = OrganizationEventFormMode.create;
   }
 
@@ -379,7 +449,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     );
   }
 
-  // ===================== Pick Cover =====================
+  // ===================== Pick & Crop Cover =====================
 
   Future<void> pickEventCover() async {
     try {
@@ -390,19 +460,50 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
         imageQuality: 85,
       );
 
-      if (image == null) return;
+      if (image == null) {
+        return;
+      }
 
-      eventCover = File(image.path);
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        aspectRatio: const CropAspectRatio(ratioX: 16, ratioY: 9),
+        compressQuality: 85,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop Event Cover',
+            lockAspectRatio: true,
+            aspectRatioPresets: [CropAspectRatioPreset.ratio16x9],
+          ),
+          IOSUiSettings(
+            title: 'Crop Event Cover',
+            aspectRatioLockEnabled: true,
+            resetAspectRatioEnabled: false,
+            aspectRatioPresets: [CropAspectRatioPreset.ratio16x9],
+          ),
+        ],
+      );
+
+      if (croppedFile == null) {
+        return;
+      }
+
+      eventCover = File(croppedFile.path);
+
       removeOldCover = false;
+
       emit(Success());
     } catch (e) {
       emit(Error());
+
+      AppToast.error(e.toString());
     }
   }
 
   void removeEventCover() {
     eventCover = null;
+
     removeOldCover = true;
+
     emit(Success());
   }
 
@@ -426,7 +527,9 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       lastDate: lastDate,
     );
 
-    if (pickedDate == null) return;
+    if (pickedDate == null) {
+      return;
+    }
 
     dateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
 
@@ -441,33 +544,45 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       initialTime: TimeOfDay.now(),
     );
 
-    if (picked == null || !context.mounted) return;
+    if (picked == null || !context.mounted) {
+      return;
+    }
 
     startTime = picked;
+
     startTimeController.text = picked.format(context);
 
-    if (endTime == null) return;
+    if (endTime == null) {
+      return;
+    }
 
     final startMinutes = (picked.hour * 60) + picked.minute;
+
     final endMinutes = (endTime!.hour * 60) + endTime!.minute;
 
     if (endMinutes <= startMinutes) {
       endTime = null;
+
       endTimeController.clear();
     }
   }
 
   // ===================== Create Event =====================
+
   Future<void> createOrganizationEvent({
     required String status,
     required CreateOrganizationEventAction action,
+    required BuildContext context,
   }) async {
-    if (!formKey.currentState!.validate()) return;
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
 
     if (eventCover == null) {
       AppToast.error(
         'organization.create_edit_event.pleasee_select_event_cover'.tr(),
       );
+
       return;
     }
 
@@ -507,70 +622,54 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
         final newEvent = OrganizationEventDetailsModel(
           id: createdEvent.id,
-
           name: createdEvent.name,
-
           description: createdEvent.description,
-
           category: createdEvent.category,
-
           date: createdEvent.date,
-
           status: createdEvent.status,
-
           skills: createdEvent.skills,
-
           spots: createdEvent.spots,
-
           cover: createdEvent.cover,
-
           location: {
             'url': createdEvent.locationUrl,
             'description': createdEvent.locationDescription,
             'city': createdEvent.locationCity,
             'state': createdEvent.locationState,
           },
-
           joiners: 0,
-
           attendees: 0,
-
           joined: false,
-
           avgRating: 0.0,
-
           unreadChatMessages: 0,
-
           qr: createdEvent.qr,
-
           due: createdEvent.due,
-
           created: createdEvent.created,
-
           modified: createdEvent.modified,
         );
 
-        // ===================== Hive وقتها بس بعد نجاح الـ API =====================
+        // ===================== Local Events =====================
 
         events.insert(0, newEvent);
 
         await saveEventsToCache();
 
+        // ===================== Home =====================
+
         if (homeCubit != null) {
           await homeCubit!.insertHomeEvent(newEvent);
         }
 
-        // ===================== مسح الفورم دلوقتي بس بعد نجاح الإنشاء الفعلي =====================
-
-        resetForm();
-
-        emit(Success());
+        // ===================== Success =====================
 
         AppToast.success(
           'organization.create_edit_event.event_created_successfully'.tr(),
         );
 
+        final appCubit = AppCubit.get(context);
+
         AppNavigator.pop();
+
+        appCubit.getUser();
       },
     );
   }
@@ -594,32 +693,20 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     final result = await repo.updateOrganizationEvent(
       OrganizationEventUpdateParam(
         id: id,
-
         name: eventNameController.text.trim(),
-
         description: eventDescriptionController.text.trim(),
-
         category: selectedCategory.value == 'Other'
             ? otherCategoryController.text.trim()
             : selectedCategory.value,
-
         locationUrl: locationLinkController.text.trim(),
-
         locationCity: selectedCity.value?.nameEn,
-
         locationState: selectedGov.value?.nameEn,
-
         locationDescription: locationAddressController.text.trim(),
-
         date: getEventDateTime(),
-
         spots: int.tryParse(requiredVolunteersController.text),
-
         skills: selectedSkills.value,
-
         cover: eventCover,
-
-        status: publish ? "upcoming" : null,
+        status: publish ? 'upcoming' : null,
       ),
     );
 
@@ -639,7 +726,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
         if (baseEvent != null) {
           final updatedEvent = baseEvent.copyWith(
-            status: publish ? "upcoming" : baseEvent.status,
+            status: publish ? 'upcoming' : baseEvent.status,
             name: eventNameController.text.trim(),
             description: eventDescriptionController.text.trim(),
             category: selectedCategory.value == 'Other'
@@ -656,13 +743,11 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
               'city': selectedCity.value?.nameEn,
               'state': selectedGov.value?.nameEn,
             },
-            // 👈 عدّلت: لو المستخدم مسح الصورة ومختارش وحدة جديدة، نمسح الكوفر بدل ما نسيب القديم
             cover: eventCover != null
                 ? eventCover!.path
                 : (removeOldCover ? null : baseEvent.cover),
           );
 
-          // تحديث الليست المحلي بتاع شاشة الـ Events (لو الـ event موجود فيها أصلاً)
           final index = events.indexWhere((e) => e.id == id);
 
           if (index != -1) {
@@ -671,13 +756,10 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
             await saveEventsToCache();
           }
 
-          // تحديث الهوم دايمًا، سواء الـ event كان موجود في الليست المحلي أو لأ
           if (homeCubit != null) {
             await homeCubit!.updateHomeEvent(updatedEvent);
           }
         }
-
-        emit(Success());
 
         AppToast.success(
           'organization.create_edit_event.event_updated_successfully'.tr(),
@@ -689,12 +771,13 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   }
 
   // ===================== Publish Event =====================
+
   Future<void> publishOrganizationEvent({
     required int id,
     required DateTime date,
   }) async {
     final result = await repo.updateOrganizationEvent(
-      OrganizationEventUpdateParam(id: id, date: date, status: "upcoming"),
+      OrganizationEventUpdateParam(id: id, date: date, status: 'upcoming'),
     );
 
     result.fold(
@@ -707,7 +790,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
         if (index != -1) {
           events[index] = events[index].copyWith(
             date: date,
-            status: "upcoming",
+            status: 'upcoming',
           );
 
           await saveEventsToCache();
@@ -741,7 +824,9 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   bool loadEventsFromCache() {
     final box = HiveBoxes.organizationEventsBox;
 
-    if (box.isEmpty) return false;
+    if (box.isEmpty) {
+      return false;
+    }
 
     events
       ..clear()
@@ -753,6 +838,7 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   }
 
   // ===================== Get Organization Events =====================
+
   Future<void> getOrganizationEvents({
     bool refresh = false,
     List<String>? statuses,
@@ -760,24 +846,37 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
   }) async {
     if (refresh) {
       currentPage = 1;
+
+      // ===================== Preserve Current Filters =====================
+
       selectedStatuses = statuses;
-      search = searchText;
+
+      // ===================== Preserve Current Search =====================
+
+      final trimmedSearch = searchText?.trim();
+
+      search = trimmedSearch == null || trimmedSearch.isEmpty
+          ? null
+          : trimmedSearch;
     }
 
-    // ================= Cache First =================
+    // ===================== Cache First =====================
 
     if (!refresh && events.isEmpty) {
       loadEventsFromCache();
     }
 
-    // ================= API Background Refresh =================
+    // ===================== API =====================
 
     final result = await repo.getOrganizationEvents(
       GetOrganizationEventsParam(
         page: currentPage,
         size: 10,
+
+        // Search + Status filters are sent together.
         status: selectedStatuses,
-        search: search?.trim().isEmpty ?? true ? null : search,
+
+        search: search,
       ),
     );
 
@@ -789,7 +888,6 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
         AppToast.error(failure.errMessage);
       },
-
       (data) async {
         events
           ..clear()
@@ -806,7 +904,10 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
   // ===================== Delete Organization Event =====================
 
-  Future<bool> deleteOrganizationEvent({required int id}) async {
+  Future<bool> deleteOrganizationEvent({
+    required int id,
+    BuildContext? context,
+  }) async {
     final result = await repo.deleteOrganizationEvent(id);
 
     return result.fold(
@@ -826,6 +927,10 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
         AppToast.success('organization.events.event_deleted_successfully'.tr());
 
+        if (context != null && context.mounted) {
+          await AppCubit.get(context).getUser();
+        }
+
         return true;
       },
     );
@@ -844,7 +949,11 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       GetOrganizationEventsParam(
         page: currentPage + 1,
         size: 10,
+
+        // Keep current filters.
         status: selectedStatuses,
+
+        // Keep current search.
         search: search,
       ),
     );
@@ -853,7 +962,6 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
       (failure) {
         AppToast.error(failure.errMessage);
       },
-
       (response) async {
         currentPage++;
 
@@ -869,6 +977,8 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
 
     isLoadingMore = false;
   }
+
+  // ===================== Close =====================
 
   @override
   Future<void> close() {
@@ -889,6 +999,8 @@ class OrganizationEventsCubit extends Cubit<OrganizationEventsState> {
     locationAddressController.dispose();
 
     requiredVolunteersController.dispose();
+
+    searchController.dispose();
 
     selectedCategory.dispose();
 

@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
-import 'package:sanad_app/features/shared/auth/data/repos/volunteer/volunteer_repo.dart';
 import 'package:sanad_app/core/shared/widgets/custom_field_dropdown.dart';
 import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -19,6 +18,7 @@ import '../../../../../../core/validator/app_validators.dart';
 import '../../../../../../core/constant/app_size.dart';
 import '../../../../../../core/style/app_colors.dart';
 import '../../../../../../core/shared/models/city_model.dart';
+import '../../../data/repos/volunteer/volunteer_sign_up_repo.dart';
 import '../controllers/volunteer_sign_up_cubit.dart';
 
 class VolunteerSignUpForm extends StatefulWidget {
@@ -37,7 +37,7 @@ class _VolunteerSignUpFormState extends State<VolunteerSignUpForm> {
   void initState() {
     super.initState();
 
-    _cubit = VolunteerSignUpCubit(VolunteerRepoImpel());
+    _cubit = VolunteerSignUpCubit(VolunteerSignUpRepoImpel());
 
     _cubit.getInterests();
     _cubit.loadLocationData();

@@ -613,6 +613,7 @@ class _OrganizationEventFormScreenState
                                   status: 'draft',
 
                                   action: CreateOrganizationEventAction.draft,
+                                  context: context,
                                 );
                               },
 
@@ -643,6 +644,7 @@ class _OrganizationEventFormScreenState
                                   status: 'upcoming',
 
                                   action: CreateOrganizationEventAction.publish,
+                                  context: context,
                                 );
                               },
 

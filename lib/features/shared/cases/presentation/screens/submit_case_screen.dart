@@ -30,11 +30,11 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
     super.initState();
 
     Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted) {
-        setState(() {
-          showForm = true;
-        });
-      }
+      if (!mounted) return;
+
+      setState(() {
+        showForm = true;
+      });
     });
   }
 
@@ -52,7 +52,6 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
       value: widget.casesCubit,
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-
         body: SafeArea(
           child: Column(
             children: [
@@ -69,7 +68,6 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
                             widget.isEdit
                                 ? 'shared.cases.edit.title'.tr()
                                 : 'shared.cases.submit.title'.tr(),
-
                             style: TextStyle(
                               fontSize: AppSize.font(20),
                               fontWeight: FontWeight.w800,
@@ -83,7 +81,6 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
                             widget.isEdit
                                 ? 'shared.cases.edit.desc'.tr()
                                 : 'shared.cases.submit.desc'.tr(),
-
                             style: TextStyle(
                               fontSize: AppSize.font(13),
                               color: secondaryColor,
@@ -100,12 +97,10 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
                       child: Container(
                         width: AppSize.getSize(36),
                         height: AppSize.getSize(36),
-
                         decoration: BoxDecoration(
                           color: closeBackgroundColor,
                           shape: BoxShape.circle,
                         ),
-
                         child: Center(
                           child: CustomIcon(
                             icon: AppIcons.close,
@@ -123,20 +118,17 @@ class _SubmitCaseScreenState extends State<SubmitCaseScreen> {
               Expanded(
                 child: AnimatedSlide(
                   offset: showForm ? Offset.zero : const Offset(0, 0.3),
-
                   duration: const Duration(milliseconds: 400),
-
                   curve: Curves.easeOutCubic,
-
                   child: AnimatedOpacity(
                     opacity: showForm ? 1 : 0,
-
                     duration: const Duration(milliseconds: 400),
-
                     child: SingleChildScrollView(
                       padding: AppSize.padding(horizontal: 16, bottom: 24),
-
-                      child: CasesForm(caseItem: widget.caseItem),
+                      child: CasesForm(
+                        caseItem: widget.caseItem,
+                        casesCubit: widget.casesCubit,
+                      ),
                     ),
                   ),
                 ),

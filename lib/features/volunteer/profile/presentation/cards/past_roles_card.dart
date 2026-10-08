@@ -1,5 +1,5 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
@@ -113,7 +113,7 @@ class PastRolesCard extends StatelessWidget {
                 child: _RoleItem(
                   background: itemBackground,
                   tag: role.role ?? '-',
-                  title: role.volunteer ?? '-',
+                  title: role.event ?? '-',
                   date: _formatDate(role.created),
                   textColor: textColor,
                   lightTextColor: lightTextColor,

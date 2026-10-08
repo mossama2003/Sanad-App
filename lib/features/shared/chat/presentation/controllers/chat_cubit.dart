@@ -125,7 +125,7 @@ class ChatCubit extends Cubit<ChatState> {
               .map((e) => e.toUiModel(currentUserId: currentUserId))
               .toList(),
           page: 1,
-          hasMore: true,
+          hasMore: false,
           isSyncing: true,
         ),
       );
@@ -158,7 +158,7 @@ class ChatCubit extends Cubit<ChatState> {
         return data.count;
       },
     );
-    
+
     membersReadyNotifier.value = true;
 
     await historyResult.fold(
@@ -562,7 +562,10 @@ class ChatCubit extends Cubit<ChatState> {
   // ── Pagination on scroll up ────────────────────────────────────────────
   Future<void> loadMoreHistory() async {
     final current = state;
-    if (current is! ChatLoaded || !current.hasMore || current.isLoadingMore) {
+    if (current is! ChatLoaded ||
+        current.isSyncing ||
+        !current.hasMore ||
+        current.isLoadingMore) {
       return;
     }
 

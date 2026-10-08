@@ -40,7 +40,7 @@ class OrganizationEventUpdateParam {
   });
 
   Future<FormData> toFormData() async {
-    return FormData.fromMap({
+    final formData = FormData.fromMap({
       if (locationUrl != null) "location_url": locationUrl,
 
       if (locationCity != null) "location_city": locationCity,
@@ -62,13 +62,20 @@ class OrganizationEventUpdateParam {
 
       if (spots != null) "spots": spots,
 
-      if (skills != null) "skills": skills,
-
       if (cover != null)
         "cover": await MultipartFile.fromFile(
           cover!.path,
           filename: cover!.path.split('/').last,
         ),
     });
+
+    // الباك إند عايز الصيغة دي: skills[0], skills[1], ...
+    if (skills != null) {
+      for (var i = 0; i < skills!.length; i++) {
+        formData.fields.add(MapEntry('skills[$i]', skills![i]));
+      }
+    }
+
+    return formData;
   }
 }

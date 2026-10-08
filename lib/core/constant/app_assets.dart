@@ -76,6 +76,7 @@ class AppIcons {
   static String starOutlined = '$icons/star_outlined.svg';
   static String growthArrow = '$icons/growth-arrow.svg';
   static String rightArrow = '$icons/right_arrow.svg';
+  static String leftArrow = '$icons/left_arrow.svg';
   static String arrowBack = '$icons/arrow-back.svg';
   static String arrowDown = '$icons/arrow-down.svg';
   static String upArrow = '$icons/up-arrow.svg';

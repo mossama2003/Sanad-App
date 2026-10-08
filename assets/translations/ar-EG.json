@@ -85,7 +85,7 @@
     },
     "phone": {
       "required": "* مطلوب",
-      "egyptian_invalid": "من فضلك ادخل رقم تليفون مصري صحيح (11 رقم)",
+      "egyptian_invalid": "من فضلك ادخل رقم تليفون مصري صحيح (10 رقم)",
       "invalid": "رقم الموبايل غير صحيح"
     },
     "OTP": {
@@ -137,7 +137,8 @@
       "or": " أو ",
       "sign_up_as_organization": "منظمة",
       "account_signed_in": "تم تسجيل الدخول للحساب",
-      "user_role_not_found": "نوع المستخدم غير موجود"
+      "user_role_not_found": "نوع المستخدم غير موجود",
+      "user_not_found": "المستخدم غير موجود"
     },
     "chat": {
       "no_messages_title": "لا توجد رسائل بعد",
@@ -261,6 +262,7 @@
         "confirm_complete_title": "إكمال الحالة",
         "confirm_complete_desc": "هل أنت متأكد من إكمال هذه الحالة؟ لن تظهر كحالة نشطة بعد ذلك.",
         "complete": "إكمال",
+        "completed": "مكتمل",
         "case_completed": "تم إكمال الحالة بنجاح"
       },
       "pop_up": {
@@ -401,8 +403,18 @@
       "support": "الدعم",
       "help_center": "مركز المساعدة",
       "contact_support": "تواصل مع الدعم",
+      "faqs": "الأسئلة الشائعة",
       "sign_out": "تسجيل الخروج",
       "sign_out_desc": "هل أنت متأكد إنك عايز تسجل خروج من حسابك؟"
+    },
+    "faq": {
+      "title": "الأسئلة الشائعة",
+      "search_hint": "ابحث في الأسئلة الشائعة...",
+      "no_results": "لا توجد أسئلة شائعة",
+      "no_results_desc": "جرّب البحث باستخدام كلمة مختلفة.",
+      "still_need_help": "هل ما زلت بحاجة إلى مساعدة؟",
+      "contact_support_desc": "تواصل مع فريق الدعم وسنسعد بمساعدتك.",
+      "error": "حدث خطأ أثناء تحميل الأسئلة الشائعة."
     }
   },
   "organization": {
@@ -731,6 +743,7 @@
       "leave_confirm": "مغادرة",
       "started": "بدأت الفعالية",
       "no_cover": "لا توجد صورة للفعالية",
+      "chat": "المحادثة",
       "bottom_sheet": {
         "date_time": "التاريخ والوقت",
         "duration": "المدة",

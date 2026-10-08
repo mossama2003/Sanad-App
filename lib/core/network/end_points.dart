@@ -98,3 +98,6 @@ String UPDATE_ORGANIZATION_EVENT(int ID) => 'v1/events/manage_event/$ID/';
 String DELETE_ORGANIZATION_EVENT(int ID) => 'v1/events/manage_event/$ID/';
 
 String ORGANIZATION_HOME = 'v1/dashboard/home/organization/';
+
+/// Support
+String FAQS = 'v1/portal/faq/';

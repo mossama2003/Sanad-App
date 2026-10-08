@@ -4,6 +4,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../core/network/local/cache/cache_helper.dart';
+import '../../../../shared/chat/data/models/chat_model.dart';
+import '../../../../shared/chat/presentation/screens/chat_screen.dart';
 import '../../../events/presentation/dialogs/volunteer_event_details_bottom_sheet.dart';
 import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/shared/widgets/custom_button.dart';
@@ -25,14 +28,13 @@ class VolunteerMyEventsSection extends StatelessWidget {
     final secondaryColor = textColor.withValues(alpha: .6);
 
     final myEvents =
-    (cubit.home?.activeEvents ?? [])
-        .where(
-          (e) =>
-      e.joined &&
-          (e.status == 'ongoing' || e.status == 'upcoming'),
-    )
-        .toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
+        (cubit.home?.activeEvents ?? [])
+            .where(
+              (e) =>
+                  e.joined && (e.status == 'ongoing' || e.status == 'upcoming'),
+            )
+            .toList()
+          ..sort((a, b) => a.date.compareTo(b.date));
 
     return Column(
       children: [
@@ -66,9 +68,7 @@ class VolunteerMyEventsSection extends StatelessWidget {
 
             GestureDetector(
               onTap: () {
-                cubit.updateSelectedNavbarItem(
-                  VolunteerHomeNavbarItem.events,
-                );
+                cubit.updateSelectedNavbarItem(VolunteerHomeNavbarItem.events);
               },
               child: Row(
                 children: [
@@ -187,6 +187,16 @@ class VolunteerMyEventsSection extends StatelessWidget {
                 child: VolunteerEventsCard(
                   event: event,
 
+                  onChatTap: () {
+                    AppNavigator.push(
+                      ChatScreen(
+                        eventId: event.id,
+                        currentUserId: CacheHelper.get(CacheKeys.userId),
+                        event: event.toChatEvent(),
+                      ),
+                    );
+                  },
+
                   onDetailsTap: () {
                     AppNavigator.sheet(
                       VolunteerEventDetailsBottomSheet(
@@ -196,10 +206,9 @@ class VolunteerMyEventsSection extends StatelessWidget {
                             AppNavigator.dialog(
                               ConfirmDialog(
                                 title: 'volunteer.events.leave_title'.tr(),
-                                message: 'volunteer.events.leave_message'
+                                message: 'volunteer.events.leave_message'.tr(),
+                                confirmText: 'volunteer.events.leave_confirm'
                                     .tr(),
-                                confirmText:
-                                'volunteer.events.leave_confirm'.tr(),
                                 cancelText: 'core.cancel'.tr(),
                                 isDestructive: true,
                                 onConfirm: () {
@@ -223,8 +232,7 @@ class VolunteerMyEventsSection extends StatelessWidget {
                         ConfirmDialog(
                           title: 'volunteer.events.leave_title'.tr(),
                           message: 'volunteer.events.leave_message'.tr(),
-                          confirmText: 'volunteer.events.leave_confirm'
-                              .tr(),
+                          confirmText: 'volunteer.events.leave_confirm'.tr(),
                           cancelText: 'core.cancel'.tr(),
                           isDestructive: true,
                           onConfirm: () {
