@@ -4,9 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/shared/widgets/custom_search_field.dart';
 import '../../../../../core/style/app_colors.dart';
+import '../../../contact_us/presentation/screens/contact_us_screen.dart';
 import '../../data/models/faq_model.dart';
 import '../../data/repos/faq_repo.dart';
 import '../controllers/faq_cubit.dart';
@@ -57,55 +59,65 @@ class _FaqScreenState extends State<FaqScreen> {
 
     return Container(
       margin: AppSize.margin(bottom: 10),
-      decoration: BoxDecoration(
+      child: Material(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSize.getSize(14)),
-        border: Border.all(
-          color: theme.colorScheme.onSurface.withValues(alpha: .07),
-        ),
-      ),
-      child: Theme(
-        data: theme.copyWith(
-          dividerColor: Colors.transparent,
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-        ),
-        child: ExpansionTile(
-          initiallyExpanded: isExpanded,
-          onExpansionChanged: (value) {
-            if (value) {
-              _cubit.toggleFaq(index);
-            } else if (_cubit.expandedIndex == index) {
-              _cubit.toggleFaq(index);
-            }
-          },
-          tilePadding: AppSize.padding(horizontal: 15, vertical: 2),
-          childrenPadding: AppSize.padding(horizontal: 15, bottom: 15),
-          iconColor: theme.colorScheme.primary,
-          collapsedIconColor: theme.colorScheme.onSurface.withValues(alpha: .5),
-          title: Text(
-            faq.question,
-            style: TextStyle(
-              color: theme.colorScheme.onSurface,
-              fontSize: AppSize.font(14),
-              fontWeight: FontWeight.w600,
-              height: 1.4,
+        clipBehavior: Clip.antiAlias,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppSize.getSize(14)),
+            border: Border.all(
+              color: theme.colorScheme.onSurface.withValues(alpha: .07),
             ),
           ),
-          children: [
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: Text(
-                faq.answer,
+          child: Theme(
+            data: theme.copyWith(
+              dividerColor: Colors.transparent,
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+            ),
+            child: ExpansionTile(
+              initiallyExpanded: isExpanded,
+              onExpansionChanged: (value) {
+                if (value) {
+                  if (_cubit.expandedIndex != index) {
+                    _cubit.toggleFaq(index);
+                  }
+                } else if (_cubit.expandedIndex == index) {
+                  _cubit.toggleFaq(index);
+                }
+              },
+              tilePadding: AppSize.padding(horizontal: 15, vertical: 2),
+              childrenPadding: AppSize.padding(horizontal: 15, bottom: 15),
+              iconColor: theme.colorScheme.primary,
+              collapsedIconColor: theme.colorScheme.onSurface.withValues(
+                alpha: .5,
+              ),
+              title: Text(
+                faq.question,
                 style: TextStyle(
-                  color: theme.colorScheme.onSurface.withValues(alpha: .6),
-                  fontSize: AppSize.font(13),
-                  fontWeight: FontWeight.w400,
-                  height: 1.6,
+                  color: theme.colorScheme.onSurface,
+                  fontSize: AppSize.font(14),
+                  fontWeight: FontWeight.w600,
+                  height: 1.4,
                 ),
               ),
+              children: [
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    faq.answer,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface.withValues(alpha: .6),
+                      fontSize: AppSize.font(13),
+                      fontWeight: FontWeight.w400,
+                      height: 1.6,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -156,82 +168,85 @@ class _FaqScreenState extends State<FaqScreen> {
   Widget _contactSupport() {
     final theme = Theme.of(context);
 
-    return Container(
-      width: double.infinity,
-      padding: AppSize.padding(horizontal: 15, vertical: 15),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withValues(alpha: .07),
-        borderRadius: BorderRadius.circular(AppSize.getSize(15)),
-        border: Border.all(
-          color: theme.colorScheme.primary.withValues(alpha: .1),
+    return InkWell(
+      onTap: () => AppNavigator.push(const ContactUsScreen()),
+      child: Container(
+        width: double.infinity,
+        padding: AppSize.padding(horizontal: 15, vertical: 15),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primary.withValues(alpha: .07),
+          borderRadius: BorderRadius.circular(AppSize.getSize(15)),
+          border: Border.all(
+            color: theme.colorScheme.primary.withValues(alpha: .1),
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: AppSize.getSize(42),
-            height: AppSize.getSize(42),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: .1),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: CustomIcon(
-                icon: AppIcons.contactSupport,
-                color: theme.colorScheme.primary,
-                width: AppSize.getSize(20),
-                height: AppSize.getSize(20),
+        child: Row(
+          children: [
+            Container(
+              width: AppSize.getSize(42),
+              height: AppSize.getSize(42),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: .1),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: CustomIcon(
+                  icon: AppIcons.contactSupport,
+                  color: theme.colorScheme.primary,
+                  width: AppSize.getSize(20),
+                  height: AppSize.getSize(20),
+                ),
               ),
             ),
-          ),
 
-          SizedBox(width: AppSize.getWidth(12)),
+            SizedBox(width: AppSize.getWidth(12)),
 
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'shared.faq.still_need_help'.tr(),
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface,
-                    fontSize: AppSize.font(14),
-                    fontWeight: FontWeight.w600,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'shared.faq.still_need_help'.tr(),
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
+                      fontSize: AppSize.font(14),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
 
-                SizedBox(height: AppSize.getHeight(4)),
+                  SizedBox(height: AppSize.getHeight(4)),
 
-                Text(
-                  'shared.faq.contact_support_desc'.tr(),
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface.withValues(alpha: .5),
-                    fontSize: AppSize.font(12),
-                    height: 1.4,
+                  Text(
+                    'shared.faq.contact_support_desc'.tr(),
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface.withValues(alpha: .5),
+                      fontSize: AppSize.font(12),
+                      height: 1.4,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          SizedBox(width: AppSize.getWidth(5)),
-
-          InkWell(
-            borderRadius: BorderRadius.circular(100),
-            onTap: () {
-              // AppNavigator.push(const ContactSupportScreen());
-            },
-            child: Padding(
-              padding: AppSize.padding(horizontal: 5, vertical: 8),
-              child: CustomIcon(
-                icon: AppIcons.rightArrow,
-                color: theme.colorScheme.primary,
-                width: AppSize.getSize(20),
-                height: AppSize.getSize(20),
+                ],
               ),
             ),
-          ),
-        ],
+
+            SizedBox(width: AppSize.getWidth(5)),
+
+            InkWell(
+              borderRadius: BorderRadius.circular(100),
+              onTap: () {
+                // AppNavigator.push(const ContactSupportScreen());
+              },
+              child: Padding(
+                padding: AppSize.padding(horizontal: 5, vertical: 8),
+                child: CustomIcon(
+                  icon: AppIcons.rightArrow,
+                  color: theme.colorScheme.primary,
+                  width: AppSize.getSize(20),
+                  height: AppSize.getSize(20),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

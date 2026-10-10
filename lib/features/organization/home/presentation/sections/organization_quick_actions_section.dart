@@ -9,6 +9,7 @@ import '../../../../../core/style/app_colors.dart';
 import '../../../../shared/cases/data/repos/cases_repo.dart';
 import '../../../../shared/cases/presentation/controllers/case_cubit.dart';
 import '../../../../shared/cases/presentation/screens/submit_case_screen.dart';
+import '../../../../shared/emergency/presentation/screens/emergency_screen.dart';
 import '../controllers/organization_home_cubit.dart';
 
 class OrganizationQuickActionsSection extends StatelessWidget {
@@ -106,7 +107,7 @@ class OrganizationQuickActionsSection extends StatelessWidget {
               child: _buildActionCard(
                 context,
 
-                onTap: () {},
+                onTap: () => AppNavigator.push(EmergencyScreen(isOrg: true)),
 
                 icon: AppIcons.cases,
 

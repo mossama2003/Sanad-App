@@ -23,8 +23,7 @@ String DELETE_ACCOUNT = 'v1/users/profile/delete/';
 /// Skills
 String GET_SKILLS = 'v1/categories/select_category/';
 
-/// Both Volunteering and Organization
-
+/// SHARED Volunteering and Organization
 //EVENTS
 String GET_EVENTS = 'v1/events/read_event/';
 
@@ -51,6 +50,9 @@ String DELETE_CASE_COMMENT(int id) => 'v1/cases/case_comments/$id/';
 String DELETE_CASE(int id) => 'v1/cases/manage_case/$id/';
 
 String LIKE_CASE(int id) => 'v1/cases/like/$id/';
+
+//EMERGENCY
+String GET_EMERGENCY(bool me) => 'v1/emergency/read_emergency_case/?me=$me';
 
 /// Chat
 String GET_CHAT_TOKEN(int eventId) =>
@@ -90,6 +92,8 @@ String VOLUNTEER_HOME = 'v1/dashboard/home/volunteer/';
 
 String VOLUNTEER_COMMUNITIES = 'v1/events/read_event/';
 
+String JOIN_EMERGENCY = 'v1/emergency/join/';
+
 /// Organization Endpoints
 String CREATE_ORGANIZATION_EVENT = 'v1/events/manage_event/';
 
@@ -99,5 +103,15 @@ String DELETE_ORGANIZATION_EVENT(int ID) => 'v1/events/manage_event/$ID/';
 
 String ORGANIZATION_HOME = 'v1/dashboard/home/organization/';
 
+String CREATE_EMERGENCY = 'v1/emergency/manage_emergency_case/';
+
+String DELETE_EMERGENCY(int ID) => 'v1/emergency/manage_emergency_case/$ID/';
+
+String UPDATE_EMERGENCY(int id) => 'v1/emergency/manage_emergency_case/$id/';
+
 /// Support
 String FAQS = 'v1/portal/faq/';
+
+String CONTACT_US = 'v1/portal/contact_us/';
+
+String TERMS_CONDITIONS = 'v1/portal/terms/';

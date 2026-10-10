@@ -71,6 +71,7 @@ class AppIcons {
   static String creditCard = '$icons/credit-card.svg';
   static String share = '$icons/share.svg';
   static String emergency = '$icons/emergency.svg';
+  static String  siren = '$icons/siren.svg';
   static String completed = '$icons/completed.svg';
   static String star = '$icons/star.svg';
   static String starOutlined = '$icons/star_outlined.svg';
@@ -139,4 +140,5 @@ class AppIcons {
   static String snapchat = '$icons/snapchat.svg';
   static String twitter = '$icons/twitter.svg';
   static String idCard = '$icons/id-card.svg';
+  static String terms = '$icons/terms.svg';
 }

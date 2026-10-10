@@ -11,7 +11,7 @@ import '../../../events/data/models/organization_event_details_model.dart';
 import '../../../events/data/params/organization_event_update_param.dart';
 import '../../../events/data/repos/organization_events_repo.dart';
 import '../../../events/presentation/controllers/organization_events_cubit.dart';
-import '../../../events/presentation/screens/organization_event_form_screen.dart';
+import '../../../events/presentation/forms/organization_event_form.dart';
 import '../../../events/presentation/screens/organization_events_screen.dart';
 import '../../data/enums/organization_home_navbar_enum.dart';
 import '../../data/models/organization_home_model.dart';
@@ -317,7 +317,7 @@ class OrganizationHomeCubit extends Cubit<OrganizationHomeState> {
     AppNavigator.push(
       BlocProvider.value(
         value: eventsCubit,
-        child: OrganizationEventFormScreen(
+        child: OrganizationEventForm(
           event: event,
         ),
       ),

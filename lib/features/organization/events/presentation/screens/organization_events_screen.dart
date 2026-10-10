@@ -16,7 +16,7 @@ import '../dialogs/organization_publish_dialog.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../cards/organization_events_card.dart';
-import 'organization_event_form_screen.dart';
+import '../forms/organization_event_form.dart';
 import 'organization_qr_code_screen.dart';
 
 class OrganizationEventsScreen extends StatefulWidget {
@@ -71,7 +71,7 @@ class _OrganizationEventsScreenState extends State<OrganizationEventsScreen> {
     AppNavigator.push(
       BlocProvider.value(
         value: _cubit,
-        child: OrganizationEventFormScreen(event: event),
+        child: OrganizationEventForm(event: event),
       ),
     );
   }

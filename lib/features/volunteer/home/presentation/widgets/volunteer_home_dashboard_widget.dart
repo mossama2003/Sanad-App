@@ -1,15 +1,16 @@
 import 'dart:ui';
 
+import 'package:sanad_app/features/shared/emergency/presentation/screens/emergency_screen.dart';
 import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+import '../../../qr_check_in/presentation/screens/qr_check_in_screen.dart';
+import '../../../../../core/shared/controllers/user/app_cubit.dart';
+import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
-import '../../../../../core/helper/app_navigator.dart';
-import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../../qr_check_in/presentation/screens/qr_check_in_screen.dart';
 
 class VolunteerHomeDashboardWidget extends StatelessWidget {
   const VolunteerHomeDashboardWidget({super.key});
@@ -91,7 +92,9 @@ class VolunteerHomeDashboardWidget extends StatelessWidget {
                       SizedBox(width: AppSize.getWidth(10)),
                       Expanded(
                         child: CustomButton(
-                          icon: AppIcons.warning,
+                          onTap: () =>
+                              AppNavigator.push(EmergencyScreen(isOrg: false)),
+                          icon: AppIcons.siren,
                           iconSize: AppSize.getSize(20),
                           bgColor: AppColors.red,
                           textColor: AppColors.white,

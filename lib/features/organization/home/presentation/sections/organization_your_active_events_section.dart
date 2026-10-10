@@ -13,7 +13,7 @@ import '../../../../shared/chat/data/models/chat_model.dart';
 import '../../../../shared/chat/presentation/screens/chat_screen.dart';
 import '../../../events/presentation/cards/organization_events_card.dart';
 import '../../../events/presentation/dialogs/organization_publish_dialog.dart';
-import '../../../events/presentation/screens/organization_event_form_screen.dart';
+import '../../../events/presentation/forms/organization_event_form.dart';
 import '../../../events/presentation/screens/organization_qr_code_screen.dart';
 import '../../data/enums/organization_home_navbar_enum.dart';
 import '../controllers/organization_home_cubit.dart';
@@ -214,7 +214,7 @@ class OrganizationYourActiveEventsSection extends StatelessWidget {
                             BlocProvider.value(
                               value: cubit.eventsCubit,
 
-                              child: OrganizationEventFormScreen(event: event),
+                              child: OrganizationEventForm(event: event),
                             ),
                           );
                         },
@@ -227,7 +227,7 @@ class OrganizationYourActiveEventsSection extends StatelessWidget {
                       BlocProvider.value(
                         value: cubit.eventsCubit,
 
-                        child: OrganizationEventFormScreen(event: event),
+                        child: OrganizationEventForm(event: event),
                       ),
                     );
                   },
