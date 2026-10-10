@@ -19,6 +19,7 @@ extension AppLanguageExtension on AppLanguage {
     switch (this) {
       case AppLanguage.arabic:
         return const Locale('ar', 'EG');
+
       case AppLanguage.english:
         return const Locale('en', 'US');
     }
@@ -28,6 +29,7 @@ extension AppLanguageExtension on AppLanguage {
     switch (this) {
       case AppLanguage.arabic:
         return 'العربية';
+
       case AppLanguage.english:
         return 'English';
     }
@@ -38,48 +40,65 @@ class AppLocales {
   /// Current selected language
   static AppLanguage? currentLang;
 
-  /// List of supported languages
+  /// Supported languages
   static const supportedLanguages = AppLanguage.values;
 
-  /// Get current locale
+  /// Current locale
   static Locale get currentLocale {
-    return currentLang?.locale ?? AppLanguage.arabic.locale;
+    return currentLang?.locale ?? AppLanguage.english.locale;
   }
 
-  /// Get current language code
+  /// Current language code
   static String get currentLocaleCode {
-    return currentLang?.code ?? AppLanguage.arabic.code;
+    return currentLang?.code ?? AppLanguage.english.code;
   }
 
-  /// Get list of supported locales
+  /// Supported locales
   static List<Locale> get supportedLocales {
     return supportedLanguages.map((lang) => lang.locale).toList();
   }
 
-  /// Initialize locales by detecting device language or using cached language
+  /// Initialize language
   static Future<void> init() async {
-    final deviceLang = Intl.systemLocale.split('_')[0];
-    final cachedLangCode = await CacheHelper.get(CacheKeys.lang);
-    final defaultLang = _getLangEnumFromCode(deviceLang) ?? AppLanguage.arabic;
-    final selectedLang = _getLangEnumFromCode(cachedLangCode) ?? defaultLang;
+    // Get device language
+    final deviceLanguage = Intl.getCurrentLocale().split('_').first;
+
+    // Get cached language
+    final cachedLangCode = await CacheHelper.get(CacheKeys.lang) as String?;
+
+    // If user selected a language before, use it.
+    // Otherwise, use device language.
+    final selectedLang =
+        _getLangEnumFromCode(cachedLangCode) ??
+        _getLangEnumFromCode(deviceLanguage) ??
+        AppLanguage.english;
+
     currentLang = selectedLang;
+
+    // Save initial language if there is no cached language
     if (cachedLangCode == null) {
       await CacheHelper.save(CacheKeys.lang, selectedLang.code);
     }
   }
 
-  /// Change lang
-  static Future<void> changeLang(BuildContext ctx, AppLanguage lang) async {
+  /// Change language manually
+  static Future<void> changeLang(BuildContext context, AppLanguage lang) async {
     currentLang = lang;
-    await ctx.setLocale(lang.locale);
+
+    await context.setLocale(lang.locale);
+
     await CacheHelper.save(CacheKeys.lang, lang.code);
   }
 
-  /// Helper method to get `AppLanguageEnum` from code
+  /// Convert language code to enum
   static AppLanguage? _getLangEnumFromCode(String? code) {
-    return AppLanguage.values.firstWhere(
-      (lang) => lang.code == code,
-      orElse: () => AppLanguage.english,
+    if (code == null || code.isEmpty) {
+      return null;
+    }
+
+    return AppLanguage.values.cast<AppLanguage?>().firstWhere(
+      (lang) => lang?.code == code,
+      orElse: () => null,
     );
   }
 }

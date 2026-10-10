@@ -1,0 +1,1 @@
+enum NotificationEnums { badge, xp, urgentCase, event }

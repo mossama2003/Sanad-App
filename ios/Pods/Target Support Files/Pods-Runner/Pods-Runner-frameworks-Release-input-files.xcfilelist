@@ -1,0 +1,5 @@
+${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh
+${BUILT_PRODUCTS_DIR}/Ably/Ably.framework
+${BUILT_PRODUCTS_DIR}/AblyDeltaCodec/AblyDeltaCodec.framework
+${BUILT_PRODUCTS_DIR}/ably_flutter/ably_flutter.framework
+${BUILT_PRODUCTS_DIR}/msgpack/msgpack.framework

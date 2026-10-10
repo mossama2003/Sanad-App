@@ -1,16 +1,12 @@
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:open_file/open_file.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../features/auth/data/models/user_model.dart';
+import '../../features/shared/auth/data/models/user_model.dart';
 import '../network/local/cache/cache_helper.dart';
-import '../network/remote/api/dio_helper.dart';
-import '../shared/controllers/app/app_cubit.dart';
+import '../shared/controllers/user/app_cubit.dart';
 import 'app_navigator.dart';
 import 'app_toast.dart';
 
@@ -30,9 +26,6 @@ class AppHelper {
     return AppCubit.get(AppNavigator.context).user;
   }
 
-  static Future<void> getAuthUser() async {
-    await AppCubit.get(AppNavigator.context).getAuth();
-  }
 
   static Future<void> share(String text) async {
     await SharePlus.instance.share(ShareParams(text: text));
@@ -45,27 +38,26 @@ class AppHelper {
     }
   }
 
-
-  static Future<void> downloadAndOpenFile(String attachment) async {
-    try {
-      AppNavigator.push(
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Center(child: CircularProgressIndicator()),
-        ),
-      );
-      final tempDir = await getTemporaryDirectory();
-      final filePath = '${tempDir.path}/${attachment.split('/').last}';
-      final file = File(filePath);
-      final api = attachment;
-      await DioHelper.download(url: api, savePath: filePath);
-      await OpenFile.open(file.path);
-      AppNavigator.pop();
-    } catch (e) {
-      AppNavigator.pop();
-      AppToast.error('Error: $e');
-    }
-  }
+  // static Future<void> downloadAndOpenFile(String attachment) async {
+  //   try {
+  //     AppNavigator.push(
+  //       Scaffold(
+  //         backgroundColor: Colors.transparent,
+  //         body: Center(child: CircularProgressIndicator()),
+  //       ),
+  //     );
+  //     final tempDir = await getTemporaryDirectory();
+  //     final filePath = '${tempDir.path}/${attachment.split('/').last}';
+  //     final file = File(filePath);
+  //     final api = attachment;
+  //     await DioHelper.download(url: api, savePath: filePath);
+  //     await OpenFile.open(file.path);
+  //     AppNavigator.pop();
+  //   } catch (e) {
+  //     AppNavigator.pop();
+  //     AppToast.error('Error: $e');
+  //   }
+  // }
 
   static Future<DateTime?> pickDate({
     DateTime? min,
@@ -90,5 +82,64 @@ class AppHelper {
     DateTime parsedTime = DateTime.parse(time).toLocal();
     String formattedTime = DateFormat(format, lang).format(parsedTime);
     return formattedTime;
+  }
+
+  static String timeAgoShort(DateTime date) {
+    final now = DateTime.now();
+    final diff = now.difference(date);
+
+    // Future
+    if (diff.isNegative) {
+      final future = date.difference(now);
+
+      if (future.inMinutes < 1) {
+        return 'Just now';
+      }
+
+      if (future.inMinutes < 60) {
+        return 'in ${future.inMinutes} min';
+      }
+
+      if (future.inHours < 24) {
+        return 'in ${future.inHours} hr';
+      }
+
+      if (future.inDays < 30) {
+        return 'in ${future.inDays} day${future.inDays == 1 ? '' : 's'}';
+      }
+
+      if (future.inDays < 365) {
+        final months = (future.inDays / 30).floor();
+        return 'in $months month${months == 1 ? '' : 's'}';
+      }
+
+      final years = (future.inDays / 365).floor();
+      return 'in $years year${years == 1 ? '' : 's'}';
+    }
+
+    // Past
+    if (diff.inMinutes < 1) {
+      return 'Just now';
+    }
+
+    if (diff.inMinutes < 60) {
+      return '${diff.inMinutes} min ago';
+    }
+
+    if (diff.inHours < 24) {
+      return '${diff.inHours} hr ago';
+    }
+
+    if (diff.inDays < 30) {
+      return '${diff.inDays} day${diff.inDays == 1 ? '' : 's'} ago';
+    }
+
+    if (diff.inDays < 365) {
+      final months = (diff.inDays / 30).floor();
+      return '$months month${months == 1 ? '' : 's'} ago';
+    }
+
+    final years = (diff.inDays / 365).floor();
+    return '$years year${years == 1 ? '' : 's'} ago';
   }
 }

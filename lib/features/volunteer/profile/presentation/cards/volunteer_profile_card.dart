@@ -1,0 +1,311 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:sanad_app/core/constant/app_assets.dart';
+import 'package:sanad_app/core/helper/app_navigator.dart';
+import 'package:sanad_app/core/shared/widgets/custom_button.dart';
+import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
+
+import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/style/app_colors.dart';
+import '../../../../shared/auth/data/models/user_profile_model.dart';
+import '../../../edit_profile/presentations/screens/edit_vol_profile_screen.dart';
+
+class VolunteerProfileCard extends StatelessWidget {
+  final VolunteerProfileModel? profile;
+
+  const VolunteerProfileCard({super.key, required this.profile});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final cardColor = theme.colorScheme.surface;
+    final textColor = theme.colorScheme.onSurface;
+
+    final secondaryTextColor = isDark ? AppColors.grey400 : AppColors.grey500;
+
+    final itemBackground = isDark
+        ? AppColors.grey900.withValues(alpha: .25)
+        : AppColors.grey300.withValues(alpha: .2);
+
+    final languages = profile?.languages ?? [];
+    final skills = profile?.skills ?? [];
+
+    final items = [
+      {
+        'title': 'volunteer.profile.blood_type'.tr(),
+        'value': profile?.bloodGroup?.trim().isNotEmpty == true
+            ? profile!.bloodGroup!
+            : '-',
+        'icon': AppIcons.blood,
+      },
+      {
+        'title': 'volunteer.profile.profession'.tr(),
+        'value': profile?.profession?.trim().isNotEmpty == true
+            ? profile!.profession!
+            : '-',
+        'icon': AppIcons.business,
+      },
+      {
+        'title': 'volunteer.profile.own_vehicle'.tr(),
+        'value': profile?.ownVehicle == true
+            ? 'volunteer.profile.yes'.tr()
+            : 'volunteer.profile.no'.tr(),
+        'icon': AppIcons.car,
+      },
+      {
+        'title': 'volunteer.profile.exp'.tr(),
+        'value': '${profile?.emergencyExperience ?? 0}',
+        'icon': AppIcons.experience,
+      },
+    ];
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: textColor.withValues(alpha: .15), width: .7),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? .3 : .05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: AppSize.padding(all: 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'volunteer.profile.volunteer_profile'.tr(),
+            style: TextStyle(
+              color: textColor,
+              fontSize: AppSize.font(15),
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+
+          SizedBox(height: AppSize.getHeight(16)),
+
+          // Profile basic information
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: items.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: AppSize.getWidth(10),
+              mainAxisSpacing: AppSize.getHeight(10),
+              mainAxisExtent: AppSize.getHeight(62),
+            ),
+            itemBuilder: (context, index) {
+              final item = items[index];
+
+              return Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: itemBackground,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: AppSize.padding(vertical: 8, horizontal: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: AppSize.getWidth(30),
+                      height: AppSize.getHeight(30),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.primary.withValues(alpha: .1),
+                      ),
+                      child: Center(
+                        child: CustomIcon(
+                          icon: item['icon'] as String,
+                          width: AppSize.getWidth(18),
+                          height: AppSize.getHeight(18),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(width: AppSize.getWidth(8)),
+
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item['title'] as String,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: secondaryTextColor,
+                              fontWeight: FontWeight.w300,
+                              fontSize: AppSize.font(11),
+                              height: 1.1,
+                            ),
+                          ),
+
+                          SizedBox(height: AppSize.getHeight(3)),
+
+                          Text(
+                            item['value'] as String,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: AppSize.font(14),
+                              fontWeight: FontWeight.w600,
+                              height: 1.1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+
+          // Languages
+          if (languages.isNotEmpty) ...[
+            SizedBox(height: AppSize.getHeight(16)),
+
+            Row(
+              children: [
+                CustomIcon(
+                  icon: AppIcons.language,
+                  color: secondaryTextColor,
+                  width: AppSize.getSize(18),
+                  height: AppSize.getSize(18),
+                ),
+
+                SizedBox(width: AppSize.getWidth(5)),
+
+                Expanded(
+                  child: Text(
+                    'volunteer.profile.language'.tr(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: secondaryTextColor,
+                      fontSize: AppSize.font(13),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: AppSize.getHeight(10)),
+
+            Wrap(
+              spacing: AppSize.getWidth(5),
+              runSpacing: AppSize.getHeight(5),
+              children: languages.map((language) {
+                return _Tag(
+                  text: language,
+                  color: AppColors.primary,
+                  isDark: isDark,
+                );
+              }).toList(),
+            ),
+          ],
+
+          // Skills
+          if (skills.isNotEmpty) ...[
+            SizedBox(height: AppSize.getHeight(16)),
+
+            Row(
+              children: [
+                CustomIcon(
+                  icon: AppIcons.skills,
+                  color: secondaryTextColor,
+                  width: AppSize.getSize(14),
+                  height: AppSize.getSize(14),
+                ),
+
+                SizedBox(width: AppSize.getWidth(5)),
+
+                Expanded(
+                  child: Text(
+                    'volunteer.profile.skills_certifications'.tr(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: secondaryTextColor,
+                      fontSize: AppSize.font(13),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: AppSize.getHeight(10)),
+
+            Wrap(
+              spacing: AppSize.getWidth(5),
+              runSpacing: AppSize.getHeight(5),
+              children: skills.map((skill) {
+                return _Tag(
+                  text: skill,
+                  color: AppColors.laserBlue,
+                  isDark: isDark,
+                );
+              }).toList(),
+            ),
+          ],
+
+          SizedBox(height: AppSize.getHeight(16)),
+
+          // Edit button
+          CustomButton(
+            onTap: () {
+              AppNavigator.push(EditVolProfileScreen());
+            },
+            height: AppSize.getHeight(35),
+            bgColor: AppColors.primary.withValues(alpha: isDark ? .2 : .1),
+            title: 'volunteer.profile.edit_volunteer_profile'.tr(),
+            textColor: AppColors.primary,
+            textSize: AppSize.font(13),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Tag extends StatelessWidget {
+  final String text;
+  final Color color;
+  final bool isDark;
+
+  const _Tag({required this.text, required this.color, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: isDark ? .2 : .1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: AppSize.padding(vertical: 5, horizontal: 13),
+      child: Text(
+        text,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: color,
+          fontSize: AppSize.font(12),
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+}

@@ -1,0 +1,77 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+
+import '../../../../../core/constant/app_assets.dart';
+import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/style/app_colors.dart';
+import '../cards/donations_card.dart';
+import '../cards/donations_info_card.dart';
+
+class DonationsScreen extends StatelessWidget {
+  const DonationsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .7);
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: AppSize.padding(horizontal: 12, vertical: 15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'shared.donations.title'.tr(),
+              style: TextStyle(
+                fontSize: AppSize.font(22),
+                fontWeight: FontWeight.w700,
+                color: textColor,
+              ),
+            ),
+            SizedBox(height: AppSize.getHeight(3)),
+            Text(
+              'shared.donations.desc'.tr(),
+              style: TextStyle(
+                fontSize: AppSize.font(15),
+                fontWeight: FontWeight.w300,
+                color: secondaryColor,
+              ),
+            ),
+            SizedBox(height: AppSize.getHeight(15)),
+            Row(
+              children: [
+                Expanded(
+                  child: DonationsInfoCard(
+                    icon: AppIcons.donations,
+                    iconColor: AppColors.primary,
+                    iconBackgroundColor: AppColors.primary.withValues(
+                      alpha: 0.20,
+                    ),
+                    title: 'shared.donations_removed.EGP_12500'.tr(),
+                    subtitle: 'shared.donations.your_total_donations'.tr(),
+                  ),
+                ),
+                SizedBox(width: AppSize.getWidth(13)),
+                Expanded(
+                  child: DonationsInfoCard(
+                    icon: AppIcons.growthArrow,
+                    iconColor: AppColors.laserBlue,
+                    iconBackgroundColor: AppColors.laserBlue.withValues(
+                      alpha: 0.20,
+                    ),
+                    title: 'shared.donations_removed.8'.tr(),
+                    subtitle: 'shared.donations.campaigns_supported'.tr(),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: AppSize.getHeight(15)),
+            const DonationsCard(),
+          ],
+        ),
+      ),
+    );
+  }
+}

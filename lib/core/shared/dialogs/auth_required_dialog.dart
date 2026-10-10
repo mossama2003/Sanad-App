@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:shuaa_alamal/core/style/app_text_style.dart';
 
-import '../../../features/auth/presentation/sign_in/screens/sign_in_screen.dart';
 import '../../constant/app_size.dart';
-import '../../helper/app_navigator.dart';
 import '../../style/app_colors.dart';
+import '../../style/app_text_style.dart';
 import '../widgets/custom_button.dart';
 import 'custom_dialog.dart';
 
@@ -31,7 +29,7 @@ class AuthRequiredDialog extends StatelessWidget {
         SizedBox(height: AppSize.getHeight(32)),
         CustomButton(
           title: "auth_required.sign_in".tr(),
-          onTap: () => AppNavigator.push(const SignInScreen()),
+          // onTap: () => AppNavigator.push(const SignInScreen()),
         ),
       ],
     );

@@ -5,94 +5,176 @@ import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import '../../end_points.dart';
 import 'dio_interceptors.dart';
 
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+
 class DioHelper {
   static Dio? dio;
 
-  /// DIO INITIALIZATION
-  static void init() async {
+  static late CookieJar cookieJar;
+
+  static Future<void> init() async {
     dio = Dio(
       BaseOptions(
         baseUrl: BASE_URL,
         followRedirects: false,
         receiveDataWhenStatusError: true,
         validateStatus: (status) => status! < 500,
-        receiveTimeout: const Duration(seconds: 30),
         connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        sendTimeout: const Duration(seconds: 30),
+        maxRedirects: 5,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       ),
     );
-    dio!.interceptors.addAll([
-      AppInterceptors(dio!),
-      if (kDebugMode)
+
+    cookieJar = CookieJar();
+
+    dio!.interceptors.add(
+      CookieManager(cookieJar),
+    );
+
+    dio!.interceptors.add(
+      DioInterceptors(dio!),
+    );
+
+    if (kDebugMode) {
+      dio!.interceptors.add(
         PrettyDioLogger(
           error: true,
           request: true,
           requestBody: true,
           responseBody: true,
-          requestHeader: false,
-          responseHeader: false,
+          requestHeader: true,
+          responseHeader: true,
         ),
-    ]);
+      );
+    }
   }
 
-  static Future<Response> post({
-    Options? options,
-    FormData? formData,
-    required String endPoint,
-    Map<String, dynamic>? data,
-    Map<String, dynamic>? query,
-  }) async {
-    return dio!.post(
-      endPoint,
-      options: options,
-      queryParameters: query,
-      data: formData ?? data,
-    );
+  static String _buildUrl(
+      String url, {
+        bool useFullUrl = false,
+      }) {
+    if (useFullUrl) return url;
+
+    return '$BASE_URL$url';
   }
+
 
   static Future<Response> get({
-    Options? options,
-    required String endPoint,
+    required String url,
     Map<String, dynamic>? query,
-  }) async {
-    return dio!.get(endPoint, queryParameters: query, options: options);
-  }
-
-  static Future<Response> put({
+    Map<String, dynamic>? headers,
+    dynamic data,
     Options? options,
-    required String endPoint,
-    FormData? formData,
-    Map<String, dynamic>? data,
-    Map<String, dynamic>? query,
+    bool useFullUrl = false,
   }) async {
-    return dio!.put(
-      endPoint,
-      data: formData ?? data,
-      options: options,
+    return await dio!.get(
+      _buildUrl(
+        url,
+        useFullUrl: useFullUrl || url.startsWith('http'),
+      ),
       queryParameters: query,
+      data: data,
+      options: options ??
+          Options(
+            headers: headers,
+          ),
     );
   }
 
-  static Future<Response> delete({
-    Options? options,
-    required String endPoint,
+
+  static Future<Response> post({
+    required String url,
     Map<String, dynamic>? query,
+    Map<String, dynamic>? headers,
+    dynamic data,
+    Options? options,
+    bool useFullUrl = false,
   }) async {
-    return dio!.delete(endPoint, queryParameters: query, options: options);
+    return await dio!.post(
+      _buildUrl(
+        url,
+        useFullUrl: useFullUrl,
+      ),
+      data: data,
+      queryParameters: query,
+      options: options ??
+          Options(
+            headers: headers,
+          ),
+    );
   }
 
-  static Future<Response> download ({
+
+  static Future<Response> put({
     required String url,
-    required String savePath,
-    ProgressCallback? onReceiveProgress,
     Map<String, dynamic>? query,
+    Map<String, dynamic>? headers,
+    dynamic data,
     Options? options,
+    bool useFullUrl = false,
   }) async {
-    return dio!.download(
-      url,
-      savePath,
-      onReceiveProgress: onReceiveProgress,
+    return await dio!.put(
+      _buildUrl(
+        url,
+        useFullUrl: useFullUrl,
+      ),
+      data: data,
       queryParameters: query,
-      options: options,
+      options: options ??
+          Options(
+            headers: headers,
+          ),
+    );
+  }
+
+
+  static Future<Response> patch({
+    required String url,
+    Map<String, dynamic>? query,
+    Map<String, dynamic>? headers,
+    dynamic data,
+    Options? options,
+    bool useFullUrl = false,
+  }) async {
+    return await dio!.patch(
+      _buildUrl(
+        url,
+        useFullUrl: useFullUrl,
+      ),
+      data: data,
+      queryParameters: query,
+      options: options ??
+          Options(
+            headers: headers,
+          ),
+    );
+  }
+
+
+  static Future<Response> delete({
+    required String url,
+    Map<String, dynamic>? query,
+    Map<String, dynamic>? headers,
+    dynamic data,
+    Options? options,
+    bool useFullUrl = false,
+  }) async {
+    return await dio!.delete(
+      _buildUrl(
+        url,
+        useFullUrl: useFullUrl,
+      ),
+      data: data,
+      queryParameters: query,
+      options: options ??
+          Options(
+            headers: headers,
+          ),
     );
   }
 }

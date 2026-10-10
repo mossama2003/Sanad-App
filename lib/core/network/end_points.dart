@@ -1,59 +1,117 @@
-// ignore_for_file: constant_identifier_names
+// ignore_for_file: non_constant_identifier_names
 
-const BASE_URL = BASE_URL_DEMO;
-const BASE_URL_LIVE = 'https://shuaa-alamal-api.techiesonic.com';
-const BASE_URL_DEMO = 'https://shuaa-alamal-api.techiesonic.com';
+/// Production
+String BASE_URL = 'https://testapi.joinsanad.org/api/';
 
-const String API_V1 = '/api/v1';
-const String CLIENT = '/client';
+/// Auth
+String SIGN_UP = 'auth/registration/';
 
-const String REGISTER = '$API_V1$CLIENT/register';
+String SIGN_IN = 'auth/login/';
 
-const String LOGIN_EMAIL = '$API_V1/login';
-const String LOGIN_PHONE = '$API_V1/send-otp';
+String GET_USER = 'auth/user/';
 
-const String SOCIAL = '$API_V1/social';
+String REFRESH_TOKEN = 'auth/token/refresh/';
 
-const String SEND_PHONE_OTP = '$API_V1/phone-verify-send';
-const String VERIFY_PHONE_OTP = '$API_V1/otp-verify';
-const String RESEND_PHONE_OTP = '$API_V1/resend-otp';
+String LOG_OUT = 'auth/logout/';
 
-const String SEND_EMAIL_OTP = '$API_V1/email-verify-send';
-const String VERIFY_EMAIL_OTP = '$API_V1/email-verify';
+String UPDATE_ACCOUNT = 'auth/user/';
 
-const String FORGET_PASSWORD = '$API_V1/reset-password/send-code';
-const String FORGET_VERIFY = '$API_V1/reset-password/verify-code';
-const String RESET_PASSWORD = '$API_V1/reset-password';
+String UPDATE_PROFILE = 'v1/users/profile/update/';
 
-const String AUTH = '$API_V1/auth';
-const String USER = '$API_V1/user';
+String DELETE_ACCOUNT = 'v1/users/profile/delete/';
 
-const String DELETE_ACCOUNT = '$API_V1/delete-account';
+/// Skills
+String GET_SKILLS = 'v1/categories/select_category/';
 
-const String HOME = '$API_V1$CLIENT/home';
+/// SHARED Volunteering and Organization
+//EVENTS
+String GET_EVENTS = 'v1/events/read_event/';
 
-const String SPECIALTIES = '$API_V1$CLIENT/specialties';
+String EVENT_QR(int ID) => 'v1/events/read_event/$ID/';
 
-const String DOCTORS = '$API_V1$CLIENT/doctors';
+//CASES
+String CREATE_CASE = 'v1/cases/manage_case/';
 
-const String REVIEWS = '$API_V1$CLIENT/reviews';
+String UPDATE_CASE(int id) => 'v1/cases/manage_case/$id/';
 
-const String FAVORITES = '$API_V1$CLIENT/favorites';
+String GET_CASES(bool me) => 'v1/cases/read_case/?me=$me';
 
-const String SEARCH = '$API_V1$CLIENT/search';
+String GET_CASE_COMMENTS(int caseId) => 'v1/cases/case_comments/?case=$caseId';
 
-const String APPOINTMENTS = '$API_V1$CLIENT/appointments';
-const String APPOINTMENTS_TYPES = '$API_V1$CLIENT/appointment-types';
+String ADD_CASE_COMMENT = 'v1/cases/case_comments/';
 
-const String TIME_SLOTS = 'available-slots';
+String GET_CASE_CHAT_TOKEN(int caseId) =>
+    'v1/cases/read_case/$caseId/chat_token/';
 
-const String MEDICAL_DOCUMENTS = '$API_V1$CLIENT/medical-documents';
+String EDIT_CASE_COMMENT(int id) => 'v1/cases/case_comments/$id/';
 
-const String MEDICAL_RECORDS = '$API_V1$CLIENT/medical-records';
+String DELETE_CASE_COMMENT(int id) => 'v1/cases/case_comments/$id/';
 
-const String LEGAL = '$API_V1/legals';
-const String CONTACT_US = '$API_V1/contact-us';
+String DELETE_CASE(int id) => 'v1/cases/manage_case/$id/';
 
-const String NOTIFICATIONS = '$API_V1$CLIENT/notifications';
-const String READ_NOTIFICATION = '$NOTIFICATIONS/mark-read';
-const String NOTIFICATION_SETTINGS = '$NOTIFICATIONS/setting';
+String LIKE_CASE(int id) => 'v1/cases/like/$id/';
+
+//EMERGENCY
+String GET_EMERGENCY(bool me) => 'v1/emergency/read_emergency_case/?me=$me';
+
+/// Chat
+String GET_CHAT_TOKEN(int eventId) =>
+    'v1/events/read_event/$eventId/chat_token/';
+
+String GET_CHAT_HISTORY = 'v1/events/event_chat/';
+
+String SEND_CHAT_MESSAGE = 'v1/events/event_chat/';
+
+String EVENT_MEMBER_BATCH_UPDATE(int eventId) =>
+    'v1/events/event_member_batch_update/$eventId/';
+
+String EDIT_MESSAGE(int messageId) => 'v1/events/event_chat/$messageId/';
+
+String DELETE_MESSAGE = 'v1/events/event_chat/batch_delete/';
+
+String EVENT_MEMBERS = 'v1/events/read_event_member/';
+
+String MANAGE_EVENT_MEMBER(int id) => 'v1/events/manage_event_member/$id/';
+
+String LEAVE_EVENT_CHAT = 'v1/events/leave/';
+
+String REPORT_EVENT_CHAT = 'v1/events/event_report/';
+
+String SEARCH_CHAT_MESSAGES = 'v1/events/event_chat/search/';
+
+String SEARCH_CHAT_CONTEXT = 'v1/events/event_chat/search_context/';
+
+/// Volunteering Endpoints
+String JOIN_EVENT = 'v1/events/join/';
+
+String LEAVE_EVENT = 'v1/events/leave/';
+
+String SCAN_QR = 'v1/events/scan/';
+
+String VOLUNTEER_HOME = 'v1/dashboard/home/volunteer/';
+
+String VOLUNTEER_COMMUNITIES = 'v1/events/read_event/';
+
+String JOIN_EMERGENCY = 'v1/emergency/join/';
+
+/// Organization Endpoints
+String CREATE_ORGANIZATION_EVENT = 'v1/events/manage_event/';
+
+String UPDATE_ORGANIZATION_EVENT(int ID) => 'v1/events/manage_event/$ID/';
+
+String DELETE_ORGANIZATION_EVENT(int ID) => 'v1/events/manage_event/$ID/';
+
+String ORGANIZATION_HOME = 'v1/dashboard/home/organization/';
+
+String CREATE_EMERGENCY = 'v1/emergency/manage_emergency_case/';
+
+String DELETE_EMERGENCY(int ID) => 'v1/emergency/manage_emergency_case/$ID/';
+
+String UPDATE_EMERGENCY(int id) => 'v1/emergency/manage_emergency_case/$id/';
+
+/// Support
+String FAQS = 'v1/portal/faq/';
+
+String CONTACT_US = 'v1/portal/contact_us/';
+
+String TERMS_CONDITIONS = 'v1/portal/terms/';

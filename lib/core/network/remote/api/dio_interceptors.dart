@@ -1,32 +1,75 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 
-import '../../../helper/app_locals.dart';
+import '../../end_points.dart';
 import '../../local/cache/cache_helper.dart';
 
 /// An interceptor that handles the error responses from a [DIO] request.
-class AppInterceptors extends Interceptor {
+class DioInterceptors extends Interceptor {
   final Dio dio;
 
-  AppInterceptors(this.dio);
+  DioInterceptors(this.dio);
 
-  /// On [REQUEST] API
   @override
   Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final String? token = await CacheHelper.get(CacheKeys.token);
-    options.headers.addAll({
-      'Accept': 'application/json',
-      'Accept-Language': AppLocales.currentLocaleCode,
-      if (token != null) 'Authorization': 'Bearer $token',
-    });
+    final String? lang = CacheHelper.get(CacheKeys.lang);
+
+    final String? accessToken = CacheHelper.get(CacheKeys.accessToken);
+
+    debugPrint("TOKEN FROM CACHE => $accessToken");
+    debugPrint("PROFILE ID FROM CACHE => ${CacheHelper.get(CacheKeys.profileId)}");
+    debugPrint("USER ID FROM CACHE => ${CacheHelper.get(CacheKeys.userId)}");
+
+    if (lang != null && lang.isNotEmpty) {
+      options.headers['lang'] = lang;
+    }
+
+    if (accessToken != null && accessToken.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $accessToken';
+    }
+
     return handler.next(options);
   }
 
-  /// On [RESPONSE] API
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) async {
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
     return handler.next(response);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    if (err.response?.statusCode == 401 || err.response?.statusCode == 403) {
+      final refreshToken = CacheHelper.get(CacheKeys.refreshToken);
+
+      if (refreshToken != null) {
+        try {
+          final response = await dio.post(
+            REFRESH_TOKEN,
+            data: {"refresh": refreshToken},
+          );
+
+          if (response.statusCode == 200) {
+            final newAccessToken = response.data['access'];
+
+            await CacheHelper.save(CacheKeys.accessToken, newAccessToken);
+
+            final options = err.requestOptions;
+
+            options.headers['Authorization'] = 'Bearer $newAccessToken';
+
+            final retryResponse = await dio.fetch(options);
+
+            return handler.resolve(retryResponse);
+          }
+        } catch (e) {
+          debugPrint("REFRESH TOKEN ERROR => $e");
+        }
+      }
+    }
+
+    return handler.next(err);
   }
 }

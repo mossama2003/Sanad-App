@@ -1,80 +1,132 @@
+import 'package:sanad_app/features/volunteer/community/presentation/controllers/volunteer_community_cubit.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'features/organization/home/presentation/controllers/organization_home_cubit.dart';
+import 'features/volunteer/events/presentation/controllers/volunteer_events_cubit.dart';
+import 'features/volunteer/home/presentation/controllers/volunteer_home_cubit.dart';
+import 'features/volunteer/community/data/repos/volunteer_community_repo.dart';
+import 'features/organization/home/data/repos/organization_home_repo.dart';
+import 'features/shared/splash/presentations/screens/splash_screen.dart';
+import 'features/volunteer/events/data/repos/volunteer_events_repo.dart';
+import 'features/volunteer/home/data/repos/volunteer_home_repo.dart';
+import 'core/shared/controllers/user/app_cubit.dart';
+import 'core/network/local/cache/cache_helper.dart';
+import 'core/network/remote/api/dio_helper.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'core/storage/hive/hive_init.dart';
+import 'core/helper/app_navigator.dart';
+import 'core/helper/app_helper.dart';
+import 'core/helper/app_locals.dart';
+import 'core/style/app_theme.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  /// HIVE INITIALIZATION
+  await HiveInit.init();
+
+  /// SHARED PREFERENCE INITIALIZATION
+  await CacheHelper.init();
+
+  /// THEME INIT
+  await AppTheme.init();
+
+  /// LANGUAGE INIT
+  await EasyLocalization.ensureInitialized();
+
+  await initializeDateFormatting('ar');
+  await initializeDateFormatting('en');
+
+  await AppLocales.init();
+
+  /// DIO INITIALIZATION
+  await DioHelper.init();
+
+  /// DISABLE AUTO ROTATE
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  runApp(
+    EasyLocalization(
+      path: 'assets/translations',
+      startLocale: AppLocales.currentLocale,
+      fallbackLocale: AppLanguage.english.locale,
+      supportedLocales: AppLocales.supportedLocales,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
+    return ValueListenableBuilder<AppThemeEnum>(
+      valueListenable: AppTheme.themeNotifier,
+      builder: (context, currentTheme, _) {
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (_) => AppCubit()),
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+            BlocProvider(
+              create: (_) => VolunteerHomeCubit(VolunteerHomeRepoImpel()),
+            ),
 
-  final String title;
+            BlocProvider(
+              create: (_) => VolunteerEventsCubit(VolunteerEventsRepoImpel())
+                ..loadEventsFromCache()
+                ..getVolunteerEvents(),
+            ),
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
+            BlocProvider(
+              create: (_) => OrganizationHomeCubit(OrganizationHomeRepoImpel()),
+            ),
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            BlocProvider(
+              create: (_) =>
+                  VolunteerCommunityCubit(VolunteerCommunityRepoImpel()),
             ),
           ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+          child: GestureDetector(
+            onTap: AppHelper.closeKeyboard,
+            child: MaterialApp(
+              title: 'Sanad',
+              theme: AppTheme.light,
+              darkTheme: AppTheme.dark,
+              themeMode: currentTheme.mode,
+              home: SplashScreen(),
+              locale: context.locale,
+              supportedLocales: context.supportedLocales,
+              localizationsDelegates: context.localizationDelegates,
+              navigatorKey: AppNavigator.key,
+              debugShowCheckedModeBanner: false,
+              builder: (context, child) {
+                return ScrollConfiguration(
+                  behavior: AppBehavior(),
+                  child: child!,
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
+  }
+}
+
+class AppBehavior extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
   }
 }
