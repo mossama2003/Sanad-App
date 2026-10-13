@@ -30,7 +30,6 @@ class OrganizationQuickActionsSection extends StatelessWidget {
       children: [
         Text(
           'organization.home.quick_actions.title'.tr(),
-
           style: TextStyle(
             fontSize: AppSize.font(18),
             fontWeight: FontWeight.w600,
@@ -40,64 +39,48 @@ class OrganizationQuickActionsSection extends StatelessWidget {
 
         SizedBox(height: AppSize.getHeight(12)),
 
+        // First row: two actions
         Row(
           children: [
             Expanded(
               child: _buildActionCard(
                 context,
-
                 onTap: () {
                   OrganizationHomeCubit.get(context).openEventForm(null);
                 },
-
                 icon: AppIcons.events,
-
                 iconColor: AppColors.white,
-
                 bgColor: AppColors.primary,
-
                 label: 'organization.home.quick_actions.create_event'.tr(),
               ),
             ),
 
-            SizedBox(width: AppSize.getWidth(12)),
-
-            Expanded(
-              child: _buildActionCard(
-                context,
-
-                onTap: () {},
-
-                icon: AppIcons.donations,
-
-                iconColor: AppColors.white,
-
-                bgColor: AppColors.brand600,
-
-                label: 'organization.home.quick_actions.donation_campaign'.tr(),
-              ),
-            ),
+            // Expanded(
+            //   child: _buildActionCard(
+            //     context,
+            //     onTap: () {},
+            //     icon: AppIcons.donations,
+            //     iconColor: AppColors.white,
+            //     bgColor: AppColors.brand600,
+            //     label: 'organization.home.quick_actions.donation_campaign'.tr(),
+            //   ),
+            // ),
           ],
         ),
 
         SizedBox(height: AppSize.getHeight(12)),
 
+        // Second row: emergency and create case
         Row(
           children: [
             Expanded(
               child: _buildActionCard(
                 context,
-
-                onTap: () => _openCreateCase(context),
-                // 👈 تعديل هنا
-
-                icon: AppIcons.file,
-
+                onTap: () => AppNavigator.push(EmergencyScreen(isOrg: true)),
+                icon: AppIcons.cases,
                 iconColor: AppColors.white,
-
-                bgColor: AppColors.gold,
-
-                label: 'organization.home.quick_actions.create_case'.tr(),
+                bgColor: AppColors.red,
+                label: 'organization.home.quick_actions.emergencies'.tr(),
               ),
             ),
 
@@ -106,16 +89,11 @@ class OrganizationQuickActionsSection extends StatelessWidget {
             Expanded(
               child: _buildActionCard(
                 context,
-
-                onTap: () => AppNavigator.push(EmergencyScreen(isOrg: true)),
-
-                icon: AppIcons.cases,
-
+                onTap: () => _openCreateCase(context),
+                icon: AppIcons.file,
                 iconColor: AppColors.white,
-
-                bgColor: AppColors.red,
-
-                label: 'organization.home.quick_actions.emergencies'.tr(),
+                bgColor: AppColors.gold,
+                label: 'organization.home.quick_actions.create_case'.tr(),
               ),
             ),
           ],

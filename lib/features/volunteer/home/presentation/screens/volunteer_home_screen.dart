@@ -3,8 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/constant/app_assets.dart';
+import '../../../../../core/helper/app_count_up_text.dart';
 import '../../../../../core/helper/app_number_formatter.dart';
-import '../../../../shared/badges/presentation/screens/badges_screen.dart';
+import '../../../badges/presentation/screens/badges_screen.dart';
 import '../../../rewards/presentation/screens/rewards_screen.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/helper/app_navigator.dart';
@@ -57,7 +58,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                     children: [
                       GestureDetector(
                         onTap: () =>
-                            AppNavigator.push(VolunteerRewardsScreen()),
+                            AppNavigator.push(RewardsScreen()),
                         child: _buildStatCard(
                           bgColor: AppColors.sportyViolet.withValues(
                             alpha: 0.2,
@@ -75,7 +76,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
 
                       GestureDetector(
                         onTap: () =>
-                            AppNavigator.push(VolunteerRewardsScreen()),
+                            AppNavigator.push(RewardsScreen()),
                         child: _buildStatCard(
                           bgColor: AppColors.brand600.withValues(alpha: 0.2),
                           bgIconColor: AppColors.brand600.withValues(
@@ -130,6 +131,8 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
     required Color bgIconColor,
     required Color iconColor,
   }) {
+    final numericValue = int.tryParse(value);
+
     return Container(
       width: AppSize.getWidth(110),
       padding: AppSize.padding(all: 15),
@@ -156,14 +159,25 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
 
           SizedBox(height: AppSize.getHeight(5)),
 
-          Text(
-            value,
-            style: TextStyle(
-              color: titleColor,
-              fontSize: AppSize.font(20),
-              fontWeight: FontWeight.bold,
+          if (numericValue != null)
+            AppCountUpText(
+              value: numericValue,
+              duration: const Duration(milliseconds: 350),
+              style: TextStyle(
+                color: titleColor,
+                fontSize: AppSize.font(20),
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          else
+            Text(
+              value,
+              style: TextStyle(
+                color: titleColor,
+                fontSize: AppSize.font(20),
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
 
           SizedBox(height: AppSize.getHeight(5)),
 

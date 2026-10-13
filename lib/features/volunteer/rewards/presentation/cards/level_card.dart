@@ -4,6 +4,7 @@ import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/helper/app_count_up_text.dart';
 import '../../../../../core/style/app_colors.dart';
 
 class LevelCard extends StatelessWidget {
@@ -27,11 +28,7 @@ class LevelCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF7B2FBE),
-            Color(0xFF4A90D9),
-            Color(0xFF2ECFA0),
-          ],
+          colors: [Color(0xFF7B2FBE), Color(0xFF4A90D9), Color(0xFF2ECFA0)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -80,10 +77,7 @@ class LevelCard extends StatelessWidget {
               ),
               const Spacer(),
               Container(
-                padding: AppSize.padding(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
+                padding: AppSize.padding(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.white.withValues(alpha: .25),
                   borderRadius: BorderRadius.circular(20),
@@ -100,13 +94,17 @@ class LevelCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: AppSize.getHeight(20)),
+          // XP الحالي والحد المطلوب للمستوى التالي
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '$currentXp XP',
+              AppCountUpText(
+                value: currentXp,
+                suffix: ' XP',
+                duration: const Duration(milliseconds: 1400),
                 style: TextStyle(
                   fontSize: AppSize.font(12),
+                  fontWeight: FontWeight.w700,
                   color: AppColors.white,
                 ),
               ),
@@ -119,22 +117,35 @@ class LevelCard extends StatelessWidget {
               ),
             ],
           ),
+
           SizedBox(height: AppSize.getHeight(8)),
+
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: AppColors.white.withValues(alpha: .3),
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                AppColors.gold,
-              ),
-              minHeight: 8,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0, end: progress),
+              duration: const Duration(milliseconds: 1500),
+              curve: Curves.easeOutCubic,
+              builder: (context, animatedProgress, child) {
+                return LinearProgressIndicator(
+                  value: animatedProgress,
+                  backgroundColor: AppColors.white.withValues(alpha: .3),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    AppColors.gold,
+                  ),
+                  minHeight: 8,
+                );
+              },
             ),
           ),
+
           SizedBox(height: AppSize.getHeight(8)),
+
           Center(
-            child: Text(
-              '$remaining XP to Level ${level + 1}',
+            child: AppCountUpText(
+              value: remaining,
+              suffix: ' XP to Level ${level + 1}',
+              duration: const Duration(milliseconds: 1400),
               style: TextStyle(
                 fontSize: AppSize.font(12),
                 color: AppColors.white,

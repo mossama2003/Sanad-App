@@ -138,7 +138,9 @@ class _XpActivityRow extends StatelessWidget {
                 ),
                 SizedBox(height: AppSize.getHeight(2)),
                 Text(
-                  activity.time,
+                  activity.createdAt,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: AppSize.font(12),
                     color: secondaryColor,

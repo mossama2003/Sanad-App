@@ -199,18 +199,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsGroupCard(
                 title: 'shared.settings.preferences'.tr(),
                 children: [
-                  SettingsTile(
-                    icon: AppIcons.lock,
-                    title: 'shared.settings.privacy_settings'.tr(),
-                    trailing: _arrowIcon(),
-                  ),
-                  SizedBox(height: AppSize.getHeight(10)),
-                  SettingsTile(
-                    icon: AppIcons.privacyPolicy,
-                    title: 'shared.settings.security_settings'.tr(),
-                    trailing: _arrowIcon(),
-                  ),
-                  SizedBox(height: AppSize.getHeight(10)),
+                  // SettingsTile(
+                  //   icon: AppIcons.lock,
+                  //   title: 'shared.settings.privacy_settings'.tr(),
+                  //   trailing: _arrowIcon(),
+                  // ),
+                  // SizedBox(height: AppSize.getHeight(10)),
+                  // SettingsTile(
+                  //   icon: AppIcons.privacyPolicy,
+                  //   title: 'shared.settings.security_settings'.tr(),
+                  //   trailing: _arrowIcon(),
+                  // ),
+                  // SizedBox(height: AppSize.getHeight(10)),
                   SettingsTile(
                     icon: AppIcons.earth,
                     title: 'shared.settings.language'.tr(),

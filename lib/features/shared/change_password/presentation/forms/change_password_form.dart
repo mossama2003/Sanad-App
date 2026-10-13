@@ -209,7 +209,7 @@ class ChangePasswordForm extends StatelessWidget {
                   loading: isLoading,
                   enable: cubit.isFormValid && !isLoading,
                   bgColor: AppColors.primary,
-                  textColor: Colors.white,
+                  textColor: AppColors.white,
                   onTap: cubit.submitChangePassword,
                 ),
               ),

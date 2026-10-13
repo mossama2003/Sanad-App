@@ -20,24 +20,6 @@ class CasesScreen extends StatelessWidget {
   const CasesScreen({super.key, required this.casesCubit, required this.isOrg});
 
   // ============================================================
-  // Create
-  // ============================================================
-
-  Future<void> _createCase(BuildContext context) async {
-    await AppNavigator.push(
-      BlocProvider.value(
-        value: casesCubit,
-        child: SubmitCaseScreen(casesCubit: casesCubit),
-      ),
-    );
-
-    if (!context.mounted) return;
-
-    // Refresh the currently selected tab after returning.
-    await casesCubit.getCases(me: casesCubit.isMySelected);
-  }
-
-  // ============================================================
   // Delete
   // ============================================================
 

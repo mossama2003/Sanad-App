@@ -65,69 +65,6 @@ class _OrganizationEmergencyFormState extends State<OrganizationEmergencyForm> {
     }
   }
 
-  void _fillFormForEditing() {
-    final emergency = widget.emergency;
-
-    if (emergency == null) return;
-
-    cubit.titleController.text = emergency.name;
-    cubit.descriptionController.text = emergency.description;
-    cubit.volunteersController.text = emergency.volunteers.toString();
-    cubit.contactController.text = cubit.normalizeEgyptianPhone(
-      emergency.contactPhone,
-    );
-
-    cubit.selectedCategory.value = cubit.categories.contains(emergency.category)
-        ? emergency.category
-        : 'other';
-
-    cubit.selectedUrgency.value =
-        cubit.urgencyLevels.contains(emergency.urgency)
-        ? emergency.urgency
-        : 'medium';
-
-    cubit.selectedSkills
-      ..clear()
-      ..addAll(emergency.skills.where((skill) => cubit.skills.contains(skill)));
-
-    cubit.certificationsController.text = emergency.certifications.join(', ');
-
-    final location = emergency.location;
-
-    if (location != null) {
-      cubit.locationController.text = location.description;
-
-      final coordinates = emergency.coordinates;
-
-      if (coordinates is Map) {
-        cubit.latitude = double.tryParse(
-          '${coordinates['latitude'] ?? coordinates['lat'] ?? ''}',
-        );
-
-        cubit.longitude = double.tryParse(
-          '${coordinates['longitude'] ?? coordinates['lng'] ?? ''}',
-        );
-      }
-    }
-
-    final bloodType = emergency.bloodType;
-
-    cubit.selectedBloodType.value =
-        bloodType != null && cubit.bloodTypes.contains(bloodType)
-        ? bloodType
-        : 'Any';
-
-    cubit.existingPhotos
-      ..clear()
-      ..addAll(emergency.attachments.where((attachment) => attachment.isImage));
-
-    cubit.existingDocuments
-      ..clear()
-      ..addAll(
-        emergency.attachments.where((attachment) => !attachment.isImage),
-      );
-  }
-
   // ============================================================
   // Limit Message
   // ============================================================

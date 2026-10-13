@@ -2,7 +2,7 @@
   "core": {
     "no_content": "No content",
     "search": "Search",
-    "error_title": "Something Went Wrong",
+    "error_title": "Something Went Wrong, Please Try Again",
     "error_desc": "An unexpected error occurred. Please try again or contact support if the issue persists.",
     "reload": "Reload",
     "yes": "Yes",

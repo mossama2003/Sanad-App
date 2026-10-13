@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/helper/app_count_up_text.dart';
 import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
@@ -468,8 +469,10 @@ class OrganizationProfileScreen extends StatelessWidget {
     String label,
   ) {
     final theme = Theme.of(context);
-
     final isDark = theme.brightness == Brightness.dark;
+
+    // Parse numeric values to enable count-up animation.
+    final numericValue = int.tryParse(value);
 
     return Container(
       padding: AppSize.padding(all: 16),
@@ -505,14 +508,25 @@ class OrganizationProfileScreen extends StatelessWidget {
 
           SizedBox(height: AppSize.getHeight(10)),
 
-          Text(
-            value,
-            style: TextStyle(
-              color: theme.colorScheme.onSurface,
-              fontSize: AppSize.font(18),
-              fontWeight: FontWeight.bold,
+          if (numericValue != null)
+            AppCountUpText(
+              value: numericValue,
+              duration: const Duration(milliseconds: 350),
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontSize: AppSize.font(18),
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          else
+            Text(
+              value,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontSize: AppSize.font(18),
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
 
           SizedBox(height: AppSize.getHeight(2)),
 

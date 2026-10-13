@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sanad_app/core/constant/app_size.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
 
+import '../../../../../core/helper/app_count_up_text.dart';
+
 class StatCard extends StatelessWidget {
   final String icon;
   final Color iconColor;
@@ -26,11 +28,17 @@ class StatCard extends StatelessWidget {
     final cardColor = theme.colorScheme.surface;
     final textColor = theme.colorScheme.onSurface;
 
+    // Parse the numeric value while preserving compact values and text.
+    final numericValue = int.tryParse(value);
+
     return Container(
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: textColor.withValues(alpha: .15), width: .7),
+        border: Border.all(
+          color: textColor.withValues(alpha: .15),
+          width: .7,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? .3 : .05),
@@ -51,21 +59,32 @@ class StatCard extends StatelessWidget {
             height: AppSize.getHeight(26),
           ),
 
-          Text(
-            value,
-            style: TextStyle(
-              color: textColor,
-              fontSize: smallValue ? AppSize.font(19) : AppSize.font(22),
-              fontWeight: FontWeight.w800,
-              letterSpacing: -.5,
+          if (numericValue != null)
+            AppCountUpText(
+              value: numericValue,
+              duration: const Duration(milliseconds: 700),
+              style: TextStyle(
+                color: textColor,
+                fontSize: smallValue ? AppSize.font(19) : AppSize.font(22),
+                fontWeight: FontWeight.w800,
+                letterSpacing: -.5,
+              ),
+            )
+          else
+            Text(
+              value,
+              style: TextStyle(
+                color: textColor,
+                fontSize: smallValue ? AppSize.font(19) : AppSize.font(22),
+                fontWeight: FontWeight.w800,
+                letterSpacing: -.5,
+              ),
             ),
-          ),
+
           Text(
             label,
             style: TextStyle(
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: .5),
+              color: theme.colorScheme.onSurface.withValues(alpha: .5),
               fontSize: AppSize.font(12),
               fontWeight: FontWeight.w600,
             ),

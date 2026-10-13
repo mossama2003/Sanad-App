@@ -54,6 +54,8 @@ class VolunteerProfileScreen extends StatelessWidget {
             ? user!.profile as VolunteerProfileModel
             : null;
 
+        final level = profile?.level ?? cubit.volunteerLevel;
+
         final location = [
           profile?.city,
           profile?.state,
@@ -74,54 +76,59 @@ class VolunteerProfileScreen extends StatelessWidget {
               child: Column(
                 children: [
                   AvatarCard(
-                    name: '${user?.name ?? ''} ${user?.lastName ?? ''}',
+                    name: '${user?.name ?? ''} ${user?.lastName ?? ''}'.trim(),
                     location: location,
                     createdAt: profile?.created,
                     image: user?.avatar,
-                    level: 'volunteer.profile.level'.tr(),
+                    level: level?.name ?? 'volunteer.profile.level'.tr(),
                   ),
 
                   SizedBox(height: AppSize.getHeight(24)),
 
                   GestureDetector(
                     onTap: () =>
-                        AppNavigator.push(const VolunteerRewardsScreen()),
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                      childAspectRatio: 1.50,
+                        AppNavigator.push(const RewardsScreen()),
+                    child: Column(
                       children: [
-                        StatCard(
-                          icon: AppIcons.voltage,
-                          iconColor: const Color(0xFF7B5EA7),
-                          value: (profile?.xp ?? 0).compact,
-                          label: 'volunteer.profile.xp'.tr(),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: StatCard(
+                                icon: AppIcons.voltage,
+                                iconColor: const Color(0xFF7B5EA7),
+                                value: (profile?.xp ?? 0).compact,
+                                label: 'volunteer.profile.xp'.tr(),
+                              ),
+                            ),
+                            SizedBox(width: AppSize.getWidth(10)),
+                            Expanded(
+                              child: StatCard(
+                                icon: AppIcons.fire,
+                                iconColor: const Color(0xFFFF6B35),
+                                value: (profile?.streak ?? 0).compact,
+                                label: 'volunteer.profile.streak'.tr(),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: AppSize.getWidth(16)),
+                        SizedBox(
+                          width: double.infinity,
+                          child: StatCard(
+                            icon: AppIcons.calendar,
+                            iconColor: const Color(0xFF2ECFA0),
+                            value: '0',
+                            label: 'volunteer.profile.attended'.tr(),
+                          ),
                         ),
 
-                        StatCard(
-                          icon: AppIcons.fire,
-                          iconColor: const Color(0xFFFF6B35),
-                          value: (profile?.streak ?? 0).compact,
-                          label: 'volunteer.profile.streak'.tr(),
-                        ),
-
-                        StatCard(
-                          icon: AppIcons.calendar,
-                          iconColor: const Color(0xFF2ECFA0),
-                          value: '0',
-                          label: 'volunteer.profile.attended'.tr(),
-                        ),
-
-                        StatCard(
-                          icon: AppIcons.donations,
-                          iconColor: const Color(0xFFE05C5C),
-                          value: 'EGP 0',
-                          label: 'volunteer.profile.donations'.tr(),
-                          smallValue: true,
-                        ),
+                        // StatCard(
+                        //   icon: AppIcons.donations,
+                        //   iconColor: const Color(0xFFE05C5C),
+                        //   value: 'EGP 0',
+                        //   label: 'volunteer.profile.donations'.tr(),
+                        //   smallValue: true,
+                        // ),
                       ],
                     ),
                   ),

@@ -7,7 +7,7 @@ import '../../../../../core/style/app_colors.dart';
 class TabBarWidget extends StatelessWidget {
   final int selected;
   final ValueChanged<int> onTap;
-  final int allCount, earnedCount, inProgressCount;
+  final int allCount, earnedCount;
 
   const TabBarWidget({
     super.key,
@@ -15,7 +15,6 @@ class TabBarWidget extends StatelessWidget {
     required this.onTap,
     required this.allCount,
     required this.earnedCount,
-    required this.inProgressCount,
   });
 
   @override
@@ -28,7 +27,6 @@ class TabBarWidget extends StatelessWidget {
     final labels = [
       '${'shared.badges.all'.tr()} ($allCount)',
       '${'shared.badges.earned'.tr()} ($earnedCount)',
-      '${'shared.badges.in_progress'.tr()} ($inProgressCount)',
     ];
 
     final backgroundColor = isDark

@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:sanad_app/features/donations_coming_soon_screen.dart';
 
 import '../../../../../core/helper/app_navigator.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../shared/cases/data/repos/cases_repo.dart';
 import '../../../../shared/cases/presentation/controllers/case_cubit.dart';
 import '../../../../shared/cases/presentation/screens/cases_screen.dart';
-import '../../../../shared/donations/presentation/screens/donations_screen.dart';
 import '../../../events/presentation/screens/volunteer_events_screen.dart';
 import '../../../community/presentation/screens/volunteer_community_screen.dart';
 import '../../../../../core/storage/hive/hive_boxes.dart';
@@ -52,7 +52,7 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
       case VolunteerHomeNavbarItem.community:
         return const VolunteerCommunityScreen();
       case VolunteerHomeNavbarItem.donations:
-        return const DonationsScreen();
+        return const DonationsComingSoonScreen();
     }
   }
 

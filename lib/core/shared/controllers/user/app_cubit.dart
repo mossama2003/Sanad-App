@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 import '../../../../features/shared/auth/data/models/user_model.dart';
+import '../../../../features/shared/auth/data/models/user_profile_model.dart';
+import '../../../../features/shared/auth/data/models/volunteer_level_model.dart';
 import '../../../network/local/cache/cache_helper.dart';
 import '../../../network/remote/api/dio_helper.dart';
 import '../../../storage/hive/hive_clear.dart';
@@ -16,6 +18,7 @@ class AppCubit extends Cubit<AppStates> {
   static AppCubit get(BuildContext context) => BlocProvider.of(context);
 
   UserModel? user;
+  VolunteerLevelModel? volunteerLevel;
 
   // ================= GET USER =================
   Future<UserModel?> getUser() async {
@@ -31,15 +34,6 @@ class AppCubit extends Cubit<AppStates> {
         headers: {"Authorization": "Bearer $accessToken"},
       );
 
-      // ================= SUCCESS =================
-      if (response.statusCode == 200) {
-        user = UserModel.fromJson(response.data);
-
-        emit(UserLoaded(user!));
-
-        return user;
-      }
-
       // ================= TOKEN EXPIRED =================
       if (response.statusCode == 401 || response.statusCode == 403) {
         final refreshed = await refreshToken();
@@ -53,26 +47,34 @@ class AppCubit extends Cubit<AppStates> {
           );
 
           if (retryResponse.statusCode == 200) {
-            user = UserModel.fromJson(retryResponse.data);
-
-            emit(UserLoaded(user!));
-
-            return user;
+            response = retryResponse;
+          } else {
+            return null;
           }
+        } else {
+          return null;
         }
+      }
+
+      // ================= SUCCESS =================
+      if (response.statusCode == 200) {
+        user = UserModel.fromJson(response.data);
+
+        // ================= GET VOLUNTEER LEVEL =================
+        if (user?.profile is VolunteerProfileModel) {
+          final profile = user!.profile as VolunteerProfileModel;
+          volunteerLevel = profile.level;
+        } else {
+          volunteerLevel = null;
+        }
+
+        emit(UserLoaded(user!));
+
+        return user;
       }
     } catch (e) {
       debugPrint("GET USER ERROR => $e");
     }
-
-    // ================= LOGOUT =================
-
-    user = null;
-
-    await CacheHelper.remove(CacheKeys.accessToken);
-    await CacheHelper.remove(CacheKeys.refreshToken);
-
-    emit(ErrorState());
 
     return null;
   }

@@ -1,3 +1,5 @@
+import 'package:sanad_app/features/shared/auth/data/models/volunteer_level_model.dart';
+
 class UserProfileModel {
   int? id;
   String? type;
@@ -19,6 +21,8 @@ class VolunteerProfileModel extends UserProfileModel {
 
   List<VolunteerBadgeModel>? badges;
   List<VolunteerRoleModel>? roles;
+
+  VolunteerLevelModel? level;
 
   int? xp;
   int? streak;
@@ -44,6 +48,7 @@ class VolunteerProfileModel extends UserProfileModel {
     this.reliabilityScore,
     this.badges,
     this.roles,
+    this.level,
     this.xp,
     this.streak,
     this.gender,
@@ -85,6 +90,12 @@ class VolunteerProfileModel extends UserProfileModel {
             (e) => VolunteerRoleModel.fromJson(Map<String, dynamic>.from(e)),
           )
           .toList(),
+
+      level: json['level'] is Map
+          ? VolunteerLevelModel.fromJson(
+              Map<String, dynamic>.from(json['level']),
+            )
+          : null,
 
       xp: json['xp'],
       streak: json['streak'],

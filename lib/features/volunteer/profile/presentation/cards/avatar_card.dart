@@ -75,7 +75,7 @@ class AvatarCard extends StatelessWidget {
             Positioned(
               bottom: -1,
               child: GestureDetector(
-                onTap: () => AppNavigator.push(const VolunteerRewardsScreen()),
+                onTap: () => AppNavigator.push(const RewardsScreen()),
                 child: Container(
                   padding: AppSize.padding(horizontal: 12, vertical: 3),
                   decoration: BoxDecoration(

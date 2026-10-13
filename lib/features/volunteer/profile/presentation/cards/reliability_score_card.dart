@@ -4,6 +4,7 @@ import 'package:sanad_app/core/shared/widgets/custom_progress_bar.dart';
 
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/helper/app_count_up_text.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../../../shared/auth/data/models/user_profile_model.dart';
@@ -13,23 +14,30 @@ class ReliabilityScoreCard extends StatelessWidget {
 
   const ReliabilityScoreCard({super.key, required this.reliabilityScore});
 
-  String _percentage(double? value) {
-    return '${((value ?? 0) * 100).round()}%';
+  double _normalizedPercentage(double? value) {
+    final percentage = ((value ?? 0) * 100).round();
+    return percentage.clamp(0, 100).toDouble();
   }
 
   @override
   Widget build(BuildContext context) {
-    final score = reliabilityScore?.totalScore ?? 0;
+    final int score = (reliabilityScore?.totalScore ?? 0).clamp(0, 100).toInt();
 
-    final participation = reliabilityScore?.participationRate ?? 0;
+    final participation = _normalizedPercentage(
+      reliabilityScore?.participationRate,
+    );
 
-    final completion = reliabilityScore?.completionRate ?? 0;
+    final completion = _normalizedPercentage(reliabilityScore?.completionRate);
 
-    final emergency = reliabilityScore?.emergencyResponseRate ?? 0;
+    final emergency = _normalizedPercentage(
+      reliabilityScore?.emergencyResponseRate,
+    );
 
-    final cases = reliabilityScore?.casesEngagementScore ?? 0;
+    final cases = _normalizedPercentage(reliabilityScore?.casesEngagementScore);
 
-    final donations = reliabilityScore?.donationsEngagementScore ?? 0;
+    final donations = _normalizedPercentage(
+      reliabilityScore?.donationsEngagementScore,
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -61,38 +69,41 @@ class ReliabilityScoreCard extends StatelessWidget {
 
               SizedBox(width: AppSize.getWidth(5)),
 
-              Text(
-                'volunteer.profile.reliability_score'.tr(),
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: AppSize.font(15),
-                  fontWeight: FontWeight.w700,
+              Expanded(
+                child: Text(
+                  'volunteer.profile.reliability_score'.tr(),
+                  style: TextStyle(
+                    color: AppColors.white,
+                    fontSize: AppSize.font(15),
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
 
-              const Spacer(),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  AppCountUpText(
+                    value: score,
+                    duration: const Duration(milliseconds: 800),
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.white,
+                    ),
+                  ),
 
-              RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: '$score',
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.white,
-                      ),
+                  Text(
+                    '/100',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.white.withValues(alpha: 0.9),
                     ),
-                    TextSpan(
-                      text: '/100',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.white.withValues(alpha: 0.9),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -101,7 +112,7 @@ class ReliabilityScoreCard extends StatelessWidget {
 
           CustomProgressBar(
             height: AppSize.getSize(6),
-            percent: ((score / 100).clamp(0.0, 1.0) * 100),
+            percent: (score / 100) * 100,
             color: AppColors.white,
             bgColor: AppColors.white.withValues(alpha: 0.2),
           ),
@@ -109,15 +120,14 @@ class ReliabilityScoreCard extends StatelessWidget {
           SizedBox(height: AppSize.getHeight(16)),
 
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _ScoreItem(
                 title: 'volunteer.profile.attendance_rate'.tr(),
-                value: _percentage(participation),
+                value: participation,
               ),
               _ScoreItem(
                 title: 'volunteer.profile.completion_rate'.tr(),
-                value: _percentage(completion),
+                value: completion,
               ),
             ],
           ),
@@ -125,15 +135,14 @@ class ReliabilityScoreCard extends StatelessWidget {
           SizedBox(height: AppSize.getHeight(12)),
 
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _ScoreItem(
                 title: 'volunteer.profile.emergency_response'.tr(),
-                value: _percentage(emergency),
+                value: emergency,
               ),
               _ScoreItem(
                 title: 'volunteer.profile.cases_engagement'.tr(),
-                value: _percentage(cases),
+                value: cases,
               ),
             ],
           ),
@@ -144,8 +153,9 @@ class ReliabilityScoreCard extends StatelessWidget {
             children: [
               _ScoreItem(
                 title: 'volunteer.profile.donations_engagement'.tr(),
-                value: _percentage(donations),
+                value: donations,
               ),
+              const Expanded(child: SizedBox()),
             ],
           ),
 
@@ -153,10 +163,7 @@ class ReliabilityScoreCard extends StatelessWidget {
 
           Container(
             width: double.infinity,
-            padding: AppSize.padding(
-              vertical: 12,
-              horizontal: 12,
-            ),
+            padding: AppSize.padding(vertical: 12, horizontal: 12),
             decoration: BoxDecoration(
               color: AppColors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
@@ -207,7 +214,7 @@ class ReliabilityScoreCard extends StatelessWidget {
 
 class _ScoreItem extends StatelessWidget {
   final String title;
-  final String value;
+  final double value;
 
   const _ScoreItem({required this.title, required this.value});
 
@@ -225,14 +232,25 @@ class _ScoreItem extends StatelessWidget {
               fontWeight: FontWeight.w400,
             ),
           ),
+
           SizedBox(height: AppSize.getHeight(3)),
-          Text(
-            value,
-            style: TextStyle(
-              color: AppColors.white,
-              fontSize: AppSize.font(13),
-              fontWeight: FontWeight.w700,
-            ),
+
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              AppCountUpText(
+                value: value.round(),
+                duration: const Duration(milliseconds: 700),
+                style: TextStyle(
+                  color: AppColors.white,
+                  fontSize: AppSize.font(13),
+                  fontWeight: FontWeight.w700,
+                ),
+                suffix: '%',
+              ),
+            ],
           ),
         ],
       ),

@@ -96,6 +96,12 @@ String VOLUNTEER_COMMUNITIES = 'v1/events/read_event/';
 
 String JOIN_EMERGENCY = 'v1/emergency/join/';
 
+String GET_ALL_BADGES = 'v1/portal/badges/';
+
+String GET_XP_ACTIVITIES(int ID) => 'v1/users/xp_activities/?volunteer=$ID';
+
+String GET_LEADERBOARD = 'v1/dashboard/leaderboard/';
+
 /// Organization Endpoints
 String CREATE_ORGANIZATION_EVENT = 'v1/events/manage_event/';
 

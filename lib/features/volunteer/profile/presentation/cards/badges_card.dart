@@ -7,15 +7,12 @@ import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../../../../shared/auth/data/models/user_profile_model.dart';
-import '../../../../shared/badges/presentation/screens/badges_screen.dart';
+import '../../../badges/presentation/screens/badges_screen.dart';
 
 class BadgesCard extends StatelessWidget {
   final List<VolunteerBadgeModel> badges;
 
-  const BadgesCard({
-    super.key,
-    required this.badges,
-  });
+  const BadgesCard({super.key, required this.badges});
 
   @override
   Widget build(BuildContext context) {
@@ -29,15 +26,10 @@ class BadgesCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: textColor.withValues(alpha: .15),
-          width: .7,
-        ),
+        border: Border.all(color: textColor.withValues(alpha: .15), width: .7),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(
-              alpha: isDark ? .3 : .05,
-            ),
+            color: Colors.black.withValues(alpha: isDark ? .3 : .05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -66,21 +58,17 @@ class BadgesCard extends StatelessWidget {
               const Spacer(),
               TextButton(
                 onPressed: () {
-                  AppNavigator.push(
-                    const BadgesScreen(),
-                  );
+                  AppNavigator.push(const BadgesScreen());
                 },
                 style: TextButton.styleFrom(
-                  tapTargetSize:
-                  MaterialTapTargetSize.shrinkWrap,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   padding: EdgeInsets.zero,
                 ),
                 child: Text(
                   'volunteer.profile.view_all'.tr(),
                   style: TextStyle(
                     fontSize: AppSize.font(13),
-                    color: theme.colorScheme.onSurface
-                        .withValues(alpha: .5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: .5),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -103,26 +91,19 @@ class BadgesCard extends StatelessWidget {
             )
           else
             Row(
-              mainAxisAlignment:
-              MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: badges.take(6).map((badge) {
                 return Container(
                   width: AppSize.getWidth(40),
                   height: AppSize.getWidth(40),
                   decoration: BoxDecoration(
-                    color:
-                    theme.scaffoldBackgroundColor,
-                    borderRadius:
-                    BorderRadius.circular(12),
+                    color: theme.scaffoldBackgroundColor,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    badge.icon?.isNotEmpty == true
-                        ? badge.icon!
-                        : '🏅',
-                    style: TextStyle(
-                      fontSize: AppSize.font(22),
-                    ),
+                    badge.icon?.isNotEmpty == true ? badge.icon! : '🏅',
+                    style: TextStyle(fontSize: AppSize.font(22)),
                   ),
                 );
               }).toList(),

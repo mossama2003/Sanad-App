@@ -11,11 +11,7 @@ class WeeklyLeaderboardCard extends StatelessWidget {
   final List<LeaderboardModel> entries;
   final String? period;
 
-  const WeeklyLeaderboardCard({
-    super.key,
-    required this.entries,
-    this.period,
-  });
+  const WeeklyLeaderboardCard({super.key, required this.entries, this.period});
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +24,7 @@ class WeeklyLeaderboardCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: textColor.withValues(alpha: .12),
-          width: .7,
-        ),
+        border: Border.all(color: textColor.withValues(alpha: .12), width: .7),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(
@@ -64,17 +57,12 @@ class WeeklyLeaderboardCard extends StatelessWidget {
               const Spacer(),
               Text(
                 period ?? 'shared.rewards.this_week'.tr(),
-                style: TextStyle(
-                  fontSize: AppSize.font(13),
-                  color: textColor,
-                ),
+                style: TextStyle(fontSize: AppSize.font(13), color: textColor),
               ),
             ],
           ),
           SizedBox(height: AppSize.getHeight(14)),
-          ...entries.map(
-                (e) => _LeaderboardRow(entry: e),
-          ),
+          ...entries.map((e) => _LeaderboardRow(entry: e)),
         ],
       ),
     );
@@ -84,9 +72,7 @@ class WeeklyLeaderboardCard extends StatelessWidget {
 class _LeaderboardRow extends StatelessWidget {
   final LeaderboardModel entry;
 
-  const _LeaderboardRow({
-    required this.entry,
-  });
+  const _LeaderboardRow({required this.entry});
 
   Color get _rankBgColor {
     switch (entry.rank) {
@@ -119,110 +105,97 @@ class _LeaderboardRow extends StatelessWidget {
     final theme = Theme.of(context);
     final textColor = theme.colorScheme.onSurface;
 
-    return Padding(
-      padding: AppSize.padding(vertical: 5),
-      child: Container(
-        padding: AppSize.padding(
-          horizontal: 10,
-          vertical: 10,
-        ),
-        decoration: BoxDecoration(
-          color: entry.isCurrentUser
-              ? AppColors.primary.withValues(alpha: .08)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-          border: entry.isCurrentUser
-              ? Border.all(
-            color: AppColors.primary.withValues(alpha: .25),
-            width: 1,
-          )
-              : null,
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: AppSize.getSize(32),
-              height: AppSize.getSize(32),
-              decoration: BoxDecoration(
-                color: _rankBgColor,
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                '${entry.rank}',
-                style: TextStyle(
-                  fontSize: AppSize.font(13),
-                  fontWeight: FontWeight.w700,
-                  color: _rankTextColor,
-                ),
+    return Container(
+      decoration: BoxDecoration(
+        color: entry.isCurrentUser
+            ? AppColors.primary.withValues(alpha: .08)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        border: entry.isCurrentUser
+            ? Border.all(
+                color: AppColors.primary.withValues(alpha: .25),
+                width: 1,
+              )
+            : null,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: AppSize.getSize(32),
+            height: AppSize.getSize(32),
+            decoration: BoxDecoration(
+              color: _rankBgColor,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              '${entry.rank}',
+              style: TextStyle(
+                fontSize: AppSize.font(13),
+                fontWeight: FontWeight.w700,
+                color: _rankTextColor,
               ),
             ),
-            SizedBox(width: AppSize.getWidth(10)),
-            Container(
-              width: AppSize.getSize(38),
-              height: AppSize.getSize(38),
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF2ECFA0),
-                    Color(0xFF1BB88A),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                entry.initials,
-                style: TextStyle(
-                  fontSize: AppSize.font(14),
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.white,
-                ),
+          ),
+          SizedBox(width: AppSize.getWidth(10)),
+          Container(
+            width: AppSize.getSize(38),
+            height: AppSize.getSize(38),
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [Color(0xFF2ECFA0), Color(0xFF1BB88A)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
-            SizedBox(width: AppSize.getWidth(10)),
-            Expanded(
-              child: Text(
-                entry.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: AppSize.font(14),
-                  fontWeight: FontWeight.w600,
-                  color: textColor,
-                ),
+            alignment: Alignment.center,
+            child: Text(
+              entry.initials,
+              style: TextStyle(
+                fontSize: AppSize.font(14),
+                fontWeight: FontWeight.w700,
+                color: AppColors.white,
               ),
             ),
-            Container(
-              padding: AppSize.padding(
-                horizontal: 10,
-                vertical: 5,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: .12),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                '${_formatXp(entry.xp)} XP',
-                style: TextStyle(
-                  fontSize: AppSize.font(12),
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
-                ),
+          ),
+          SizedBox(width: AppSize.getWidth(10)),
+          Expanded(
+            child: Text(
+              entry.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: AppSize.font(14),
+                fontWeight: FontWeight.w600,
+                color: textColor,
               ),
             ),
-          ],
-        ),
+          ),
+          SizedBox(width: AppSize.getWidth(5)),
+          Container(
+            padding: AppSize.padding(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: .12),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              '${_formatXp(entry.xp)} XP',
+              style: TextStyle(
+                fontSize: AppSize.font(12),
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   String _formatXp(int xp) {
     if (xp >= 1000) {
-      final formatted = (xp / 1000)
-          .toStringAsFixed(xp % 1000 == 0 ? 0 : 3);
+      final formatted = (xp / 1000).toStringAsFixed(xp % 1000 == 0 ? 0 : 3);
 
       return '${formatted.replaceAll(RegExp(r'0+$'), '').replaceAll(RegExp(r'\.$'), '')}K'
           .replaceAll(RegExp(r'(\.\d*?)0+K'), r'$1K');

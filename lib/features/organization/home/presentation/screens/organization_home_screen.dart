@@ -5,6 +5,7 @@ import 'package:sanad_app/core/helper/app_number_formatter.dart';
 
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/helper/app_count_up_text.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/style/app_colors.dart';
 import '../controllers/organization_home_cubit.dart';
@@ -121,41 +122,31 @@ class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
     required String title,
   }) {
     final theme = Theme.of(context);
+    final numericValue = int.tryParse(value);
 
     return Container(
       width: AppSize.getWidth(100),
-
       padding: AppSize.padding(all: 10),
-
       decoration: BoxDecoration(
         color: theme.cardColor,
-
         borderRadius: BorderRadius.circular(20),
-
         border: Border.all(
           color: theme.colorScheme.onSurface.withValues(alpha: .08),
         ),
-
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: .08),
-
             blurRadius: 8,
-
             offset: const Offset(0, 2),
           ),
         ],
       ),
-
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-
         children: [
           Container(
             padding: AppSize.padding(all: 8),
-
             decoration: BoxDecoration(shape: BoxShape.circle, color: iconBg),
-
             child: CustomIcon(
               icon: icon,
               color: iconColor,
@@ -163,24 +154,29 @@ class _OrganizationHomeScreenState extends State<OrganizationHomeScreen> {
               height: AppSize.getSize(20),
             ),
           ),
-
           SizedBox(height: AppSize.getHeight(5)),
-
-          Text(
-            value,
-
-            style: TextStyle(
-              fontSize: AppSize.font(20),
-              fontWeight: FontWeight.w500,
-              color: theme.colorScheme.onSurface,
+          if (numericValue != null)
+            AppCountUpText(
+              value: numericValue,
+              duration: const Duration(milliseconds: 350),
+              style: TextStyle(
+                fontSize: AppSize.font(20),
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.onSurface,
+              ),
+            )
+          else
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: AppSize.font(20),
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
-          ),
-
           Text(
             title,
-
             textAlign: TextAlign.center,
-
             style: TextStyle(
               fontSize: AppSize.font(10),
               fontWeight: FontWeight.w300,
