@@ -262,7 +262,7 @@ class EmergencyAttachment {
         : json;
 
     return EmergencyAttachment(
-      id: json['id'] is int ? json['id'] : null,
+      id: json['id'] != null ? _toInt(json['id']) : null,
       url: file['url']?.toString() ?? '',
       name: file['name']?.toString() ?? '',
       contentType: (file['content-type'] ?? file['content_type'])?.toString(),

@@ -1046,5 +1046,12 @@
       "delete_account_desc": "Are you sure you want to permanently delete your account?\n\nThis action cannot be undone. You will lose your profile, data, and all activity associated with this account.",
       "profile_updated_successfully": "Profile Update Successfully"
     }
+  },
+  "coming_soon": {
+    "dashboard_coming_soon_title": "Dashboard Coming Soon",
+    "dashoard_coming_soon_description": "We're preparing the dashboard to provide you with a better experience and help you keep track of everything that matters. It will be available soon!",
+    "donations_coming_soon_title": "Donations Coming Soon",
+    "donations_coming_soon_description": "We're working on a donations feature that will soon allow you to support those in need and make a real difference in their lives.",
+    "status": "We're working on it"
   }
 }

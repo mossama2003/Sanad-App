@@ -1,21 +1,24 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../../core/constant/app_assets.dart';
-import '../../../../../core/constant/app_size.dart';
-import '../../../../../core/helper/app_navigator.dart';
-import '../../../../../core/helper/app_toast.dart';
-import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/shared/widgets/custom_button.dart';
+import '../../../../../core/shared/dialogs/confirm_dialog.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
-import '../../../../../core/style/app_colors.dart';
-import '../../data/models/emergency_model.dart';
+import '../../../../../core/helper/app_navigator.dart';
+import '../../../../../core/constant/app_assets.dart';
 import '../../data/params/emergency_param.dart';
-import '../controllers/emergency_cubit.dart';
+import '../../data/models/emergency_model.dart';
+import '../../../../../core/constant/app_size.dart';
+import '../../../../../core/helper/app_toast.dart';
+import '../../../../../core/style/app_colors.dart';
 import '../forms/report_emergency_form.dart';
+import '../controllers/emergency_cubit.dart';
 import '../helpers/emergency_helpers.dart';
 
 class EmergencyDetailsDialog extends StatelessWidget {
@@ -240,60 +243,83 @@ class EmergencyDetailsDialog extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
-          child: SingleChildScrollView(
+
+          // Fixed dialog height; no vertical scrolling.
+          child: SizedBox(
+            height: MediaQuery.sizeOf(context).height * 0.85,
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ==================================================
-                // Cover + Badges + Close
+                // Image Slider + Fixed Badge + Fixed Close Button
                 // ==================================================
                 SizedBox(
-                  height: AppSize.getHeight(190),
+                  height: AppSize.getHeight(210),
                   width: double.infinity,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      EmergencyCover(url: e.coverUrl, color: urgencyColor),
+                      _EmergencyDetailsImageCarousel(
+                        imageUrls: e.attachments
+                            .where(
+                              (attachment) =>
+                                  attachment.isImage &&
+                                  attachment.url.isNotEmpty,
+                            )
+                            .map((attachment) => attachment.url)
+                            .toList(),
+                        fallbackUrl: e.coverUrl ?? '',
+                        fallbackColor: urgencyColor,
+                      ),
+
+                      // Gradient overlay
+                      IgnorePointer(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              stops: const [.35, 1],
+                              colors: [
+                                Colors.black.withValues(alpha: .12),
+                                Colors.black.withValues(alpha: .35),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Fixed urgency badge
                       Positioned(
                         top: AppSize.getHeight(12),
                         left: AppSize.getWidth(12),
-                        child: Row(
-                          children: [
-                            EmergencyBadge(
-                              label: EmergencyHelpers.urgencyLabel(e.urgency),
-                              color: urgencyColor,
-                              icon: AppIcons.siren,
-                            ),
-                            // SizedBox(width: AppSize.getWidth(8)),
-                            // EmergencyBadge(
-                            //   label: e.active
-                            //       ? 'shared.emergency.card.active'.tr()
-                            //       : 'shared.emergency.card.closed'.tr(),
-                            //   color: e.active
-                            //       ? urgencyColor
-                            //       : AppColors.grey800,
-                            //   icon: AppIcons.siren,
-                            // ),
-                          ],
+                        child: IgnorePointer(
+                          child: EmergencyBadge(
+                            label: EmergencyHelpers.urgencyLabel(e.urgency),
+                            color: urgencyColor,
+                            icon: AppIcons.siren,
+                          ),
                         ),
                       ),
+
+                      // Fixed close button
                       Positioned(
                         top: AppSize.getHeight(10),
                         right: AppSize.getWidth(10),
-                        child: GestureDetector(
-                          onTap: () => AppNavigator.pop(),
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: .85),
-                              shape: BoxShape.circle,
-                            ),
-                            child: CustomIcon(
-                              icon: AppIcons.close,
-                              color: AppColors.black,
-                              width: AppSize.getSize(16),
-                              height: AppSize.getSize(16),
+                        child: Material(
+                          color: Colors.white.withValues(alpha: .95),
+                          shape: const CircleBorder(),
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            onTap: () => Navigator.of(context).pop(),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: CustomIcon(
+                                icon: AppIcons.close,
+                                color: AppColors.black,
+                                width: AppSize.getSize(16),
+                                height: AppSize.getSize(16),
+                              ),
                             ),
                           ),
                         ),
@@ -303,428 +329,485 @@ class EmergencyDetailsDialog extends StatelessWidget {
                 ),
 
                 // ==================================================
-                // Content
+                // Fixed Content Area — No ScrollView
                 // ==================================================
-                Padding(
-                  padding: AppSize.padding(all: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Title
-                      Text(
-                        e.name,
-                        style: TextStyle(
-                          fontSize: AppSize.font(20),
-                          fontWeight: FontWeight.w700,
-                          color: textColor,
-                        ),
-                      ),
-
-                      // Creator
-                      if ((e.creator?.name ?? '').isNotEmpty) ...[
-                        SizedBox(height: AppSize.getHeight(8)),
-                        Row(
-                          children: [
-                            CustomIcon(
-                              icon: AppIcons.organization,
-                              color: urgencyColor,
-                              width: AppSize.getSize(16),
-                              height: AppSize.getSize(16),
-                            ),
-                            SizedBox(width: AppSize.getWidth(6)),
-                            Expanded(
-                              child: Text(
-                                e.creator!.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: AppSize.font(15),
-                                  fontWeight: FontWeight.w500,
-                                  color: urgencyColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-
-                      SizedBox(height: AppSize.getHeight(14)),
-
-                      // Time + Location + Category
-                      Wrap(
-                        spacing: AppSize.getWidth(14),
-                        runSpacing: AppSize.getHeight(8),
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              CustomIcon(
-                                icon: AppIcons.time,
-                                color: secondaryColor,
-                                width: AppSize.getSize(15),
-                                height: AppSize.getSize(15),
-                              ),
-                              SizedBox(width: AppSize.getWidth(5)),
-                              Text(
-                                EmergencyHelpers.timeAgo(e.created),
-                                style: TextStyle(
-                                  fontSize: AppSize.font(13),
-                                  color: secondaryColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (location.isNotEmpty)
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: AppSize.getWidth(170),
-                              ),
-                              child: Row(
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return ClipRect(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.topCenter,
+                          child: SizedBox(
+                            width: constraints.maxWidth,
+                            child: Padding(
+                              padding: AppSize.padding(all: 20),
+                              child: Column(
                                 mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  CustomIcon(
-                                    icon: AppIcons.location,
-                                    color: secondaryColor,
-                                    width: AppSize.getSize(15),
-                                    height: AppSize.getSize(15),
+                                  // Title
+                                  Text(
+                                    e.name,
+                                    style: TextStyle(
+                                      fontSize: AppSize.font(20),
+                                      fontWeight: FontWeight.w700,
+                                      color: textColor,
+                                    ),
                                   ),
-                                  SizedBox(width: AppSize.getWidth(5)),
-                                  Flexible(
-                                    child: Text(
-                                      location,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: AppSize.font(13),
-                                        color: secondaryColor,
+
+                                  // Creator
+                                  if ((e.creator?.name ?? '').isNotEmpty) ...[
+                                    SizedBox(height: AppSize.getHeight(8)),
+                                    Row(
+                                      children: [
+                                        CustomIcon(
+                                          icon: AppIcons.organization,
+                                          color: urgencyColor,
+                                          width: AppSize.getSize(16),
+                                          height: AppSize.getSize(16),
+                                        ),
+                                        SizedBox(width: AppSize.getWidth(6)),
+                                        Expanded(
+                                          child: Text(
+                                            e.creator!.name,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontSize: AppSize.font(15),
+                                              fontWeight: FontWeight.w500,
+                                              color: urgencyColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+
+                                  SizedBox(height: AppSize.getHeight(14)),
+
+                                  // Time + Location + Category
+                                  Wrap(
+                                    spacing: AppSize.getWidth(14),
+                                    runSpacing: AppSize.getHeight(8),
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    children: [
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          CustomIcon(
+                                            icon: AppIcons.time,
+                                            color: secondaryColor,
+                                            width: AppSize.getSize(15),
+                                            height: AppSize.getSize(15),
+                                          ),
+                                          SizedBox(width: AppSize.getWidth(5)),
+                                          Text(
+                                            EmergencyHelpers.timeAgo(e.created),
+                                            style: TextStyle(
+                                              fontSize: AppSize.font(13),
+                                              color: secondaryColor,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (location.isNotEmpty)
+                                        ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxWidth: AppSize.getWidth(170),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              CustomIcon(
+                                                icon: AppIcons.location,
+                                                color: secondaryColor,
+                                                width: AppSize.getSize(15),
+                                                height: AppSize.getSize(15),
+                                              ),
+                                              SizedBox(
+                                                width: AppSize.getWidth(5),
+                                              ),
+                                              Flexible(
+                                                child: Text(
+                                                  location,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    fontSize: AppSize.font(13),
+                                                    color: secondaryColor,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      _chip(
+                                        EmergencyHelpers.categoryLabel(
+                                          e.category,
+                                        ),
+                                        AppColors.primary,
+                                      ),
+                                    ],
+                                  ),
+
+                                  SizedBox(height: AppSize.getHeight(14)),
+
+                                  // Description
+                                  Text(
+                                    e.description,
+                                    style: TextStyle(
+                                      fontSize: AppSize.font(15),
+                                      height: 1.4,
+                                      color: secondaryColor,
+                                    ),
+                                  ),
+
+                                  // Skills / Blood Type / Certifications
+                                  if (e.skills.isNotEmpty ||
+                                      e.bloodType != null ||
+                                      e.certifications.isNotEmpty) ...[
+                                    SizedBox(height: AppSize.getHeight(14)),
+                                    Wrap(
+                                      spacing: AppSize.getWidth(8),
+                                      runSpacing: AppSize.getHeight(8),
+                                      children: [
+                                        for (final skill in e.skills)
+                                          _chip(skill, AppColors.laserBlue),
+                                        if (e.bloodType != null)
+                                          _chip(
+                                            'shared.emergency.card.blood_type'
+                                                .tr(args: [e.bloodType!]),
+                                            AppColors.red,
+                                          ),
+                                        for (final certification
+                                            in e.certifications)
+                                          _chip(
+                                            certification,
+                                            AppColors.grey800,
+                                          ),
+                                      ],
+                                    ),
+                                  ],
+
+                                  SizedBox(height: AppSize.getHeight(18)),
+
+                                  // Volunteers
+                                  Row(
+                                    children: [
+                                      CustomIcon(
+                                        icon: AppIcons.community,
+                                        color: urgencyColor,
+                                        width: AppSize.getSize(18),
+                                        height: AppSize.getSize(18),
+                                      ),
+                                      SizedBox(width: AppSize.getWidth(6)),
+                                      Text(
+                                        'shared.emergency.card.volunteers'.tr(),
+                                        style: TextStyle(
+                                          fontSize: AppSize.font(15),
+                                          fontWeight: FontWeight.w500,
+                                          color: textColor,
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      Text(
+                                        '${e.joiners} / ${e.volunteers} ($percent%)',
+                                        style: TextStyle(
+                                          fontSize: AppSize.font(15),
+                                          fontWeight: FontWeight.w700,
+                                          color: textColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  SizedBox(height: AppSize.getHeight(10)),
+
+                                  EmergencyProgressBar(
+                                    progress: e.progress,
+                                    color: urgencyColor,
+                                    height: AppSize.getHeight(8),
+                                  ),
+
+                                  // Phone
+                                  if (e.contactPhone.isNotEmpty) ...[
+                                    SizedBox(height: AppSize.getHeight(18)),
+                                    InkWell(
+                                      borderRadius: BorderRadius.circular(8),
+                                      onTap: () => _callPhone(e.contactPhone),
+                                      child: Padding(
+                                        padding: AppSize.padding(vertical: 4),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            CustomIcon(
+                                              icon: AppIcons.phone,
+                                              color: secondaryColor,
+                                              width: AppSize.getSize(18),
+                                              height: AppSize.getSize(18),
+                                            ),
+                                            SizedBox(
+                                              width: AppSize.getWidth(10),
+                                            ),
+                                            Text(
+                                              EmergencyHelpers.formatPhone(
+                                                e.contactPhone,
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: AppSize.font(15),
+                                                color: textColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+
+                                  SizedBox(height: AppSize.getHeight(14)),
+
+                                  Divider(
+                                    thickness: .5,
+                                    height: 1,
+                                    color: theme.dividerColor,
+                                  ),
+
+                                  SizedBox(height: AppSize.getHeight(16)),
+
+                                  // Join + Location
+                                  if (showActions)
+                                    Row(
+                                      children: [
+                                        if (canJoin)
+                                          Expanded(
+                                            child: Opacity(
+                                              opacity: joinDisabled ? .5 : 1,
+                                              child: CustomButton(
+                                                loading: isJoining,
+                                                title: joinTitle,
+                                                height: AppSize.getHeight(45),
+                                                bgColor: urgencyColor,
+                                                onTap: joinDisabled || isJoining
+                                                    ? null
+                                                    : () => emergencyCubit
+                                                          .joinEmergency(e.id),
+                                              ),
+                                            ),
+                                          ),
+                                        if (canJoin && hasLocation)
+                                          SizedBox(width: AppSize.getWidth(10)),
+                                        if (hasLocation)
+                                          Expanded(
+                                            child: InkWell(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              onTap: () =>
+                                                  _openLocation(locationUrl),
+                                              child: Container(
+                                                height: AppSize.getHeight(45),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                  border: Border.all(
+                                                    color: AppColors.primary,
+                                                    width: 1.2,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.near_me_outlined,
+                                                      color: AppColors.primary,
+                                                      size: AppSize.getSize(18),
+                                                    ),
+                                                    SizedBox(
+                                                      width: AppSize.getWidth(
+                                                        6,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'shared.emergency.card.location'
+                                                          .tr(),
+                                                      style: TextStyle(
+                                                        color:
+                                                            AppColors.primary,
+                                                        fontSize: AppSize.font(
+                                                          14,
+                                                        ),
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+
+                                  // Owner Actions
+                                  if (isOwner) ...[
+                                    Container(
+                                      padding: AppSize.padding(all: 10),
+                                      decoration: BoxDecoration(
+                                        color: theme
+                                            .colorScheme
+                                            .surfaceContainerHighest
+                                            .withValues(alpha: .45),
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            e.active
+                                                ? Icons
+                                                      .radio_button_unchecked_rounded
+                                                : Icons.check_circle_rounded,
+                                            color: e.active
+                                                ? urgencyColor
+                                                : Colors.green,
+                                            size: AppSize.getSize(22),
+                                          ),
+                                          SizedBox(width: AppSize.getWidth(10)),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'shared.emergency.card.completed'
+                                                      .tr(),
+                                                  style: TextStyle(
+                                                    color: textColor,
+                                                    fontSize: AppSize.font(14),
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: AppSize.getHeight(2),
+                                                ),
+                                                Text(
+                                                  e.active
+                                                      ? 'shared.emergency.card.mark_completed'
+                                                            .tr()
+                                                      : 'shared.emergency.card.completed_message'
+                                                            .tr(),
+                                                  style: TextStyle(
+                                                    color: secondaryColor,
+                                                    fontSize: AppSize.font(11),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Switch.adaptive(
+                                            value: !e.active,
+                                            activeTrackColor: Colors.green,
+                                            onChanged: (completed) {
+                                              _setEmergencyCompleted(
+                                                context,
+                                                e,
+                                                completed,
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    SizedBox(height: AppSize.getHeight(15)),
+
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: CustomButton(
+                                            title:
+                                                'shared.emergency.card.manage'
+                                                    .tr(),
+                                            height: AppSize.getHeight(40),
+                                            icon: AppIcons.edit,
+                                            iconSize: AppSize.getSize(18),
+                                            bgColor: AppColors.primary,
+                                            textColor: AppColors.white,
+                                            onTap: () =>
+                                                _editEmergency(context, e),
+                                          ),
+                                        ),
+                                        SizedBox(width: AppSize.getWidth(10)),
+                                        Expanded(
+                                          child: CustomButton(
+                                            title:
+                                                'shared.emergency.card.delete'
+                                                    .tr(),
+                                            height: AppSize.getHeight(40),
+                                            icon: AppIcons.delete,
+                                            iconSize: AppSize.getSize(18),
+                                            borderColor: AppColors.red,
+                                            bgColor: Colors.transparent,
+                                            textColor: AppColors.red,
+                                            onTap: () =>
+                                                _deleteEmergency(context, e),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+
+                                  // Share
+                                  SizedBox(
+                                    height: AppSize.getHeight(
+                                      showActions || isOwner ? 8 : 0,
+                                    ),
+                                  ),
+
+                                  Center(
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(12),
+                                      onTap: () => _share(e),
+                                      child: Padding(
+                                        padding: AppSize.padding(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            CustomIcon(
+                                              icon: AppIcons.share,
+                                              color: textColor,
+                                              width: AppSize.getSize(16),
+                                              height: AppSize.getSize(16),
+                                            ),
+                                            SizedBox(
+                                              width: AppSize.getWidth(8),
+                                            ),
+                                            Text(
+                                              'shared.emergency.card.share'
+                                                  .tr(),
+                                              style: TextStyle(
+                                                fontSize: AppSize.font(15),
+                                                fontWeight: FontWeight.w500,
+                                                color: textColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          _chip(
-                            EmergencyHelpers.categoryLabel(e.category),
-                            AppColors.primary,
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: AppSize.getHeight(14)),
-
-                      // Description
-                      Text(
-                        e.description,
-                        style: TextStyle(
-                          fontSize: AppSize.font(15),
-                          height: 1.4,
-                          color: secondaryColor,
-                        ),
-                      ),
-
-                      // Skills / Blood Type / Certifications
-                      if (e.skills.isNotEmpty ||
-                          e.bloodType != null ||
-                          e.certifications.isNotEmpty) ...[
-                        SizedBox(height: AppSize.getHeight(14)),
-                        Wrap(
-                          spacing: AppSize.getWidth(8),
-                          runSpacing: AppSize.getHeight(8),
-                          children: [
-                            for (final skill in e.skills)
-                              _chip(skill, AppColors.laserBlue),
-                            if (e.bloodType != null)
-                              _chip(
-                                'shared.emergency.card.blood_type'.tr(
-                                  args: [e.bloodType!],
-                                ),
-                                AppColors.red,
-                              ),
-                            for (final certification in e.certifications)
-                              _chip(certification, AppColors.grey800),
-                          ],
-                        ),
-                      ],
-
-                      SizedBox(height: AppSize.getHeight(18)),
-
-                      // Volunteers
-                      Row(
-                        children: [
-                          CustomIcon(
-                            icon: AppIcons.community,
-                            color: urgencyColor,
-                            width: AppSize.getSize(18),
-                            height: AppSize.getSize(18),
-                          ),
-                          SizedBox(width: AppSize.getWidth(6)),
-                          Text(
-                            'shared.emergency.card.volunteers'.tr(),
-                            style: TextStyle(
-                              fontSize: AppSize.font(15),
-                              fontWeight: FontWeight.w500,
-                              color: textColor,
-                            ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            '${e.joiners} / ${e.volunteers} ($percent%)',
-                            style: TextStyle(
-                              fontSize: AppSize.font(15),
-                              fontWeight: FontWeight.w700,
-                              color: textColor,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: AppSize.getHeight(10)),
-
-                      EmergencyProgressBar(
-                        progress: e.progress,
-                        color: urgencyColor,
-                        height: AppSize.getHeight(8),
-                      ),
-
-                      // Phone
-                      if (e.contactPhone.isNotEmpty) ...[
-                        SizedBox(height: AppSize.getHeight(18)),
-                        InkWell(
-                          borderRadius: BorderRadius.circular(8),
-                          onTap: () => _callPhone(e.contactPhone),
-                          child: Padding(
-                            padding: AppSize.padding(vertical: 4),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CustomIcon(
-                                  icon: AppIcons.phone,
-                                  color: secondaryColor,
-                                  width: AppSize.getSize(18),
-                                  height: AppSize.getSize(18),
-                                ),
-                                SizedBox(width: AppSize.getWidth(10)),
-                                Text(
-                                  EmergencyHelpers.formatPhone(e.contactPhone),
-                                  style: TextStyle(
-                                    fontSize: AppSize.font(15),
-                                    color: textColor,
-                                  ),
-                                ),
-                              ],
-                            ),
                           ),
                         ),
-                      ],
-
-                      SizedBox(height: AppSize.getHeight(14)),
-
-                      Divider(
-                        thickness: .5,
-                        height: 1,
-                        color: theme.dividerColor,
-                      ),
-
-                      SizedBox(height: AppSize.getHeight(16)),
-
-                      // ==================================================
-                      // Join + Location
-                      // ==================================================
-                      if (showActions)
-                        Row(
-                          children: [
-                            if (canJoin)
-                              Expanded(
-                                child: Opacity(
-                                  opacity: joinDisabled ? .5 : 1,
-                                  child: CustomButton(
-                                    loading: isJoining,
-                                    title: joinTitle,
-                                    height: AppSize.getHeight(45),
-                                    bgColor: urgencyColor,
-                                    onTap: joinDisabled || isJoining
-                                        ? null
-                                        : () => emergencyCubit.joinEmergency(
-                                            e.id,
-                                          ),
-                                  ),
-                                ),
-                              ),
-                            if (canJoin && hasLocation)
-                              SizedBox(width: AppSize.getWidth(10)),
-                            if (hasLocation)
-                              Expanded(
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(30),
-                                  onTap: () => _openLocation(locationUrl),
-                                  child: Container(
-                                    height: AppSize.getHeight(45),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(30),
-                                      border: Border.all(
-                                        color: AppColors.primary,
-                                        width: 1.2,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.near_me_outlined,
-                                          color: AppColors.primary,
-                                          size: AppSize.getSize(18),
-                                        ),
-                                        SizedBox(width: AppSize.getWidth(6)),
-                                        Text(
-                                          'shared.emergency.card.location'.tr(),
-                                          style: TextStyle(
-                                            color: AppColors.primary,
-                                            fontSize: AppSize.font(14),
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-
-                      // ==================================================
-                      // Owner Actions: Completed + Edit + Delete
-                      // ==================================================
-                      if (isOwner) ...[
-                        Container(
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerHighest
-                                .withValues(alpha: .45),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                e.active
-                                    ? Icons.radio_button_unchecked_rounded
-                                    : Icons.check_circle_rounded,
-                                color: e.active ? urgencyColor : Colors.green,
-                                size: AppSize.getSize(22),
-                              ),
-                              SizedBox(width: AppSize.getWidth(10)),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'shared.emergency.card.completed'.tr(),
-                                      style: TextStyle(
-                                        color: textColor,
-                                        fontSize: AppSize.font(14),
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    SizedBox(height: AppSize.getHeight(2)),
-                                    Text(
-                                      e.active
-                                          ? 'shared.emergency.card.mark_completed'
-                                                .tr()
-                                          : 'shared.emergency.card.completed_message'
-                                                .tr(),
-                                      style: TextStyle(
-                                        color: secondaryColor,
-                                        fontSize: AppSize.font(11),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Switch.adaptive(
-                                value: !e.active,
-                                activeTrackColor: Colors.green,
-                                onChanged: (completed) {
-                                  _setEmergencyCompleted(context, e, completed);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        SizedBox(height: AppSize.getHeight(15)),
-
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomButton(
-                                title: 'shared.emergency.card.manage'.tr(),
-                                height: AppSize.getHeight(40),
-                                icon: AppIcons.edit,
-                                iconSize: AppSize.getSize(18),
-                                bgColor: AppColors.primary,
-                                textColor: AppColors.white,
-                                onTap: () => _editEmergency(context, e),
-                              ),
-                            ),
-                            SizedBox(width: AppSize.getWidth(10)),
-                            Expanded(
-                              child: CustomButton(
-                                title: 'shared.emergency.card.delete'.tr(),
-                                height: AppSize.getHeight(40),
-                                icon: AppIcons.delete,
-                                iconSize: AppSize.getSize(18),
-                                borderColor: AppColors.red,
-                                bgColor: Colors.transparent,
-                                textColor: AppColors.red,
-                                onTap: () => _deleteEmergency(context, e),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-
-                      // ==================================================
-                      // Share
-                      // ==================================================
-                      SizedBox(
-                        height: AppSize.getHeight(
-                          showActions || isOwner ? 8 : 0,
-                        ),
-                      ),
-
-                      Center(
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () => _share(e),
-                          child: Padding(
-                            padding: AppSize.padding(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CustomIcon(
-                                  icon: AppIcons.share,
-                                  color: textColor,
-                                  width: AppSize.getSize(16),
-                                  height: AppSize.getSize(16),
-                                ),
-                                SizedBox(width: AppSize.getWidth(8)),
-                                Text(
-                                  'shared.emergency.card.share'.tr(),
-                                  style: TextStyle(
-                                    fontSize: AppSize.font(15),
-                                    fontWeight: FontWeight.w500,
-                                    color: textColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ],
@@ -732,6 +815,200 @@ class EmergencyDetailsDialog extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _EmergencyDetailsImageCarousel extends StatefulWidget {
+  const _EmergencyDetailsImageCarousel({
+    required this.imageUrls,
+    required this.fallbackUrl,
+    required this.fallbackColor,
+  });
+
+  final List<String> imageUrls;
+  final String fallbackUrl;
+  final Color fallbackColor;
+
+  @override
+  State<_EmergencyDetailsImageCarousel> createState() =>
+      _EmergencyDetailsImageCarouselState();
+}
+
+class _EmergencyDetailsImageCarouselState
+    extends State<_EmergencyDetailsImageCarousel> {
+  late final PageController _pageController;
+
+  Timer? _autoScrollTimer;
+  int _currentPage = 0;
+
+  List<String> get _images {
+    final images = widget.imageUrls
+        .where((url) => url.trim().isNotEmpty)
+        .toList();
+
+    if (images.isNotEmpty) return images;
+
+    if (widget.fallbackUrl.trim().isNotEmpty) {
+      return [widget.fallbackUrl];
+    }
+
+    return [];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _pageController = PageController();
+    _startAutoScroll();
+  }
+
+  @override
+  void didUpdateWidget(covariant _EmergencyDetailsImageCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.imageUrls != widget.imageUrls ||
+        oldWidget.fallbackUrl != widget.fallbackUrl) {
+      _currentPage = 0;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_pageController.hasClients) return;
+
+        _pageController.jumpToPage(0);
+        _restartAutoScroll();
+      });
+    }
+  }
+
+  void _startAutoScroll() {
+    _autoScrollTimer?.cancel();
+
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted || _images.length <= 1) return;
+      if (!_pageController.hasClients) return;
+
+      final position = _pageController.position;
+
+      if (position.isScrollingNotifier.value) return;
+
+      final nextPage = (_currentPage + 1) % _images.length;
+
+      _pageController.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  void _restartAutoScroll() {
+    _startAutoScroll();
+  }
+
+  @override
+  void dispose() {
+    _autoScrollTimer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final images = _images;
+
+    if (images.isEmpty) {
+      return Container(
+        color: widget.fallbackColor.withValues(alpha: .12),
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.image_not_supported_outlined,
+          color: widget.fallbackColor,
+          size: AppSize.getSize(42),
+        ),
+      );
+    }
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        PageView.builder(
+          controller: _pageController,
+          physics: const PageScrollPhysics(),
+          itemCount: images.length,
+          onPageChanged: (index) {
+            setState(() {
+              _currentPage = index;
+            });
+          },
+          itemBuilder: (context, index) {
+            return CachedNetworkImage(
+              imageUrl: images[index],
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+              placeholder: (_, __) {
+                return Container(
+                  color: widget.fallbackColor.withValues(alpha: .12),
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: AppSize.getSize(26),
+                    height: AppSize.getSize(26),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: widget.fallbackColor,
+                    ),
+                  ),
+                );
+              },
+              errorWidget: (_, __, ___) {
+                return Container(
+                  color: widget.fallbackColor.withValues(alpha: .12),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.broken_image_outlined,
+                    color: widget.fallbackColor,
+                    size: AppSize.getSize(38),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+
+        // Page indicators
+        if (images.length > 1)
+          Positioned(
+            bottom: AppSize.getHeight(10),
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(images.length, (index) {
+                  final isActive = index == _currentPage;
+
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    margin: EdgeInsets.symmetric(
+                      horizontal: AppSize.getWidth(3),
+                    ),
+                    width: isActive
+                        ? AppSize.getWidth(18)
+                        : AppSize.getWidth(6),
+                    height: AppSize.getHeight(6),
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: .55),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

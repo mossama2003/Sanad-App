@@ -524,7 +524,7 @@ class EmergencyCubit extends Cubit<EmergencyState> {
     if (!validateForm()) return false;
 
     if (!hasLocation) {
-      AppToast.error('shared.emergency.location_required'.tr());
+      AppToast.error('shared.emergency.reports.location_required'.tr());
       return false;
     }
 

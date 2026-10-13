@@ -39,9 +39,7 @@ extension OrganizationHomeNavbarItemExt on OrganizationHomeNavbarItem {
     }
   }
 
-  BottomNavigationBarItem buildItem(
-      bool isSelected,
-      ) {
+  BottomNavigationBarItem buildItem(bool isSelected) {
     final isDashboard = this == OrganizationHomeNavbarItem.dashboard;
 
     return BottomNavigationBarItem(
@@ -49,14 +47,8 @@ extension OrganizationHomeNavbarItemExt on OrganizationHomeNavbarItem {
 
       icon: Container(
         padding: isDashboard
-            ? AppSize.padding(
-          horizontal: 14,
-          vertical: 12,
-        )
-            : AppSize.padding(
-          horizontal: 10,
-          vertical: 6,
-        ),
+            ? AppSize.padding(horizontal: 14, vertical: 12)
+            : AppSize.padding(horizontal: 10, vertical: 6),
 
         decoration: BoxDecoration(
           color: isDashboard && isSelected
@@ -65,9 +57,7 @@ extension OrganizationHomeNavbarItemExt on OrganizationHomeNavbarItem {
               ? AppColors.primary.withValues(alpha: 0.10)
               : Colors.transparent,
 
-          borderRadius: BorderRadius.circular(
-            isDashboard ? 20 : 14,
-          ),
+          borderRadius: BorderRadius.circular(isDashboard ? 20 : 14),
         ),
 
         child: Column(
@@ -77,13 +67,9 @@ extension OrganizationHomeNavbarItemExt on OrganizationHomeNavbarItem {
             CustomSvg(
               svg: icon,
 
-              width: isDashboard
-                  ? AppSize.getSize(28)
-                  : AppSize.getSize(23),
+              width: isDashboard ? AppSize.getSize(28) : AppSize.getSize(23),
 
-              height: isDashboard
-                  ? AppSize.getSize(28)
-                  : AppSize.getSize(23),
+              height: isDashboard ? AppSize.getSize(28) : AppSize.getSize(23),
 
               color: isDashboard && isSelected
                   ? AppColors.white
@@ -92,9 +78,7 @@ extension OrganizationHomeNavbarItemExt on OrganizationHomeNavbarItem {
                   : AppColors.black.withValues(alpha: 0.7),
             ),
 
-            SizedBox(
-              height: AppSize.getHeight(4),
-            ),
+            SizedBox(height: AppSize.getHeight(4)),
 
             Text(
               label,

@@ -10,11 +10,11 @@ import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/shared/widgets/custom_button.dart';
 import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../../../shared/auth/data/models/user_model.dart';
 import '../../../../shared/auth/data/models/user_profile_model.dart';
 import '../../../../shared/auth/presentation/sign_in/screens/sign_in_screen.dart';
 import '../../../../shared/settings/presentations/screens/settings_screen.dart';
 import '../../../../../core/shared/widgets/contact_info_card.dart';
+import '../../../../volunteer/profile/presentation/cards/avatar_card.dart';
 import '../cards/social_media_card.dart';
 
 class OrganizationProfileScreen extends StatelessWidget {
@@ -50,15 +50,18 @@ class OrganizationProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildCoverAndAvatar(context, user),
-
-                  SizedBox(height: AppSize.getHeight(44)),
-
-                  _buildNameAndBadge(context, user, profile),
-
-                  SizedBox(height: AppSize.getHeight(10)),
-
-                  _buildDescription(context, profile),
+                  AvatarCard(
+                    name: '${user?.name ?? ''} ${user?.lastName ?? ''}'.trim(),
+                    location: [
+                      profile?.state,
+                      profile?.headquarters,
+                    ].where((e) => e != null && e.trim().isNotEmpty).join(', '),
+                    createdAt: profile?.created,
+                    image: user?.avatar,
+                    level: user?.isVerified == true
+                        ? 'Verified Organization'
+                        : 'Organization',
+                  ),
 
                   SizedBox(height: AppSize.getHeight(16)),
 
@@ -131,143 +134,6 @@ class OrganizationProfileScreen extends StatelessWidget {
     return 'https://$value';
   }
 
-  Widget _buildCoverAndAvatar(BuildContext context, UserModel? user) {
-    final theme = Theme.of(context);
-
-    final organizationName = user?.name ?? '';
-    final avatar = user?.avatar;
-
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: SizedBox(
-            width: double.infinity,
-            height: 170,
-            child: avatar != null && avatar.isNotEmpty
-                ? Image.network(
-                    avatar,
-                    width: double.infinity,
-                    height: 170,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) {
-                      return Container(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        child: _buildAvatarInitial(organizationName),
-                      );
-                    },
-                  )
-                : Container(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    child: _buildAvatarInitial(organizationName),
-                  ),
-          ),
-        ),
-
-        Positioned(
-          bottom: -30,
-          left: 16,
-          child: Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: theme.scaffoldBackgroundColor,
-                width: 3,
-              ),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(13),
-              child: avatar != null && avatar.isNotEmpty
-                  ? Image.network(
-                      avatar,
-                      width: 75,
-                      height: 75,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) {
-                        return _buildAvatarInitial(organizationName);
-                      },
-                    )
-                  : _buildAvatarInitial(organizationName),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAvatarInitial(String organizationName) {
-    return Center(
-      child: Text(
-        organizationName.isNotEmpty ? organizationName[0].toUpperCase() : 'O',
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 26,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNameAndBadge(
-    BuildContext context,
-    UserModel? user,
-    OrganizationProfileModel? profile,
-  ) {
-    final theme = Theme.of(context);
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Flexible(
-          child: Text(
-            user?.name ?? '',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: theme.colorScheme.onSurface,
-              fontSize: AppSize.font(20),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-
-        if (profile?.isVerified == true) ...[
-          SizedBox(width: AppSize.getSize(10)),
-          CustomIcon(
-            icon: AppIcons.verified,
-            color: AppColors.primary,
-            width: AppSize.getSize(20),
-            height: AppSize.getSize(20),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildDescription(
-    BuildContext context,
-    OrganizationProfileModel? profile,
-  ) {
-    final theme = Theme.of(context);
-
-    final headquarters = profile?.headquarters?.trim() ?? '';
-
-    return Text(
-      headquarters.isNotEmpty
-          ? headquarters
-          : 'No organization information available',
-      style: TextStyle(
-        color: theme.colorScheme.onSurface.withValues(alpha: .6),
-        fontSize: 14,
-        height: 1.5,
-      ),
-    );
-  }
-
   Widget _buildStatsGrid(
     BuildContext context,
     OrganizationProfileModel? profile,
@@ -293,15 +159,15 @@ class OrganizationProfileScreen extends StatelessWidget {
         (profile?.attendeesCount ?? 0).compact,
         'organization.profile.volunteers_engaged'.tr(),
       ),
-      (
-        AppIcons.pound,
-        theme.brightness == Brightness.dark
-            ? Colors.orange.withValues(alpha: .15)
-            : const Color(0xFFFDF1E4),
-        const Color(0xFFE8A13D),
-        'EGP ${(profile?.donationsRaised ?? 0).compact}',
-        'organization.profile.donations_raised'.tr(),
-      ),
+      // (
+      //   AppIcons.pound,
+      //   theme.brightness == Brightness.dark
+      //       ? Colors.orange.withValues(alpha: .15)
+      //       : const Color(0xFFFDF1E4),
+      //   const Color(0xFFE8A13D),
+      //   'EGP ${(profile?.donationsRaised ?? 0).compact}',
+      //   'organization.profile.donations_raised'.tr(),
+      // ),
       (
         AppIcons.fileDone,
         theme.brightness == Brightness.dark
@@ -313,16 +179,46 @@ class OrganizationProfileScreen extends StatelessWidget {
       ),
     ];
 
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 1.35,
-      children: stats
-          .map((s) => _statCard(context, s.$1, s.$2, s.$3, s.$4, s.$5))
-          .toList(),
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _statCard(
+                context,
+                stats[0].$1,
+                stats[0].$2,
+                stats[0].$3,
+                stats[0].$4,
+                stats[0].$5,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _statCard(
+                context,
+                stats[1].$1,
+                stats[1].$2,
+                stats[1].$3,
+                stats[1].$4,
+                stats[1].$5,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: _statCard(
+            context,
+            stats[2].$1,
+            stats[2].$2,
+            stats[2].$3,
+            stats[2].$4,
+            stats[2].$5,
+          ),
+        ),
+      ],
     );
   }
 

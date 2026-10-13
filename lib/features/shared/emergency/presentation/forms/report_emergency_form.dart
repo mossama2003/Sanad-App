@@ -391,7 +391,7 @@ class _OrganizationEmergencyFormState extends State<OrganizationEmergencyForm> {
     if (!cubit.formKey.currentState!.validate()) return;
 
     if (!hasLocation) {
-      AppToast.error('shared.emergency.location_required'.tr());
+      AppToast.error('shared.emergency.reports.location_required'.tr());
       return;
     }
 

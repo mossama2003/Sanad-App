@@ -11,6 +11,7 @@ class UserModel {
   String? avatar;
   String? role;
   int? unreadNotifications;
+  bool? isVerified;
 
   UserProfileModel? profile;
   List<UserAttachmentModel> attachments;
@@ -25,6 +26,7 @@ class UserModel {
     this.avatar,
     this.role,
     this.unreadNotifications,
+    this.isVerified = false,
     this.profile,
     this.attachments = const [],
   });
@@ -40,10 +42,10 @@ class UserModel {
       avatar: json['avatar'],
       role: json['role'],
       unreadNotifications: json['unread_notifications'],
+      isVerified: json['is_verified'] ?? false,
       profile: json['profile'] != null
           ? UserProfileModel.fromJson(json['profile'])
           : null,
-
       attachments: json['attachments'] != null
           ? List<UserAttachmentModel>.from(
               json['attachments'].map((e) => UserAttachmentModel.fromJson(e)),
