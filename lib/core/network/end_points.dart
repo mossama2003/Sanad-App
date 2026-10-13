@@ -14,6 +14,8 @@ String REFRESH_TOKEN = 'auth/token/refresh/';
 
 String LOG_OUT = 'auth/logout/';
 
+String CHANGE_PASSWORD = 'auth/password/change/';
+
 String UPDATE_ACCOUNT = 'auth/user/';
 
 String UPDATE_PROFILE = 'v1/users/profile/update/';

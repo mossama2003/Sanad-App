@@ -577,6 +577,24 @@
         "copyright": "Copyright",
         "billing": "Billing"
       }
+    },
+    "change_password": {
+      "title": "Change Password",
+      "success": "Password changed successfully",
+      "notice_title": "Security Notice",
+      "notice_desc": "Create a strong password that you do not use on any other account to keep your data safe.",
+      "current_password": "Current Password",
+      "current_password_hint": "Enter your current password",
+      "new_password": "New Password",
+      "new_password_hint": "Enter new password",
+      "confirm_password": "Confirm New Password",
+      "confirm_password_hint": "Re-enter new password",
+      "rule_min_length": "At least 8 characters",
+      "rule_uppercase": "One uppercase letter",
+      "rule_number": "One number",
+      "rule_match": "Passwords match",
+      "cancel": "Cancel",
+      "continue_btn": "Continue"
     }
   },
   "organization": {

@@ -21,6 +21,7 @@ import '../../../contact_us/presentation/screens/contact_us_screen.dart';
 import '../../../faq/presentation/screens/faq_screen.dart';
 import '../../../terms/presentation/screens/terms_screen.dart';
 import '../cards/settings_card.dart';
+import '../../../change_password/presentation/screens/change_password_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -188,6 +189,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     icon: AppIcons.password,
                     title: 'shared.settings.change_password'.tr(),
                     trailing: _arrowIcon(),
+                    onTap: () =>
+                        AppNavigator.push(const ChangePasswordScreen()),
                   ),
                 ],
               ),
