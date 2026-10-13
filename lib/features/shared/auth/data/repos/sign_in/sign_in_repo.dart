@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:sanad_app/features/shared/auth/data/params/sign_in_param.dart';
 import 'package:sanad_app/core/network/end_points.dart';
 import 'package:dartz/dartz.dart';

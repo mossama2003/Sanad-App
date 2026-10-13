@@ -6,9 +6,7 @@ import 'package:sanad_app/features/volunteer/home/presentation/screens/volunteer
 
 import '../../../../../../core/helper/app_navigator.dart';
 import '../../../../../../core/helper/app_toast.dart';
-import '../../../../../../core/network/end_points.dart';
 import '../../../../../../core/network/local/cache/cache_helper.dart';
-import '../../../../../../core/network/remote/api/dio_helper.dart';
 import '../../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../organization/home/presentation/screens/organization_home_body.dart';
 import '../../../data/params/sign_in_param.dart';
@@ -20,7 +18,8 @@ class SignInCubit extends Cubit<SignInState> {
 
   final SignInRepo repo;
 
-  static SignInCubit get(BuildContext context) => BlocProvider.of(context);
+  static SignInCubit get(BuildContext context) =>
+      BlocProvider.of<SignInCubit>(context);
 
   final formKey = GlobalKey<FormState>();
 
@@ -35,85 +34,98 @@ class SignInCubit extends Cubit<SignInState> {
   }
 
   Future<void> signIn() async {
-    if (!formKey.currentState!.validate()) return;
+    if (formKey.currentState?.validate() != true) return;
 
     emit(Loading());
 
-    final appCubit = AppCubit.get(AppNavigator.context);
+    try {
+      final appCubit = AppCubit.get(AppNavigator.context);
 
-    final api = await repo.signIn(
-      SignInParam(
-        email: emailController.text.trim(),
-        password: passwordController.text,
-      ),
-    );
+      final api = await repo.signIn(
+        SignInParam(
+          email: emailController.text.trim(),
+          password: passwordController.text,
+        ),
+      );
 
-    api.fold(
-      (failure) {
-        emit(Error());
-
-        AppToast.error(failure.errMessage);
-      },
-
-      (auth) async {
-        // Save Tokens
-        await CacheHelper.save(CacheKeys.accessToken, auth.access);
-
-        await CacheHelper.save(CacheKeys.accessToken, auth.access);
-
-        // Debug cookies
-        final cookies = await DioHelper.cookieJar.loadForRequest(
-          Uri.parse(BASE_URL),
-        );
-
-        debugPrint("LOGIN COOKIES => $cookies");
-
-        debugPrint("ACCESS TOKEN => ${auth.access}");
-        debugPrint("REFRESH TOKEN => ${auth.refresh}");
-
-        // Get User Data
-        final user = await appCubit.getUser();
-
-        if (user == null) {
+      await api.fold<Future<void>>(
+        (failure) async {
           emit(Error());
-          AppToast.error('shared.sign_in.user_not_found'.tr());
-          return;
-        }
+          AppToast.error(failure.errMessage);
+        },
+        (auth) async {
+          final accessToken = auth.access;
 
-        if (user.profile?.id != null) {
-          await CacheHelper.save(CacheKeys.profileId, user.profile!.id!);
-        }
+          if (accessToken!.isEmpty) {
+            emit(Error());
+            AppToast.error('shared.sign_in.user_not_found'.tr());
+            return;
+          }
 
-        if (user.id != null) {
-          await CacheHelper.save(CacheKeys.userId, user.id!);
-        }
+          await CacheHelper.save(CacheKeys.accessToken, accessToken);
 
-        emit(Success());
+          final refreshToken = auth.refresh;
 
-        AppToast.success('shared.sign_in.account_signed_in'.tr());
+          if (refreshToken != null && refreshToken.isNotEmpty) {
+            await CacheHelper.save(CacheKeys.refreshToken, refreshToken);
+          } else {
+            await CacheHelper.remove(CacheKeys.refreshToken);
+          }
 
-        final role = user.role;
+          final user = await appCubit.getUser();
 
-        if (role == null) {
-          AppToast.error('shared.sign_in.user_role_not_found'.tr());
+          if (user == null) {
+            emit(Error());
+            AppToast.error('shared.sign_in.user_not_found'.tr());
+            return;
+          }
 
-          return;
-        }
+          final profileId = user.profile?.id;
 
-        switch (role) {
-          case 'volunteer':
-            AppNavigator.remove(const VolunteerHomeBody());
-            break;
+          if (profileId != null) {
+            await CacheHelper.save(CacheKeys.profileId, profileId);
+          }
 
-          case 'organization':
-            AppNavigator.remove(const OrganizationHomeBody());
-            break;
+          final userId = user.id;
 
-          default:
-            AppToast.error('Unknown role: $role');
-        }
-      },
-    );
+          if (userId != null) {
+            await CacheHelper.save(CacheKeys.userId, userId);
+          }
+
+          final role = user.role;
+
+          if (role == null || role.isEmpty) {
+            emit(Error());
+            AppToast.error('shared.sign_in.user_role_not_found'.tr());
+            return;
+          }
+
+          emit(Success());
+
+          AppToast.success('shared.sign_in.account_signed_in'.tr());
+
+          switch (role) {
+            case 'volunteer':
+              AppNavigator.remove(const VolunteerHomeBody());
+              break;
+
+            case 'organization':
+              AppNavigator.remove(const OrganizationHomeBody());
+              break;
+
+            default:
+              emit(Error());
+              AppToast.error('Unknown role: $role');
+          }
+        },
+      );
+    } catch (e, stackTrace) {
+      debugPrint('SIGN IN ERROR: $e');
+      debugPrintStack(stackTrace: stackTrace);
+
+      emit(Error());
+      AppToast.error('Something went wrong. Please try again.');
+    }
   }
 
   @override
