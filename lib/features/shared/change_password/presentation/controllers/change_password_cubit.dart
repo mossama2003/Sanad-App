@@ -44,8 +44,12 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
   }
 
   bool get hasMinLength => newPasswordController.text.length >= 8;
-  bool get hasUppercase => newPasswordController.text.contains(RegExp(r'[A-Z]'));
+
+  bool get hasUppercase =>
+      newPasswordController.text.contains(RegExp(r'[A-Z]'));
+
   bool get hasNumber => newPasswordController.text.contains(RegExp(r'[0-9]'));
+
   bool get passwordsMatch =>
       newPasswordController.text.isNotEmpty &&
       newPasswordController.text == confirmPasswordController.text;

@@ -74,23 +74,43 @@ class ServerFailure extends Failure {
   }
 
   factory ServerFailure.fromResponse(Response response) {
+    final data = response.data;
     if (response.statusCode == 401) {
       CacheHelper.remove('token');
-      if (response.data['message'] != null) {
-        return ServerFailure(response.data['message']);
-      } else if (response.data['error'] != null) {
-        return ServerFailure(response.data['error']);
-      } else {
-        return ServerFailure('failure.unexpected_error'.tr());
+    }
+    if (data is Map) {
+      final message = data['message'];
+      if (message != null && message.toString().trim().isNotEmpty) {
+        return ServerFailure(message.toString().trim());
       }
-    } else {
-      if (response.data['message'] != null) {
-        return ServerFailure(response.data['message']);
-      } else if (response.data['error'] != null) {
-        return ServerFailure(response.data['error']);
-      } else {
-        return ServerFailure.fromStatusCode(response.statusCode);
+      final detail = data['detail'];
+      if (detail != null && detail.toString().trim().isNotEmpty) {
+        return ServerFailure(detail.toString().trim());
+      }
+      final error = data['error'];
+      if (error != null && error.toString().trim().isNotEmpty) {
+        return ServerFailure(error.toString().trim());
+      }
+      final errors = data['errors'];
+      if (errors is Map) {
+        final messages = <String>[];
+        for (final value in errors.values) {
+          if (value is List) {
+            messages.addAll(
+              value
+                  .where((item) => item != null)
+                  .map((item) => item.toString().trim())
+                  .where((item) => item.isNotEmpty),
+            );
+          } else if (value != null && value.toString().trim().isNotEmpty) {
+            messages.add(value.toString().trim());
+          }
+        }
+        if (messages.isNotEmpty) {
+          return ServerFailure(messages.toSet().join('\n'));
+        }
       }
     }
+    return ServerFailure.fromStatusCode(response.statusCode);
   }
 }

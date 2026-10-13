@@ -32,9 +32,7 @@ class ChangePasswordScreen extends StatelessWidget {
             ),
           ),
         ),
-        body: const SafeArea(
-          child: ChangePasswordForm(),
-        ),
+        body: const SafeArea(child: ChangePasswordForm()),
       ),
     );
   }

@@ -1,16 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 
+import '../../../../../core/shared/widgets/custom_field_text.dart';
+import '../../../../../core/shared/widgets/custom_button.dart';
+import '../../../../../core/shared/widgets/custom_icon.dart';
+import '../../../../../core/validator/app_validators.dart';
+import '../../../../../core/helper/app_navigator.dart';
+import '../controllers/change_password_cubit.dart';
 import '../../../../../core/constant/app_assets.dart';
 import '../../../../../core/constant/app_size.dart';
-import '../../../../../core/helper/app_navigator.dart';
-import '../../../../../core/shared/widgets/custom_button.dart';
-import '../../../../../core/shared/widgets/custom_field_text.dart';
-import '../../../../../core/shared/widgets/custom_icon.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../../../../core/validator/app_validators.dart';
-import '../controllers/change_password_cubit.dart';
 
 class ChangePasswordForm extends StatelessWidget {
   const ChangePasswordForm({super.key});
