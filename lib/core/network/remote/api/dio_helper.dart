@@ -10,6 +10,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 class DioHelper {
   static Dio? dio;
+
   static late CookieJar cookieJar;
 
   static Future<void> init() async {
@@ -18,54 +19,50 @@ class DioHelper {
         baseUrl: BASE_URL,
         followRedirects: false,
         receiveDataWhenStatusError: true,
-        validateStatus: (status) => status != null && status < 500,
+        validateStatus: (status) => status! < 500,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         sendTimeout: const Duration(seconds: 30),
         maxRedirects: 5,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+        },
       ),
     );
 
     cookieJar = CookieJar();
 
-    dio!.interceptors.add(CookieManager(cookieJar));
-    dio!.interceptors.add(DioInterceptors(dio!));
+    dio!.interceptors.add(
+      CookieManager(cookieJar),
+    );
+
+    dio!.interceptors.add(
+      DioInterceptors(dio!),
+    );
 
     if (kDebugMode) {
       dio!.interceptors.add(
         PrettyDioLogger(
           error: true,
           request: true,
-          requestBody: false,
+          requestBody: true,
           responseBody: true,
-          requestHeader: false,
-          responseHeader: false,
+          requestHeader: true,
+          responseHeader: true,
         ),
       );
     }
   }
 
-  static String _buildUrl(String url, {bool useFullUrl = false}) {
-    if (useFullUrl || url.startsWith('http')) {
-      return url;
-    }
+  static String _buildUrl(
+      String url, {
+        bool useFullUrl = false,
+      }) {
+    if (useFullUrl) return url;
 
     return '$BASE_URL$url';
   }
 
-  static Options _buildOptions({
-    Map<String, dynamic>? headers,
-    Options? options,
-    bool skipAuth = false,
-  }) {
-    final currentOptions = options ?? Options();
-
-    return currentOptions.copyWith(
-      headers: {...?currentOptions.headers, ...?headers},
-      extra: {...?currentOptions.extra, if (skipAuth) 'skipAuth': true},
-    );
-  }
 
   static Future<Response> get({
     required String url,
@@ -74,19 +71,21 @@ class DioHelper {
     dynamic data,
     Options? options,
     bool useFullUrl = false,
-    bool skipAuth = false,
   }) async {
-    return dio!.get(
-      _buildUrl(url, useFullUrl: useFullUrl),
+    return await dio!.get(
+      _buildUrl(
+        url,
+        useFullUrl: useFullUrl || url.startsWith('http'),
+      ),
       queryParameters: query,
       data: data,
-      options: _buildOptions(
-        headers: headers,
-        options: options,
-        skipAuth: skipAuth,
-      ),
+      options: options ??
+          Options(
+            headers: headers,
+          ),
     );
   }
+
 
   static Future<Response> post({
     required String url,
@@ -95,19 +94,21 @@ class DioHelper {
     dynamic data,
     Options? options,
     bool useFullUrl = false,
-    bool skipAuth = false,
   }) async {
-    return dio!.post(
-      _buildUrl(url, useFullUrl: useFullUrl),
+    return await dio!.post(
+      _buildUrl(
+        url,
+        useFullUrl: useFullUrl,
+      ),
       data: data,
       queryParameters: query,
-      options: _buildOptions(
-        headers: headers,
-        options: options,
-        skipAuth: skipAuth,
-      ),
+      options: options ??
+          Options(
+            headers: headers,
+          ),
     );
   }
+
 
   static Future<Response> put({
     required String url,
@@ -116,19 +117,21 @@ class DioHelper {
     dynamic data,
     Options? options,
     bool useFullUrl = false,
-    bool skipAuth = false,
   }) async {
-    return dio!.put(
-      _buildUrl(url, useFullUrl: useFullUrl),
+    return await dio!.put(
+      _buildUrl(
+        url,
+        useFullUrl: useFullUrl,
+      ),
       data: data,
       queryParameters: query,
-      options: _buildOptions(
-        headers: headers,
-        options: options,
-        skipAuth: skipAuth,
-      ),
+      options: options ??
+          Options(
+            headers: headers,
+          ),
     );
   }
+
 
   static Future<Response> patch({
     required String url,
@@ -137,19 +140,21 @@ class DioHelper {
     dynamic data,
     Options? options,
     bool useFullUrl = false,
-    bool skipAuth = false,
   }) async {
-    return dio!.patch(
-      _buildUrl(url, useFullUrl: useFullUrl),
+    return await dio!.patch(
+      _buildUrl(
+        url,
+        useFullUrl: useFullUrl,
+      ),
       data: data,
       queryParameters: query,
-      options: _buildOptions(
-        headers: headers,
-        options: options,
-        skipAuth: skipAuth,
-      ),
+      options: options ??
+          Options(
+            headers: headers,
+          ),
     );
   }
+
 
   static Future<Response> delete({
     required String url,
@@ -158,17 +163,18 @@ class DioHelper {
     dynamic data,
     Options? options,
     bool useFullUrl = false,
-    bool skipAuth = false,
   }) async {
-    return dio!.delete(
-      _buildUrl(url, useFullUrl: useFullUrl),
+    return await dio!.delete(
+      _buildUrl(
+        url,
+        useFullUrl: useFullUrl,
+      ),
       data: data,
       queryParameters: query,
-      options: _buildOptions(
-        headers: headers,
-        options: options,
-        skipAuth: skipAuth,
-      ),
+      options: options ??
+          Options(
+            headers: headers,
+          ),
     );
   }
 }

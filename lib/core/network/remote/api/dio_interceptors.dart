@@ -10,109 +10,66 @@ class DioInterceptors extends Interceptor {
 
   DioInterceptors(this.dio);
 
-  bool _isPublicRequest(RequestOptions options) {
-    final path = options.path.toLowerCase();
-
-    return options.extra['skipAuth'] == true ||
-        path.endsWith('/auth/login/') ||
-        path.endsWith('/auth/register/');
-  }
-
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final lang = CacheHelper.get(CacheKeys.lang)?.toString();
-    final skipAuth = _isPublicRequest(options);
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    final String? lang = CacheHelper.get(CacheKeys.lang);
+
+    final String? accessToken = CacheHelper.get(CacheKeys.accessToken);
+
+    debugPrint("TOKEN FROM CACHE => $accessToken");
+    debugPrint("PROFILE ID FROM CACHE => ${CacheHelper.get(CacheKeys.profileId)}");
+    debugPrint("USER ID FROM CACHE => ${CacheHelper.get(CacheKeys.userId)}");
 
     if (lang != null && lang.isNotEmpty) {
       options.headers['lang'] = lang;
     }
 
-    if (skipAuth) {
-      options.headers.remove('Authorization');
-      options.headers.remove('authorization');
-    } else {
-      final accessToken = CacheHelper.get(CacheKeys.accessToken)?.toString();
-
-      if (accessToken != null && accessToken.isNotEmpty) {
-        options.headers['Authorization'] = 'Bearer $accessToken';
-      } else {
-        options.headers.remove('Authorization');
-        options.headers.remove('authorization');
-      }
+    if (accessToken != null && accessToken.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $accessToken';
     }
 
-    handler.next(options);
+    return handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    handler.next(response);
+    return handler.next(response);
   }
 
   @override
-  Future<void> onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) async {
-    final requestOptions = err.requestOptions;
-    final statusCode = err.response?.statusCode;
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    if (err.response?.statusCode == 401 || err.response?.statusCode == 403) {
+      final refreshToken = CacheHelper.get(CacheKeys.refreshToken);
 
-    if (_isPublicRequest(requestOptions)) {
-      handler.next(err);
-      return;
-    }
+      if (refreshToken != null) {
+        try {
+          final response = await dio.post(
+            REFRESH_TOKEN,
+            data: {"refresh": refreshToken},
+          );
 
-    if (statusCode != 401) {
-      handler.next(err);
-      return;
-    }
+          if (response.statusCode == 200) {
+            final newAccessToken = response.data['access'];
 
-    if (requestOptions.extra['retriedAfterRefresh'] == true) {
-      handler.next(err);
-      return;
-    }
+            await CacheHelper.save(CacheKeys.accessToken, newAccessToken);
 
-    final refreshToken = CacheHelper.get(CacheKeys.refreshToken)?.toString();
+            final options = err.requestOptions;
 
-    if (refreshToken == null || refreshToken.isEmpty) {
-      handler.next(err);
-      return;
-    }
+            options.headers['Authorization'] = 'Bearer $newAccessToken';
 
-    try {
-      final refreshResponse = await dio.post(
-        REFRESH_TOKEN,
-        data: {'refresh': refreshToken},
-        options: Options(extra: {'skipAuth': true, 'isTokenRefresh': true}),
-      );
+            final retryResponse = await dio.fetch(options);
 
-      if (refreshResponse.statusCode != 200) {
-        handler.next(err);
-        return;
+            return handler.resolve(retryResponse);
+          }
+        } catch (e) {
+          debugPrint("REFRESH TOKEN ERROR => $e");
+        }
       }
-
-      final newAccessToken = refreshResponse.data['access']?.toString();
-
-      if (newAccessToken == null || newAccessToken.isEmpty) {
-        handler.next(err);
-        return;
-      }
-
-      await CacheHelper.save(CacheKeys.accessToken, newAccessToken);
-
-      requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
-
-      requestOptions.extra['retriedAfterRefresh'] = true;
-
-      final retryResponse = await dio.fetch(requestOptions);
-
-      handler.resolve(retryResponse);
-    } on DioException catch (e) {
-      debugPrint('Token refresh failed: ${e.response?.statusCode}');
-      handler.next(err);
-    } catch (e) {
-      debugPrint('Token refresh failed: $e');
-      handler.next(err);
     }
+
+    return handler.next(err);
   }
 }
