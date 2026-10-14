@@ -595,6 +595,30 @@
       "rule_match": "Passwords match",
       "cancel": "Cancel",
       "continue_btn": "Continue"
+    },
+    "forgot_password": {
+      "request_title": "Forgot Password",
+      "request_desc": "Enter your email address and we will send you a verification code to reset your password.",
+      "confirm_title": "Reset Password",
+      "confirm_desc": "Enter the verification code sent to your email and create a new password.",
+      "email": "Email Address",
+      "email_hint": "Enter your email address",
+      "otp": "Verification Code",
+      "otp_hint": "Enter OTP code",
+      "new_password": "New Password",
+      "new_password_hint": "Enter new password",
+      "confirm_new_password": "Confirm New Password",
+      "confirm_new_password_hint": "Re-enter new password",
+      "send_code": "Send Verification Code",
+      "reset_password": "Reset Password",
+      "back_to_sign_in": "Back to Sign In",
+      "resend_code": "Resend Code",
+      "resend_in": "Resend code in {seconds}s",
+      "otp_sent_success": "Verification code sent to your email successfully.",
+      "reset_success": "Password reset successfully. Please sign in with your new password.",
+      "otp_required": "Please enter the verification code",
+      "otp_length": "Verification code must not exceed 8 characters",
+      "otp_length_error": "The code must be exactly 8 characters"
     }
   },
   "organization": {

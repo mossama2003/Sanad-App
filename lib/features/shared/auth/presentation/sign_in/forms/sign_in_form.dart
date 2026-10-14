@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../organization_sign_up/screens/organization_sign_up_screen.dart';
 import '../../volunteer_sign_up/screens/volunteer_sign_up_screen.dart';
+import 'package:sanad_app/features/shared/forgot_password/presentation/screens/forgot_password_request_screen.dart';
 import '../../../../../../core/shared/widgets/custom_field_text.dart';
 import '../../../../../../core/shared/widgets/custom_button.dart';
 import '../../../../../../core/shared/widgets/custom_svg.dart';
@@ -135,9 +136,20 @@ class _SignInFormState extends State<SignInForm> {
                       ),
 
                       SizedBox(height: AppSize.getHeight(15)),
-                      Text(
-                        'shared.sign_in.forget_password'.tr(),
-                        style: TextStyle(color: AppColors.primary).xs,
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(4),
+                          onTap: () {
+                            AppNavigator.push(
+                              const ForgotPasswordRequestScreen(),
+                            );
+                          },
+                          child: Text(
+                            'shared.sign_in.forget_password'.tr(),
+                            style: TextStyle(color: AppColors.primary).xs,
+                          ),
+                        ),
                       ),
                       SizedBox(height: AppSize.getHeight(25)),
                       _socialIcon(
