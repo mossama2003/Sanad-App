@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'features/organization/home/presentation/controllers/organization_home_cubit.dart';
+import 'features/shared/notification/data/services/notification_service.dart';
 import 'features/volunteer/events/presentation/controllers/volunteer_events_cubit.dart';
 import 'features/volunteer/home/presentation/controllers/volunteer_home_cubit.dart';
 import 'features/volunteer/community/data/repos/volunteer_community_repo.dart';
@@ -22,19 +23,38 @@ import 'core/helper/app_helper.dart';
 import 'core/helper/app_locals.dart';
 import 'core/style/app_theme.dart';
 
-void main() async {
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+// Firebase
+import 'firebase_options.dart';
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  debugPrint('FCM Background Message: ${message.messageId}');
+}
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  /// HIVE INITIALIZATION
+  // Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Register background handler only once.
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  // Hive
   await HiveInit.init();
 
-  /// SHARED PREFERENCE INITIALIZATION
+  // Shared Preferences
   await CacheHelper.init();
 
-  /// THEME INIT
+  // Theme
   await AppTheme.init();
 
-  /// LANGUAGE INIT
+  // Localization
   await EasyLocalization.ensureInitialized();
 
   await initializeDateFormatting('ar');
@@ -42,11 +62,11 @@ void main() async {
 
   await AppLocales.init();
 
-  /// DIO INITIALIZATION
+  // Dio
   await DioHelper.init();
 
-  /// DISABLE AUTO ROTATE
-  SystemChrome.setPreferredOrientations([
+  // Disable auto rotation
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
@@ -62,8 +82,70 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _notificationsInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_notificationsInitialized) return;
+
+    _notificationsInitialized = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      _initializeNotifications();
+    });
+  }
+
+  Future<void> _initializeNotifications() async {
+    try {
+      await NotificationService.instance.initialize(
+        onNotificationTap: _handleNotificationTap,
+      );
+
+      final token = await NotificationService.instance.getToken();
+
+      debugPrint('Sanad FCM Token: $token');
+    } catch (e, stackTrace) {
+      debugPrint('Notifications initialization failed: $e');
+
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
+  Future<void> _handleNotificationTap(Map<String, dynamic> data) async {
+    final route = data['route']?.toString();
+
+    if (route == null || route.isEmpty) {
+      debugPrint('Notification has no route: $data');
+      return;
+    }
+
+    final navigator = AppNavigator.key.currentState;
+
+    if (navigator == null) {
+      debugPrint('Navigator is not ready yet.');
+      return;
+    }
+
+    try {
+      navigator.pushNamed(route, arguments: data);
+    } catch (e, stackTrace) {
+      debugPrint('Failed to open notification route "$route": $e');
+
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,21 +155,17 @@ class MyApp extends StatelessWidget {
         return MultiBlocProvider(
           providers: [
             BlocProvider(create: (_) => AppCubit()),
-
             BlocProvider(
               create: (_) => VolunteerHomeCubit(VolunteerHomeRepoImpel()),
             ),
-
             BlocProvider(
               create: (_) => VolunteerEventsCubit(VolunteerEventsRepoImpel())
                 ..loadEventsFromCache()
                 ..getVolunteerEvents(),
             ),
-
             BlocProvider(
               create: (_) => OrganizationHomeCubit(OrganizationHomeRepoImpel()),
             ),
-
             BlocProvider(
               create: (_) =>
                   VolunteerCommunityCubit(VolunteerCommunityRepoImpel()),

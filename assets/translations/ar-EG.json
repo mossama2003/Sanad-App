@@ -459,17 +459,22 @@
     },
     "notifications": {
       "title": "الإشعارات",
-      "desc": "3 تحديثات جديدة",
+      "desc": "{count} تحديثات جديدة",
       "mark_all_read": "تحديد الكل كمقروء",
       "all": "الكل",
       "unread": "غير مقروء",
       "rewards": "المكافآت",
-      "events": "الفعاليات"
-    },
-    "notifications_removed": {
-      "new_badge_earned": "حصلت على شارة جديدة!",
-      "you_earned_the_social_butterfly_badge": "لقد حصلت على شارة الفراشة الاجتماعية",
-      "1h_ago": "منذ ساعة"
+      "events": "الفعاليات",
+      "load_error_title": "تعذر تحميل الإشعارات",
+      "retry": "حاول مرة أخرى",
+      "empty_title": "أنت على اطلاع بكل جديد!",
+      "empty_desc": "ستظهر الإشعارات الجديدة هنا.",
+      "empty_unread_title": "لا توجد إشعارات غير مقروءة",
+      "empty_unread_desc": "لقد قرأت جميع إشعاراتك.",
+      "empty_rewards_title": "لا توجد مكافآت حتى الآن",
+      "empty_rewards_desc": "ستظهر تحديثات الشارات ونقاط الخبرة هنا.",
+      "empty_events_title": "لا توجد إشعارات للفعاليات",
+      "empty_events_desc": "ستظهر تذكيرات الفعاليات وتحديثاتها هنا."
     },
     "badges": {
       "badges": "الشارات",

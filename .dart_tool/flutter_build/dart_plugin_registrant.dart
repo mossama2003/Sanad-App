@@ -9,6 +9,7 @@ import 'dart:io'; // flutter_ignore: dart_io_import.
 import 'package:android_file_picker/android_file_picker.dart' as android_file_picker;
 import 'package:file_selector_android/file_selector_android.dart' as file_selector_android;
 import 'package:flutter_image_compress_common/flutter_image_compress_common.dart' as flutter_image_compress_common;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart' as flutter_local_notifications;
 import 'package:geolocator_android/geolocator_android.dart' as geolocator_android;
 import 'package:image_picker_android/image_picker_android.dart' as image_picker_android;
 import 'package:open_file_android/open_file_android.dart' as open_file_android;
@@ -21,6 +22,7 @@ import 'package:webview_flutter_android/webview_flutter_android.dart' as webview
 import 'package:file_picker_darwin/file_picker_darwin.dart' as file_picker_darwin;
 import 'package:file_selector_ios/file_selector_ios.dart' as file_selector_ios;
 import 'package:flutter_image_compress_common/flutter_image_compress_common.dart' as flutter_image_compress_common;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart' as flutter_local_notifications;
 import 'package:geolocator_apple/geolocator_apple.dart' as geolocator_apple;
 import 'package:image_picker_ios/image_picker_ios.dart' as image_picker_ios;
 import 'package:open_file_ios/open_file_ios.dart' as open_file_ios;
@@ -31,8 +33,10 @@ import 'package:url_launcher_ios/url_launcher_ios.dart' as url_launcher_ios;
 import 'package:video_player_avfoundation/video_player_avfoundation.dart' as video_player_avfoundation;
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart' as webview_flutter_wkwebview;
 import 'package:connectivity_plus/connectivity_plus.dart' as connectivity_plus;
+import 'package:device_info_plus/device_info_plus.dart' as device_info_plus;
 import 'package:file_picker_linux/file_picker_linux.dart' as file_picker_linux;
 import 'package:file_selector_linux/file_selector_linux.dart' as file_selector_linux;
+import 'package:flutter_local_notifications_linux/flutter_local_notifications_linux.dart' as flutter_local_notifications_linux;
 import 'package:geolocator_linux/geolocator_linux.dart' as geolocator_linux;
 import 'package:image_picker_linux/image_picker_linux.dart' as image_picker_linux;
 import 'package:open_file_linux/open_file_linux.dart' as open_file_linux;
@@ -45,6 +49,7 @@ import 'package:wakelock_plus/wakelock_plus.dart' as wakelock_plus;
 import 'package:file_picker_darwin/file_picker_darwin.dart' as file_picker_darwin;
 import 'package:file_selector_macos/file_selector_macos.dart' as file_selector_macos;
 import 'package:flutter_image_compress_macos/flutter_image_compress_macos.dart' as flutter_image_compress_macos;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart' as flutter_local_notifications;
 import 'package:geolocator_apple/geolocator_apple.dart' as geolocator_apple;
 import 'package:image_picker_macos/image_picker_macos.dart' as image_picker_macos;
 import 'package:open_file_mac/open_file_mac.dart' as open_file_mac;
@@ -55,7 +60,9 @@ import 'package:url_launcher_macos/url_launcher_macos.dart' as url_launcher_maco
 import 'package:video_player_avfoundation/video_player_avfoundation.dart' as video_player_avfoundation;
 import 'package:wakelock_plus/wakelock_plus.dart' as wakelock_plus;
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart' as webview_flutter_wkwebview;
+import 'package:device_info_plus/device_info_plus.dart' as device_info_plus;
 import 'package:file_selector_windows/file_selector_windows.dart' as file_selector_windows;
+import 'package:flutter_local_notifications_windows/flutter_local_notifications_windows.dart' as flutter_local_notifications_windows;
 import 'package:image_picker_windows/image_picker_windows.dart' as image_picker_windows;
 import 'package:open_file_windows/open_file_windows.dart' as open_file_windows;
 import 'package:package_info_plus/package_info_plus.dart' as package_info_plus;
@@ -95,6 +102,15 @@ class _PluginRegistrant {
       } catch (err) {
         print(
           '`flutter_image_compress_common` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
+        flutter_local_notifications.AndroidFlutterLocalNotificationsPlugin.registerWith();
+      } catch (err) {
+        print(
+          '`flutter_local_notifications` threw an error: $err. '
           'The app may not function as expected until you remove this plugin from pubspec.yaml'
         );
       }
@@ -209,6 +225,15 @@ class _PluginRegistrant {
       }
 
       try {
+        flutter_local_notifications.IOSFlutterLocalNotificationsPlugin.registerWith();
+      } catch (err) {
+        print(
+          '`flutter_local_notifications` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
         geolocator_apple.GeolocatorApple.registerWith();
       } catch (err) {
         print(
@@ -300,6 +325,15 @@ class _PluginRegistrant {
       }
 
       try {
+        device_info_plus.DeviceInfoPlusLinuxPlugin.registerWith();
+      } catch (err) {
+        print(
+          '`device_info_plus` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
         file_picker_linux.FilePickerLinux.registerWith();
       } catch (err) {
         print(
@@ -313,6 +347,15 @@ class _PluginRegistrant {
       } catch (err) {
         print(
           '`file_selector_linux` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
+        flutter_local_notifications_linux.LinuxFlutterLocalNotificationsPlugin.registerWith();
+      } catch (err) {
+        print(
+          '`flutter_local_notifications_linux` threw an error: $err. '
           'The app may not function as expected until you remove this plugin from pubspec.yaml'
         );
       }
@@ -427,6 +470,15 @@ class _PluginRegistrant {
       }
 
       try {
+        flutter_local_notifications.MacOSFlutterLocalNotificationsPlugin.registerWith();
+      } catch (err) {
+        print(
+          '`flutter_local_notifications` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
         geolocator_apple.GeolocatorApple.registerWith();
       } catch (err) {
         print(
@@ -518,10 +570,28 @@ class _PluginRegistrant {
 
     } else if (Platform.isWindows) {
       try {
+        device_info_plus.DeviceInfoPlusWindowsPlugin.registerWith();
+      } catch (err) {
+        print(
+          '`device_info_plus` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
         file_selector_windows.FileSelectorWindows.registerWith();
       } catch (err) {
         print(
           '`file_selector_windows` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
+      try {
+        flutter_local_notifications_windows.FlutterLocalNotificationsWindows.registerWith();
+      } catch (err) {
+        print(
+          '`flutter_local_notifications_windows` threw an error: $err. '
           'The app may not function as expected until you remove this plugin from pubspec.yaml'
         );
       }

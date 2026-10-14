@@ -31,6 +31,10 @@ String GET_EVENTS = 'v1/events/read_event/';
 
 String EVENT_QR(int ID) => 'v1/events/read_event/$ID/';
 
+String GET_NOTIFICATIONS = 'v1/users/notification_inbox/';
+
+String REGISTER_FCM_DEVICE = '/api/fcm/devices/';
+
 //CASES
 String CREATE_CASE = 'v1/cases/manage_case/';
 
