@@ -1,5 +1,9 @@
 plugins {
     id("com.android.application")
+
+    // Firebase Configuration
+    id("com.google.gms.google-services")
+
     id("org.jetbrains.kotlin.android")
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -12,6 +16,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+
+        // Required by flutter_local_notifications
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -28,6 +35,7 @@ android {
 
     buildTypes {
         release {
+            // Debug signing for local testing
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -35,4 +43,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

@@ -302,6 +302,18 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "device_info_plus",
+      "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/device_info_plus-13.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "device_info_plus_platform_interface",
+      "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/device_info_plus_platform_interface-8.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
       "name": "dio",
       "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/dio-5.11.1",
       "packageUri": "lib/",
@@ -594,6 +606,36 @@
       "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/flutter_lints-6.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.8"
+    },
+    {
+      "name": "flutter_local_notifications",
+      "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/flutter_local_notifications-22.3.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "flutter_local_notifications_linux",
+      "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/flutter_local_notifications_linux-8.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "flutter_local_notifications_platform_interface",
+      "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/flutter_local_notifications_platform_interface-12.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "flutter_local_notifications_web",
+      "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/flutter_local_notifications_web-1.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "flutter_local_notifications_windows",
+      "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/flutter_local_notifications_windows-3.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
     },
     {
       "name": "flutter_localizations",
@@ -1448,6 +1490,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "timezone",
+      "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/timezone-0.11.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
       "name": "timing",
       "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/timing-1.0.2",
       "packageUri": "lib/",
@@ -1648,6 +1696,12 @@
     {
       "name": "win32",
       "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/win32-6.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "win32_registry",
+      "rootUri": "file:///Users/os/.pub-cache/hosted/pub.dev/win32_registry-3.0.3",
       "packageUri": "lib/",
       "languageVersion": "3.10"
     },

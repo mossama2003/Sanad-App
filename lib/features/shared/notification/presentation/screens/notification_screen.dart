@@ -1,84 +1,35 @@
-import 'package:sanad_app/features/shared/notification/data/enums/notification_enums.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+import '../../data/models/notification_model.dart';
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../data/models/notification_model.dart';
 
-class NotificationsScreen extends StatefulWidget {
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../data/repos/notification_repo.dart';
+import '../controllers/notification_cubit.dart';
+
+class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider<NotificationsCubit>(
+      create: (_) =>
+      NotificationsCubit(NotificationsRepoImpel())
+        ..getAllNotifications(),
+      child: const _NotificationsView(),
+    );
+  }
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
-  int _selectedTab = 0;
+class _NotificationsView extends StatelessWidget {
+  const _NotificationsView();
 
-  // void _markAllAsRead() {
-  //   setState(() {
-  //     for (int i = 0; i < _notifications.length; i++) {
-  //       _notifications[i] = _notifications[i].copyWith(isRead: true);
-  //     }
-  //   });
-  // }
-
-  final List<NotificationModel> _notifications = [
-    NotificationModel(
-      type: NotificationEnums.badge,
-      title: 'New Badge Unlocked!',
-      body: "You earned the 'Blood Hero' badge for donating blood 5 times.",
-      time: '2m ago',
-      isRead: false,
-      xpAmount: 250,
-    ),
-    NotificationModel(
-      type: NotificationEnums.xp,
-      title: 'XP Earned',
-      body: 'You received 150 XP for attending Beach Cleanup Drive.',
-      time: '1h ago',
-      isRead: false,
-      xpAmount: 150,
-    ),
-    NotificationModel(
-      type: NotificationEnums.urgentCase,
-      title: 'Urgent Case Near You',
-      body: 'Blood donation needed at Cairo University Hospital.',
-      time: '3h ago',
-      isRead: false,
-    ),
-    NotificationModel(
-      type: NotificationEnums.event,
-      title: 'Event Reminder',
-      body: 'Orphanage Visit starts tomorrow at 2:00 PM.',
-      time: '5h ago',
-      isRead: true,
-    ),
-  ];
-
-  List<NotificationModel> get _filtered {
-    switch (_selectedTab) {
-      case 1:
-        return _notifications.where((n) => !n.isRead).toList();
-      case 2:
-        return _notifications
-            .where(
-              (n) =>
-                  n.type == NotificationEnums.badge ||
-                  n.type == NotificationEnums.xp,
-            )
-            .toList();
-      case 3:
-        return _notifications
-            .where((n) => n.type == NotificationEnums.event)
-            .toList();
-      default:
-        return _notifications;
-    }
+  Future<void> _refreshNotifications(BuildContext context) async {
+    await context.read<NotificationsCubit>().refreshNotifications();
   }
-
-  int get _unreadCount => _notifications.where((n) => !n.isRead).length;
 
   @override
   Widget build(BuildContext context) {
@@ -109,31 +60,110 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
             ),
             SizedBox(height: AppSize.getHeight(3)),
-            Text(
-              'shared.notifications.desc'.tr(),
-              style: TextStyle(
-                fontSize: AppSize.font(15),
-                fontWeight: FontWeight.w300,
-                color: secondaryColor,
-              ),
+
+            // وصف الصفحة: عدد الإشعارات غير المقروءة
+            BlocBuilder<NotificationsCubit, NotificationsState>(
+              builder: (context, state) {
+                final unreadCount =
+                    context.read<NotificationsCubit>().unreadCount;
+
+                return Text(
+                  'shared.notifications.desc'.tr(
+                    namedArgs: {
+                      'count': unreadCount.toString(),
+                    },
+                  ),
+                  style: TextStyle(
+                    fontSize: AppSize.font(15),
+                    fontWeight: FontWeight.w300,
+                    color: secondaryColor,
+                  ),
+                );
+              },
             ),
-            // SizedBox(height: AppSize.getHeight(15)),
-            // _MarkAllBanner(onTap: _markAllAsRead),
+
             SizedBox(height: AppSize.getHeight(12)),
-            _NotifTabBar(
-              selected: _selectedTab,
-              unreadCount: _unreadCount,
-              onTap: (i) => setState(() => _selectedTab = i),
+
+            // Tabs
+            BlocBuilder<NotificationsCubit, NotificationsState>(
+              builder: (context, state) {
+                final cubit = context.read<NotificationsCubit>();
+
+                return _NotifTabBar(
+                  selected: cubit.selectedTab,
+                  unreadCount: cubit.unreadCount,
+                  onTap: cubit.changeTab,
+                );
+              },
             ),
+
             SizedBox(height: AppSize.getHeight(16)),
+
+            // Notifications list
             Expanded(
-              child: ListView.separated(
-                padding: AppSize.padding(horizontal: 16, bottom: 24),
-                itemCount: _filtered.length,
-                separatorBuilder: (_, _) =>
-                    SizedBox(height: AppSize.getHeight(10)),
-                itemBuilder: (_, i) =>
-                    _NotificationCard(notification: _filtered[i]),
+              child: BlocBuilder<NotificationsCubit, NotificationsState>(
+                builder: (context, state) {
+                  final cubit = context.read<NotificationsCubit>();
+                  final notifications = cubit.filteredNotifications;
+
+                  if (state is NotificationsLoading &&
+                      cubit.notifications.isEmpty) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    );
+                  }
+
+                  if (state is NotificationsError &&
+                      cubit.notifications.isEmpty) {
+                    return _NotificationsMessage(
+                      icon: Icons.cloud_off_outlined,
+                      title: 'shared.notifications.load_error_title'.tr(),
+                      message: state.message,
+                      actionLabel: 'shared.notifications.retry'.tr(),
+                      onAction: () => _refreshNotifications(context),
+                    );
+                  }
+
+                  if (notifications.isEmpty) {
+                    return RefreshIndicator(
+                      color: AppColors.primary,
+                      onRefresh: () => _refreshNotifications(context),
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          SizedBox(height: AppSize.getHeight(100)),
+                          _NotificationsMessage(
+                            icon: _emptyIcon(cubit.selectedTab),
+                            title: _emptyTitle(cubit.selectedTab),
+                            message: _emptyDescription(cubit.selectedTab),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    color: AppColors.primary,
+                    onRefresh: () => _refreshNotifications(context),
+                    child: ListView.separated(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: AppSize.padding(
+                        horizontal: 16,
+                        bottom: 24,
+                      ),
+                      itemCount: notifications.length,
+                      separatorBuilder: (_, __) =>
+                          SizedBox(height: AppSize.getHeight(10)),
+                      itemBuilder: (context, index) {
+                        return _NotificationCard(
+                          notification: notifications[index],
+                        );
+                      },
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -141,48 +171,125 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
     );
   }
+
+  IconData _emptyIcon(int tab) {
+    switch (tab) {
+      case 1:
+        return Icons.mark_email_read_outlined;
+      case 2:
+        return Icons.workspace_premium_outlined;
+      case 3:
+        return Icons.event_available_outlined;
+      default:
+        return Icons.notifications_none_rounded;
+    }
+  }
+
+  String _emptyTitle(int tab) {
+    switch (tab) {
+      case 1:
+        return 'shared.notifications.empty_unread_title'.tr();
+      case 2:
+        return 'shared.notifications.empty_rewards_title'.tr();
+      case 3:
+        return 'shared.notifications.empty_events_title'.tr();
+      default:
+        return 'shared.notifications.empty_title'.tr();
+    }
+  }
+
+  String _emptyDescription(int tab) {
+    switch (tab) {
+      case 1:
+        return 'shared.notifications.empty_unread_desc'.tr();
+      case 2:
+        return 'shared.notifications.empty_rewards_desc'.tr();
+      case 3:
+        return 'shared.notifications.empty_events_desc'.tr();
+      default:
+        return 'shared.notifications.empty_desc'.tr();
+    }
+  }
 }
 
-// class _MarkAllBanner extends StatelessWidget {
-//   final VoidCallback onTap;
-//
-//   const _MarkAllBanner({required this.onTap});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return GestureDetector(
-//       onTap: onTap,
-//       child: Container(
-//         width: double.infinity,
-//         margin: AppSize.padding(horizontal: 16),
-//         padding: AppSize.padding(vertical: 12),
-//         decoration: BoxDecoration(
-//           color: AppColors.primary.withValues(alpha: 0.1),
-//           borderRadius: BorderRadius.circular(14),
-//         ),
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             Icon(
-//               Icons.check_circle_outline,
-//               color: AppColors.primary,
-//               size: AppSize.getSize(16),
-//             ),
-//             SizedBox(width: AppSize.getWidth(6)),
-//             Text(
-//               'shared.notifications.mark_all_read'.tr(),
-//               style: TextStyle(
-//                 fontSize: AppSize.font(13),
-//                 fontWeight: FontWeight.w600,
-//                 color: AppColors.primary,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+class _NotificationsMessage extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  const _NotificationsMessage({
+    required this.icon,
+    required this.title,
+    required this.message,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final secondaryColor = textColor.withValues(alpha: .6);
+
+    return Center(
+      child: Padding(
+        padding: AppSize.padding(horizontal: 24, vertical: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: AppSize.getSize(76),
+              height: AppSize.getSize(76),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: .1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: AppSize.getSize(36),
+                color: AppColors.primary,
+              ),
+            ),
+            SizedBox(height: AppSize.getHeight(18)),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: textColor,
+                fontSize: AppSize.font(17),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            SizedBox(height: AppSize.getHeight(8)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: secondaryColor,
+                fontSize: AppSize.font(13),
+                height: 1.5,
+              ),
+            ),
+            if (actionLabel != null && onAction != null) ...[
+              SizedBox(height: AppSize.getHeight(18)),
+              FilledButton.icon(
+                onPressed: onAction,
+                icon: const Icon(Icons.refresh_rounded),
+                label: Text(actionLabel!),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _NotifTabBar extends StatelessWidget {
   final int selected;
@@ -214,22 +321,20 @@ class _NotifTabBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(
-          color: textColor.withValues(alpha: isDark ? .2 : .2),
-          width: 0.7,
-        ),
+        border: Border.all(color: textColor.withValues(alpha: .2), width: .7),
       ),
       child: Row(
-        children: List.generate(tabs.length, (i) {
-          final isSelected = selected == i;
-          final (label, badge) = tabs[i];
+        children: List.generate(tabs.length, (index) {
+          final isSelected = selected == index;
+          final (label, badge) = tabs[index];
 
           return Expanded(
             child: GestureDetector(
-              onTap: () => onTap(i),
+              onTap: () => onTap(index),
+              behavior: HitTestBehavior.opaque,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: AppSize.padding(vertical: 9),
+                padding: AppSize.padding(vertical: 9, horizontal: 2),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? (isDark
@@ -243,15 +348,20 @@ class _NotifTabBar extends StatelessWidget {
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: AppSize.font(11),
-                        fontWeight: FontWeight.w600,
-                        color: isSelected
-                            ? AppColors.primary
-                            : textColor.withValues(alpha: .6),
+                    Flexible(
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: AppSize.font(11),
+                          fontWeight: FontWeight.w600,
+                          color: isSelected
+                              ? AppColors.primary
+                              : textColor.withValues(alpha: .6),
+                        ),
                       ),
                     ),
                     if (badge != null && badge > 0) ...[
@@ -291,26 +401,30 @@ class _NotificationCard extends StatelessWidget {
   Color get _iconBgColor {
     switch (notification.type) {
       case NotificationEnums.badge:
-        return const Color(0xFFFFD700).withValues(alpha: 0.15);
+        return const Color(0xFFFFD700).withValues(alpha: .15);
       case NotificationEnums.xp:
-        return const Color(0xFF7B2FBE).withValues(alpha: 0.12);
+        return const Color(0xFF7B2FBE).withValues(alpha: .12);
       case NotificationEnums.urgentCase:
-        return const Color(0xFFE05C5C).withValues(alpha: 0.12);
+        return const Color(0xFFE05C5C).withValues(alpha: .12);
       case NotificationEnums.event:
-        return const Color(0xFF2ECFA0).withValues(alpha: 0.12);
+        return const Color(0xFF2ECFA0).withValues(alpha: .12);
+      case NotificationEnums.general:
+        return AppColors.primary.withValues(alpha: .12);
     }
   }
 
   Color get _iconColor {
     switch (notification.type) {
       case NotificationEnums.badge:
-        return const Color(0xFFFFD700);
+        return const Color(0xFFB8860B);
       case NotificationEnums.xp:
         return const Color(0xFF7B2FBE);
       case NotificationEnums.urgentCase:
         return const Color(0xFFE05C5C);
       case NotificationEnums.event:
-        return const Color(0xFF2ECFA0);
+        return const Color(0xFF159B78);
+      case NotificationEnums.general:
+        return AppColors.primary;
     }
   }
 
@@ -324,6 +438,8 @@ class _NotificationCard extends StatelessWidget {
         return Icons.warning_amber_outlined;
       case NotificationEnums.event:
         return Icons.calendar_month_outlined;
+      case NotificationEnums.general:
+        return Icons.notifications_none_rounded;
     }
   }
 
@@ -342,7 +458,7 @@ class _NotificationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: textColor.withValues(alpha: isDark ? .12 : .15),
-          width: 0.7,
+          width: .7,
         ),
         boxShadow: [
           BoxShadow(
@@ -370,6 +486,7 @@ class _NotificationCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Text(
@@ -381,15 +498,18 @@ class _NotificationCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (!notification.isRead)
+                    if (!notification.isRead) ...[
+                      SizedBox(width: AppSize.getWidth(8)),
                       Container(
                         width: AppSize.getSize(8),
                         height: AppSize.getSize(8),
-                        decoration: BoxDecoration(
+                        margin: const EdgeInsets.only(top: 5),
+                        decoration: const BoxDecoration(
                           color: AppColors.primary,
                           shape: BoxShape.circle,
                         ),
                       ),
+                    ],
                   ],
                 ),
                 SizedBox(height: AppSize.getHeight(4)),
@@ -404,19 +524,21 @@ class _NotificationCard extends StatelessWidget {
                 SizedBox(height: AppSize.getHeight(8)),
                 Row(
                   children: [
-                    Text(
-                      notification.time,
-                      style: TextStyle(
-                        fontSize: AppSize.font(11),
-                        color: secondaryColor,
+                    Expanded(
+                      child: Text(
+                        notification.relativeTime,
+                        style: TextStyle(
+                          fontSize: AppSize.font(11),
+                          color: secondaryColor,
+                        ),
                       ),
                     ),
-                    const Spacer(),
-                    if (notification.xpAmount != null)
+                    if (notification.xpAmount != null &&
+                        notification.xpAmount! > 0)
                       Container(
                         padding: AppSize.padding(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.12),
+                          color: AppColors.primary.withValues(alpha: .12),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
