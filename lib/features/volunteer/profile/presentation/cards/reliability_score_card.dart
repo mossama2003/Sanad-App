@@ -35,9 +35,9 @@ class ReliabilityScoreCard extends StatelessWidget {
 
     final cases = _normalizedPercentage(reliabilityScore?.casesEngagementScore);
 
-    final donations = _normalizedPercentage(
-      reliabilityScore?.donationsEngagementScore,
-    );
+    // final donations = _normalizedPercentage(
+    //   reliabilityScore?.donationsEngagementScore,
+    // );
 
     return Container(
       decoration: BoxDecoration(
@@ -147,17 +147,16 @@ class ReliabilityScoreCard extends StatelessWidget {
             ],
           ),
 
-          SizedBox(height: AppSize.getHeight(12)),
-
-          Row(
-            children: [
-              _ScoreItem(
-                title: 'volunteer.profile.donations_engagement'.tr(),
-                value: donations,
-              ),
-              const Expanded(child: SizedBox()),
-            ],
-          ),
+          // SizedBox(height: AppSize.getHeight(12)),
+          // Row(
+          //   children: [
+          //     _ScoreItem(
+          //       title: 'volunteer.profile.donations_engagement'.tr(),
+          //       value: donations,
+          //     ),
+          //     const Expanded(child: SizedBox()),
+          //   ],
+          // ),
 
           SizedBox(height: AppSize.getHeight(16)),
 

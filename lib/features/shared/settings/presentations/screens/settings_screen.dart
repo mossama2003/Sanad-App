@@ -168,8 +168,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsGroupCard(
                 icon: isDark ? AppIcons.darkMood : AppIcons.lightMood,
                 title: isDark
-                    ? 'shared.settings.dark_mood'.tr()
-                    : 'shared.settings.light_mood'.tr(),
+                    ? 'shared.settings.light_mood'.tr()
+                    : 'shared.settings.dark_mood'.tr(),
 
                 trailing: CustomSwitch(value: isDark, onChanged: _toggleTheme),
               ),

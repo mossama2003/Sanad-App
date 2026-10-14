@@ -739,22 +739,22 @@ class _OrganizationEmergencyFormState extends State<OrganizationEmergencyForm> {
                   // ========================================================
                   // Certifications
                   // ========================================================
-                  CustomFieldText(
-                    controller: cubit.certificationsController,
-                    title:
-                        'shared.emergency.reports.'
-                                'required_certifications'
-                            .tr(),
-                    hintText:
-                        'shared.emergency.reports.'
-                                'certifications_hint'
-                            .tr(),
-                    titleSize: AppSize.font(15),
-                    titleColor: titleColor,
-                    borderRadius: 20,
-                  ),
-
-                  SizedBox(height: AppSize.getHeight(15)),
+                  // CustomFieldText(
+                  //   controller: cubit.certificationsController,
+                  //   title:
+                  //       'shared.emergency.reports.'
+                  //               'required_certifications'
+                  //           .tr(),
+                  //   hintText:
+                  //       'shared.emergency.reports.'
+                  //               'certifications_hint'
+                  //           .tr(),
+                  //   titleSize: AppSize.font(15),
+                  //   titleColor: titleColor,
+                  //   borderRadius: 20,
+                  // ),
+                  //
+                  // SizedBox(height: AppSize.getHeight(15)),
 
                   // ========================================================
                   // Contact

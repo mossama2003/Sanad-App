@@ -599,7 +599,7 @@ class EmergencyCubit extends Cubit<EmergencyState> {
           isMySelected = true;
 
           emit(EmergencyCreated(emergency.id));
-          AppToast.success('volunteer.emergency.created_success'.tr());
+          AppToast.success('shared.emergency.created_success'.tr());
 
           return true;
         },

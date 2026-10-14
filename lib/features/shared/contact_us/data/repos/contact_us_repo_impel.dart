@@ -3,12 +3,20 @@ part of 'contact_us_repo.dart';
 class ContactUsRepoImpel implements ContactUsRepo {
   @override
   Future<Either<Failure, void>> submitContactUs({
+    required String email,
+    required String phone,
+    required String subject,
     required String comment,
   }) async {
     try {
       final response = await DioHelper.post(
         url: CONTACT_US,
-        data: {'comment': comment, 'response': 'Pending'},
+        data: {
+          'email': email,
+          'phone': phone,
+          'subject': subject,
+          'comment': comment,
+        },
       );
 
       if (response.statusCode == 201) {

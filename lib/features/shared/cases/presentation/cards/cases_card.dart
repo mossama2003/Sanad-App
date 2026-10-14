@@ -521,8 +521,8 @@ class CasesCard extends StatelessWidget {
                                 children: [
                                   casesCubit.isLikingCase(caseItem.id)
                                       ? SizedBox(
-                                          width: AppSize.getWidth(18),
-                                          height: AppSize.getHeight(18),
+                                          width: AppSize.getWidth(22),
+                                          height: AppSize.getHeight(22),
                                           child:
                                               const CircularProgressIndicator(
                                                 strokeWidth: 2,
@@ -534,8 +534,8 @@ class CasesCard extends StatelessWidget {
                                           color: caseItem.isLiked
                                               ? AppColors.red
                                               : secondaryColor,
-                                          width: AppSize.getWidth(18),
-                                          height: AppSize.getHeight(18),
+                                          width: AppSize.getWidth(22),
+                                          height: AppSize.getHeight(22),
                                         ),
 
                                   SizedBox(width: AppSize.getWidth(3)),
@@ -572,8 +572,8 @@ class CasesCard extends StatelessWidget {
                                 CustomIcon(
                                   icon: AppIcons.comment,
                                   color: secondaryColor,
-                                  width: AppSize.getWidth(18),
-                                  height: AppSize.getHeight(18),
+                                  width: AppSize.getWidth(22),
+                                  height: AppSize.getHeight(22),
                                 ),
                                 SizedBox(width: AppSize.getWidth(3)),
                                 Text(

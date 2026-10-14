@@ -1,8 +1,7 @@
-import 'package:sanad_app/core/shared/widgets/custom_button.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:sanad_app/core/constant/app_assets.dart';
-import 'package:flutter/material.dart';
 import 'package:sanad_app/core/shared/widgets/custom_icon.dart';
+import 'package:sanad_app/core/constant/app_assets.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 
 import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/style/app_colors.dart';
@@ -113,19 +112,20 @@ class OrganizationHomeDashboardWidget extends StatelessWidget {
                     ),
                   ),
 
-                  SizedBox(height: AppSize.getHeight(18)),
+                  // SizedBox(height: AppSize.getHeight(18)),
 
-                  CustomButton(
-                    height: AppSize.getHeight(40),
-
-                    title: 'organization.home.dashboard.go_to_dashboard'.tr(),
-
-                    textSize: AppSize.font(14),
-
-                    textColor: AppColors.black,
-
-                    bgColor: AppColors.white.withValues(alpha: 0.95),
-                  ),
+                  // CustomButton(
+                  //   onTap: ()=> AppNavigator.push(),
+                  //   height: AppSize.getHeight(40),
+                  //
+                  //   title: 'organization.home.dashboard.go_to_dashboard'.tr(),
+                  //
+                  //   textSize: AppSize.font(14),
+                  //
+                  //   textColor: AppColors.black,
+                  //
+                  //   bgColor: AppColors.white.withValues(alpha: 0.95),
+                  // ),
                 ],
               ),
             ),

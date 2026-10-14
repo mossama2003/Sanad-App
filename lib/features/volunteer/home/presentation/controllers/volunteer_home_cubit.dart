@@ -71,14 +71,14 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
     final result = await repo.getVolunteerHome();
 
     result.fold(
-          (failure) {
+      (failure) {
         if (home == null) {
           emit(Error());
         }
 
         AppToast.error(failure.errMessage);
       },
-          (data) async {
+      (data) async {
         home = data;
 
         await _homeBox.put('home', data);
@@ -92,10 +92,10 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
     final result = await repo.joinEvent(eventId);
 
     result.fold(
-          (failure) {
+      (failure) {
         AppToast.error(failure.errMessage);
       },
-          (_) async {
+      (_) async {
         _updateEventJoinStatus(eventId, joined: true);
 
         await _saveHomeCache();
@@ -111,10 +111,10 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
     final result = await repo.leaveEvent(eventId);
 
     result.fold(
-          (failure) {
+      (failure) {
         AppToast.error(failure.errMessage);
       },
-          (_) async {
+      (_) async {
         _updateEventJoinStatus(eventId, joined: false);
 
         await _saveHomeCache();
@@ -157,8 +157,8 @@ class VolunteerHomeCubit extends Cubit<VolunteerHomeState> {
 
       spots: joined
           ? event.spots > 0
-          ? event.spots - 1
-          : 0
+                ? event.spots - 1
+                : 0
           : event.spots + 1,
     );
   }

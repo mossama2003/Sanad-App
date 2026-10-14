@@ -20,7 +20,6 @@ class ContactUsCubit extends Cubit<ContactUsState> {
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController messageController = TextEditingController();
@@ -94,28 +93,21 @@ class ContactUsCubit extends Cubit<ContactUsState> {
 
     if (!(formKey.currentState?.validate() ?? false)) return;
 
-    // Ensure a category is selected.
-    if (selectedCategory.value == null ||
-        !categories.contains(selectedCategory.value)) {
+    final subject = selectedCategory.value;
+
+    if (subject == null || !categories.contains(subject)) {
       AppToast.error('shared.contact_us.validation.required'.tr());
       return;
     }
 
     emit(ContactUsLoading());
 
-    final comment =
-        '''
-Name: ${nameController.text.trim()}
-Email: ${emailController.text.trim()}
-Phone: ${phoneController.text.trim()}
-Category: ${selectedCategory.value}
-
-Message:
-${messageController.text.trim()}
-'''
-            .trim();
-
-    final result = await repo.submitContactUs(comment: comment);
+    final result = await repo.submitContactUs(
+      email: emailController.text.trim(),
+      phone: phoneController.text.trim(),
+      subject: subject,
+      comment: messageController.text.trim(),
+    );
 
     if (isClosed) return;
 
@@ -127,7 +119,9 @@ ${messageController.text.trim()}
       (_) {
         clearForm();
         emit(ContactUsSuccess());
+
         AppToast.success('shared.contact_us.success'.tr());
+
         AppNavigator.pop();
       },
     );
@@ -136,7 +130,6 @@ ${messageController.text.trim()}
   // ===================== Clear Form =====================
 
   void clearForm() {
-    nameController.clear();
     emailController.clear();
     phoneController.clear();
     messageController.clear();
@@ -150,7 +143,6 @@ ${messageController.text.trim()}
 
   @override
   Future<void> close() {
-    nameController.dispose();
     emailController.dispose();
     phoneController.dispose();
     messageController.dispose();

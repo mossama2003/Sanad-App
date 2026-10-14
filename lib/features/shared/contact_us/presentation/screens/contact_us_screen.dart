@@ -93,21 +93,6 @@ class _ContactUsViewState extends State<_ContactUsView> {
 
                     SizedBox(height: AppSize.getHeight(22)),
 
-                    // Name
-                    CustomFieldText(
-                      title: 'shared.contact_us.name'.tr(),
-                      hintText: 'shared.contact_us.name_hint'.tr(),
-                      controller: cubit.nameController,
-                      enabled: !isLoading,
-                      keyboardType: TextInputType.name,
-                      isRequired: true,
-                      borderRadius: 15,
-                      padding: AppSize.padding(horizontal: 16, vertical: 17),
-                      validator: cubit.validateRequired,
-                    ),
-
-                    SizedBox(height: AppSize.getHeight(20)),
-
                     // Email
                     CustomFieldText(
                       title: 'shared.contact_us.email'.tr(),

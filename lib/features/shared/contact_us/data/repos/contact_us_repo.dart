@@ -7,5 +7,10 @@ import '../../../../../core/network/remote/api/dio_helper.dart';
 part 'contact_us_repo_impel.dart';
 
 abstract class ContactUsRepo {
-  Future<Either<Failure, void>> submitContactUs({required String comment});
+  Future<Either<Failure, void>> submitContactUs({
+    required String email,
+    required String phone,
+    required String subject,
+    required String comment,
+  });
 }

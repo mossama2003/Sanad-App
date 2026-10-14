@@ -124,8 +124,8 @@ class VolunteerProfileCard extends StatelessWidget {
                       child: Center(
                         child: CustomIcon(
                           icon: item['icon'] as String,
-                          width: AppSize.getWidth(18),
-                          height: AppSize.getHeight(18),
+                          width: AppSize.getWidth(22),
+                          height: AppSize.getHeight(22),
                         ),
                       ),
                     ),

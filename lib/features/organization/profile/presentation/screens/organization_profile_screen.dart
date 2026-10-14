@@ -160,15 +160,15 @@ class OrganizationProfileScreen extends StatelessWidget {
         (profile?.attendeesCount ?? 0).compact,
         'organization.profile.volunteers_engaged'.tr(),
       ),
-      // (
-      //   AppIcons.pound,
-      //   theme.brightness == Brightness.dark
-      //       ? Colors.orange.withValues(alpha: .15)
-      //       : const Color(0xFFFDF1E4),
-      //   const Color(0xFFE8A13D),
-      //   'EGP ${(profile?.donationsRaised ?? 0).compact}',
-      //   'organization.profile.donations_raised'.tr(),
-      // ),
+      (
+        AppIcons.pound,
+        theme.brightness == Brightness.dark
+            ? Colors.orange.withValues(alpha: .15)
+            : const Color(0xFFFDF1E4),
+        const Color(0xFFE8A13D),
+        'EGP ${(profile?.donationsRaised ?? 0).compact}',
+        'organization.profile.donations_raised'.tr(),
+      ),
       (
         AppIcons.fileDone,
         theme.brightness == Brightness.dark
@@ -208,16 +208,69 @@ class OrganizationProfileScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: _statCard(
-            context,
-            stats[2].$1,
-            stats[2].$2,
-            stats[2].$3,
-            stats[2].$4,
-            stats[2].$5,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Stack(
+                  children: [
+                    Opacity(
+                      opacity: 0.65,
+                      child: _statCard(
+                        context,
+                        stats[2].$1,
+                        stats[2].$2,
+                        stats[2].$3,
+                        stats[2].$4,
+                        stats[2].$5,
+                      ),
+                    ),
+
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: CustomPaint(painter: _ComingSoonPainter()),
+                      ),
+                    ),
+
+                    Positioned.fill(
+                      child: Center(
+                        child: Transform.rotate(
+                          angle: -0.45,
+                          child: Container(
+                            width: 220,
+                            padding: const EdgeInsets.symmetric(vertical: 7),
+                            color: Colors.black,
+                            alignment: Alignment.center,
+                            child: const Text(
+                              'COMING SOON',
+                              style: TextStyle(
+                                color: Color(0xFFFFD600),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _statCard(
+                context,
+                stats[3].$1,
+                stats[3].$2,
+                stats[3].$3,
+                stats[3].$4,
+                stats[3].$5,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -541,4 +594,37 @@ class OrganizationProfileScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ComingSoonPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const stripeWidth = 8.0;
+    final paint = Paint()..color = const Color(0xFFFFD600);
+
+    canvas.save();
+
+    canvas.clipRect(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    // Yellow diagonal warning stripes.
+    for (
+      double x = -size.height;
+      x < size.width + size.height;
+      x += stripeWidth * 2
+    ) {
+      final path = Path()
+        ..moveTo(x, 0)
+        ..lineTo(x + stripeWidth, 0)
+        ..lineTo(x + size.height + stripeWidth, size.height)
+        ..lineTo(x + size.height, size.height)
+        ..close();
+
+      canvas.drawPath(path, paint);
+    }
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

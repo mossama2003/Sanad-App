@@ -158,7 +158,7 @@ class DonationsComingSoonScreen extends StatelessWidget {
                         left: 8,
                         right: 8,
                         child: Container(
-                          height: AppSize.getHeight(18),
+                          height: AppSize.getHeight(22),
                           decoration: BoxDecoration(
                             color: const Color(0xFF35B99A),
                             borderRadius: BorderRadius.circular(9),

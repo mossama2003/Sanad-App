@@ -16,13 +16,13 @@ class NotificationsScreen extends StatefulWidget {
 class _NotificationsScreenState extends State<NotificationsScreen> {
   int _selectedTab = 0;
 
-  void _markAllAsRead() {
-    setState(() {
-      for (int i = 0; i < _notifications.length; i++) {
-        _notifications[i] = _notifications[i].copyWith(isRead: true);
-      }
-    });
-  }
+  // void _markAllAsRead() {
+  //   setState(() {
+  //     for (int i = 0; i < _notifications.length; i++) {
+  //       _notifications[i] = _notifications[i].copyWith(isRead: true);
+  //     }
+  //   });
+  // }
 
   final List<NotificationModel> _notifications = [
     NotificationModel(
@@ -117,8 +117,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 color: secondaryColor,
               ),
             ),
-            SizedBox(height: AppSize.getHeight(15)),
-            _MarkAllBanner(onTap: _markAllAsRead),
+            // SizedBox(height: AppSize.getHeight(15)),
+            // _MarkAllBanner(onTap: _markAllAsRead),
             SizedBox(height: AppSize.getHeight(12)),
             _NotifTabBar(
               selected: _selectedTab,
@@ -143,46 +143,46 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 }
 
-class _MarkAllBanner extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _MarkAllBanner({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        margin: AppSize.padding(horizontal: 16),
-        padding: AppSize.padding(vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.check_circle_outline,
-              color: AppColors.primary,
-              size: AppSize.getSize(16),
-            ),
-            SizedBox(width: AppSize.getWidth(6)),
-            Text(
-              'shared.notifications.mark_all_read'.tr(),
-              style: TextStyle(
-                fontSize: AppSize.font(13),
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// class _MarkAllBanner extends StatelessWidget {
+//   final VoidCallback onTap;
+//
+//   const _MarkAllBanner({required this.onTap});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       onTap: onTap,
+//       child: Container(
+//         width: double.infinity,
+//         margin: AppSize.padding(horizontal: 16),
+//         padding: AppSize.padding(vertical: 12),
+//         decoration: BoxDecoration(
+//           color: AppColors.primary.withValues(alpha: 0.1),
+//           borderRadius: BorderRadius.circular(14),
+//         ),
+//         child: Row(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             Icon(
+//               Icons.check_circle_outline,
+//               color: AppColors.primary,
+//               size: AppSize.getSize(16),
+//             ),
+//             SizedBox(width: AppSize.getWidth(6)),
+//             Text(
+//               'shared.notifications.mark_all_read'.tr(),
+//               style: TextStyle(
+//                 fontSize: AppSize.font(13),
+//                 fontWeight: FontWeight.w600,
+//                 color: AppColors.primary,
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class _NotifTabBar extends StatelessWidget {
   final int selected;

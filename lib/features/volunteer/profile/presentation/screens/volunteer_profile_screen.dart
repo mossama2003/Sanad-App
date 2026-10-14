@@ -1,25 +1,25 @@
+import 'package:sanad_app/core/shared/widgets/custom_button.dart';
+import 'package:sanad_app/core/helper/app_navigator.dart';
+import 'package:sanad_app/core/constant/app_size.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sanad_app/core/constant/app_size.dart';
 import 'package:flutter/material.dart';
-import 'package:sanad_app/core/helper/app_navigator.dart';
-import 'package:sanad_app/core/shared/widgets/custom_button.dart';
 
-import '../../../../../core/constant/app_assets.dart';
-import '../../../../../core/helper/app_number_formatter.dart';
-import '../../../../../core/shared/controllers/user/app_cubit.dart';
-import '../../../../../core/style/app_colors.dart';
-import '../../../../shared/auth/data/models/user_profile_model.dart';
 import '../../../../shared/auth/presentation/sign_in/screens/sign_in_screen.dart';
 import '../../../../shared/settings/presentations/screens/settings_screen.dart';
+import '../../../../shared/auth/data/models/user_profile_model.dart';
 import '../../../rewards/presentation/screens/rewards_screen.dart';
-import '../cards/badges_card.dart';
+import '../../../../../core/shared/controllers/user/app_cubit.dart';
 import '../../../../../core/shared/widgets/contact_info_card.dart';
-import '../cards/past_roles_card.dart';
-import '../cards/reliability_score_card.dart';
-import '../cards/stats_card.dart';
+import '../../../../../core/helper/app_number_formatter.dart';
+import '../../../../../core/constant/app_assets.dart';
+import '../../../../../core/style/app_colors.dart';
 import '../cards/volunteer_profile_card.dart';
+import '../cards/reliability_score_card.dart';
+import '../cards/past_roles_card.dart';
+import '../cards/badges_card.dart';
 import '../cards/avatar_card.dart';
+import '../cards/stats_card.dart';
 
 class VolunteerProfileScreen extends StatelessWidget {
   const VolunteerProfileScreen({super.key});
@@ -85,14 +85,13 @@ class VolunteerProfileScreen extends StatelessWidget {
 
                   SizedBox(height: AppSize.getHeight(24)),
 
-                  GestureDetector(
-                    onTap: () =>
-                        AppNavigator.push(const RewardsScreen()),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => AppNavigator.push(RewardsScreen()),
                               child: StatCard(
                                 icon: AppIcons.voltage,
                                 iconColor: const Color(0xFF7B5EA7),
@@ -100,8 +99,11 @@ class VolunteerProfileScreen extends StatelessWidget {
                                 label: 'volunteer.profile.xp'.tr(),
                               ),
                             ),
-                            SizedBox(width: AppSize.getWidth(10)),
-                            Expanded(
+                          ),
+                          SizedBox(width: AppSize.getWidth(10)),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => AppNavigator.push(RewardsScreen()),
                               child: StatCard(
                                 icon: AppIcons.fire,
                                 iconColor: const Color(0xFFFF6B35),
@@ -109,28 +111,81 @@ class VolunteerProfileScreen extends StatelessWidget {
                                 label: 'volunteer.profile.streak'.tr(),
                               ),
                             ),
-                          ],
-                        ),
-                        SizedBox(height: AppSize.getWidth(16)),
-                        SizedBox(
-                          width: double.infinity,
-                          child: StatCard(
-                            icon: AppIcons.calendar,
-                            iconColor: const Color(0xFF2ECFA0),
-                            value: '0',
-                            label: 'volunteer.profile.attended'.tr(),
                           ),
-                        ),
+                        ],
+                      ),
+                      SizedBox(height: AppSize.getWidth(10)),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => AppNavigator.push(RewardsScreen()),
+                              child: StatCard(
+                                icon: AppIcons.calendar,
+                                iconColor: const Color(0xFF2ECFA0),
+                                value: '0',
+                                label: 'volunteer.profile.attended'.tr(),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: AppSize.getWidth(10)),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Stack(
+                                children: [
+                                  Opacity(
+                                    opacity: 0.65,
+                                    child: StatCard(
+                                      icon: AppIcons.donations,
+                                      iconColor: const Color(0xFFE05C5C),
+                                      value: 'EGP 0',
+                                      label: 'volunteer.profile.donations'.tr(),
+                                      smallValue: true,
+                                    ),
+                                  ),
 
-                        // StatCard(
-                        //   icon: AppIcons.donations,
-                        //   iconColor: const Color(0xFFE05C5C),
-                        //   value: 'EGP 0',
-                        //   label: 'volunteer.profile.donations'.tr(),
-                        //   smallValue: true,
-                        // ),
-                      ],
-                    ),
+                                  Positioned.fill(
+                                    child: IgnorePointer(
+                                      child: CustomPaint(
+                                        painter: _DonationComingSoonPainter(),
+                                      ),
+                                    ),
+                                  ),
+
+                                  Positioned.fill(
+                                    child: IgnorePointer(
+                                      child: Center(
+                                        child: Transform.rotate(
+                                          angle: -0.45,
+                                          child: Container(
+                                            width: 180,
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 6,
+                                            ),
+                                            color: Colors.black,
+                                            alignment: Alignment.center,
+                                            child: const Text(
+                                              'COMING SOON',
+                                              style: TextStyle(
+                                                color: Color(0xFFFFD600),
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w900,
+                                                letterSpacing: 1.2,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
 
                   SizedBox(height: AppSize.getHeight(16)),
@@ -179,5 +234,52 @@ class VolunteerProfileScreen extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _DonationComingSoonPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const stripeWidth = 7.0;
+
+    final yellowPaint = Paint()..color = const Color(0xFFFFD600);
+
+    final blackPaint = Paint()..color = Colors.black;
+
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
+
+    // شريط قطري في اتجاه من أعلى اليسار إلى أسفل اليمين.
+    final stripePath = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+
+    canvas.drawPath(stripePath, blackPaint);
+
+    // خطوط صفراء وسوداء مائلة.
+    for (
+      double x = -size.height;
+      x < size.width + size.height;
+      x += stripeWidth * 2
+    ) {
+      final path = Path()
+        ..moveTo(x, 0)
+        ..lineTo(x + stripeWidth, 0)
+        ..lineTo(x + size.height + stripeWidth, size.height)
+        ..lineTo(x + size.height, size.height)
+        ..close();
+
+      canvas.drawPath(path, yellowPaint);
+    }
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _DonationComingSoonPainter oldDelegate) {
+    return false;
   }
 }

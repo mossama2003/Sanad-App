@@ -6,7 +6,6 @@ import 'package:sanad_app/core/constant/app_assets.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../core/constant/app_size.dart';
-import '../../../../../../core/shared/widgets/custom_button.dart';
 import '../../../../../../core/style/app_colors.dart';
 import '../../../../../core/helper/app_number_formatter.dart';
 import '../../../../../core/shared/controllers/user/app_cubit.dart';
@@ -93,6 +92,9 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
           titleSpacing: 0,
         ),
 
+        // ============================================================
+        // Body
+        // ============================================================
         body: SafeArea(
           child: RefreshIndicator(
             color: AppColors.red,
@@ -139,6 +141,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
 
                       Text(
                         'shared.emergency.desc'.tr(),
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: AppSize.font(15),
                           fontWeight: FontWeight.w300,
@@ -151,23 +154,9 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                       SizedBox(height: AppSize.getHeight(15)),
 
                       // ==================================================
-                      // Report Emergency
-                      // Organization Only
+                      // Tabs
                       // ==================================================
                       if (widget.isOrg) ...[
-                        CustomButton(
-                          onTap: _reportEmergency,
-                          title: 'shared.emergency.button'.tr(),
-                          bgColor: AppColors.red,
-                          icon: AppIcons.add,
-                          height: AppSize.getHeight(50),
-                        ),
-
-                        SizedBox(height: AppSize.getHeight(20)),
-
-                        // ==================================================
-                        // Tabs
-                        // ==================================================
                         EmergencyTabSelector(
                           isMySelected: _cubit.isMySelected,
                           myEmergenciesCount: _cubit.myEmergenciesCount,
@@ -188,6 +177,28 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             ),
           ),
         ),
+
+        // ============================================================
+        // Floating Action Button
+        // Organization Only
+        // ============================================================
+        floatingActionButton: widget.isOrg
+            ? FloatingActionButton(
+                heroTag: 'organization_emergency_fab',
+                onPressed: _reportEmergency,
+                backgroundColor: AppColors.red,
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: CustomIcon(
+                  icon: AppIcons.add,
+                  color: AppColors.white,
+                  width: AppSize.getSize(28),
+                  height: AppSize.getSize(28),
+                ),
+              )
+            : null,
       ),
     );
   }

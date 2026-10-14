@@ -57,8 +57,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
-                        onTap: () =>
-                            AppNavigator.push(RewardsScreen()),
+                        onTap: () => AppNavigator.push(RewardsScreen()),
                         child: _buildStatCard(
                           bgColor: AppColors.sportyViolet.withValues(
                             alpha: 0.2,
@@ -75,8 +74,7 @@ class _VolunteerHomeScreenState extends State<VolunteerHomeScreen> {
                       ),
 
                       GestureDetector(
-                        onTap: () =>
-                            AppNavigator.push(RewardsScreen()),
+                        onTap: () => AppNavigator.push(RewardsScreen()),
                         child: _buildStatCard(
                           bgColor: AppColors.brand600.withValues(alpha: 0.2),
                           bgIconColor: AppColors.brand600.withValues(

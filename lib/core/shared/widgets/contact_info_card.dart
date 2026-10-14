@@ -155,8 +155,8 @@ class _ContactRow extends StatelessWidget {
         CustomIcon(
           icon: icon,
           color: AppColors.primary,
-          width: AppSize.getWidth(18),
-          height: AppSize.getHeight(18),
+          width: AppSize.getWidth(22),
+          height: AppSize.getHeight(22),
         ),
 
         SizedBox(width: AppSize.getWidth(10)),
