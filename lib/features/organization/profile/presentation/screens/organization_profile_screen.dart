@@ -66,11 +66,11 @@ class OrganizationProfileScreen extends StatelessWidget {
 
                   SizedBox(height: AppSize.getHeight(16)),
 
-                  _buildOrganizationInfo(context, profile),
+                  _buildStatsGrid(context, profile),
 
                   SizedBox(height: AppSize.getHeight(20)),
 
-                  _buildStatsGrid(context, profile),
+                  _buildOrganizationInfo(context, profile),
 
                   SizedBox(height: AppSize.getHeight(16)),
 

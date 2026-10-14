@@ -465,11 +465,6 @@
       "rewards": "Rewards",
       "events": "Events"
     },
-    "notifications_removed": {
-      "new_badge_earned": "New Badge Earned!",
-      "you_earned_the_social_butterfly_badge": "You earned the Social Butterfly badge",
-      "1h_ago": "1h ago"
-    },
     "badges": {
       "badges": "Badges",
       "earn_badges": "Earn badges by making an impact",

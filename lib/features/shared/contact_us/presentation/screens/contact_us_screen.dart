@@ -9,7 +9,6 @@ import '../../../../../core/constant/app_size.dart';
 import '../../../../../core/shared/widgets/custom_button.dart';
 import '../../../../../core/shared/widgets/custom_field_text.dart';
 import '../../../../../core/style/app_colors.dart';
-import '../../../../../core/validator/app_validators.dart';
 import '../../data/repos/contact_us_repo.dart';
 import '../controllers/contact_us_cubit.dart';
 
@@ -93,41 +92,41 @@ class _ContactUsViewState extends State<_ContactUsView> {
 
                     SizedBox(height: AppSize.getHeight(22)),
 
-                    // Email
-                    CustomFieldText(
-                      title: 'shared.contact_us.email'.tr(),
-                      hintText: 'shared.contact_us.email_hint'.tr(),
-                      controller: cubit.emailController,
-                      enabled: !isLoading,
-                      keyboardType: TextInputType.emailAddress,
-                      isRequired: true,
-                      borderRadius: 15,
-                      padding: AppSize.padding(horizontal: 16, vertical: 17),
-                      validator: cubit.validateEmail,
-                    ),
-
-                    SizedBox(height: AppSize.getHeight(20)),
-
-                    // Phone
-                    CustomFieldText(
-                      controller: cubit.phoneController,
-                      title: 'shared.contact_us.phone'.tr(),
-                      hintText: '1xxxxxxxxx',
-                      enabled: !isLoading,
-                      isRequired: true,
-                      titleSize: AppSize.font(15),
-                      borderRadius: 20,
-                      keyboardType: TextInputType.phone,
-                      prefixText: '+20 ',
-                      validator: AppValidators.egyptianPhoneWithoutZero,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(10),
-                        FilteringTextInputFormatter.deny(RegExp(r'^0')),
-                      ],
-                    ),
-
-                    SizedBox(height: AppSize.getHeight(20)),
+                    // // Email
+                    // CustomFieldText(
+                    //   title: 'shared.contact_us.email'.tr(),
+                    //   hintText: 'shared.contact_us.email_hint'.tr(),
+                    //   controller: cubit.emailController,
+                    //   enabled: !isLoading,
+                    //   keyboardType: TextInputType.emailAddress,
+                    //   isRequired: true,
+                    //   borderRadius: 15,
+                    //   padding: AppSize.padding(horizontal: 16, vertical: 17),
+                    //   validator: cubit.validateEmail,
+                    // ),
+                    //
+                    // SizedBox(height: AppSize.getHeight(20)),
+                    //
+                    // // Phone
+                    // CustomFieldText(
+                    //   controller: cubit.phoneController,
+                    //   title: 'shared.contact_us.phone'.tr(),
+                    //   hintText: '1xxxxxxxxx',
+                    //   enabled: !isLoading,
+                    //   isRequired: true,
+                    //   titleSize: AppSize.font(15),
+                    //   borderRadius: 20,
+                    //   keyboardType: TextInputType.phone,
+                    //   prefixText: '+20 ',
+                    //   validator: AppValidators.egyptianPhoneWithoutZero,
+                    //   inputFormatters: [
+                    //     FilteringTextInputFormatter.digitsOnly,
+                    //     LengthLimitingTextInputFormatter(10),
+                    //     FilteringTextInputFormatter.deny(RegExp(r'^0')),
+                    //   ],
+                    // ),
+                    //
+                    // SizedBox(height: AppSize.getHeight(20)),
 
                     // Category
                     Text(

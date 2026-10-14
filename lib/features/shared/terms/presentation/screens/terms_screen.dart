@@ -13,7 +13,7 @@ class TermsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
+    return BlocProvider<TermsCubit>(
       create: (_) => TermsCubit(TermsRepoImpel())..fetchTerms(),
       child: const _TermsAndConditionsView(),
     );
@@ -21,7 +21,7 @@ class TermsScreen extends StatelessWidget {
 }
 
 class _TermsAndConditionsView extends StatefulWidget {
-  const _TermsAndConditionsView();
+  const _TermsAndConditionsView({super.key});
 
   @override
   State<_TermsAndConditionsView> createState() =>
@@ -36,15 +36,19 @@ class _TermsAndConditionsViewState extends State<_TermsAndConditionsView> {
   void initState() {
     super.initState();
 
-    _cubit = TermsCubit.get(context);
-    _scrollController = ScrollController()..addListener(_handleScroll);
+    _cubit = context.read<TermsCubit>();
+
+    // منع استعادة أي scroll offset قديم وغير صالح.
+    _scrollController = ScrollController(keepScrollOffset: false)
+      ..addListener(_handleScroll);
   }
 
   void _handleScroll() {
     if (!_scrollController.hasClients) return;
 
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
+    final position = _scrollController.position;
+
+    if (position.pixels >= position.maxScrollExtent - 200) {
       _cubit.loadMore();
     }
   }
@@ -98,7 +102,6 @@ class _TermsAndConditionsViewState extends State<_TermsAndConditionsView> {
                   SizedBox(
                     height: 42,
                     child: BlocBuilder<TermsCubit, TermsState>(
-                      bloc: _cubit,
                       builder: (context, state) {
                         final selectedType = _cubit.selectedTermType;
 
@@ -131,10 +134,13 @@ class _TermsAndConditionsViewState extends State<_TermsAndConditionsView> {
             // Terms list
             Expanded(
               child: BlocBuilder<TermsCubit, TermsState>(
-                bloc: _cubit,
                 builder: (context, state) {
                   if (state is TermsLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    );
                   }
 
                   if (state is TermsError) {
@@ -209,7 +215,7 @@ class _TermsAndConditionsViewState extends State<_TermsAndConditionsView> {
                       padding: AppSize.padding(horizontal: 12, vertical: 8),
                       itemCount:
                           state.terms.length + (state.next != null ? 1 : 0),
-                      separatorBuilder: (_, _) =>
+                      separatorBuilder: (_, __) =>
                           SizedBox(height: AppSize.getHeight(12)),
                       itemBuilder: (context, index) {
                         // Load more
@@ -218,7 +224,9 @@ class _TermsAndConditionsViewState extends State<_TermsAndConditionsView> {
                             padding: AppSize.padding(vertical: 16),
                             child: Center(
                               child: state.isLoadingMore
-                                  ? const CircularProgressIndicator()
+                                  ? const CircularProgressIndicator(
+                                      color: AppColors.primary,
+                                    )
                                   : TextButton(
                                       onPressed: _cubit.loadMore,
                                       child: Text(
@@ -231,16 +239,21 @@ class _TermsAndConditionsViewState extends State<_TermsAndConditionsView> {
 
                         final term = state.terms[index];
 
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: theme.cardColor,
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(
-                              color: theme.dividerColor.withValues(alpha: 0.5),
-                            ),
+                        final cardShape = RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          side: BorderSide(
+                            color: theme.dividerColor.withValues(alpha: 0.5),
                           ),
+                        );
+
+                        return Material(
+                          key: ValueKey('term_card_${term.id}'),
+                          color: theme.cardColor,
+                          shape: cardShape,
+                          clipBehavior: Clip.antiAlias,
                           child: ExpansionTile(
-                            key: PageStorageKey('term_${term.id}'),
+                            // Keep expansion state separate from list position.
+                            key: PageStorageKey('terms_expansion_${term.id}'),
                             tilePadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 6,
@@ -251,6 +264,10 @@ class _TermsAndConditionsViewState extends State<_TermsAndConditionsView> {
                               16,
                               18,
                             ),
+                            shape: cardShape,
+                            collapsedShape: cardShape,
+                            backgroundColor: Colors.transparent,
+                            collapsedBackgroundColor: Colors.transparent,
                             leading: Container(
                               width: 42,
                               height: 42,
@@ -283,10 +300,12 @@ class _TermsAndConditionsViewState extends State<_TermsAndConditionsView> {
                             children: [
                               Align(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: SelectableText(
-                                  term.description,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    height: 1.7,
+                                child: SelectionArea(
+                                  child: Text(
+                                    term.description,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      height: 1.7,
+                                    ),
                                   ),
                                 ),
                               ),
